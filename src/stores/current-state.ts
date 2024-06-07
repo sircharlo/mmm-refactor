@@ -1,9 +1,10 @@
 import { defineStore, storeToRefs } from 'pinia';
 import { useCongregationSettingsStore } from 'stores/congregation-settings';
 import { settingsDefinitions } from '../defaults/settings';
+import { date } from 'quasar';
 import { electronApi } from '../helpers/electron-api';
-const { toggleMediaWindow, path, getUserDataPath } = electronApi;
-import { Dark, date } from 'quasar';
+const { path, getUserDataPath } = electronApi;
+
 import { DateInfo } from 'src/types/dates';
 import { SettingsValues } from 'src/types/settings';
 import { DownloadedFile } from 'src/types/media';
@@ -143,15 +144,6 @@ export const useCurrentStateStore = defineStore('current-state', {
       if (!congregation) congregation = this.currentCongregation;
       if (!congregation) return null;
       return congregations.value[congregation][id];
-    },
-    applySettings(congregation: string | number) {
-      console.log('applySettings', congregation);
-      const enableMediaDisplayButton = this.getSettingValue(
-        'enableMediaDisplayButton'
-      );
-      this.mediaPlayer.windowVisible = !!enableMediaDisplayButton;
-      toggleMediaWindow(enableMediaDisplayButton ? 'show' : 'hide');
-      Dark.set(this.getSettingValue('darkMode') as boolean | 'auto');
     },
   },
 });

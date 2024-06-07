@@ -79,12 +79,13 @@
       </q-toolbar>
     </q-header>
 
-    <q-footer v-if="currentSettings?.enableMediaDisplayButton">
+    <q-footer v-if="currentSettings?.enableMediaDisplayButton || currentSettings?.enableMusicButton">
       <q-toolbar class="bg-blue-3 text-grey-9">
         <q-space />
         <ScenePicker />
         <MusicButton />
-        <q-separator vertical inset />
+        <q-separator vertical inset
+          v-if="currentSettings?.enableMediaDisplayButton && currentSettings?.enableMusicButton" />
         <MediaDisplayButton />
       </q-toolbar>
     </q-footer>
@@ -148,18 +149,19 @@ import { storeToRefs } from 'pinia';
 
 import { useCurrentStateStore } from 'stores/current-state';
 const currentState = useCurrentStateStore();
-const { applySettings, invalidSettings } = currentState;
+const { invalidSettings } = currentState;
 const {
   currentCongregation,
   selectedDate,
   lookupPeriod,
   mediaPlaying,
+  mediaPlayer,
 } = storeToRefs(currentState);
 
 import { useCongregationSettingsStore } from 'stores/congregation-settings';
 const congregationSettings = useCongregationSettingsStore();
 
-import { LocalStorage, date } from 'quasar';
+import { Dark, LocalStorage, date } from 'quasar';
 
 congregationSettings.$subscribe((_, state) => {
   LocalStorage.set('congregations', state.congregations);
@@ -184,9 +186,14 @@ const { updateJwLanguages } = jwStore;
 const chooseSong = ref(false);
 
 const mediaSortForDay = ref(true);
+import { electronApi } from '../helpers/electron-api';
+import { useI18n } from 'vue-i18n';
+const { toggleMediaWindow } = electronApi;
+
 
 export default {
   setup() {
+    const { locale } = useI18n({ useScope: 'global' })
     const drawer = ref(true);
     updateJwLanguages();
     const { currentSettings } = storeToRefs(currentState);
@@ -199,6 +206,25 @@ export default {
         ? currentSettings.value['congregationName']
         : 'Profile selection';
     });
+
+    const applySettings = () => {
+      console.log('applySettings');
+
+      // Media Window
+      const enableMediaDisplayButton = currentSettings.value?.enableMediaDisplayButton;
+      mediaPlayer.value.windowVisible = !!enableMediaDisplayButton;
+      toggleMediaWindow(enableMediaDisplayButton ? 'show' : 'hide');
+
+      // Dark Mode
+      Dark.set(currentSettings.value?.darkMode as boolean | 'auto');
+
+      // I18n
+      const currentLanguage = currentSettings.value?.localAppLang as string;
+      if (currentLanguage) {
+        // date.setLocale(currentLanguage);
+        locale.value = currentLanguage
+      }
+    }
     watch(currentCongregation, () => {
       console.log('currentCongregation changed', currentCongregation.value);
       downloadBackgroundMusic();
@@ -206,7 +232,7 @@ export default {
     watch(
       () => currentSettings.value,
       (newVal) => {
-        applySettings(currentCongregation.value);
+        applySettings();
         lookupPeriod.value = getLookupPeriod();
         if (!currentCongregation.value && route.fullPath !== '/congregation-selector') {
           router.push({ path: '/congregation-selector' });

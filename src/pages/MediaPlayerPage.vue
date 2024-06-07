@@ -1,7 +1,5 @@
 <template>
   {{ mediaPlayer }}
-  <!-- <pre>{{ selectedDate }} - {{ customDuration }}</pre>
-  <pre>{{ customDurations[currentCongregation][selectedDate] }}</pre> -->
   <q-page-container padding class="q-electron-drag vertical-middle overflow-hidden"
     style="align-content: center; height: 100vh;">
     <q-resize-observer @resize="onResize" debounce="50" />
@@ -13,14 +11,13 @@
         v-else-if="isVideo(mediaPlayer.url)">
         <source ref="mediaElementSource" :src="mediaPlayer.url" />
       </video>
-      <!-- eslint-disable -->
       <div v-else>
         <audio style="display: none;" ref="mediaElement" v-if="isAudio(mediaPlayer.url)" @loadedmetadata="playMedia()">
           <source ref="mediaElementSource" :src="mediaPlayer.url" />
         </audio>
-        <div class="q-pa-md center" id="yeartext" v-html="yeartext" />
-        <!-- eslint-enable -->
-        <div id="yeartextLogoContainer">
+        <div class="q-pa-md center" id="yeartext"
+          v-html="(yeartexts[new Date().getFullYear()] && yeartexts[new Date().getFullYear()][currentSettings?.lang]) ?? ''" />
+        <div id="yeartextLogoContainer" v-if="!currentSettings?.hideMediaLogo">
           <p id="yeartextLogo"></p>
         </div>
       </div>
@@ -45,20 +42,7 @@ const { yeartexts, customDurations } = storeToRefs(jwStore);
 
 import { isAudio, isImage, isVideo } from 'src/helpers/mediaPlayback';
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
-import { SettingsValues } from 'src/types/settings';
 
-
-const yeartext: Ref<string> = ref('')
-watch(currentSettings, (newVal: SettingsValues) => {
-  const lang = newVal?.lang as string
-  const year = new Date().getFullYear()
-  yeartext.value = yeartexts.value[year][lang]
-})
-watch(yeartexts, (newVal) => {
-  const lang = currentSettings.value.lang as string
-  const year = new Date().getFullYear()
-  yeartext.value = newVal[year][lang]
-})
 
 const panzoom: Ref<PanzoomObject | undefined> = ref()
 
@@ -129,7 +113,7 @@ export default defineComponent({
       mediaElement,
       mediaImage,
       initiatePanzoom,
-      yeartext,
+      yeartexts,
       isImage,
       isVideo,
       isAudio,

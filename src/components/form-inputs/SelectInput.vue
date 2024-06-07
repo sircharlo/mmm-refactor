@@ -1,13 +1,19 @@
 <template>
-  <q-select emit-value map-options filled v-model="localValue" :use-input="useInput" input-debounce="0" clearable
-    @filter="filterFn" :options="getListOptions(options)" dense :label="label">
-  </q-select>
+    <q-select emit-value map-options filled v-model="localValue" :use-input="useInput" input-debounce="0"
+      :hide-selected="useInput" :fill-input="useInput" @filter="filterFn"
+      :options="(getListOptions(options) as Array<{ value: string, label: string }>)?.map(option => {
+    return {
+      value: option.value,
+      label: $t(option.label)
+    }
+    }) " dense
+      v-bind="{ label: label || undefined }">
+    </q-select>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent, ref, watch } from 'vue';
 import { getListOptions, filterFn } from 'src/helpers/settings';
-
 export default defineComponent({
   name: 'SelectInput',
   props: {

@@ -1,5 +1,6 @@
 <template>
-  <q-input :rules="getRules(rules)" dense filled v-model="localValue" class="q-pb-none" />
+  <q-input :rules="getRules(rules)" dense filled v-model="localValue" class="q-pb-none"
+    v-bind="{ label: label || undefined }" />
 </template>
 
 <script>
@@ -20,6 +21,10 @@ export default defineComponent({
     actions: {
       type: Array,
       default: () => [],
+    },
+    label: {
+      type: String,
+      default: null,
     },
   },
   emits: ['update:modelValue'],

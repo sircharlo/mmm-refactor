@@ -13,6 +13,7 @@ const { nonMediaScenes, nonStageScenes, scenes } = storeToRefs(obsState)
 
 
 import { obsConnect } from 'src/helpers/obs';
+import { localeOptions } from 'src/i18n';
 
 const requiredRule: ValidationRule = (val: string) =>
   (val && val.length > 0) || 'Required';
@@ -105,11 +106,13 @@ const getListOptions = (list: string | undefined) => {
     return filteredJwLanguages.value.map((language) => {
       return { label: language.name, value: language.langcode };
     });
+  } else if (list === 'appLanguages') {
+    return localeOptions;
   } else if (list == 'darkModes') {
     return [
-      { label: 'Automatic', value: 'auto' },
-      { label: 'Dark', value: true },
-      { label: 'Light', value: false },
+      { label: 'automatic', value: 'auto' },
+      { label: 'dark', value: true },
+      { label: 'light', value: false },
     ];
   } else if (list == 'resolutions') {
     return [

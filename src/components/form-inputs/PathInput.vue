@@ -1,6 +1,6 @@
 <template>
   <q-input @click="localValue = getFolderPath()" :rules="rules" dense filled v-model="localValue" readonly
-    class="q-pb-none">
+    v-bind="{ label: label || undefined }" class="q-pb-none">
     <template v-slot:append>
       <q-icon name="mdi-folder" />
     </template>
@@ -21,6 +21,10 @@ export default defineComponent({
     rules: {
       type: Array,
       default: () => [],
+    },
+    label: {
+      type: String,
+      default: null,
     },
   },
   emits: ['update:modelValue'],

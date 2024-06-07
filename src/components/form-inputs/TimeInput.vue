@@ -1,5 +1,6 @@
 <template>
-  <q-input filled v-model="localValue" mask="time" :rules="getRules(rules)" class="q-pb-none" dense readonly>
+  <q-input filled v-model="localValue" mask="time" :rules="getRules(rules)" class="q-pb-none" dense readonly
+    v-bind="{ label: label || undefined }">
     <q-popup-proxy breakpoint="1000" transition-show="scale" transition-hide="scale">
       <q-time format24h v-model="localValue" :options="getTimeOptions(options)">
         <div class="row items-center justify-end">
@@ -29,6 +30,10 @@ export default defineComponent({
     options: {
       type: Array as () => Array<string>,
       default: () => [],
+    },
+    label: {
+      type: String,
+      default: null,
     },
   },
   emits: ['update:modelValue'],

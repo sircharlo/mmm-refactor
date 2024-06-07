@@ -1,5 +1,5 @@
 <template>
-  <q-btn icon="mdi-music" @click="musicPopup = false" :label="musicPlaying ? musicRemainingTime : ''" :flat="!disabled"
+  <q-btn icon="mdi-music" v-if="currentSettings?.enableMusicButton" @click="musicPopup = false" :label="musicPlaying ? musicRemainingTime : ''" :flat="!disabled"
     :outline="disabled" :disable="disabled">
     <q-tooltip v-if="!disabled && !musicPopup">
       Background music
@@ -36,7 +36,7 @@ import { isMeetingDay, isWeMeetingDay } from 'src/helpers/date';
 import { date } from 'quasar';
 import klawSync from 'klaw-sync';
 const currentState = useCurrentStateStore();
-const { mediaPlaying } = storeToRefs(currentState);
+const { mediaPlaying, currentSettings } = storeToRefs(currentState);
 const { getSettingValue } = currentState
 
 const musicPlayer: Ref<HTMLAudioElement | undefined> = ref();
@@ -129,7 +129,8 @@ export default defineComponent({
       stopMusic,
       musicPlayer,
       musicPlayerSource,
-      mediaPlaying
+      mediaPlaying,
+      currentSettings
     };
   },
 });

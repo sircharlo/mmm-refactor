@@ -12,14 +12,19 @@
           <template
             v-for="[settingId, item] in Object.entries(settingsDefinitions).filter(([settingId, item]) => item.group === groupId)"
             :key="settingId">
-            <q-item :inset-level="item.subgroup ? 1 : 0" :class="invalidSettings.includes(settingId) ? 'q-py-lg' : ''"
-              v-if="!onlyShowInvalid || !invalidSettingsLength || invalidSettings.includes(settingId)">
-              <q-item-section class="col-2">
-                {{ item.name }}
+            <q-item :class="{
+              'q-py-lg': invalidSettings.includes(settingId),
+              'bg-grey-8': item.subgroup && $q.dark.isActive,
+              'bg-grey-3': item.subgroup && !$q.dark.isActive
+            }"
+              v-if="(!item.subgroup || currentSettings[item.subgroup]) && (!onlyShowInvalid || !invalidSettingsLength || invalidSettings.includes(settingId))">
+              <q-item-section class="col-4">
+                {{ $t(settingId) }}
               </q-item-section>
               <q-item-section>
                 <!-- <pre>{{ item }}</pre> -->
-                <ToggleInput v-if="item.type === 'toggle'" v-model="currentSettings[settingId]" :actions="item.actions" />
+                <ToggleInput v-if="item.type === 'toggle'" v-model="currentSettings[settingId]"
+                  :actions="item.actions" />
                 <TextInput v-else-if="item.type === 'text'" :rules="item.rules" :actions="item.actions"
                   v-model="currentSettings[settingId]" />
                 <SliderInput v-else-if="item.type === 'slider'" :max="item.max" :min="item.min" :step="item.step"
@@ -30,7 +35,7 @@
                   v-model="currentSettings[settingId]" />
                 <PathInput v-else-if="item.type === 'path'" v-model="currentSettings[settingId]" />
                 <SelectInput v-else-if="item.type === 'list'" v-model="currentSettings[settingId]"
-                  :use-input="settingId.toLowerCase().includes('lang')" :options="item.list" />
+                  :use-input="settingId === 'lang'" :options="item.list" />
                 <pre v-else>{{ item }}</pre>
               </q-item-section>
             </q-item>

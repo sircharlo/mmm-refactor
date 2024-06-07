@@ -143,9 +143,10 @@ let fileDownloadNotification: typeof Notify.create | undefined = undefined;
 
 watch(downloadProgress, () => {
   const downloadProgressSize = Object.keys(downloadProgress.value).length;
-  const nonCompleteUrls = Object.keys(nonCompleteItems.value);
-  const nonCompleteCount = nonCompleteUrls.length;
+  console.log('downloadProgressSize', downloadProgressSize);
   if (downloadProgressSize > 0) {
+    const nonCompleteUrls = Object.keys(nonCompleteItems.value);
+    const nonCompleteCount = nonCompleteUrls.length;
     const percent = totalDownloadProgress.value.percentage;
     const notificationOptions = {
       message: nonCompleteCount === 1 ? path.basename(nonCompleteUrls[0]) : 'Downloading files',

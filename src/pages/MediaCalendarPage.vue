@@ -7,7 +7,7 @@
         <template v-slot:avatar>
           <q-icon name="mdi-exclamation-thick" />
         </template>
-        There are no media items for the selected date. Use the <strong>Import media</strong> menu to add some.
+        {{ $t('noMedia') }}
       </q-banner>
 
       <template v-else v-for="media in sortableMediaItems" :key="media.uniqueId">
@@ -78,12 +78,13 @@
                                 " />
                         </q-card-section>
                         <q-card-section class="q-px-sm q-pt-lg">
-                          <q-btn round color="negative" icon="fas fa-arrows-rotate" size="sm"
+                          <q-btn round color="negative" :label="$t('videoTimeReset')" size="sm"
                             @click="resetMediaDuration(media)" />
                         </q-card-section>
                       </q-card-section>
                       <q-card-actions align="right">
-                        <q-btn flat label="OK" color="primary" @click="mediaDurationPopups[media.uniqueId] = false" />
+                        <q-btn flat :label="$t('videoTimeSave')" color="primary"
+                          @click="mediaDurationPopups[media.uniqueId] = false" />
                       </q-card-actions>
                     </q-card>
                   </q-dialog>
@@ -151,10 +152,10 @@
                           max: media.duration
                         };
                           customDurations[currentCongregation][selectedDate][media.uniqueId].min = (marker.StartTimeTicks / 10000 / 1000);
-                        customDurations[currentCongregation][selectedDate][media.uniqueId].max = (marker.StartTimeTicks + marker.DurationTicks - marker.EndTransitionDurationTicks) / 10000 / 1000;
-                        mediaPlayer.action = 'play'; mediaPlayer.url = media.fileUrl;
-                        mediaPlayer.uniqueId = media.uniqueId;
-                        " :disable="mediaPlayer.url !== '' && isVideo(mediaPlayer.url)">
+                          customDurations[currentCongregation][selectedDate][media.uniqueId].max = (marker.StartTimeTicks + marker.DurationTicks - marker.EndTransitionDurationTicks) / 10000 / 1000;
+                          mediaPlayer.action = 'play'; mediaPlayer.url = media.fileUrl;
+                          mediaPlayer.uniqueId = media.uniqueId;
+                          " :disable="mediaPlayer.url !== '' && isVideo(mediaPlayer.url)">
                           <q-item-section>{{ marker.Label }}</q-item-section>
                         </q-item>
                       </q-list>
@@ -577,16 +578,15 @@ export default defineComponent({
     onMounted(() => {
       watch(selectedDate, (newVal) => {
         console.log('selectedDate changed', newVal)
-        if (!currentCongregation.value) return;
-        if (!customDurations.value[currentCongregation.value])
-          customDurations.value[currentCongregation.value] = {};
-        if (!customDurations.value[currentCongregation.value][selectedDate.value])
-          customDurations.value[currentCongregation.value][newVal] = {};
+        const congregation = currentCongregation.value;
+        if (!congregation) return;
+        const durations = customDurations.value[congregation] ||= {};
+        durations[newVal] ||= {};
       });
 
       selectedDate.value = date.formatDate(
         lookupPeriod.value
-          .filter((day) => day.meeting)
+          .filter((day: { meeting: boolean; }) => day.meeting)
           .map((day) => day.date)[0],
         'YYYY/MM/DD'
       );

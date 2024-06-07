@@ -1,5 +1,5 @@
 <template>
-  <q-btn :icon="mediaPlayer.windowVisible ? 'mdi-television' : 'mdi-television-off'" @click="mediaDisplayPopup = false" :flat="!disabled" :outline="disabled"
+  <q-btn v-if="currentSettings?.enableMediaDisplayButton" :icon="mediaPlayer.windowVisible ? 'mdi-television' : 'mdi-television-off'" @click="mediaDisplayPopup = false" :flat="!disabled" :outline="disabled"
     :disable="disabled" :color="mediaPlayer.windowVisible ? '' : 'red-5'">
     <q-tooltip v-if="!disabled && !mediaDisplayPopup" anchor="bottom left" self="top left">
       Media display
@@ -30,7 +30,7 @@ import { electronApi } from 'src/helpers/electron-api';
 import { useCurrentStateStore } from 'stores/current-state';
 import { storeToRefs } from 'pinia';
 const currentState = useCurrentStateStore();
-const { mediaPlayer } = storeToRefs(currentState);
+const { mediaPlayer, currentSettings } = storeToRefs(currentState);
 
 const { toggleMediaWindow } = electronApi;
 const mediaDisplayPopup = ref();
@@ -52,7 +52,8 @@ export default defineComponent({
     return {
       mediaDisplayPopup,
       showMediaWindow,
-      mediaPlayer
+      mediaPlayer,
+      currentSettings
     };
   },
 });
