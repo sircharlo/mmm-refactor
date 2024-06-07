@@ -1,0 +1,177 @@
+import {
+  app,
+  BrowserWindow,
+  Menu,
+  session,
+} from 'electron';
+import { initialize, enable } from '@electron/remote/main';
+import path from 'path';
+import os from 'os';
+
+initialize();
+
+// needed in case process is undefined under Linux
+const platform = process.platform || os.platform();
+let mainWindow: BrowserWindow | null | undefined;
+let mediaWindow: BrowserWindow | null | undefined;
+
+function createMediaWindow() {
+  const window = new BrowserWindow({
+    title: 'Media Window',
+    // roundedCorners: windowOpts.fullscreen,
+    fullscreen: false,
+    x: 50,
+    y: 50,
+    alwaysOnTop: true,
+    backgroundColor: 'black',
+    width: 1280,
+    height: 720,
+    minHeight: 110,
+    minWidth: 195,
+    frame: false,
+    thickFrame: false,
+    webPreferences: {
+      backgroundThrottling: false,
+      nodeIntegration: true,
+      webSecurity: false,
+      sandbox: false,
+      // More info: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/electron-preload-script
+      preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD),
+    },
+    show: false,
+  });
+
+  window.setAspectRatio(16 / 9);
+  if (platform !== 'darwin') {
+    // window.setAlwaysOnTop(true, 'screen-saver');
+    window.setMenuBarVisibility(false);
+  }
+  window.loadURL('/media');
+  if (process.env.DEBUGGING) {
+    window.webContents.openDevTools();
+  } else {
+    window.webContents.on('devtools-opened', () => {
+      mainWindow?.webContents.closeDevTools();
+    });
+  }
+
+  return window;
+}
+
+function createWindow() {
+  session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+    const parsedUrl = new URL(details.url);
+    if (
+      parsedUrl.hostname.includes('jw.org') ||
+      parsedUrl.hostname.includes('jw-cdn.org') ||
+      parsedUrl.hostname.includes('akamaihd') ||
+      parsedUrl.hostname.includes('cloudfront.net')
+    ) {
+      if (details.requestHeaders) {
+        const baseUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}/`;
+        details.requestHeaders.Referer = baseUrl;
+        details.requestHeaders.Origin = baseUrl;
+        details.requestHeaders['User-Agent'] = details.requestHeaders[
+          'User-Agent'
+        ].replace('Electron', '');
+      }
+    }
+    callback({ requestHeaders: details.requestHeaders });
+  });
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    const parsedUrl = new URL(details.url);
+    if (
+      parsedUrl.hostname.includes('jw.org') ||
+      parsedUrl.hostname.includes('jw-cdn.org') ||
+      parsedUrl.hostname.includes('akamaihd') ||
+      parsedUrl.hostname.includes('cloudfront.net')
+    ) {
+      if (details.responseHeaders) {
+        if (
+          !details.responseHeaders['access-control-allow-origin'] ||
+          !details.responseHeaders['access-control-allow-origin'].includes('*')
+        ) {
+          details.responseHeaders['access-control-allow-origin'] = ['*'];
+          details.responseHeaders['access-control-allow-credentials'] = [
+            'true',
+          ];
+        }
+      }
+    }
+    callback({ responseHeaders: details.responseHeaders });
+  });
+  /**
+   * Initial window options
+   */
+  mainWindow = new BrowserWindow({
+    icon: path.resolve(__dirname, 'icons/icon.png'), // tray icon
+    width: 1000,
+    height: 600,
+    // backgroundColor: 'black',
+    useContentSize: true,
+    webPreferences: {
+      backgroundThrottling: false,
+      nodeIntegration: true,
+      webSecurity: false,
+      sandbox: false,
+      preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD),
+    },
+  });
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate([]));
+
+
+  enable(mainWindow.webContents);
+  mainWindow.webContents.setUserAgent(
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+  );
+  mainWindow.loadURL(process.env.APP_URL);
+
+  if (process.env.DEBUGGING) {
+    mainWindow.webContents.openDevTools();
+  } else {
+    mainWindow.webContents.on('devtools-opened', () => {
+      mainWindow?.webContents.closeDevTools();
+    });
+  }
+
+  mainWindow.on('closed', () => {
+    mainWindow = undefined;
+  });
+  mediaWindow?.on('closed', () => {
+    mediaWindow = undefined;
+  });
+
+  mainWindow.on('close', () => {
+    mediaWindow?.close();
+  });
+
+  if (mediaWindow) {
+  } else {
+    mediaWindow = createMediaWindow();
+    mediaWindow.on('close', (/* e */) => {
+      // if (!authorizedCloseMediaWin) e.preventDefault();
+      // e.preventDefault();
+    });
+    const mediaUrl = new URL(
+      path.posix.join(process.env.APP_URL, '#', 'media-player')
+    );
+    enable(mediaWindow.webContents);
+    mediaWindow.loadURL(mediaUrl.toString());
+    mainWindow?.webContents.send('mediaWindowShown');
+  }
+}
+
+app.whenReady().then(createWindow);
+
+app.on('window-all-closed', () => {
+  if (platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+app.on('activate', () => {
+  if (mainWindow === undefined) {
+    createWindow();
+  }
+});

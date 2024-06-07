@@ -1,0 +1,59 @@
+// app global css in SCSS form
+
+.fitSnugly {
+  width: 100vw;
+  height: 100vh;
+}
+
+@font-face {
+  font-family: 'WT-ClearText-Bold';
+  src: url('https://b.jw-cdn.org/fonts/wt-clear-text/1.019/Wt-ClearText-Bold.woff2');
+}
+@font-face {
+  font-family: 'JW-Icons';
+  src: url('https://wol.jw.org/assets/fonts/jw-icons-external-1970474.woff');
+}
+#yeartext {
+  font-family: 'WT-ClearText-Bold', 'NotoSerif', serif;
+  align-content: center;
+  text-align: center;
+  color: white !important;
+  font-size: 4vw;
+  line-height: 2vw;
+  font-weight: 800;
+  margin: auto;
+  bottom: 0;
+  right: 0;
+  letter-spacing: 0.05rem;
+}
+
+.themeScrp {
+  margin: 1em;
+}
+
+.themeScrp a {
+  color: white;
+  text-decoration: none;
+  outline: 0;
+  pointer-events: none;
+}
+
+#yeartextLogoContainer {
+  font-size: 16vh;
+  position: absolute;
+  bottom: 12vh;
+  right: 14vh;
+  color: black !important;
+  line-height: normal !important;
+  box-sizing: unset;
+  background: rgba(255, 255, 255, 0.2);
+  border: rgba(255, 255, 255, 0) 1.5vh solid;
+  height: 12vh;
+  width: 12vh;
+  overflow: hidden;
+  font-family: "JW-Icons";
+
+  #yeartextLogo {
+    margin: -2.5vh -2vh;
+  }
+}
