@@ -1,5 +1,5 @@
-import enUS from './en-US';
-import frCA from './fr-CA';
+import enUS from './en-US/index.json';
+import frCA from './fr-CA/index.json';
 
 export const localeOptions = [
   { value: 'en-US', label: 'English (United States)' },

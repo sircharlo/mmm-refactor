@@ -4,7 +4,7 @@
       :options="(getListOptions(options) as Array<{ value: string, label: string }>)?.map(option => {
     return {
       value: option.value,
-      label: $t(option.label)
+      label: (options === 'jwLanguages' || options?.startsWith('obs')) ? option.label : $t(option.label)
     }
     }) " dense
       v-bind="{ label: label || undefined }">

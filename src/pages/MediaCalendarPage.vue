@@ -207,7 +207,7 @@
             </div>
           </q-item-section>
         </q-item>
-        <q-item>
+        <q-item v-if="media.markers && media.markers.length > 0">
           <q-markup-table>
             <q-tr>
               <q-th>Start</q-th>

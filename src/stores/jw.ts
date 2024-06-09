@@ -99,6 +99,9 @@ export const useJwStore = defineStore('jw-store', {
           langwritten,
         } as PublicationFetcher
         const pubMediaLinks = await getPubMediaLinks(songbook)
+        if (!pubMediaLinks) {
+          return []
+        }
         songbook.fileformat = Object.keys(pubMediaLinks.files[songbook.langwritten])
           .sort()
           .pop();

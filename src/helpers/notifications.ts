@@ -1,11 +1,16 @@
-import { Notify, QNotifyUpdateOptions } from 'quasar';
+import { Notify, QNotifyCreateOptions, QNotifyUpdateOptions } from 'quasar';
+// import { i18n } from 'src/boot/i18n';
+// const global = i18n.global;
+// const {tm} = global
+
 
 const createTemporaryNotification = ({
   message,
   caption,
   icon,
-  type
-}: QNotifyUpdateOptions) => {
+  type,
+  group
+}: QNotifyCreateOptions) => {
   return Notify.create({
     group: false,
     timeout: 2000,
@@ -13,6 +18,7 @@ const createTemporaryNotification = ({
     ...(caption && { caption }),
     ...(type && { type }),
     ...(icon && { icon }),
+    ...(group && { group }),
   });
 };
 const createUpdatableNotification = ({
@@ -23,7 +29,7 @@ const createUpdatableNotification = ({
   type,
   progress,
   onDismiss
-}: QNotifyUpdateOptions) => {
+}: QNotifyCreateOptions) => {
   return Notify.create({
     group: false,
     timeout: 0, // we want to be in control when it gets dismissed

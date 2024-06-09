@@ -4,9 +4,9 @@
       <q-badge color="negative" v-if="invalidSettingsLength">
         <q-toggle color="white" label="Only show settings that are not valid" v-model="onlyShowInvalid"> </q-toggle>
       </q-badge>
-      {{ currentSettings }}
+      <!-- {{ currentSettings }} -->
       <template v-for="[groupId, { name, description }] in Object.entries(settingsGroups)" :key="groupId">
-        <q-expansion-item expand-separator icon="mdi-home-account" :label="name" :caption="description"
+        <q-expansion-item expand-separator icon="mdi-home-account" :label="$t(name)" :caption="$t(description)"
           v-model="expansionState[groupId]"
           v-if="!invalidSettingsLength || !onlyShowInvalid || Object.entries(settingsDefinitions).filter(([settingId, item]) => item.group === groupId).map(([settingId, _]) => settingId).some(settingId => invalidSettings.includes(settingId))">
           <template

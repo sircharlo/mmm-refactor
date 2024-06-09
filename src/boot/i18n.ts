@@ -21,8 +21,10 @@ declare module 'vue-i18n' {
 }
 /* eslint-enable @typescript-eslint/no-empty-interface */
 
+let i18n: ReturnType<typeof createI18n> = createI18n({});
+
 export default boot(({ app }) => {
-  const i18n = createI18n({
+  i18n = createI18n({
     locale: 'en-US',
     legacy: false,
     messages,
@@ -31,3 +33,5 @@ export default boot(({ app }) => {
   // Set i18n instance on app
   app.use(i18n);
 });
+
+export { i18n };

@@ -22,11 +22,11 @@ import {
 import { electronApi } from 'src/helpers/electron-api';
 import {
   DatedTextItem,
-  DocumentItem,
+  // DocumentItem,
   MultimediaExtractItem,
   MultimediaItem,
   MultimediaItemsFetcher,
-  PublicationIssuePropertyItem,
+  // PublicationIssuePropertyItem,
   PublicationItem,
   // PublicationItem,
   TableItem,
@@ -143,7 +143,6 @@ let fileDownloadNotification: typeof Notify.create | undefined = undefined;
 
 watch(downloadProgress, () => {
   const downloadProgressSize = Object.keys(downloadProgress.value).length;
-  console.log('downloadProgressSize', downloadProgressSize);
   if (downloadProgressSize > 0) {
     const nonCompleteUrls = Object.keys(nonCompleteItems.value);
     const nonCompleteCount = nonCompleteUrls.length;
@@ -245,8 +244,6 @@ const getMultimediaMepsLangs = (source: MultimediaItemsFetcher) => {
 }
 
 const getMediaVideoMarkers = (source: MultimediaItemsFetcher, mediaId: number) => {
-  console.log(source.db,
-    `SELECT * from VideoMarker WHERE MultimediaId = ${mediaId} ORDER by StartTimeTicks`)
   const mediaVideoMarkers = (
     executeQuery(
       source.db,
@@ -328,7 +325,6 @@ const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
   if (suppressZoomExists) {
     where += ' AND Multimedia.SuppressZoom <> 1';
   }
-  console.log(source, select + from + where + groupAndSort);
   const items = executeQuery(
     source.db,
     `${select} ${from} ${where} ${groupAndSort}`
@@ -357,7 +353,7 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
       ? "AND NOT UniqueEnglishSymbol = 'th' "
       : ''
     }
-    ORDER BY DocumentExtract.BeginParagraphOrdinal`
+      ORDER BY DocumentExtract.BeginParagraphOrdinal`
   ) as MultimediaExtractItem[];
 
   // AND NOT RefPublication.PublicationCategorySymbol = 'web'
@@ -383,7 +379,6 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
       : extract.UniqueEnglishSymbol.replace(/\d/g, '');
 
     if (symbol === 'snnw') return []; // That's the "old new songs" songbook; we don't need images from that
-    console.log('lsq debug', symbol, (getSettingValue('lang') as string), extract.Lang, (getSettingValue('lang') as string) || extract.Lang);
     let extractLang = extract.Lang ?? (getSettingValue('lang') as string);
     let extractDb = await getDbFromJWPUB({
       pub: symbol,
@@ -570,16 +565,16 @@ const getWeMedia = async (lookupDate: Date) => {
       console.error('No suitable db or docid found');
       return [];
     }
-    const magazine = executeQuery(
-      db,
-      'SELECT Title FROM PublicationIssueProperty LIMIT 1'
-    )[0] as PublicationIssuePropertyItem;
-    const article = executeQuery(
-      db,
-      `SELECT Title FROM Document WHERE DocumentId = ${docId}`
-    )[0] as DocumentItem;
-    const displayTitle = `${magazine.Title} - ${article.Title}`;
-    console.log('displayTitle', displayTitle);
+    // const magazine = executeQuery(
+    //   db,
+    //   'SELECT Title FROM PublicationIssueProperty LIMIT 1'
+    // )[0] as PublicationIssuePropertyItem;
+    // const article = executeQuery(
+    //   db,
+    //   `SELECT Title FROM Document WHERE DocumentId = ${docId}`
+    // )[0] as DocumentItem;
+    // const displayTitle = `${magazine.Title} - ${article.Title}`;
+    // console.log('displayTitle', displayTitle);
 
     const videos = executeQuery(
       db,
@@ -725,7 +720,6 @@ const getWeMedia = async (lookupDate: Date) => {
       if (videoMarkers) media.VideoMarkers = videoMarkers;
     }
 
-
     await processMissingMediaInfo(allMedia);
 
     const dynamicMediaForDay = await dynamicMediaMapper(allMedia, lookupDate);
@@ -783,7 +777,15 @@ const getMwMedia = async (lookupDate: Date) => {
       langwritten: getSettingValue('lang') as string,
     };
     const db = await getDbFromJWPUB(publication);
-    if (!db) throw new Error('No db found');
+    if (!db) {
+      createTemporaryNotification({
+        message: 'error.downloadMedia',
+        caption: 'mwMeeting',
+        type: 'negative',
+        group: 'error.downloadMedia.mwMeeting',
+      })
+      throw new Error('No db found');
+    }
     const docId = (
       executeQuery(
         db,
@@ -915,7 +917,7 @@ const getPubMediaLinks = async (publication: PublicationFetcher) => {
   if (!publication.fileformat) publication.fileformat = '';
   if (publication.pub === 'sjjm') {
     publication.pub = currentSongbook.value.pub;
-    publication.fileformat = currentSongbook.value.fileformat;
+    // publication.fileformat = currentSongbook.value.fileformat;
   }
   publication.fileformat = publication.fileformat.toUpperCase();
   const params = {
@@ -928,7 +930,15 @@ const getPubMediaLinks = async (publication: PublicationFetcher) => {
     langwritten: publication.langwritten,
     txtCMSLang: 'E',
   };
-  return await get(urlWithParamsToString(url, params));
+  const response = await get(urlWithParamsToString(url, params));
+  if (!response) {
+    createTemporaryNotification({
+      message: 'error.pubNotFound',
+      caption: [publication.pub, publication.langwritten, publication.issue, publication.track, publication.fileformat].filter(Boolean).join('_'),
+      type: 'negative',
+    })
+  }
+  return response;
 };
 
 export function findBestResolution(mediaLinks: MediaLink[]) {
@@ -1051,8 +1061,10 @@ const getJwMediaInfo = async (publication: PublicationFetcher) => {
     if (publication.fileformat?.includes('MP4')) url += '_VIDEO';
     else if (publication.fileformat?.includes('MP3')) url += '_AUDIO';
     const responseObject = await get(url);
-    if (!responseObject.media || responseObject.media.length === 0)
-      throw new Error('No thumbnail found: ' + url);
+    if (!responseObject.media || responseObject.media.length === 0) {
+      console.warn('No thumbnail found:' + url);
+      return { thumbnail: '', title: '' };
+    }
     return {
       thumbnail: getBestImageUrl(responseObject.media[0].images),
       title: responseObject.media[0].title,

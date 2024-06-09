@@ -6,7 +6,7 @@
           <q-avatar class="q-px-sm q-mr-md">
             <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg" />
           </q-avatar>
-          {{ route.meta.title }} {{ route.fullPath }} {{ $t('autoStartMusic') }}
+          {{ route.meta.title }} {{ route.fullPath }}
           <!-- {{ enableNav }} -->
           {{ drawer }}
           {{ miniState }}
@@ -194,7 +194,7 @@ const { toggleMediaWindow } = electronApi;
 export default {
   setup() {
     const { locale } = useI18n({ useScope: 'global' })
-    const drawer = ref(true);
+    const drawer = ref(false);
     updateJwLanguages();
     const { currentSettings } = storeToRefs(currentState);
     const route = useRoute();
@@ -238,10 +238,13 @@ export default {
           router.push({ path: '/congregation-selector' });
           return;
         }
-        drawer.value = !(route.fullPath.includes('wizard')) && newVal !== undefined;
+        drawer.value = !(route.fullPath.includes('wizard') && newVal !== undefined);
       },
       { immediate: true, deep: true }
     );
+    watch(route, (newVal) => {
+      drawer.value = !newVal.fullPath.includes('wizard');
+    })
 
     return {
       miniState,

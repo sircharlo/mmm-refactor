@@ -16,7 +16,7 @@ import { obsConnect } from 'src/helpers/obs';
 import { localeOptions } from 'src/i18n';
 
 const requiredRule: ValidationRule = (val: string) =>
-  (val && val.length > 0) || 'Required';
+  (val && val.length > 0) || 'required';
 
 const coTuesdays = (date: string) => {
   if (!date) return false;
@@ -96,7 +96,7 @@ const filterFn = (
   update(() => {
     const needle = val.toLowerCase();
     filteredJwLanguages.value = jwLanguages.value.list.filter(
-      (v) => v.name.toLowerCase().indexOf(needle) > -1
+      (v) => (v.name.toLowerCase().indexOf(needle) > -1) || (v.vernacularName.toLowerCase().indexOf(needle) > -1)
     );
   });
 };
@@ -104,7 +104,7 @@ const filterFn = (
 const getListOptions = (list: string | undefined) => {
   if (list == 'jwLanguages') {
     return filteredJwLanguages.value.map((language) => {
-      return { label: language.name, value: language.langcode };
+      return { label: `${language.vernacularName} (${language.name})`, value: language.langcode };
     });
   } else if (list === 'appLanguages') {
     return localeOptions;
@@ -123,13 +123,13 @@ const getListOptions = (list: string | undefined) => {
     ];
   } else if (list == 'days') {
     return [
-      { label: 'Monday', value: '0' },
-      { label: 'Tuesday', value: '1' },
-      { label: 'Wednesday', value: '2' },
-      { label: 'Thursday', value: '3' },
-      { label: 'Friday', value: '4' },
-      { label: 'Saturday', value: '5' },
-      { label: 'Sunday', value: '6' },
+      { label: 'monday', value: '0' },
+      { label: 'tuesday', value: '1' },
+      { label: 'wednesday', value: '2' },
+      { label: 'thursday', value: '3' },
+      { label: 'friday', value: '4' },
+      { label: 'saturday', value: '5' },
+      { label: 'sunday', value: '6' },
     ];
   } else if (list?.startsWith('obs')) {
     let sceneArray = scenes.value;

@@ -67,7 +67,7 @@ export interface SettingsGroups {
 
 export interface SettingsGroup {
   name: string;
-  description?: string;
+  description: string;
   order?: number;
   hidden?: boolean;
 }

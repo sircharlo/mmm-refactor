@@ -1,4 +1,7 @@
 export default {
+  // Wizard
+  'setupWizard.welcome': 'Welcome to M³',
+  'setupWizard.intro': 'M³ is an app designed to make your playing media at congregation meetings easy and stress-free. Let\'s configure a few things, and then we\'ll get on our way.',
   // Settings
   'autoPlayFirst': 'Automatically play first media item',
   'autoRunAtBoot': 'Run app at system start-up',

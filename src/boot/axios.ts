@@ -5,16 +5,20 @@ export default boot(({ app }) => {
 });
 
 const get = async (url: string, params?: AxiosRequestConfig) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let returnVal: { data: any | undefined } = { data: undefined };
   try {
-    return (await axios.get(url, { params })).data;
+    returnVal = (await axios.get(url, { params }));
   } catch (error) {
-    console.error(error);
-    return {};
+    console.warn(error);
   }
+  return returnVal.data;
 };
 
-const getLanguages = async () =>
-  (await get('https://www.jw.org/en/languages/')).languages;
+const getLanguages = async () => {
+  const req  = await get('https://www.jw.org/en/languages/')
+  return req?.languages;
+}
 
 const urlWithParamsToString = (url: string, params: object) => {
   const urlWithParams = new URL(url);

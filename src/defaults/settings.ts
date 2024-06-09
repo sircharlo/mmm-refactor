@@ -4,31 +4,32 @@ import {
   SettingsValues,
 } from '../types/settings';
 
+// todo: remove name attr, as its not used
+
 export const settingsGroups: SettingsGroups = {
   congregationMeetings: {
-    name: 'Congregation Meetings',
-    description: 'Settings relating to your congregation and meetings.',
+    name: 'congregationMeetings',
+    description: 'congregationMeetingsDescription',
     order: 1,
   },
   mediaRetrievalPlayback: {
-    name: 'Media Retrieval and Playback',
-    description:
-      'Configure media retrieval and playback settings, such as language and resolution.',
+    name: 'mediaRetrievalAndPlayback',
+    description: 'mediaRetrievalAndPlaybackDescription',
     order: 2,
   },
   app: {
-    name: 'Application Configuration',
-    description:
-      'Configure various M3 settings, such as language for the user interface.',
+    name: 'applicationConfiguration',
+    description: 'applicationConfigurationDescription',
     order: 3,
   },
   integrations: {
-    name: 'Integrations',
-    description: 'Configure integrations with other apps.',
+    name: 'integrations',
+    description: 'integrationsDescription',
     order: 4,
   },
   advanced: {
-    name: 'Advanced',
+    name: 'advanced',
+    description: 'advancedDescription',
     order: 5,
   },
   // {

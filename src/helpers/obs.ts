@@ -7,6 +7,8 @@ const { mediaPlayer } = storeToRefs(currentState);
 
 import { useObsStateStore } from 'stores/obs-state';
 const obsState = useObsStateStore();
+const { scenes, currentScene, currentSceneUuid, obsConnected } =
+  storeToRefs(obsState);
 
 import {
   createUpdatableNotification,
@@ -15,8 +17,6 @@ import {
 import { isImage } from './mediaPlayback';
 import { JsonObject } from 'type-fest';
 
-const { scenes, currentScene, currentSceneUuid, obsConnected } =
-  storeToRefs(obsState);
 
 import { obsWebSocket, obsNotification } from 'src/boot/obs'
 import { useRouter } from 'vue-router';
@@ -44,7 +44,6 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 //   }
 // }
 const notifyObsError = (errorMessage?: string) => {
-  console.log(obsNotification.value)
   if (getSettingValue('obsEnable')) {
     const notificationOptions = {
       message: 'Failed to connect to OBS Studio',
@@ -117,9 +116,8 @@ const currentRoute = computed(() => useRouter()?.currentRoute.value.fullPath);
 
 const obsConnect = async (setup?: boolean) => {
   const obsPort = getSettingValue('obsPort') as string;
-  console.log('obsPort', obsPort);
-  const obsPortDigits = obsPort.toString().replace(/\D/g, '');
-  if (obsPortDigits.length === 0) return
+  const obsPortDigits = obsPort?.toString().replace(/\D/g, '');
+  if (obsPortDigits?.length === 0) return
   if (!getSettingValue('obsEnable')) {
     await obsWebSocket?.disconnect();
     obsNotification.value = null;
@@ -141,7 +139,6 @@ const obsConnect = async (setup?: boolean) => {
   const maxAttempts = setup ? 1 : 6;
   const previousRoute = currentRoute.value;
   while (attempt < maxAttempts) {
-    console.log('attempt', attempt, 'of', maxAttempts, currentRoute.value, previousRoute);
     if (currentRoute.value !== previousRoute) {
       if (obsNotification.value) {
         updateNotification(obsNotification.value, {
@@ -153,7 +150,6 @@ const obsConnect = async (setup?: boolean) => {
     try {
       const { obsWebSocketVersion, negotiatedRpcVersion } = await obsWebSocket?.connect('ws://127.0.0.1:' + obsPort, obsPassword);
       if (obsWebSocketVersion && negotiatedRpcVersion) {
-        console.log('Connected to OBS', obsWebSocketVersion, negotiatedRpcVersion);
         const sceneList = await obsWebSocket?.call('GetSceneList');
         if (sceneList) {
           scenes.value = sceneList.scenes.reverse();

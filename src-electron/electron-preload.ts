@@ -127,7 +127,23 @@ screen.on('display-removed', () => {
   moveMediaWindow();
 });
 
+const isWritable = (filePath: fs.PathLike) => {
+  let fileAccess = false
+  try {
+      fs.closeSync(fs.openSync(filePath, 'r+'))
+      fileAccess = true
+  } catch (err) {
+      console.log('can not open file:' + filePath, 'error:' + err)
+  }
+  return fileAccess
+}
 
+function sleepSync(ms) {
+  const start = Date.now();
+  while (Date.now() - start < ms) {
+    // Busy wait
+  }
+}
 
 const toggleMediaWindow = (action: string) => {
   const mediaWindow = getMediaWindow();
@@ -159,12 +175,25 @@ contextBridge.exposeInMainWorld('electronApi', {
   // pdfToImg: require('pdf-to-img'),
   executeQuery: (dbPath: string, query: string) => {
     try {
-      const db = sqlite3.default(dbPath);
-      return db.prepare(query).all();
+      let attempts = 0;
+      const maxAttempts = 10;
+      const delay = 250;
+
+      while (attempts < maxAttempts) {
+        if (isWritable(dbPath)) {
+          const db = sqlite3.default(dbPath);
+          return db.prepare(query).all();
+        }
+        attempts++;
+        sleepSync(delay);
+      }
+
+      return {};
     } catch (error) {
       console.error(error + '\n' + query + '\n' + dbPath);
       return {};
     }
+
   },
   fileUrlToPath: (fileurl: string) => {
     const url = require('node:url')
