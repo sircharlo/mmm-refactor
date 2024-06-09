@@ -2,6 +2,7 @@
   "cSpell.words": [
     "alllangs",
     "AYFM",
+    "cctv",
     "docid",
     "fileformat",
     "fileurl",
@@ -21,7 +22,13 @@
     "panzooms",
     "sjjm",
     "snnw",
+    "sqlite",
     "upath",
     "yeartexts"
-  ]
+  ],
+  "i18n-ally.localesPaths": [
+    "src/i18n"
+  ],
+  "i18n-ally.sourceLanguage": "en-US",
+  "i18n-ally.keystyle": "flat"
 }
