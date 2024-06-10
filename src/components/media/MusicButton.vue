@@ -1,11 +1,11 @@
 <template>
-  <q-btn icon="mdi-music" v-if="currentSettings?.enableMusicButton" @click="musicPopup = false" :label="musicPlaying ? musicRemainingTime : ''" :flat="!disabled"
+  <q-btn icon="mdi-music" v-if="currentSettings?.enableMusicButton" @click="musicPopup = false" size="md" :label="musicPlaying ? musicRemainingTime : ''" :flat="!disabled"
     :outline="disabled" :disable="disabled">
     <q-tooltip v-if="!disabled && !musicPopup">
       Background music
     </q-tooltip>
     <q-popup-proxy anchor="top middle" self="bottom middle" v-model="musicPopup">
-      <q-card>
+      <q-card class="non-selectable">
         <q-card-section>
           <div class="text-overline">Background music</div>
           <div class="text-h5">{{ musicPlaying ? musicRemainingTime : 'Inactive' }}</div>

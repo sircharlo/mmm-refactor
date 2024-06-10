@@ -138,7 +138,7 @@ const isWritable = (filePath: fs.PathLike) => {
   return fileAccess
 }
 
-function sleepSync(ms) {
+function sleepSync(ms: number) {
   const start = Date.now();
   while (Date.now() - start < ms) {
     // Busy wait

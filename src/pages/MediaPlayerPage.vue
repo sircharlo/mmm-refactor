@@ -1,5 +1,5 @@
 <template>
-  {{ mediaPlayer }}
+  <!-- {{ mediaPlayer }} -->
   <q-page-container padding class="q-electron-drag vertical-middle overflow-hidden"
     style="align-content: center; height: 100vh;">
     <q-resize-observer @resize="onResize" debounce="50" />
@@ -15,14 +15,13 @@
         <audio style="display: none;" ref="mediaElement" v-if="isAudio(mediaPlayer.url)" @loadedmetadata="playMedia()">
           <source ref="mediaElementSource" :src="mediaPlayer.url" />
         </audio>
-        <div class="q-pa-md center" id="yeartext"
+        <div class="q-pa-md center" id="yeartext" v-if="!currentSettings?.jwlCompanionMode"
           v-html="(yeartexts[new Date().getFullYear()] && yeartexts[new Date().getFullYear()][currentSettings?.lang]) ?? ''" />
         <div id="yeartextLogoContainer" v-if="!currentSettings?.hideMediaLogo">
           <p id="yeartextLogo"></p>
         </div>
       </div>
     </transition>
-    <!-- {{ mediaPlayer }} -->
   </q-page-container>
 </template>
 <script lang="ts">
@@ -43,6 +42,10 @@ const { yeartexts, customDurations } = storeToRefs(jwStore);
 import { isAudio, isImage, isVideo } from 'src/helpers/mediaPlayback';
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 
+import { electronApi } from '../helpers/electron-api';
+const { toggleMediaWindow } = electronApi;
+
+
 
 const panzoom: Ref<PanzoomObject | undefined> = ref()
 
@@ -59,6 +62,9 @@ export default defineComponent({
     const mediaImage: Ref<HTMLImageElement | undefined> = ref();
     const panzoomOptions = { animate: true, duration: 1000 }
     watch(mediaPlayer, (newVal) => {
+      if (currentSettings.value?.jwlCompanionMode) {
+        toggleMediaWindow(newVal.url ? 'show' : 'hide');
+      }
       if (!mediaElement.value) {
         const imageElem = document.getElementById('mediaImage')
         const width = imageElem?.clientWidth || 0

@@ -361,7 +361,7 @@ import { date, uid } from 'quasar';
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import {
   addFullFilePathToMultimediaItem,
-  downloadFile,
+  downloadFileIfNeeded,
   dynamicMediaMapper,
   fetchMedia,
   getDocumentMultimediaItems,
@@ -628,7 +628,7 @@ export default defineComponent({
           if (isRemoteUrl(filepath)) {
             const baseFileName = path.basename(new URL(filepath).pathname);
             filepath = (
-              await downloadFile({
+              await downloadFileIfNeeded({
                 url: filepath,
                 dir: getTempDirectory(),
                 filename: inferExtension(

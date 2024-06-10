@@ -1,6 +1,6 @@
 <template>
   <q-page padding>
-    <q-form ref="settingsFormDynamic" no-error-focus novalidate greedy>
+    <q-form ref="settingsFormDynamic" no-error-focus novalidate greedy v-if="currentSettings">
       <q-badge color="negative" v-if="invalidSettingsLength">
         <q-toggle color="white" label="Only show settings that are not valid" v-model="onlyShowInvalid"> </q-toggle>
       </q-badge>
@@ -14,10 +14,10 @@
             :key="settingId">
             <q-item :class="{
               'q-py-lg': invalidSettings.includes(settingId),
-              'bg-grey-8': item.subgroup && $q.dark.isActive,
-              'bg-grey-3': item.subgroup && !$q.dark.isActive
+              'bg-grey-8': item.depends && $q.dark.isActive,
+              'bg-grey-3': item.depends && !$q.dark.isActive
             }"
-              v-if="(!item.subgroup || currentSettings[item.subgroup]) && (!onlyShowInvalid || !invalidSettingsLength || invalidSettings.includes(settingId))">
+              v-if="(!item.depends || currentSettings[item.depends]) && (!onlyShowInvalid || !invalidSettingsLength || invalidSettings.includes(settingId))">
               <q-item-section class="col-4">
                 {{ $t(settingId) }}
               </q-item-section>

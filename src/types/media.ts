@@ -24,6 +24,15 @@ export interface DownloadedFile {
   error?: boolean;
 }
 
+export interface DownloadProgressItems {
+  [key: string]: {
+    loaded?: number;
+    total?: number;
+    complete?: boolean;
+    error?: boolean;
+  };
+}
+
 export interface FileDownloader {
   url: string;
   dir: string;

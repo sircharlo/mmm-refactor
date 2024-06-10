@@ -1,11 +1,11 @@
 <template>
-  <q-btn v-if="currentSettings?.enableMediaDisplayButton" :icon="mediaPlayer.windowVisible ? 'mdi-television' : 'mdi-television-off'" @click="mediaDisplayPopup = false" :flat="!disabled" :outline="disabled"
+  <q-btn v-if="currentSettings?.enableMediaDisplayButton" size="md" :icon="mediaPlayer.windowVisible ? 'mdi-television' : 'mdi-television-off'" @click="mediaDisplayPopup = false" :flat="!disabled" :outline="disabled"
     :disable="disabled" :color="mediaPlayer.windowVisible ? '' : 'red-5'">
     <q-tooltip v-if="!disabled && !mediaDisplayPopup" anchor="bottom left" self="top left">
       Media display
     </q-tooltip>
     <q-popup-proxy v-if="!disabled" anchor="bottom right" self="top right" v-model="mediaDisplayPopup">
-      <q-card>
+      <q-card class="non-selectable">
         <q-card-section>
           <div class="text-overline">Media display</div>
           <div class="text-h5 text-primary" v-if="mediaPlayer.windowVisible">Projecting</div>

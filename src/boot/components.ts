@@ -11,6 +11,7 @@ import MediaDisplayButton from 'src/components/media/MediaDisplayButton.vue';
 import MusicButton from 'src/components/media/MusicButton.vue';
 import SongPicker from 'src/components/media/SongPicker.vue';
 import ScenePicker from 'src/components/media/ScenePicker.vue';
+import DownloadStatus from 'src/components/media/DownloadStatus.vue';
 
 export default boot(async ({ app }) => {
   app.component('DateInput', DateInput);
@@ -25,4 +26,5 @@ export default boot(async ({ app }) => {
   app.component('MusicButton', MusicButton);
   app.component('SongPicker', SongPicker);
   app.component('ScenePicker', ScenePicker);
+  app.component('DownloadStatus', DownloadStatus);
 });

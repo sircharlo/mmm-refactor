@@ -3,10 +3,9 @@ import { storeToRefs } from 'pinia';
 import { useCurrentStateStore } from 'src/stores/current-state';
 const currentState = useCurrentStateStore();
 const { getSettingValue } = currentState;
-const { downloads, downloadProgress, totalDownloadProgress, lookupPeriod, currentSongbook, currentCongregation, nonCompleteItems, currentSettings } =
+const { downloads, downloadProgress, lookupPeriod, currentSongbook, currentCongregation, currentSettings } =
   storeToRefs(currentState);
-const { removeCompletedDownloadProgress } = currentState
-import { LocalStorage, Notify, date } from 'quasar';
+import { LocalStorage, date } from 'quasar';
 import {
   MediaImages,
   MediaLink,
@@ -37,8 +36,8 @@ import { get, urlWithParamsToString } from 'src/boot/axios';
 
 import {
   createTemporaryNotification,
-  createUpdatableNotification,
-  updateNotification,
+  // createUpdatableNotification,
+  // updateNotification,
 } from 'src/helpers/notifications';
 import {
   DownloadedFile,
@@ -61,18 +60,16 @@ import axios from 'axios';
 import { isMwMeetingDay, isWeMeetingDay } from 'src/helpers/date';
 import mepslangs from 'src/defaults/mepslangs';
 import sanitize from 'sanitize-filename';
-import { watch } from 'vue';
 import { MAX_SONGS } from 'src/stores/jw';
 
 const FEB_2023 = 20230200;
 const FOOTNOTE_TAR_PAR = 9999;
 
-const downloadFile = async ({
+const downloadFileIfNeeded = async ({
   url,
   dir,
   filename,
   size,
-  // notify,
 }: FileDownloader) => {
   fs.ensureDirSync(dir);
   if (!filename) filename = path.basename(url);
@@ -93,7 +90,19 @@ const downloadFile = async ({
       };
     }
   }
+  if (!downloads.value[url]) downloads.value[url] = downloadFile({ url, dir, filename, size });
+  return downloads.value[url];
+};
 
+const downloadFile = async ({
+  url,
+  dir,
+  filename,
+  // notify,
+}: FileDownloader) => {
+  if (!filename) filename = path.basename(url);
+  filename = sanitize(filename);
+  const destinationPath = path.join(dir, filename);
   const downloadedDataRequest = await axios
     .get(url, {
       responseType: 'arraybuffer',
@@ -102,30 +111,27 @@ const downloadFile = async ({
         if (!downloadDone) downloadProgress.value[url] = {
           loaded: progressEvent.loaded,
           total: (progressEvent.total || progressEvent.loaded),
-          complete: false
         };
       },
     })
     .catch((error) => {
       console.error(error);
-      downloads.value.delete(url);
-      delete downloadProgress.value[url]
+      downloadProgress.value[url] = {
+        error: true
+      }
       return { data: '' };
     });
   const downloadedData = downloadedDataRequest.data;
-  const byteLength = Buffer.byteLength(downloadedData)
   downloadProgress.value[url] = {
-    loaded: byteLength,
-    total: byteLength,
     complete: true
   };
   if (!downloadedData) {
-    createTemporaryNotification({
-      message: 'Error downloading file',
-      caption: filename,
-      type: 'negative',
-      icon: 'mdi-cloud-off',
-    });
+    // createTemporaryNotification({
+    //   message: 'Error downloading file',
+    //   caption: filename,
+    //   type: 'negative',
+    //   icon: 'mdi-cloud-off',
+    // });
     return {
       path: destinationPath,
       error: true,
@@ -137,56 +143,18 @@ const downloadFile = async ({
     new: true,
   };
 };
-
-
-let fileDownloadNotification: typeof Notify.create | undefined = undefined;
-
-watch(downloadProgress, () => {
-  const downloadProgressSize = Object.keys(downloadProgress.value).length;
-  if (downloadProgressSize > 0) {
-    const nonCompleteUrls = Object.keys(nonCompleteItems.value);
-    const nonCompleteCount = nonCompleteUrls.length;
-    const percent = totalDownloadProgress.value.percentage;
-    const notificationOptions = {
-      message: nonCompleteCount === 1 ? path.basename(nonCompleteUrls[0]) : 'Downloading files',
-      caption: `${percent.toFixed(0)}%`,
-      type: percent === 100 && nonCompleteCount < 2 ? 'positive' : 'ongoing',
-      spinner: percent === 100 ? false : true,
-      icon: percent === 100 ? 'mdi-cloud-check' : '',
-      timeout: percent === 100 ? 5000 : 0,
-      onDismiss() {
-        fileDownloadNotification = undefined;
-        removeCompletedDownloadProgress();
-      },
-    }
-    if (!fileDownloadNotification) {
-      fileDownloadNotification = createUpdatableNotification(notificationOptions);
-    } else {
-      updateNotification(fileDownloadNotification, notificationOptions);
-    }
-  }
-}, { deep: true, immediate: true });
-
 const fetchMedia = async () => {
-  const promises = lookupPeriod.value
-    .filter((day) => day.meeting)
-    .map(async (day) => {
-      const dayDate = day.date;
-      day.loading = true;
-      if (isWeMeetingDay(dayDate)) {
-        day.dynamicMedia = await getWeMedia(dayDate);
-      } else if (isMwMeetingDay(dayDate)) {
-        day.dynamicMedia = await getMwMedia(dayDate);
-      }
-      day.loading = false;
-    });
-  await Promise.all(promises);
-};
-
-const addToDownloads = (file: FileDownloader) => {
-  if (!downloads.value.get(file.url))
-    downloads.value.set(file.url, downloadFile(file));
-  return downloads.value.get(file.url);
+  for (const meeting of lookupPeriod.value.filter((day) => day.meeting)) {
+    console.log('meeting', meeting)
+    const dayDate = meeting.date;
+    meeting.loading = true;
+    if (isWeMeetingDay(dayDate)) {
+      meeting.dynamicMedia = await getWeMedia(dayDate);
+    } else if (isMwMeetingDay(dayDate)) {
+      meeting.dynamicMedia = await getMwMedia(dayDate);
+    }
+    meeting.loading = false;
+  }
 };
 
 const getDbFromJWPUB = async (publication: PublicationFetcher) => {
@@ -562,8 +530,15 @@ const getWeMedia = async (lookupDate: Date) => {
       ));
 
     if (!db || docId < 0) {
+      createTemporaryNotification({
+        message: 'error.downloadMedia',
+        caption: 'weMeeting',
+        type: 'negative',
+        group: 'error.downloadMedia.weMeeting',
+      })
       console.error('No suitable db or docid found');
-      return [];
+      // return [];
+      throw new Error('No db found');
     }
     // const magazine = executeQuery(
     //   db,
@@ -932,11 +907,14 @@ const getPubMediaLinks = async (publication: PublicationFetcher) => {
   };
   const response = await get(urlWithParamsToString(url, params));
   if (!response) {
-    createTemporaryNotification({
-      message: 'error.pubNotFound',
-      caption: [publication.pub, publication.langwritten, publication.issue, publication.track, publication.fileformat].filter(Boolean).join('_'),
-      type: 'negative',
-    })
+    // createTemporaryNotification({
+    //   message: 'error.pubNotFound',
+    //   caption: [publication.pub, publication.langwritten, publication.issue, publication.track, publication.fileformat].filter(Boolean).join('_'),
+    //   type: 'negative',
+    // })
+    downloadProgress.value[[publication.pub, publication.langwritten, publication.issue, publication.track, publication.fileformat].filter(Boolean).join('_')] = {
+      error: true
+    }
   }
   return response;
 };
@@ -950,7 +928,7 @@ export function findBestResolution(mediaLinks: MediaLink[]) {
   if (mediaLinks.some((m) => !m.subtitled))
     mediaLinks = mediaLinks.filter((m) => !m.subtitled);
   for (const mediaLink of mediaLinks) {
-    if (mediaLink.frameHeight <= maxRes && mediaLink.frameHeight > bestHeight) {
+    if (mediaLink.frameHeight <= maxRes && mediaLink.frameHeight >= bestHeight) {
       bestItem = mediaLink;
       bestHeight = mediaLink.frameHeight;
     }
@@ -1002,7 +980,7 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
   if (!bestItem) {
     return '';
   }
-  const downloadedFile = (await addToDownloads({
+  const downloadedFile = (await downloadFileIfNeeded({
     url: bestItem.file.url,
     dir: pubDir,
     size: bestItem.filesize,
@@ -1018,7 +996,7 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
     (downloadedFile?.new ||
       !fs.existsSync(path.join(pubDir, thumbnailFilename)))
   ) {
-    await addToDownloads({
+    await downloadFileIfNeeded({
       url: thumbnail,
       dir: pubDir,
       filename: thumbnailFilename,
@@ -1078,22 +1056,20 @@ const getJwMediaInfo = async (publication: PublicationFetcher) => {
 const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
   const publicationInfo: Publication = await getPubMediaLinks(publication);
   if (!publication.fileformat) return;
-  if (!publicationInfo.files) {
-    createTemporaryNotification({
-      message: 'Error downloading publication',
-      caption: publication.pub,
-      icon: 'mdi-cloud-off',
-      type: 'negative',
-    });
+  if (!publicationInfo?.files) {
+    downloadProgress.value[[publication.pub, publication.langwritten, publication.issue, publication.track, publication.fileformat].filter(Boolean).join('_')] = {
+      error: true
+    }
     return;
   }
-
+  console.log('publicationInfo.files', publicationInfo.files)
   const mediaLinks: MediaLink[] = publicationInfo.files[
     publication.langwritten
   ][publication.fileformat].filter(
     (mediaLink) =>
       !publication.maxTrack || mediaLink.track < publication.maxTrack
   );
+  console.log('mediaLinks', mediaLinks)
 
   const dir = getPublicationDirectory(publication, true);
   const filteredMediaItemLinks = [] as MediaLink[]
@@ -1104,15 +1080,22 @@ const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
       if (bestItem) filteredMediaItemLinks.push(bestItem)
     }
   }
+  console.log('filteredMediaItemLinks', filteredMediaItemLinks)
 
   await addToDownloadsWithLimit(filteredMediaItemLinks, dir)
 };
 
 const downloadBackgroundMusic = () => {
   if (!currentSongbook.value || !currentSettings.value?.lang) return;
+  console.log('Downloading background music', {
+    pub: currentSongbook.value.pub,
+    langwritten: currentSongbook.value.signLanguage ? currentSettings.value.lang : 'E',
+    fileformat: currentSongbook.value.fileformat,
+    maxTrack: MAX_SONGS,
+  });
   downloadPubMediaFiles({
     pub: currentSongbook.value.pub,
-    langwritten: currentSettings.value.lang,
+    langwritten: currentSongbook.value.signLanguage ? currentSettings.value.lang : 'E',
     fileformat: currentSongbook.value.fileformat,
     maxTrack: MAX_SONGS,
   })
@@ -1123,11 +1106,13 @@ async function addToDownloadsWithLimit(mediaLinks: MediaLink[], dir: string, lim
   const results = [];
 
   for (const mediaLink of mediaLinks) {
-    const downloadPromise = addToDownloads({
+    console.log('mediaLink', mediaLink)
+    const downloadPromise = downloadFileIfNeeded({
       url: mediaLink.file.url,
       dir,
       size: mediaLink.filesize,
-    });
+    }) as Promise<DownloadedFile>;
+    if (!(downloadPromise instanceof Promise)) continue;
 
     queue.push(downloadPromise);
 
@@ -1150,29 +1135,30 @@ const downloadJwpub = async (
   publication: PublicationFetcher
 ): Promise<DownloadedFile> => {
   publication.fileformat = 'JWPUB';
-  const publicationInfo: Publication = await getPubMediaLinks(publication);
-  if (!publicationInfo.files) {
-    console.error('No JWPUB file found from JSON');
+  const handleDownloadError = () => {
+    downloadProgress.value[[publication.pub, publication.langwritten, publication.issue, publication.track, publication.fileformat].filter(Boolean).join('_')] = {
+      error: true
+    };
     return {
       path: '',
       new: false,
     };
+  };
+  const publicationInfo: Publication = await getPubMediaLinks(publication);
+  if (!publicationInfo?.files) {
+    return handleDownloadError();
   }
   const mediaLinks: MediaLink[] = publicationInfo.files[
     publication.langwritten
   ][publication.fileformat].filter(
     (mediaLink) =>
       !publication.maxTrack || mediaLink.track < publication.maxTrack
-  );
+  ) || [];
   if (!mediaLinks.length) {
-    console.error('No JWPUB file found from JSON');
-    return {
-      path: '',
-      new: false,
-    };
+    return handleDownloadError();
   }
 
-  return (await addToDownloads({
+  return (await downloadFileIfNeeded({
     url: mediaLinks[0].file.url,
     dir: getPublicationDirectory(publication),
     size: mediaLinks[0].filesize,
@@ -1191,6 +1177,6 @@ export {
   dynamicMediaMapper,
   getPublicationInfoFromDb,
   addFullFilePathToMultimediaItem,
-  downloadFile,
+  downloadFileIfNeeded,
   downloadBackgroundMusic,
 };

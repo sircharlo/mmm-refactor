@@ -4,425 +4,390 @@ import {
   SettingsValues,
 } from '../types/settings';
 
-// todo: remove name attr, as its not used
-
 export const settingsGroups: SettingsGroups = {
+  app: {
+    name: 'applicationConfiguration',
+    description: 'applicationConfigurationDescription',
+  },
   congregationMeetings: {
     name: 'congregationMeetings',
     description: 'congregationMeetingsDescription',
-    order: 1,
   },
   mediaRetrievalPlayback: {
     name: 'mediaRetrievalAndPlayback',
     description: 'mediaRetrievalAndPlaybackDescription',
-    order: 2,
-  },
-  app: {
-    name: 'applicationConfiguration',
-    description: 'applicationConfigurationDescription',
-    order: 3,
   },
   integrations: {
     name: 'integrations',
     description: 'integrationsDescription',
-    order: 4,
   },
-  advanced: {
-    name: 'advanced',
-    description: 'advancedDescription',
-    order: 5,
-  },
-  // {
-  //   internal:
-  //   name: 'Internal',
-  //   hidden: true,
-  //   items: [],
+  // advanced: {
+  //   name: 'advanced',
+  //   description: 'advancedDescription',
+  //   order: 5,
   // },
 };
 
 export const settingsDefinitions: SettingsItems = {
-  autoOpenFolderWhenDone: {
-    type: 'toggle',
-    group: 'advanced',
-    name: 'auto Open Folder When Done',
-  },
-  autoPlayFirst: {
-    type: 'toggle',
-    group: 'advanced',
-    name: 'auto Play First',
-  },
-  autoPlayFirstTime: {
-    type: 'slider',
-    group: 'advanced',
-    name: 'auto Play First Time',
-    max: 60,
-    min: 5,
-    step: 1,
-  },
-  autoQuitWhenDone: {
-    type: 'toggle',
-    group: 'advanced',
-    name: 'auto Quit When Done',
-  },
-  autoRunAtBoot: {
-    type: 'toggle',
-    group: 'advanced',
-    name: 'auto Run At Boot',
-  },
-  autoStartSync: {
-    type: 'toggle',
-    group: 'advanced',
-    name: 'auto Start Sync',
-  },
-  betaUpdates: {
-    type: 'toggle',
-    group: 'advanced',
-    name: 'beta Updates',
-  },
-  customCachePath: {
-    type: 'path',
-    group: 'advanced',
-    name: 'custom Cache Path',
-  },
-  disableAutoUpdate: {
-    type: 'toggle',
-    group: 'advanced',
-    name: 'disable Auto Update',
-  },
-  disableHardwareAcceleration: {
-    type: 'toggle',
-    group: 'advanced',
-    name: 'disable Hardware Acceleration',
-  },
-  mediaWinShortcut: {
-    type: 'text',
-    group: 'advanced',
-    subgroup: 'shortcuts',
-    name: 'media Win Shortcut',
-  },
-  outputFolderDateFormat: {
-    type: 'text',
-    group: 'advanced',
-    name: 'output Folder Date Format',
-  },
-  ppBackward: {
-    type: 'text',
-    group: 'advanced',
-    name: 'pp Backward',
-  },
-  ppForward: {
-    type: 'text',
-    group: 'advanced',
-    name: 'pp Forward',
-  },
-  presentShortcut: {
-    type: 'text',
-    group: 'advanced',
-    subgroup: 'shortcuts',
-    name: 'present Shortcut',
-  },
-  shuffleShortcut: {
-    type: 'text',
-    group: 'advanced',
-    subgroup: 'shortcuts',
-    name: 'shuffle Shortcut',
-  },
-  specialCong: {
-    type: 'toggle',
-    group: 'advanced',
-    name: 'special Cong',
-  },
-  localAppLang: {
-    group: 'app',
-    type: 'list',
-    list: 'appLanguages',
-    name: 'local App Lang',
-  },
-  // localOutputPath: {
-  //   rules: ['notEmpty'],
-  //   group: 'app',
-  //   type: 'path',
-  //   name: 'local Output Path',
-  // },
-  darkMode: {
-    group: 'app',
-    type: 'list',
-    name: 'Dark mode',
-    list: 'darkModes',
-  },
+  // Congregation Meetings
   congregationName: {
     rules: ['notEmpty'],
     type: 'text',
-    name: 'congregation Name',
     group: 'congregationMeetings',
+  },
+  lang: {
+    type: 'list',
+    list: 'jwLanguages',
+    group: 'mediaRetrievalPlayback',
   },
   mwDay: {
     rules: ['notEmpty'],
     type: 'list',
     list: 'days',
-    name: 'mw Day',
     group: 'congregationMeetings',
   },
   mwStartTime: {
     options: ['meetingTime'],
     rules: ['notEmpty'],
     type: 'time',
-    name: 'mw Start Time',
     group: 'congregationMeetings',
   },
   weDay: {
     rules: ['notEmpty'],
     type: 'list',
     list: 'days',
-    name: 'we Day',
     group: 'congregationMeetings',
   },
   weStartTime: {
     options: ['meetingTime'],
     rules: ['notEmpty'],
     type: 'time',
-    name: 'we Start Time',
     group: 'congregationMeetings',
   },
   coWeek: {
     options: ['coTuesdays'],
     type: 'date',
-    name: 'co Week',
     group: 'congregationMeetings',
   },
-  obsEnable: {
-    type: 'toggle',
-    name: 'obs Enable',
-    group: 'integrations',
-    actions: ['obsConnect'],
-  },
-  obsPort: {
-    subgroup: 'obsEnable',
-    type: 'text',
-    name: 'obs Port',
-    group: 'integrations',
-    actions: ['obsConnect'],
-  },
-  obsPassword: {
-    subgroup: 'obsEnable',
-    type: 'text',
-    group: 'integrations',
-    name: 'obs Password',
-    actions: ['obsConnect'],
-  },
-  obsCameraScene: {
-    subgroup: 'obsEnable',
-    type: 'list',
-    list: 'obsAllScenes',
-    group: 'integrations',
-    name: 'obs Camera Scene',
-  },
-  obsMediaScene: {
-    subgroup: 'obsEnable',
-    type: 'list',
-    list: 'obsAllScenes',
-    group: 'integrations',
-    name: 'obs Media Scene',
-  },
-  obsImageScene: {
-    subgroup: 'obsEnable',
-    type: 'list',
-    list: 'obsNonStageScenes',
-    group: 'integrations',
-    name: 'obs Image Scene',
-  },
-  langUpdatedLast: {
-    group: 'internal',
-    type: 'internal',
-    name: 'lang Updated Last',
-  },
+
+  // Media Retrieval and Playback
   enableMediaDisplayButton: {
     type: 'toggle',
     group: 'mediaRetrievalPlayback',
-    name: 'enable Media Display Button',
   },
   preferredOutput: {
-    subgroup: 'enableMediaDisplayButton',
+    depends: 'enableMediaDisplayButton',
     type: 'list',
     list: 'screens',
-    name: 'preferred Output',
     group: 'mediaRetrievalPlayback',
   },
   hideMediaLogo: {
     type: 'toggle',
-    subgroup: 'enableMediaDisplayButton',
-    name: 'hide Media Logo',
+    depends: 'enableMediaDisplayButton',
     group: 'mediaRetrievalPlayback',
   },
-  enableSubtitles: {
-    type: 'toggle',
-    name: 'enable Subtitles',
-    group: 'mediaRetrievalPlayback',
-  },
-  langSubs: {
+  maxRes: {
     type: 'list',
-    subgroup: 'enableSubtitles',
-    name: 'lang Subs',
-    list: 'jwLanguages',
+    list: 'resolutions',
     group: 'mediaRetrievalPlayback',
+    depends: 'enableMediaDisplayButton',
   },
-  hideWinAfterMedia: {
+  excludeFootnotes: {
     type: 'toggle',
-    subgroup: 'advanced',
-    name: 'hide Win After Media',
     group: 'mediaRetrievalPlayback',
+    depends: 'enableMediaDisplayButton',
   },
-  enableMp4Conversion: {
+  excludeLffImages: {
     type: 'toggle',
-    subgroup: 'advanced',
-    name: 'enable Mp4 Conversion',
     group: 'mediaRetrievalPlayback',
+    depends: 'enableMediaDisplayButton',
+  },
+  excludeTh: {
+    type: 'toggle',
+    group: 'mediaRetrievalPlayback',
+    depends: 'enableMediaDisplayButton',
+  },
+  includePrinted: {
+    type: 'toggle',
+    group: 'mediaRetrievalPlayback',
+    depends: 'enableMediaDisplayButton',
   },
   enableMusicButton: {
     type: 'toggle',
-    name: 'enable Music Button',
     group: 'mediaRetrievalPlayback',
   },
   autoStartMusic: {
-    subgroup: 'enableMusicButton',
+    depends: 'enableMusicButton',
     type: 'toggle',
-    name: 'auto Start Music',
     group: 'mediaRetrievalPlayback',
   },
   enableMusicFadeOut: {
-    subgroup: 'enableMusicButton',
+    depends: 'enableMusicButton',
     type: 'toggle',
-    name: 'enable Music Fade Out',
-    group: 'mediaRetrievalPlayback',
-  },
-  musicFadeOutTime: {
-    type: 'slider',
-    subgroup: 'enableMusicButton',
-    name: 'music Fade Out Time',
-    group: 'mediaRetrievalPlayback',
-    max: 120,
-    min: 5,
-    step: 5,
-  },
-  musicFadeOutType: {
-    type: 'text',
-    subgroup: 'enableMusicButton',
-    name: 'music Fade Out Type',
     group: 'mediaRetrievalPlayback',
   },
   musicVolume: {
     type: 'slider',
-    subgroup: 'enableMusicButton',
-    name: 'music Volume',
+    depends: 'enableMusicButton',
     group: 'mediaRetrievalPlayback',
     max: 100,
     min: 0,
     step: 1,
   },
-  enablePp: {
-    subgroup: 'media',
+  enableSubtitles: {
     type: 'toggle',
-    name: 'enable Pp',
     group: 'mediaRetrievalPlayback',
   },
-
-  enableVlcPlaylistCreation: {
-    type: 'toggle',
-    subgroup: 'advanced',
-    group: 'mediaRetrievalPlayback',
-    name: 'enable Vlc Playlist Creation',
-  },
-  excludeFootnotes: {
-    type: 'toggle',
-    subgroup: 'exclude',
-    name: 'exclude Footnotes',
-    group: 'mediaRetrievalPlayback',
-  },
-  excludeLffImages: {
-    type: 'toggle',
-    subgroup: 'exclude',
-    name: 'exclude Lff Images',
-    group: 'mediaRetrievalPlayback',
-  },
-  excludeTh: {
-    type: 'toggle',
-    subgroup: 'exclude',
-    name: 'exclude Th',
-    group: 'mediaRetrievalPlayback',
-  },
-
-  includePrinted: {
-    type: 'toggle',
-    subgroup: 'exclude',
-    name: 'include Printed',
-    group: 'mediaRetrievalPlayback',
-  },
-  keepOriginalsAfterConversion: {
-    type: 'toggle',
-    subgroup: 'advanced',
-    group: 'mediaRetrievalPlayback',
-    name: 'keep Originals After Conversion',
-  },
-  lang: {
-    name: 'lang',
+  langSubs: {
     type: 'list',
+    depends: 'enableSubtitles',
     list: 'jwLanguages',
+    group: 'mediaRetrievalPlayback',
+  },
+  jwlCompanionMode: {
+    type: 'toggle',
     group: 'mediaRetrievalPlayback',
   },
   langFallback: {
     type: 'list',
-    subgroup: 'advanced',
     list: 'jwLanguages',
-    name: 'lang Fallback',
     group: 'mediaRetrievalPlayback',
   },
-  maxRes: {
+
+  // App
+  localAppLang: {
+    group: 'app',
     type: 'list',
-    name: 'max Res',
-    list: 'resolutions',
-    group: 'mediaRetrievalPlayback',
+    list: 'appLanguages',
   },
+  darkMode: {
+    group: 'app',
+    type: 'list',
+    list: 'darkModes',
+  },
+  autoRunAtBoot: {
+    type: 'toggle',
+    group: 'app',
+  },
+
+  // Integrations
+  obsEnable: {
+    type: 'toggle',
+    group: 'integrations',
+    actions: ['obsConnect'],
+  },
+  obsPort: {
+    depends: 'obsEnable',
+    type: 'text',
+    group: 'integrations',
+    actions: ['obsConnect'],
+  },
+  obsPassword: {
+    depends: 'obsEnable',
+    type: 'text',
+    group: 'integrations',
+    actions: ['obsConnect'],
+  },
+  obsCameraScene: {
+    depends: 'obsEnable',
+    type: 'list',
+    list: 'obsAllScenes',
+    group: 'integrations',
+  },
+  obsMediaScene: {
+    depends: 'obsEnable',
+    type: 'list',
+    list: 'obsAllScenes',
+    group: 'integrations',
+  },
+  obsImageScene: {
+    depends: 'obsEnable',
+    type: 'list',
+    list: 'obsNonStageScenes',
+    group: 'integrations',
+  },
+  // Advanced
+
+
+  // enableMp4Conversion: {
+  //   type: 'toggle',
+  //   depends: 'advanced',
+  //   name: 'enable Mp4 Conversion',
+  //   group: 'mediaRetrievalPlayback',
+  // },
+
+  // musicFadeOutType: {
+  //   type: 'text',
+  //   depends: 'enableMusicButton',
+  //   name: 'music Fade Out Type',
+  //   group: 'mediaRetrievalPlayback',
+  // },
+  // enablePp: {
+  //   // depends: 'media',
+  //   type: 'toggle',
+  //   group: 'mediaRetrievalPlayback',
+  // },
+
+  // enableVlcPlaylistCreation: {
+  //   type: 'toggle',
+  //   // depends: 'advanced',
+  //   group: 'mediaRetrievalPlayback',
+  //   name: 'enable Vlc Playlist Creation',
+  // },
+
+  // musicFadeOutTime: {
+  //   type: 'slider',
+  //   depends: 'enableMusicButton',
+  //   group: 'mediaRetrievalPlayback',
+  //   max: 120,
+  //   min: 5,
+  //   step: 5,
+  // },
+
+
+
+  // keepOriginalsAfterConversion: {
+  //   type: 'toggle',
+  //   depends: 'advanced',
+  //   group: 'mediaRetrievalPlayback',
+  //   name: 'keep Originals After Conversion',
+  // },
+
+
+
+  // autoOpenFolderWhenDone: {
+  //   type: 'toggle',
+  //   group: 'advanced',
+  //   name: 'auto Open Folder When Done',
+  // },
+  // autoPlayFirst: {
+  //   type: 'toggle',
+  //   group: 'advanced',
+  //   name: 'auto Play First',
+  // },
+  // autoPlayFirstTime: {
+  //   type: 'slider',
+  //   group: 'advanced',
+  //   name: 'auto Play First Time',
+  //   max: 60,
+  //   min: 5,
+  //   step: 1,
+  // },
+  // autoQuitWhenDone: {
+  //   type: 'toggle',
+  //   group: 'advanced',
+  //   name: 'auto Quit When Done',
+  // },
+  // autoStartSync: {
+  //   type: 'toggle',
+  //   group: 'advanced',
+  //   name: 'auto Start Sync',
+  // },
+  // betaUpdates: {
+  //   type: 'toggle',
+  //   group: 'advanced',
+  //   name: 'beta Updates',
+  // },
+  // customCachePath: {
+  //   type: 'path',
+  //   group: 'advanced',
+  //   name: 'custom Cache Path',
+  // },
+  // disableAutoUpdate: {
+  //   type: 'toggle',
+  //   group: 'advanced',
+  //   name: 'disable Auto Update',
+  // },
+  // disableHardwareAcceleration: {
+  //   type: 'toggle',
+  //   group: 'advanced',
+  //   name: 'disable Hardware Acceleration',
+  // },
+  // mediaWinShortcut: {
+  //   type: 'text',
+  //   group: 'advanced',
+  //   depends: 'shortcuts',
+  //   name: 'media Win Shortcut',
+  // },
+  // outputFolderDateFormat: {
+  //   type: 'text',
+  //   group: 'advanced',
+  //   name: 'output Folder Date Format',
+  // },
+  // ppBackward: {
+  //   type: 'text',
+  //   group: 'advanced',
+  //   name: 'pp Backward',
+  // },
+  // ppForward: {
+  //   type: 'text',
+  //   group: 'advanced',
+  //   name: 'pp Forward',
+  // },
+  // presentShortcut: {
+  //   type: 'text',
+  //   group: 'advanced',
+  //   depends: 'shortcuts',
+  //   name: 'present Shortcut',
+  // },
+  // shuffleShortcut: {
+  //   type: 'text',
+  //   group: 'advanced',
+  //   depends: 'shortcuts',
+  //   name: 'shuffle Shortcut',
+  // },
+  // specialCong: {
+  //   type: 'toggle',
+  //   group: 'advanced',
+  //   name: 'special Cong',
+  // },
+  // localOutputPath: {
+  //   rules: ['notEmpty'],
+  //   group: 'app',
+  //   type: 'path',
+  //   name: 'local Output Path',
+  // },
 };
 
 export const defaultSettings: SettingsValues = {
   autoOpenFolderWhenDone: false,
-  autoPlayFirst: false,
-  autoPlayFirstTime: 5,
-  autoQuitWhenDone: false,
+  // autoPlayFirst: false,
+  // autoPlayFirstTime: 5,
+  // autoQuitWhenDone: false,
   autoRunAtBoot: false,
   autoStartMusic: true,
-  autoStartSync: false,
-  betaUpdates: false,
+  // autoStartSync: false,
+  // betaUpdates: false,
   congregationName: '',
   darkMode: 'auto',
-  disableAutoUpdate: false,
-  disableHardwareAcceleration: false,
+  // disableAutoUpdate: false,
+  // disableHardwareAcceleration: false,
   enableMediaDisplayButton: false,
-  enableMp4Conversion: false,
+  // enableMp4Conversion: false,
   enableMusicButton: true,
   enableMusicFadeOut: true,
-  enablePp: false,
+  // enablePp: false,
   enableSubtitles: false,
-  enableVlcPlaylistCreation: false,
+  // enableVlcPlaylistCreation: false,
   excludeFootnotes: false,
-  excludeLffImages: false,
+  // excludeLffImages: false,
   excludeTh: true,
   hideMediaLogo: false,
-  hideWinAfterMedia: false,
+  jwlCompanionMode: false,
   includePrinted: true,
-  keepOriginalsAfterConversion: false,
+  // keepOriginalsAfterConversion: false,
   lang: 'E',
   localAppLang: 'en-US',
   maxRes: '720p',
   mediaWinShortcut: 'Alt+Z',
-  musicFadeOutTime: 60,
-  musicFadeOutType: 'smart',
+  // musicFadeOutTime: 60,
+  // musicFadeOutType: 'smart',
   musicVolume: 100,
   obsEnable: false,
-  obsPort: 4444,
+  obsPort: 4455,
   obsPassword: '',
-  outputFolderDateFormat: 'YYYY-MM-DD',
-  presentShortcut: 'Alt+D',
-  shuffleShortcut: 'Alt+K',
-  specialCong: false,
+  // outputFolderDateFormat: 'YYYY-MM-DD',
+  // presentShortcut: 'Alt+D',
+  // shuffleShortcut: 'Alt+K',
+  // specialCong: false,
 };

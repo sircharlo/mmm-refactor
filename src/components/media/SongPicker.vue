@@ -1,6 +1,6 @@
 <template>
   <q-dialog persistent v-model="localValue">
-    <q-card style="min-width: 500px;">
+    <q-card style="min-width: 500px;" class="non-selectable">
       <q-card-section>
         <div class="text-h6">Choose a song {{ selectedSong }}</div>
       </q-card-section>

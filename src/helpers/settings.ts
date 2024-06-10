@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ValidationRule } from 'quasar';
+import { ValidationRule, date } from 'quasar';
 
 import { useJwStore } from 'src/stores/jw';
 const jwStore = useJwStore();
@@ -18,9 +18,9 @@ import { localeOptions } from 'src/i18n';
 const requiredRule: ValidationRule = (val: string) =>
   (val && val.length > 0) || 'required';
 
-const coTuesdays = (date: string) => {
-  if (!date) return false;
-  return new Date(date).getDay() === 2;
+const coTuesdays = (lookupDate: string) => {
+  if (!lookupDate) return false;
+  return new Date(lookupDate).getDay() === 2 && date.getDateDiff(lookupDate, new Date(), 'days') >= 0;
 };
 
 const getDateOptions = (options: string[] | undefined) => {

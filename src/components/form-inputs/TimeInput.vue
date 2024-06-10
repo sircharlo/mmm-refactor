@@ -2,7 +2,7 @@
   <q-input filled v-model="localValue" mask="time" :rules="getRules(rules)" class="q-pb-none" dense readonly
     v-bind="{ label: label || undefined }">
     <q-popup-proxy breakpoint="1000" transition-show="scale" transition-hide="scale">
-      <q-time format24h v-model="localValue" :options="getTimeOptions(options)">
+      <q-time format24h v-model="localValue" :options="getTimeOptions(options)"  class="non-selectable">
         <div class="row items-center justify-end">
           <q-btn icon="mdi-close" color="negative" flat @click="clearTime" v-close-popup />
           <q-btn icon="mdi-check" color="positive" flat v-close-popup />

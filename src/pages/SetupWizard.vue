@@ -67,7 +67,7 @@
           <p>{{ $t('select-no-if-you-plan-on-using-m-to-display-all-meeting-media-this-will-activate-fully-automated-meeting-media-retrieval-yeartext-display-background-music-playback-and-other-practical-features-close-jw-library-before-proceeding-if-you-select-no') }}</p>
           <q-stepper-navigation>
             <q-btn @click="companionToJwl = false; step++" color="primary" :label="$t('no')" class="q-ml-sm" />
-            <q-btn flat @click="companionToJwl = true; step++" color="primary" :label="$t('yes')" class="q-ml-sm" />
+            <q-btn flat @click="companionToJwl = true; step = 102" color="primary" :label="$t('yes')" class="q-ml-sm" />
           </q-stepper-navigation>
         </q-step>
         <q-step :name="101" :title="$t('excellent')" :caption="$t('good-start')" icon="mdi-check" :done="step > 101">
@@ -86,10 +86,10 @@
           <p>{{ $t('to-quickly-show-and-hide-zoom-participants-on-the-tv-screens-when-needed-make-sure-that-the-setting-to-use-dual-monitors-in-zoom-is-enabled') }}</p>
           <q-stepper-navigation>
             <q-btn @click="step++" color="primary" :label="$t('continue')" />
-            <q-btn flat @click="step--" color="primary" :label="$t('back')" class="q-ml-sm" />
+            <q-btn flat @click="companionToJwl ? step = 100 : step--" color="primary" :label="$t('back')" class="q-ml-sm" />
           </q-stepper-navigation>
         </q-step>
-        <q-step :name="103" :title="$t('background-music')" icon="mdi-music" :done="step > 103">
+        <q-step :name="103" :title="$t('setupWizard.backgroundMusic')" icon="mdi-music" :done="step > 103">
           <p>{{ $t('also-look-for-this-button-in-m-s-footer') }}
             <MusicButton :disabled="true" />
           </p>
@@ -222,13 +222,12 @@ watch(companionToJwl, () => {
 async function enableExternalDisplayAndMusic() {
   await updateYeartext(currentSettings.value.lang as string)
   currentSettings.value.enableMediaDisplayButton = usingAtKh.value
-  currentSettings.value.hideWinAfterMedia = companionToJwl.value
+  currentSettings.value.jwlCompanionMode = companionToJwl.value
 
   if (usingAtKh.value) {
-    currentSettings.value.autoStartMusic, !companionToJwl.value
-    currentSettings.value.enableMusicFadeOut, !companionToJwl.value
-    // currentSettings.specialCong, companionToJwl.value
-    currentSettings.value.hideWinAfterMedia, companionToJwl.value
+    currentSettings.value.autoStartMusic = !companionToJwl.value
+    currentSettings.value.enableMusicFadeOut = !companionToJwl.value
+    currentSettings.value.jwlCompanionMode = companionToJwl.value
   }
 
 }

@@ -10,12 +10,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/CongregationSelectorPage.vue'),
       },
     ],
-    meta: { title: 'Home' },
+    meta: { title: 'titles.congregationSelector' },
   },
 
   {
     path: '/congregation-selector',
-    meta: { title: 'Congregation selection' },
+    meta: { title: 'titles.congregationSelector' },
     component: () => import('layouts/MainLayout.vue'),
     children: [
       {
@@ -31,7 +31,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', component: () => import('pages/MediaCalendarPage.vue') },
     ],
-    meta: { title: 'Media calendar' },
+    meta: { title: 'titles.mediaCalendar' },
   },
 
   {
@@ -40,7 +40,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', component: () => import('pages/MediaPlayerPage.vue') },
     ],
-    meta: { title: 'Media player' },
+    meta: { title: 'titles.mediaPlayer' },
   },
   {
     path: '/setup-wizard',
@@ -52,7 +52,7 @@ const routes: RouteRecordRaw[] = [
     path: '/settings',
     component: () => import('layouts/MainLayout.vue'),
     children: [{ path: '', component: () => import('pages/SettingsPage.vue') }],
-    meta: { title: 'Settings' },
+    meta: { title: 'titles.settings' },
   },
 
   // Always leave this as last one,

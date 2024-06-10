@@ -7,7 +7,7 @@ const { path, getUserDataPath } = electronApi;
 
 import { DateInfo } from 'src/types/dates';
 import { SettingsValues } from 'src/types/settings';
-import { DownloadedFile } from 'src/types/media';
+import { DownloadProgressItems, DownloadedFile } from 'src/types/media';
 import { useJwStore } from 'src/stores/jw';
 
 
@@ -29,14 +29,8 @@ export const useCurrentStateStore = defineStore('current-state', {
         y: 0,
         windowVisible: true,
       },
-      downloads: new Map<string, Promise<DownloadedFile>>(),
-      downloadProgress: {} as {
-        [key: string]: {
-          loaded: number,
-          total: number,
-          complete: boolean,
-        }
-      },
+      downloads: {} as { [key: string]: Promise<DownloadedFile> | DownloadedFile },
+      downloadProgress: {} as DownloadProgressItems,
     };
   },
 
@@ -50,26 +44,26 @@ export const useCurrentStateStore = defineStore('current-state', {
       if (state.lookupPeriod.length === 0) return {} as DateInfo
       return state.lookupPeriod.find(day => date.getDateDiff(day.date, state.selectedDate, 'days') === 0) || state.lookupPeriod[0]
     },
-    nonCompleteItems(state) {
-      return Object.fromEntries(Object.entries(state.downloadProgress).filter(([, value]) => !value.complete));
-    },
-    totalDownloadProgress(state) {
-      const downloadProgressArray = Object.values(state.downloadProgress);
-      const totals = downloadProgressArray.reduce(
-        (acc, { loaded, total }) => {
-          acc.totalLoaded += loaded;
-          acc.totalTotal += total;
-          return acc;
-        },
-        { totalLoaded: 0, totalTotal: 0 }
-      );
-      const percentage = totals.totalTotal !== 0 ? (totals.totalLoaded / totals.totalTotal) * 100 : 0;
-      return {
-        totalFirst: totals.totalLoaded,
-        totalSecond: totals.totalTotal,
-        percentage,
-      };
-    },
+    // nonCompleteItems(state) {
+    //   return Object.fromEntries(Object.entries(state.downloadProgress).filter(([, value]) => !value.complete));
+    // },
+    // totalDownloadProgress(state) {
+    //   const downloadProgressArray = Object.values(state.downloadProgress).filter(value => value.loaded && value.total);
+    //   const totals = downloadProgressArray.reduce(
+    //     (acc, { loaded, total }) => {
+    //       acc.totalLoaded += loaded || 0;
+    //       acc.totalTotal += total || 0;
+    //       return acc;
+    //     },
+    //     { totalLoaded: 0, totalTotal: 0 }
+    //   );
+    //   const percentage = totals.totalTotal !== 0 ? (totals.totalLoaded / totals.totalTotal) * 100 : 0;
+    //   return {
+    //     totalFirst: totals.totalLoaded,
+    //     totalSecond: totals.totalTotal,
+    //     percentage,
+    //   };
+    // },
     congregationIsSelected(state) {
       return state.currentCongregation;
     },

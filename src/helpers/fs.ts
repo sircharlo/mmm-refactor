@@ -1,37 +1,18 @@
-// import { storeToRefs } from 'pinia';
 import { PublicationFetcher } from 'src/types/publications';
 import { electronApi } from 'src/helpers/electron-api';
 import { Item } from 'klaw-sync';
 import { isImage, isVideo } from './mediaPlayback';
 
-// import {  date } from 'quasar';
 import { FULL_HD } from './converters';
-
-// import { useCurrentStateStore } from 'stores/current-state';
-// const currentState = useCurrentStateStore();
-// const { currentCongregation, selectedDate } = storeToRefs(currentState);
 
 const { path, fs, getUserDataPath, klawSync } = electronApi;
 
 const getPublicationsPath = () => path.join(getUserDataPath(), 'Publications');
 
-// const getAdditionalMediaDirectory = () => {
-//   return path.join(getUserDataPath(), 'Additional Media');
-// };
 
 const getTempDirectory = () => {
   return path.join(getUserDataPath(), 'Temp');
 };
-
-// const getCongregationAdditionalMediaDirectory = () => {
-//   return path.join(getAdditionalMediaDirectory(), currentCongregation.value);
-// };
-
-// const getDatedAdditionalMediaDirectory = () => {
-//   if (!selectedDate.value) return '';
-//   const dateString = date.formatDate(new Date(selectedDate.value), 'YYYYMMDD');
-//   return path.join(getCongregationAdditionalMediaDirectory(), dateString);
-// };
 
 const getPublicationDirectory = (
   publication: PublicationFetcher,
