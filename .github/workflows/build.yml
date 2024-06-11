@@ -19,6 +19,7 @@ jobs:
         with:
           node-version: 18
 
+      - run: pip install setuptools
       - run: yarn install && yarn global add @quasar/cli
       - run: quasar build -m electron -P always
 
