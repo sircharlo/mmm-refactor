@@ -1,173 +1,189 @@
 <template>
   <q-page padding>
-    <q-stepper v-model="step" vertical color="primary" animated>
+    <q-stepper animated color="primary" v-model="step" vertical>
       <!-- FIRST STAGE START -->
-      <q-step :name="0" :title="$t('setupWizard.welcome')" icon="mdi-human-greeting" :done="step > 0">
+      <q-step :done="step > 0" :name="0" :title="$t('setupWizard.welcome')" icon="mdi-human-greeting">
         {{ $t('setupWizard.intro') }}
         <q-stepper-navigation>
-          <q-btn @click="step++" color="primary" :label="$t('continue')" />
+          <q-btn :label="$t('continue')" @click="step++" color="primary" />
         </q-stepper-navigation>
       </q-step>
-      <q-step :name="1" :title="$t('localAppLang')" icon="mdi-translate-variant" :done="step > 1">
+      <q-step :done="step > 1" :name="1" :title="$t('localAppLang')" icon="mdi-translate-variant">
         {{ $t('what-language-would-you-like-m-to-be-displayed-in') }}
-        <SelectInput v-model="currentSettings.localAppLang" options="appLanguages" :label="$t('localAppLang')" />
+        <SelectInput :label="$t('localAppLang')" options="appLanguages" v-model="currentSettings.localAppLang" />
         <q-stepper-navigation>
-          <q-btn @click="step++" color="primary" :label="$t('continue')" :disable="!currentSettings.localAppLang" />
-          <q-btn flat @click="step--" color="primary" :label="$t('back')" class="q-ml-sm" />
+          <q-btn :disable="!currentSettings.localAppLang" :label="$t('continue')" @click="step++" color="primary" />
+          <q-btn :label="$t('back')" @click="step--" class="q-ml-sm" color="primary" flat />
         </q-stepper-navigation>
       </q-step>
-      <q-step :name="2" :title="$t('lang')" icon="mdi-download" :done="step > 2">
+      <q-step :done="step > 2" :name="2" :title="$t('lang')" icon="mdi-download">
         {{ $t('in-what-language-should-media-be-downloaded') }}
-        <SelectInput v-model="currentSettings.lang" options="jwLanguages" :label="$t('lang')" :useInput="true" />
+        <SelectInput :label="$t('lang')" :useInput="true" options="jwLanguages" v-model="currentSettings.lang" />
         <q-stepper-navigation>
-          <q-btn @click="step++" color="primary" :label="$t('continue')" :disable="!currentSettings.lang" />
-          <q-btn flat @click="step--" color="primary" :label="$t('back')" class="q-ml-sm" />
+          <q-btn :disable="!currentSettings.lang" :label="$t('continue')" @click="step++" color="primary" />
+          <q-btn :label="$t('back')" @click="step--" class="q-ml-sm" color="primary" flat />
         </q-stepper-navigation>
       </q-step>
-      <q-step :name="3" :title="$t('congregationName')" icon="mdi-label" :done="step > 3">
-        {{ $t('the-name-of-your-congregation-or-group-will-be-used-to-quickly-switch-between-profiles-if-ever-you-decide-create-more-than-one-in-the-future') }}
+      <q-step :done="step > 3" :name="3" :title="$t('congregationName')" icon="mdi-label">
+        {{
+          $t('the-name-of-your-congregation-or-group-will-be-used-to-quickly-switch-between-profiles-if-ever-you-decide-create-more-than-one-in-the-future')
+        }}
         <TextInput v-model="currentSettings.congregationName" />
         <q-stepper-navigation>
-          <q-btn @click="step++" color="primary" :label="$t('continue')" :disable="!currentSettings.congregationName" />
-          <q-btn flat @click="step--" color="primary" :label="$t('back')" class="q-ml-sm" />
+          <q-btn :disable="!currentSettings.congregationName" :label="$t('continue')" @click="step++" color="primary" />
+          <q-btn :label="$t('back')" @click="step--" class="q-ml-sm" color="primary" flat />
         </q-stepper-navigation>
       </q-step>
-      <q-step :name="4" :title="$t('setupWizard.meetingDaysTimes')" icon="mdi-calendar-range" :done="step > 4">
+      <q-step :done="step > 4" :name="4" :title="$t('setupWizard.meetingDaysTimes')" icon="mdi-calendar-range">
         {{ $t('what-are-your-meeting-days-and-times-well-use-this-info-to-display-the-media-calendar') }}
-        <SelectInput v-model="currentSettings.mwDay" options="days" :label="$t('mwDay')" />
-        <TimeInput v-model="currentSettings.mwStartTime" :options="['meetingTime']" :label="$t('mwStartTime')" />
-        <SelectInput v-model="currentSettings.weDay" options="days" :label="$t('weDay')" />
-        <TimeInput v-model="currentSettings.weStartTime" :options="['meetingTime']" :label="$t('weStartTime')" />
+        <SelectInput :label="$t('mwDay')" options="days" v-model="currentSettings.mwDay" />
+        <TimeInput :label="$t('mwStartTime')" :options="['meetingTime']" v-model="currentSettings.mwStartTime" />
+        <SelectInput :label="$t('weDay')" options="days" v-model="currentSettings.weDay" />
+        <TimeInput :label="$t('weStartTime')" :options="['meetingTime']" v-model="currentSettings.weStartTime" />
         <q-stepper-navigation>
-          <q-btn @click="step++" color="primary" :label="$t('continue')"
-            :disable="!currentSettings.mwDay || !currentSettings.mwStartTime || !currentSettings.weDay || !currentSettings.weStartTime" />
-          <q-btn flat @click="step--" color="primary" :label="$t('back')" class="q-ml-sm" />
+          <q-btn :disable="!currentSettings.mwDay || !currentSettings.mwStartTime || !currentSettings.weDay || !currentSettings.weStartTime" :label="$t('continue')" @click="step++"
+            color="primary" />
+          <q-btn :label="$t('back')" @click="step--" class="q-ml-sm" color="primary" flat />
         </q-stepper-navigation>
       </q-step>
-      <q-step :name="5" :title="$t('almost-done')" icon="mdi-progress-clock" :done="step > 5">
+      <q-step :done="step > 5" :name="5" :title="$t('almost-done')" icon="mdi-progress-clock">
         {{ $t('well-start-fetching-media-while-we-wrap-up-with-our-initial-setup') }}
         <q-stepper-navigation>
-          <q-btn @click="fetchMedia(); downloadBackgroundMusic(); step++" color="primary" :label="$t('continue')" />
+          <q-btn :label="$t('continue')" @click="fetchMedia(); downloadBackgroundMusic(); step++" color="primary" />
           <!-- <q-btn flat @click="step--" color="primary" :label="$t('back')" class="q-ml-sm" />-->
         </q-stepper-navigation>
       </q-step>
-      <q-step :name="6" :title="$t('kingdom-hall')" icon="mdi-office-building" :done="step > 5">
+      <q-step :done="step > 5" :name="6" :title="$t('kingdom-hall')" icon="mdi-office-building">
         {{ $t('are-you-using-this-app-at-a-kingdom-hall-if-so-well-configure-a-few-things-for-you-right-off-the-bat') }}
         <q-stepper-navigation>
-          <q-btn @click="usingAtKh = true; step = 100" color="primary" :label="$t('yes')" />
-          <q-btn flat @click="usingAtKh = false; step = 200" color="primary" :label="$t('no')" class="q-ml-sm" />
+          <q-btn :label="$t('yes')" @click="usingAtKh = true; step = 100" color="primary" />
+          <q-btn :label="$t('no')" @click="usingAtKh = false; step = 200" class="q-ml-sm" color="primary" flat />
         </q-stepper-navigation>
       </q-step>
       <!-- FIRST STAGE END -->
 
       <!-- KH STAGE START -->
       <template v-if="usingAtKh">
-        <q-step :name="100" :title="$t('companion-to-jw-library')" icon="mdi-podium-silver" :done="step > 100">
+        <q-step :done="step > 100" :name="100" :title="$t('companion-to-jw-library')" icon="mdi-podium-silver">
           <p class="text-subtitle1">{{ $t('will-you-be-using-this-app-as-a-companion-to-jw-library') }}</p>
-          <p>{{ $t('select-no-if-you-plan-on-using-m-to-display-all-meeting-media-this-will-activate-fully-automated-meeting-media-retrieval-yeartext-display-background-music-playback-and-other-practical-features-close-jw-library-before-proceeding-if-you-select-no') }}</p>
+          <p>{{
+            $t('select-no-if-you-plan-on-using-m-to-display-all-meeting-media-this-will-activate-fully-automated-meeting-media-retrieval-yeartext-display-background-music-playback-and-other-practical-features-close-jw-library-before-proceeding-if-you-select-no')
+          }}</p>
           <q-stepper-navigation>
-            <q-btn @click="companionToJwl = false; step++" color="primary" :label="$t('no')" class="q-ml-sm" />
-            <q-btn flat @click="companionToJwl = true; step = 102" color="primary" :label="$t('yes')" class="q-ml-sm" />
+            <q-btn :label="$t('no')" @click="companionToJwl = false; step++" class="q-ml-sm" color="primary" />
+            <q-btn :label="$t('yes')" @click="companionToJwl = true; step = 102" class="q-ml-sm" color="primary" flat />
           </q-stepper-navigation>
         </q-step>
-        <q-step :name="101" :title="$t('excellent')" :caption="$t('good-start')" icon="mdi-check" :done="step > 101">
+        <q-step :caption="$t('good-start')" :done="step > 101" :name="101" :title="$t('excellent')" icon="mdi-check">
           {{ $t('notice-the-yeartext-is-now-being-displayed-on-the-external-monitor-but-lets-keep-going') }}
           <q-stepper-navigation>
-            <q-btn @click="step++" color="primary" :label="$t('continue')" />
-            <q-btn flat @click="step--" color="primary" :label="$t('back')" class="q-ml-sm" />
+            <q-btn :label="$t('continue')" @click="step++" color="primary" />
+            <q-btn :label="$t('back')" @click="step--" class="q-ml-sm" color="primary" flat />
           </q-stepper-navigation>
         </q-step>
 
-        <q-step :name="102" :title="$t('media-display')" icon="mdi-television" :done="step > 102">
+        <q-step :done="step > 102" :name="102" :title="$t('media-display')" icon="mdi-television">
           <p>{{ $t('look-for-this-button-in-m-s-footer') }}
             <MediaDisplayButton :disabled="true" />
           </p>
-          <p>{{ $t('clicking-it-will-allow-you-to-temporarily-hide-the-media-and-yeartext-and-reveal-the-zoom-participants-underneath-once-the-zoom-part-is-over-you-can-show-the-yeartext-again-using-the-same-button') }}</p>
-          <p>{{ $t('to-quickly-show-and-hide-zoom-participants-on-the-tv-screens-when-needed-make-sure-that-the-setting-to-use-dual-monitors-in-zoom-is-enabled') }}</p>
+          <p>{{
+            $t('clicking-it-will-allow-you-to-temporarily-hide-the-media-and-yeartext-and-reveal-the-zoom-participants-underneath-once-the-zoom-part-is-over-you-can-show-the-yeartext-again-using-the-same-button')
+          }}</p>
+          <p>{{
+            $t('to-quickly-show-and-hide-zoom-participants-on-the-tv-screens-when-needed-make-sure-that-the-setting-to-use-dual-monitors-in-zoom-is-enabled')
+          }}</p>
           <q-stepper-navigation>
-            <q-btn @click="step++" color="primary" :label="$t('continue')" />
-            <q-btn flat @click="companionToJwl ? step = 100 : step--" color="primary" :label="$t('back')" class="q-ml-sm" />
+            <q-btn :label="$t('continue')" @click="step++" color="primary" />
+            <q-btn :label="$t('back')" @click="companionToJwl ? step = 100 : step--" class="q-ml-sm" color="primary"
+              flat />
           </q-stepper-navigation>
         </q-step>
-        <q-step :name="103" :title="$t('setupWizard.backgroundMusic')" icon="mdi-music" :done="step > 103">
+        <q-step :done="step > 103" :name="103" :title="$t('setupWizard.backgroundMusic')" icon="mdi-music">
           <p>{{ $t('also-look-for-this-button-in-m-s-footer') }}
             <MusicButton :disabled="true" />
           </p>
-          <p>{{ $t('clicking-it-will-allow-you-to-start-and-stop-the-playback-of-background-music-music-will-start-playing-automatically-before-a-meeting-is-scheduled-to-start-when-m-is-launched-and-will-also-stop-automatically-before-the-meeting-starts-however-background-music-playback-will-need-to-be-manually-started-after-the-concluding-prayer-using-this-button') }}</p>
+          <p>{{
+            $t('clicking-it-will-allow-you-to-start-and-stop-the-playback-of-background-music-music-will-start-playing-automatically-before-a-meeting-is-scheduled-to-start-when-m-is-launched-and-will-also-stop-automatically-before-the-meeting-starts-however-background-music-playback-will-need-to-be-manually-started-after-the-concluding-prayer-using-this-button')
+          }}</p>
           <q-stepper-navigation>
-            <q-btn @click="step++" color="primary" :label="$t('continue')" />
-            <q-btn flat @click="step--" color="primary" :label="$t('back')" class="q-ml-sm" />
+            <q-btn :label="$t('continue')" @click="step++" color="primary" />
+            <q-btn :label="$t('back')" @click="step--" class="q-ml-sm" color="primary" flat />
           </q-stepper-navigation>
         </q-step>
-        <q-step :name="104" :title="$t('obsEnable')" icon="mdi-cctv" :done="step > 104">
+        <q-step :done="step > 104" :name="104" :title="$t('obsEnable')" icon="mdi-cctv">
           <p class="text-subtitle1">{{ $t('does-your-kingdom-hall-use-a-program-called-obs-studio') }}</p>
           <p>{{ $t('obs-studio-is-a-free-app-used-to-manage-camera-and-video-feeds-in-many-kingdom-halls') }}</p>
           <q-stepper-navigation>
-            <q-btn @click="obsUsed = true; step++" color="primary" :label="$t('yes')" class="q-ml-sm" />
-            <q-btn flat @click="step = 200" :label="$t('no')" class="q-ml-sm" />
+            <q-btn :label="$t('yes')" @click="obsUsed = true; step++" class="q-ml-sm" color="primary" />
+            <q-btn :label="$t('no')" @click="step = 200" class="q-ml-sm" flat />
           </q-stepper-navigation>
         </q-step>
         <template v-if="obsUsed">
-          <q-step :name="105" :title="$t('obs-studio-integration')" icon="mdi-cctv" :done="step > 105">
+          <q-step :done="step > 105" :name="105" :title="$t('obs-studio-integration')" icon="mdi-cctv">
             <p class="text-subtitle1">{{ $t('would-you-like-to-integrate-m-with-obs-studio') }}</p>
             <p>{{ $t('doing-so-will-greatly-simplify-and-facilitate-sharing-media-during-hybrid-meetings') }}</p>
             <q-stepper-navigation>
-              <q-btn @click="obsIntegrate = true; step++" color="primary" :label="$t('yes')" class="q-ml-sm" />
-              <q-btn flat @click="step = 200" :label="$t('no')" class="q-ml-sm" />
-              <q-btn flat @click="step--" :label="$t('back')" class="q-ml-sm" />
+              <q-btn :label="$t('yes')" @click="obsIntegrate = true; step++" class="q-ml-sm" color="primary" />
+              <q-btn :label="$t('no')" @click="step = 200" class="q-ml-sm" flat />
+              <q-btn :label="$t('back')" @click="step--" class="q-ml-sm" flat />
             </q-stepper-navigation>
           </q-step>
           <template v-if="obsIntegrate">
-            <q-step :name="106" :title="$t('obs-studio-configuration')" icon="mdi-cogs" :done="step > 106">
+            <q-step :done="step > 106" :name="106" :title="$t('obs-studio-configuration')" icon="mdi-cogs">
               <p class="text-subtitle1">{{ $t('is-obs-studio-configured-correctly') }}</p>
-              <p>{{ $t('configure-the-websocket-plugin-in-obs-studio-the-virtual-camera-plugin-is-also-required-so-make-sure-its-installed-and-configured-as-well') }}</p>
+              <p>{{
+                $t('configure-the-websocket-plugin-in-obs-studio-the-virtual-camera-plugin-is-also-required-so-make-sure-its-installed-and-configured-as-well')
+              }}</p>
               <q-stepper-navigation>
-                <q-btn @click="step++" color="primary" :label="$t('continue')" class="q-ml-sm" />
-                <q-btn flat @click="step = 200" :label="$t('skip-for-now')" class="q-ml-sm" />
+                <q-btn :label="$t('continue')" @click="step++" class="q-ml-sm" color="primary" />
+                <q-btn :label="$t('skip-for-now')" @click="step = 200" class="q-ml-sm" flat />
               </q-stepper-navigation>
             </q-step>
-            <q-step :name="107" :title="$t('obs-studio-port-and-password')" icon="mdi-form-textbox-password"
-              :done="step > 107">
+            <q-step :done="step > 107" :name="107" :title="$t('obs-studio-port-and-password')"
+              icon="mdi-form-textbox-password">
               <p>{{ $t('enter-the-port-and-password-configured-in-obs-studios-websocket-plugin') }}</p>
-              <TextInput v-model="currentSettings.obsPort" :label="$t('obsPort')" :actions="['obsConnect']" />
-              <TextInput v-model="currentSettings.obsPassword" :label="$t('obsPassword')" :actions="['obsConnect']" />
+              <TextInput :actions="['obsConnect']" :label="$t('obsPort')" v-model="currentSettings.obsPort" />
+              <TextInput :actions="['obsConnect']" :label="$t('obsPassword')" v-model="currentSettings.obsPassword" />
               <!-- TODO: test if port and password are valid -->
               <q-stepper-navigation>
-                <q-btn @click="step++" color="primary" :label="$t('continue')" class="q-ml-sm"
-                  :disable="!currentSettings.obsPort || !currentSettings.obsPassword" />
-                <q-btn flat @click="step--" :label="$t('back')" class="q-ml-sm" />
+                <q-btn :disable="!currentSettings.obsPort || !currentSettings.obsPassword" :label="$t('continue')" @click="step++" class="q-ml-sm"
+                  color="primary" />
+                <q-btn :label="$t('back')" @click="step--" class="q-ml-sm" flat />
               </q-stepper-navigation>
             </q-step>
-            <q-step :name="108" :title="$t('obs-studio-stage-scene')" icon="mdi-lectern" :done="step > 108">
+            <q-step :done="step > 108" :name="108" :title="$t('obs-studio-stage-scene')" icon="mdi-lectern">
               <p class="text-subtitle1">{{ $t('configure-a-scene-in-obs-studio-to-show-a-stage-wide-shot') }}</p>
               <p>{{ $t('once-the-scene-has-been-created-select-it-here') }}</p>
-              <SelectInput v-model="currentSettings.obsCameraScene" :label="$t('obsCameraScene')" options="obsScenes" />
+              <SelectInput :label="$t('obsCameraScene')" options="obsScenes" v-model="currentSettings.obsCameraScene" />
               <q-stepper-navigation>
-                <q-btn @click="step++" color="primary" :label="$t('continue')" class="q-ml-sm"
-                  :disable="!currentSettings.obsCameraScene" />
-                <q-btn flat @click="step--" :label="$t('back')" class="q-ml-sm" />
+                <q-btn :disable="!currentSettings.obsCameraScene" :label="$t('continue')" @click="step++" class="q-ml-sm"
+                  color="primary" />
+                <q-btn :label="$t('back')" @click="step--" class="q-ml-sm" flat />
               </q-stepper-navigation>
             </q-step>
-            <q-step :name="109" :title="$t('obs-studio-media-scene')" icon="mdi-lectern" :done="step > 109">
+            <q-step :done="step > 109" :name="109" :title="$t('obs-studio-media-scene')" icon="mdi-lectern">
               <p class="text-subtitle1">{{ $t('configure-a-scene-in-obs-studio-to-capture-the-media-window') }}</p>
               <p>{{ $t('once-the-scene-has-been-created-select-it-here') }}</p>
-              <SelectInput v-model="currentSettings.obsMediaScene" :label="$t('obsMediaScene')" options="obsNonStageScenes" />
+              <SelectInput :label="$t('obsMediaScene')" options="obsNonStageScenes"
+                v-model="currentSettings.obsMediaScene" />
               <q-stepper-navigation>
-                <q-btn @click="step = 200" color="primary" :label="$t('continue')" class="q-ml-sm"
-                  :disable="!currentSettings.obsMediaScene" />
-                <q-btn flat @click="step--" :label="$t('back')" class="q-ml-sm" />
+                <q-btn :disable="!currentSettings.obsMediaScene" :label="$t('continue')" @click="step = 200" class="q-ml-sm"
+                  color="primary" />
+                <q-btn :label="$t('back')" @click="step--" class="q-ml-sm" flat />
               </q-stepper-navigation>
             </q-step>
           </template>
         </template>
         <!-- KH STAGE END -->
-        <q-step :name="200" title="Congratulations!" icon="mdi-seal" :done="step > 105">
+        <q-step :done="step > 105" :name="200" icon="mdi-seal" title="Congratulations!">
           <p class="text-subtitle1">{{ $t('m-is-now-ready-to-be-used') }}</p>
-          <p>{{ $t('feel-free-to-browse-around-the-other-available-options-or-if-you-prefer-you-can-head-right-to-the-media-playback-screen-and-start-using-it-to-display-media') }}</p>
+          <p>{{
+            $t('feel-free-to-browse-around-the-other-available-options-or-if-you-prefer-you-can-head-right-to-the-media-playback-screen-and-start-using-it-to-display-media')
+          }}</p>
           <q-stepper-navigation>
-            <q-btn @click="goToPage('/media-calendar')" color="primary" :label="$t('media-playback')" class="q-ml-sm" />
-            <q-btn outlined @click="goToPage('/settings')" :label="$t('settings')" class="q-ml-sm" />
-            <q-btn flat @click="step = 0" :label="$t('start-over')" class="q-ml-sm" />
+            <q-btn :label="$t('media-playback')" @click="goToPage('/media-calendar')" class="q-ml-sm" color="primary" />
+            <q-btn :label="$t('settings')" @click="goToPage('/settings')" class="q-ml-sm" outlined />
+            <q-btn :label="$t('start-over')" @click="step = 0" class="q-ml-sm" flat />
           </q-stepper-navigation>
         </q-step>
       </template>
@@ -189,68 +205,74 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia';
-
-import { useCurrentStateStore } from 'stores/current-state';
-const currentState = useCurrentStateStore();
-const { currentSettings } = storeToRefs(currentState);
-
-const usingAtKh = ref(false)
-const companionToJwl = ref(true)
-const obsUsed = ref(false)
-const obsIntegrate = ref(false)
-
-
-import { useJwStore } from 'src/stores/jw';
-
-const jwStore = useJwStore();
-const { updateYeartext } = jwStore;
-
+import SelectInput from 'src/components/form-inputs/SelectInput.vue';
+import TextInput from 'src/components/form-inputs/TextInput.vue';
+import TimeInput from 'src/components/form-inputs/TimeInput.vue';
+import MediaDisplayButton from 'src/components/media/MediaDisplayButton.vue';
+import MusicButton from 'src/components/media/MusicButton.vue';
+import { downloadBackgroundMusic, fetchMedia } from 'src/helpers/jw-media';
+import { defineComponent, ref, watch } from 'vue'
 import { useRouter } from 'vue-router';
 
-import { downloadBackgroundMusic, fetchMedia } from 'src/helpers/jw-media';
-
-watch(usingAtKh, () => {
-  enableExternalDisplayAndMusic()
-})
-
-watch(companionToJwl, () => {
-  enableExternalDisplayAndMusic()
-})
-
-async function enableExternalDisplayAndMusic() {
-  await updateYeartext(currentSettings.value.lang as string)
-  currentSettings.value.enableMediaDisplayButton = usingAtKh.value
-  currentSettings.value.jwlCompanionMode = companionToJwl.value
-
-  if (usingAtKh.value) {
-    currentSettings.value.autoStartMusic = !companionToJwl.value
-    currentSettings.value.enableMusicFadeOut = !companionToJwl.value
-    currentSettings.value.jwlCompanionMode = companionToJwl.value
-  }
-
-}
+import { useCurrentStateStore } from '../stores/current-state';
+import { useJwStore } from '../stores/jw';
 
 
 
 export default defineComponent({
   setup() {
+    const currentState = useCurrentStateStore();
+    const { currentSettings } = storeToRefs(currentState);
+
+    const usingAtKh = ref(false)
+    const companionToJwl = ref(true)
+    const obsUsed = ref(false)
+    const obsIntegrate = ref(false)
+
+
+    const jwStore = useJwStore();
+    const { updateYeartext } = jwStore;
     const router = useRouter();
+    watch(usingAtKh, () => {
+      enableExternalDisplayAndMusic()
+    })
+
+    watch(companionToJwl, () => {
+      enableExternalDisplayAndMusic()
+    })
+
+    async function enableExternalDisplayAndMusic() {
+      await updateYeartext(currentSettings.value.lang as string)
+      currentSettings.value.enableMediaDisplayButton = usingAtKh.value
+      currentSettings.value.jwlCompanionMode = companionToJwl.value
+
+      if (usingAtKh.value) {
+        currentSettings.value.autoStartMusic = !companionToJwl.value
+        currentSettings.value.enableMusicFadeOut = !companionToJwl.value
+        currentSettings.value.jwlCompanionMode = companionToJwl.value
+      }
+
+    }
     const goToPage = (path: string) => {
       router.push({ path })
     }
     const step = ref(0)
     return {
-      goToPage,
-      step,
-      currentSettings,
-      usingAtKh,
+      MediaDisplayButton,
+      MusicButton,
+      SelectInput,
+      TextInput,
+      TimeInput,
       companionToJwl,
-      obsUsed,
-      obsIntegrate,
-      fetchMedia,
+      currentSettings,
       downloadBackgroundMusic,
+      fetchMedia,
+      goToPage,
+      obsIntegrate,
+      obsUsed,
+      step,
+      usingAtKh
     }
   }
 })

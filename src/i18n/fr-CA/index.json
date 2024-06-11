@@ -287,5 +287,6 @@
   "zoomSpotlight": "Mettre en évidence la vidéo au démarrage de la réunion",
   "zoomStartMeeting": "Démarrer la réunion Zoom",
   "zoomStopMeeting": "Arrêter la réunion Zoom",
-  "zoomToggleComponent": "Basculer la visibilité du composant Zoom"
+  "zoomToggleComponent": "Basculer la visibilité du composant Zoom",
+  "music.stopping": "Arrêt en cours..."
 }

@@ -2,64 +2,64 @@ import { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
   {
+    children: [
+      {
+        component: () => import('pages/CongregationSelectorPage.vue'),
+        path: '',
+      },
+    ],
+    component: () => import('layouts/MainLayout.vue'),
+    meta: { title: 'titles.congregationSelector' },
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      {
-        path: '',
-        component: () => import('pages/CongregationSelectorPage.vue'),
-      },
-    ],
-    meta: { title: 'titles.congregationSelector' },
   },
 
   {
+    children: [
+      {
+        component: () => import('pages/CongregationSelectorPage.vue'),
+        path: '',
+      },
+    ],
+    component: () => import('layouts/MainLayout.vue'),
+    meta: { title: 'titles.congregationSelector' },
     path: '/congregation-selector',
-    meta: { title: 'titles.congregationSelector' },
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      {
-        path: '',
-        component: () => import('pages/CongregationSelectorPage.vue'),
-      },
-    ],
   },
 
   {
-    path: '/media-calendar',
-    component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/MediaCalendarPage.vue') },
+      { component: () => import('pages/MediaCalendarPage.vue'), path: '' },
     ],
+    component: () => import('layouts/MainLayout.vue'),
     meta: { title: 'titles.mediaCalendar' },
+    path: '/media-calendar',
   },
 
   {
-    path: '/media-player',
-    component: () => import('layouts/MediaPlayerLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/MediaPlayerPage.vue') },
+      { component: () => import('pages/MediaPlayerPage.vue'), path: '' },
     ],
+    component: () => import('layouts/MediaPlayerLayout.vue'),
     meta: { title: 'titles.mediaPlayer' },
+    path: '/media-player',
   },
   {
-    path: '/setup-wizard',
+    children: [{ component: () => import('pages/SetupWizard.vue'), path: '' }],
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/SetupWizard.vue') }],
     meta: { title: 'Setup Wizard' },
+    path: '/setup-wizard',
   },
   {
-    path: '/settings',
+    children: [{ component: () => import('pages/SettingsPage.vue'), path: '' }],
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/SettingsPage.vue') }],
     meta: { title: 'titles.settings' },
+    path: '/settings',
   },
 
   // Always leave this as last one,
   // but you can also remove it
   {
-    path: '/:catchAll(.*)*',
     component: () => import('pages/ErrorNotFound.vue'),
+    path: '/:catchAll(.*)*',
   },
 ];
 

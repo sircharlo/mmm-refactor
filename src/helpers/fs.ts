@@ -1,11 +1,11 @@
-import { PublicationFetcher } from 'src/types/publications';
-import { electronApi } from 'src/helpers/electron-api';
 import { Item } from 'klaw-sync';
-import { isImage, isVideo } from './mediaPlayback';
+import { electronApi } from 'src/helpers/electron-api';
+import { PublicationFetcher } from 'src/types/publications';
 
 import { FULL_HD } from './converters';
+import { isImage, isVideo } from './mediaPlayback';
 
-const { path, fs, getUserDataPath, klawSync } = electronApi;
+const { fs, getUserDataPath, klawSync, path } = electronApi;
 
 const getPublicationsPath = () => path.join(getUserDataPath(), 'Publications');
 
@@ -35,11 +35,11 @@ const getPublicationDirectoryContents = (
   const dir = getPublicationDirectory(publication);
   if (!fs.existsSync(dir)) return [];
   const files = klawSync(dir, {
-    nodir: true,
     filter: (file) => {
       if (!filter) return true;
       return path.basename(file.path.toLowerCase()).includes(filter.toLowerCase());
     },
+    nodir: true,
   });
   return files as Item[];
 };
@@ -143,10 +143,10 @@ const getThumbnailUrl = async (filepath: string) => {
 };
 
 export {
+  getDurationFromMediaPath,
+  getFileUrl,
   getPublicationDirectory,
   getPublicationDirectoryContents,
-  getFileUrl,
-  getThumbnailUrl,
   getTempDirectory,
-  getDurationFromMediaPath
+  getThumbnailUrl
 };

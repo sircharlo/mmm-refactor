@@ -1,66 +1,45 @@
 <template>
-  <q-input filled v-model="localValue" mask="date" readonly :rules="getRules(rules)" dense class="q-pb-none"
+  <q-input :rules="getRules(rules)" class="q-pb-none" dense filled mask="date" readonly v-model="localValue"
     v-bind="{ label: label || undefined }">
-    <q-popup-proxy breakpoint="1000" transition-show="scale" transition-hide="scale">
-      <q-date v-model="localValue" :options="getDateOptions(options)" :rules="rules" dense>
+    <q-popup-proxy breakpoint="1000" transition-hide="scale" transition-show="scale">
+      <q-date :options="getDateOptions(options)" :rules="rules" dense v-model="localValue">
         <div class="row items-center justify-end q-gutter-sm">
-          <q-btn icon="mdi-close" color="negative" flat @click="clearDate" v-close-popup />
-          <q-btn icon="mdi-check" color="positive" flat v-close-popup />
+          <q-btn @click="clearDate" color="negative" flat icon="mdi-close" v-close-popup />
+          <q-btn color="positive" flat icon="mdi-check" v-close-popup />
         </div>
       </q-date>
     </q-popup-proxy>
   </q-input>
 </template>
 
-<script>
-import { defineComponent, ref, watch } from 'vue';
-import { getRules, getDateOptions } from 'src/helpers/settings';
+<script setup lang="ts">
+import { getDateOptions, getRules } from 'src/helpers/settings';
+import { ref, watch } from 'vue';
 
-export default defineComponent({
-  name: 'DateInput',
-  props: {
-    modelValue: {
-      type: [String, Date],
-      default: null,
-    },
-    rules: {
-      type: Array,
-      default: () => [],
-    },
-    options: {
-      type: Array,
-      default: () => [],
-    },
-    label: {
-      type: String,
-      default: null,
-    },
-  },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const localValue = ref(props.modelValue);
+const emit = defineEmits(['update:modelValue']);
 
-    watch(localValue, (newValue) => {
-      emit('update:modelValue', newValue);
-    });
+const props = defineProps<{
+  label?: null | string;
+  modelValue?: string;
+  options?: string[];
+  rules?: string[];
+}>();
 
-    watch(
-      () => props.modelValue,
-      (newValue) => {
-        localValue.value = newValue;
-      }
-    );
+const localValue = ref(props.modelValue);
 
-    const clearDate = () => {
-      localValue.value = null;
-    };
-
-    return {
-      localValue,
-      getRules,
-      getDateOptions,
-      clearDate,
-    };
-  },
+watch(localValue, (newValue) => {
+  emit('update:modelValue', newValue);
 });
+
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    localValue.value = newValue;
+  }
+);
+
+const clearDate = () => {
+  localValue.value = '';
+};
+
 </script>

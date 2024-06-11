@@ -1,6 +1,6 @@
 <template>
-  <q-btn icon="mdi-music" v-if="currentSettings?.enableMusicButton" @click="musicPopup = false" size="md" :label="musicPlaying ? musicRemainingTime : ''" :flat="!disabled"
-    :outline="disabled" :disable="disabled">
+  <q-btn :disable="disabled" :flat="!disabled" :label="musicPlaying ? musicRemainingTime : ''" :outline="disabled"
+    @click="musicPopup = false" icon="mdi-music" size="md" v-if="currentSettings?.enableMusicButton">
     <q-tooltip v-if="!disabled && !musicPopup">
       Background music
     </q-tooltip>
@@ -15,32 +15,38 @@
         </q-card-section>
         <q-separator />
         <q-card-actions>
-          <q-btn flat @click="playMusic" v-if="!musicPlaying" :disabled="mediaPlaying" v-close-popup>Play music</q-btn>
-          <q-btn flat :disable="musicStopping" @click="stopMusic" v-close-popup v-else>Stop music</q-btn>
+          <q-btn :disabled="mediaPlaying" @click="playMusic" flat v-close-popup v-if="!musicPlaying">Play music</q-btn>
+          <q-btn :disable="musicStopping" @click="stopMusic" flat v-close-popup v-else>Stop music</q-btn>
         </q-card-actions>
       </q-card>
     </q-popup-proxy>
   </q-btn>
-  <audio class="hidden" ref="musicPlayer" controls>
+  <audio class="hidden" controls ref="musicPlayer">
     <source ref="musicPlayerSource" type="audio/mpeg" />
   </audio>
 </template>
 
-<script lang="ts">
-import { Ref, computed, defineComponent, ref } from 'vue';
+<script setup lang="ts">
+import klawSync from 'klaw-sync';
+import { storeToRefs } from 'pinia';
+import { date } from 'quasar';
 import { getFileUrl, getPublicationDirectoryContents } from 'src/helpers/fs';
 import { formatTime } from 'src/helpers/mediaPlayback';
-import { storeToRefs } from 'pinia';
-import { useCurrentStateStore } from 'stores/current-state';
-import { isMeetingDay, isWeMeetingDay } from 'src/helpers/date';
-import { date } from 'quasar';
-import klawSync from 'klaw-sync';
-const currentState = useCurrentStateStore();
-const { mediaPlaying, currentSettings } = storeToRefs(currentState);
-const { getSettingValue } = currentState
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n'
 
-const musicPlayer: Ref<HTMLAudioElement | undefined> = ref();
-const musicPlayerSource: Ref<HTMLSourceElement | undefined> = ref();
+import { useCurrentStateStore } from '../../stores/current-state';
+const { t } = useI18n()
+
+defineProps<{
+  disabled?: boolean
+}>()
+
+const currentState = useCurrentStateStore();
+const { currentSettings, mediaPlaying, selectedDateObject } = storeToRefs(currentState);
+const { getSettingValue } = currentState
+const musicPlayer = ref<HTMLAudioElement | undefined>();
+const musicPlayerSource = ref<HTMLSourceElement | undefined>();
 const musicPlaying = ref(false);
 const fadeOutTimer = ref();
 const musicStopping = ref(false);
@@ -64,13 +70,14 @@ function stopMusic() {
 
 const getNextSongUrl = () => {
   if (!songList.value.length) {
-    songList.value = getPublicationDirectoryContents({ pub: 'sjjm', langwritten: 'E' }, 'mp3').sort(() => Math.random() - 0.5);
+    songList.value = getPublicationDirectoryContents({ langwritten: 'E', pub: 'sjjm' }, 'mp3').sort(() => Math.random() - 0.5);
   }
   if (!songList.value.length) return '';
   let nextSong = songList.value.shift() as klawSync.Item;
   songList.value = songList.value.concat(nextSong)
   return getFileUrl(nextSong.path);
 }
+
 function playMusic() {
   if (!musicPlayer.value || !musicPlayerSource.value) return
   musicPlayer.value.volume = 1;
@@ -96,42 +103,18 @@ const musicRemainingTime = computed(() => {
   if (!musicPlayer.value) return '..:..'
   let remainingTime = currentSongRemainingTime.value
   const now = new Date();
-  const meetingDay = isMeetingDay(now);
+  const meetingDay = selectedDateObject.value.meeting;
   if (meetingDay) {
-    const weMeeting = isWeMeetingDay(now);
+    const weMeeting = meetingDay === 'we';
     const meetingStartTime = weMeeting ? getSettingValue('weStartTime') as string : getSettingValue('mwStartTime') as string
     const [hours, minutes] = meetingStartTime.split(':').map(Number);
     const meetingStartDateTime = new Date(now);
     meetingStartDateTime.setHours(hours, minutes, 0, 0);
     remainingTime = formatTime(date.getDateDiff(meetingStartDateTime, now, 'seconds'))
   }
-  return musicStopping.value ? 'Stopping...' : remainingTime
+  return musicStopping.value ? ref(t('music.stopping')).value : remainingTime
 });
 
+const musicPopup = ref(false);
 
-
-export default defineComponent({
-  name: 'MusicButton',
-  props: {
-    disabled: {
-      type: Boolean,
-      default: false,
-    }
-  },
-  setup() {
-    return {
-      musicPlaying,
-      musicRemainingTime,
-      musicPopup: ref(false),
-      currentSongRemainingTime,
-      musicStopping,
-      playMusic,
-      stopMusic,
-      musicPlayer,
-      musicPlayerSource,
-      mediaPlaying,
-      currentSettings
-    };
-  },
-});
 </script>

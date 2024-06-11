@@ -1,10 +1,11 @@
 <template>
-  <q-btn v-if="currentSettings?.enableMediaDisplayButton" size="md" :icon="mediaPlayer.windowVisible ? 'mdi-television' : 'mdi-television-off'" @click="mediaDisplayPopup = false" :flat="!disabled" :outline="disabled"
-    :disable="disabled" :color="mediaPlayer.windowVisible ? '' : 'red-5'">
-    <q-tooltip v-if="!disabled && !mediaDisplayPopup" anchor="bottom left" self="top left">
+  <q-btn :color="mediaPlayer.windowVisible ? '' : 'red-5'" :disable="disabled"
+    :flat="!disabled" :icon="mediaPlayer.windowVisible ? 'mdi-television' : 'mdi-television-off'"
+    :outline="disabled" @click="mediaDisplayPopup = false" size="md" v-if="currentSettings?.enableMediaDisplayButton">
+    <q-tooltip anchor="bottom left" self="top left" v-if="!disabled && !mediaDisplayPopup">
       Media display
     </q-tooltip>
-    <q-popup-proxy v-if="!disabled" anchor="bottom right" self="top right" v-model="mediaDisplayPopup">
+    <q-popup-proxy anchor="bottom right" self="top right" v-if="!disabled" v-model="mediaDisplayPopup">
       <q-card class="non-selectable">
         <q-card-section>
           <div class="text-overline">Media display</div>
@@ -16,8 +17,8 @@
         </q-card-section>
         <q-separator />
         <q-card-actions>
-          <q-btn flat @click="showMediaWindow(false)" v-if="mediaPlayer.windowVisible">Hide media display</q-btn>
-          <q-btn flat @click="showMediaWindow(true)" v-else>Show media display</q-btn>
+          <q-btn @click="showMediaWindow(false)" flat v-if="mediaPlayer.windowVisible">Hide media display</q-btn>
+          <q-btn @click="showMediaWindow(true)" flat v-else>Show media display</q-btn>
         </q-card-actions>
       </q-card>
     </q-popup-proxy>
@@ -25,35 +26,36 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import { electronApi } from 'src/helpers/electron-api';
-import { useCurrentStateStore } from 'stores/current-state';
 import { storeToRefs } from 'pinia';
-const currentState = useCurrentStateStore();
-const { mediaPlayer, currentSettings } = storeToRefs(currentState);
+import { electronApi } from 'src/helpers/electron-api';
+import { defineComponent, ref } from 'vue';
 
-const { toggleMediaWindow } = electronApi;
-const mediaDisplayPopup = ref();
-
-const showMediaWindow = (state: boolean) => {
-  mediaPlayer.value.windowVisible = state;
-  toggleMediaWindow(state ? 'show' : 'hide');
-};
+import { useCurrentStateStore } from '../../stores/current-state';
 
 export default defineComponent({
   name: 'MediaDisplayButton',
   props: {
     disabled: {
-      type: Boolean,
       default: false,
+      type: Boolean,
     }
   },
   setup() {
+    const currentState = useCurrentStateStore();
+    const { currentSettings, mediaPlayer } = storeToRefs(currentState);
+
+    const { toggleMediaWindow } = electronApi;
+    const mediaDisplayPopup = ref();
+
+    const showMediaWindow = (state: boolean) => {
+      mediaPlayer.value.windowVisible = state;
+      toggleMediaWindow(state ? 'show' : 'hide');
+    };
     return {
+      currentSettings,
       mediaDisplayPopup,
-      showMediaWindow,
       mediaPlayer,
-      currentSettings
+      showMediaWindow
     };
   },
 });

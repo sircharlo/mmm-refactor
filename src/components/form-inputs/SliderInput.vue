@@ -1,51 +1,30 @@
 <template>
-  <q-slider dense filled v-model="localValue" class="q-pb-none" :min="min" :max="max" :step="step" />
+  <q-slider :max="max" :min="min" :step="step" class="q-pb-none" dense filled v-model="localValue" />
 </template>
 
-<script>
-import { defineComponent, ref, watch } from 'vue';
+<script setup lang="ts">
+import { ref, watch } from 'vue';
 
-export default defineComponent({
-  name: 'SliderInput',
-  props: {
-    modelValue: {
-      type: Number,
-      default: 0,
-    },
-    min: {
-      type: Number,
-      default: 0,
-    },
-    max: {
-      type: Number,
-      default: 100,
-    },
-    step: {
-      type: Number,
-      default: 1,
-    },
-  },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const localValue = ref(props.modelValue);
+const emit = defineEmits(['update:modelValue']);
 
-    watch(localValue, (newValue) => {
-      emit('update:modelValue', newValue);
-    });
+const props = defineProps<{
+  max?: number;
+  min?: number;
+  modelValue?: number;
+  step?: number;
+}>();
 
-    watch(
-      () => props.modelValue,
-      (newValue) => {
-        localValue.value = newValue;
-      }
-    );
+const localValue = ref(props.modelValue);
 
-    // const getRules = (rules) => rules;
-
-    return {
-      localValue,
-      // getRules,
-    };
-  },
+watch(localValue, (newValue) => {
+  emit('update:modelValue', newValue);
 });
+
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    localValue.value = newValue;
+  }
+);
+
 </script>

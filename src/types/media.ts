@@ -1,42 +1,42 @@
 import { VideoMarker } from './sqlite';
 
 export interface DynamicMediaObject {
+  customDuration?: { max: number; min: number };
+  duration: number;
   fileUrl: string;
+  footnote?: boolean
+  isAdditional?: boolean
+  isAudio: boolean;
+  isImage: boolean;
+  isVideo: boolean;
+  markers?: VideoMarker[]
+  paragraph?: number;
+  section: string;
+  song?: boolean | string
   thumbnailUrl: string;
   title: string;
   uniqueId: string;
-  isImage: boolean;
-  isVideo: boolean;
-  isAudio: boolean;
-  duration: number;
-  customDuration?: { min: number; max: number };
-  section: string;
-  paragraph?: number;
-  footnote?: boolean
-  song?: boolean | string
-  isAdditional?: boolean
-  markers?: VideoMarker[]
 }
 
 export interface DownloadedFile {
-  path: string;
-  new?: boolean;
   error?: boolean;
+  new?: boolean;
+  path: string;
 }
 
 export interface DownloadProgressItems {
   [key: string]: {
-    loaded?: number;
-    total?: number;
     complete?: boolean;
     error?: boolean;
+    loaded?: number;
+    total?: number;
   };
 }
 
 export interface FileDownloader {
-  url: string;
   dir: string;
   filename?: string;
-  size?: number;
   notify?: boolean;
+  size?: number;
+  url: string;
 }

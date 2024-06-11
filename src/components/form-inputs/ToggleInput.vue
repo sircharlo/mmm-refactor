@@ -3,22 +3,22 @@
 </template>
 
 <script>
-import { defineComponent, ref, watch } from 'vue';
 import { getActions } from 'src/helpers/settings';
+import { defineComponent, ref, watch } from 'vue';
 
 export default defineComponent({
+  emits: ['update:modelValue'],
   name: 'ToggleInput',
   props: {
-    modelValue: {
-      type: Boolean,
-      default: false,
-    },
     actions: {
-      type: Array,
       default: () => [],
+      type: Array,
+    },
+    modelValue: {
+      default: false,
+      type: Boolean,
     },
   },
-  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const localValue = ref(props.modelValue);
     watch(localValue, (newValue) => {

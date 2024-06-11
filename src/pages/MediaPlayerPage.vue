@@ -1,22 +1,22 @@
 <template>
   <!-- {{ mediaPlayer }} -->
-  <q-page-container padding class="q-electron-drag vertical-middle overflow-hidden"
+  <q-page-container class="q-electron-drag vertical-middle overflow-hidden" padding
     style="align-content: center; height: 100vh;">
     <q-resize-observer @resize="onResize" debounce="50" />
-    <transition name="fade" mode="out-in" appear enter-active-class="animated fadeIn"
-      leave-active-class="animated fadeOut">
-      <q-img class="fitSnugly" fit="contain" ref="mediaImage" id="mediaImage" @load="initiatePanzoom()"
-        :src="mediaPlayer.url" v-if="isImage(mediaPlayer.url)" no-spinner />
-      <video class="fitSnugly" preload="metadata" ref="mediaElement" @animationstart="playMedia()"
+    <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut" mode="out-in"
+      name="fade">
+      <q-img :src="mediaPlayer.url" @load="initiatePanzoom()" class="fitSnugly" fit="contain" id="mediaImage"
+        no-spinner ref="mediaImage" v-if="isImage(mediaPlayer.url)" />
+      <video @animationstart="playMedia()" class="fitSnugly" preload="metadata" ref="mediaElement"
         v-else-if="isVideo(mediaPlayer.url)">
-        <source ref="mediaElementSource" :src="mediaPlayer.url" />
+        <source :src="mediaPlayer.url" ref="mediaElementSource" />
       </video>
       <div v-else>
-        <audio style="display: none;" ref="mediaElement" v-if="isAudio(mediaPlayer.url)" @loadedmetadata="playMedia()">
-          <source ref="mediaElementSource" :src="mediaPlayer.url" />
+        <audio @loadedmetadata="playMedia()" ref="mediaElement" style="display: none;" v-if="isAudio(mediaPlayer.url)">
+          <source :src="mediaPlayer.url" ref="mediaElementSource" />
         </audio>
-        <div class="q-pa-md center" id="yeartext" v-if="!currentSettings?.jwlCompanionMode"
-          v-html="(yeartexts[new Date().getFullYear()] && yeartexts[new Date().getFullYear()][currentSettings?.lang]) ?? ''" />
+        <div class="q-pa-md center" id="yeartext" v-html="(yeartexts[new Date().getFullYear()] && yeartexts[new Date().getFullYear()][currentSettings?.lang]) ?? ''"
+          v-if="!currentSettings?.jwlCompanionMode" />
         <div id="yeartextLogoContainer" v-if="!currentSettings?.hideMediaLogo">
           <p id="yeartextLogo"></p>
         </div>
@@ -25,38 +25,39 @@
   </q-page-container>
 </template>
 <script lang="ts">
-import { defineComponent, ref, Ref, watch } from 'vue'
-import { useCurrentStateStore } from 'stores/current-state';
+import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { storeToRefs } from 'pinia';
 import { useQuasar } from 'quasar'
-const currentState = useCurrentStateStore();
-const { currentSettings, mediaPlayer, currentCongregation, selectedDate } = storeToRefs(currentState);
-
-
-import { useJwStore } from 'stores/jw';
-const jwStore = useJwStore();
-const { yeartexts, customDurations } = storeToRefs(jwStore);
-
-
-
 import { isAudio, isImage, isVideo } from 'src/helpers/mediaPlayback';
-import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
+import { Ref, defineComponent, ref, watch } from 'vue'
 
 import { electronApi } from '../helpers/electron-api';
-const { toggleMediaWindow } = electronApi;
+import { useCurrentStateStore } from '../stores/current-state';
+import { useJwStore } from '../stores/jw';
 
-
-
-const panzoom: Ref<PanzoomObject | undefined> = ref()
-
-const initiatePanzoom = () => {
-  const imageElem = document.getElementById('mediaImage')
-  if (!imageElem) return
-  panzoom.value = Panzoom(imageElem)
-}
 
 export default defineComponent({
   setup() {
+    const currentState = useCurrentStateStore();
+    const { currentCongregation, currentSettings, mediaPlayer, selectedDate } = storeToRefs(currentState);
+
+
+    const jwStore = useJwStore();
+    const { customDurations, yeartexts } = storeToRefs(jwStore);
+
+
+
+    const { toggleMediaWindow } = electronApi;
+
+
+
+    const panzoom: Ref<PanzoomObject | undefined> = ref()
+
+    const initiatePanzoom = () => {
+      const imageElem = document.getElementById('mediaImage')
+      if (!imageElem) return
+      panzoom.value = Panzoom(imageElem)
+    }
     const $q = useQuasar()
     let mediaElement: Ref<HTMLVideoElement | undefined> = ref();
     const mediaImage: Ref<HTMLImageElement | undefined> = ref();
@@ -104,7 +105,7 @@ export default defineComponent({
         }
       }
       mediaPlayer.value.action = 'play'
-      let customStartStop = { min: 0, max: 0 }
+      let customStartStop = { max: 0, min: 0 }
       if (customDurations.value[currentCongregation.value][selectedDate.value][mediaPlayer.value.uniqueId]) {
         customStartStop = customDurations.value[currentCongregation.value][selectedDate.value][mediaPlayer.value.uniqueId]
       }
@@ -114,24 +115,24 @@ export default defineComponent({
 
     return {
       currentSettings,
-      mediaPlayer,
-      playMedia,
-      mediaElement,
-      mediaImage,
       initiatePanzoom,
-      yeartexts,
+      isAudio,
       isImage,
       isVideo,
-      isAudio,
-      onResize(size: { width: number; height: number; }) {
+      mediaElement,
+      mediaImage,
+      mediaPlayer,
+      onResize(size: { height: number; width: number; }) {
         $q.notify({
-          group: 'resize', // required to be updatable
-          timeout: 500, // we want to be in control when it gets dismissed
-          message: size.width + 'x' + size.height,
           badgeStyle: 'display: none',
+          group: 'resize', // required to be updatable
+          message: size.width + 'x' + size.height,
+          timeout: 500, // we want to be in control when it gets dismissed
           type: 'info'
         })
       },
+      playMedia,
+      yeartexts,
       // customDuration,
       // selectedDate,
       // currentCongregation

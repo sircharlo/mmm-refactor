@@ -6,10 +6,11 @@ export interface SettingsValues {
   autoRunAtBoot: boolean;
   autoStartMusic: boolean;
   // autoStartSync: boolean;
+  coWeek: string;
   // betaUpdates: boolean;
   congregationName: string;
-  darkMode: string;
   // disableAutoUpdate: boolean;
+  darkMode: string;
   // disableHardwareAcceleration: boolean;
   enableMediaDisplayButton: boolean;
   // enableMp4Conversion: boolean;
@@ -22,51 +23,61 @@ export interface SettingsValues {
   // excludeLffImages: boolean;
   excludeTh: boolean;
   hideMediaLogo: boolean;
-  jwlCompanionMode: boolean;
   includePrinted: boolean;
+  jwlCompanionMode: boolean;
   // keepOriginalsAfterConversion: boolean;
   lang: string;
+  langFallback: string;
+  // mediaWinShortcut: string;
+  // musicFadeOutTime: number;
+  langSubs: string;
   localAppLang: string;
   maxRes: string;
-  mediaWinShortcut: string;
-  // musicFadeOutTime: number;
   // musicFadeOutType: string;
   musicVolume: number;
-  obsEnable: boolean;
-  obsPort: number;
-  obsPassword: string;
+  mwDay: string;
   // outputFolderDateFormat: string;
   // presentShortcut: string;
   // shuffleShortcut: string;
   // specialCong: boolean;
-  [key: string]: unknown;
+  mwStartTime: string;
+  obsCameraScene: string;
+  obsEnable: boolean;
+  obsImageScene: string;
+  obsMediaScene: string;
+  obsPassword: string;
+  obsPort: string;
+  preferredOutput: string;
+  // [key: string]: unknown;
+  weDay: string;
+  weStartTime: string;
 }
 
 export interface SettingsItem {
-  group: string;
+  actions?: string[];
   depends?: string;
-  type: string;
+  group: string;
   list?: string;
-  rules?: string[];
-  options?: string[];
-  order?: number;
   max?: number;
   min?: number;
+  options?: string[];
+  order?: number;
+  rules?: string[];
   step?: number;
-  actions?: string[];
+  type: string;
 }
 
-export interface SettingsItems {
-  [key: string]: SettingsItem;
-}
+export type SettingsItems = {
+  [key in keyof SettingsValues]: SettingsItem;
+};
 
 export interface SettingsGroups {
   [id: string]: SettingsGroup;
 }
 
 export interface SettingsGroup {
-  name: string;
   description: string;
-  order?: number;
   hidden?: boolean;
+  name: string;
+  order?: number;
 }

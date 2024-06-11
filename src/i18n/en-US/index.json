@@ -1,5 +1,5 @@
 {
-  "congregationMeetings": "Meeting schedule",
+  "congregationMeetings": "Congregation meetings",
   "congregationMeetingsDescription": "Settings relating to your congregation and meeting schedule",
   "mediaRetrievalAndPlayback": "Media retrieval and playback",
   "mediaRetrievalAndPlaybackDescription": "Configure meeting media download and playback settings.",
@@ -118,5 +118,6 @@
   "what-language-would-you-like-m-to-be-displayed-in": "What language would you like M³ to be displayed in?",
   "will-you-be-using-this-app-as-a-companion-to-jw-library": "Will you be using this app alongside JW Library?",
   "would-you-like-to-integrate-m-with-obs-studio": "Would you like to integrate M³ with OBS Studio?",
-  "yes": "Yes"
+  "yes": "Yes",
+  "music.stopping": "Stopping..."
 }

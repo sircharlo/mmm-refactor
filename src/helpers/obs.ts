@@ -1,69 +1,40 @@
+import { OBSWebSocketError } from 'obs-websocket-js';
 import { storeToRefs } from 'pinia';
+import { obsNotification, obsWebSocket } from 'src/boot/obs'
+import { JsonObject } from 'type-fest';
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 
-import { useCurrentStateStore } from 'stores/current-state';
+import { useCurrentStateStore } from '../stores/current-state';
+import { useObsStateStore } from '../stores/obs-state';
+import { isImage } from './mediaPlayback';
+import { createUpdatableNotification, updateNotification } from './notifications';
+
 const currentState = useCurrentStateStore();
 const { getSettingValue } = currentState;
 const { mediaPlayer } = storeToRefs(currentState);
-
-import { useObsStateStore } from 'stores/obs-state';
 const obsState = useObsStateStore();
-const { scenes, currentScene, currentSceneUuid, obsConnected } =
-  storeToRefs(obsState);
-
-import {
-  createUpdatableNotification,
-  updateNotification,
-} from './notifications';
-import { isImage } from './mediaPlayback';
-import { JsonObject } from 'type-fest';
-
-
-import { obsWebSocket, obsNotification } from 'src/boot/obs'
-import { useRouter } from 'vue-router';
-import { computed } from 'vue';
-import { OBSWebSocketError } from 'obs-websocket-js';
-
-
+const { currentScene, currentSceneUuid, obsConnected, scenes } = storeToRefs(obsState);
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-// const notifyDisconnectObs = async () => {
-//   const notificationOptions = {
-//     message: 'Disconnecting from OBS Studio...',
-//     caption: '',
-//     spinner: false,
-//     icon: 'mdi-cctv-off',
-//     timeout: 5000,
-//     onDismiss: () => {
-//       obsNotification.value = null;
-//     }
-//   }
-//   if (obsNotification.value) {
-//     updateNotification(obsNotification.value, notificationOptions);
-//   } else {
-//     obsNotification.value = createUpdatableNotification(notificationOptions);
-//   }
-// }
 const notifyObsError = (errorMessage?: string) => {
   if (getSettingValue('obsEnable')) {
     const notificationOptions = {
-      message: 'Failed to connect to OBS Studio',
       caption: errorMessage || 'Please check your settings and try again',
-      spinner: false,
       icon: 'mdi-cctv-off',
-      type: 'negative',
-      timeout: 15000,
-      // progress: true,
+      message: 'Failed to connect to OBS Studio',
       onDismiss: () => {
         obsNotification.value = null;
-      }
+      },
+      spinner: false,
+      timeout: 15000,
+      type: 'negative'
     }
     if (obsNotification.value) {
       updateNotification(obsNotification.value, notificationOptions);
     } else {
       obsNotification.value = createUpdatableNotification(notificationOptions);
     }
-  // } else {
-  //   notifyDisconnectObs()
   }
 };
 
@@ -73,19 +44,18 @@ obsWebSocket.removeAllListeners('ConnectionError');
 obsWebSocket.removeAllListeners('CurrentProgramSceneChanged');
 obsWebSocket.removeAllListeners('SceneListChanged');
 
-
 obsWebSocket.on('Identified', async () => {
   obsConnected.value = true;
   const notificationOptions = {
-    message: 'Connected to OBS Studio',
     caption: '',
-    spinner: false,
-    type: 'positive',
-    timeout: 2000,
     icon: 'mdi-cctv',
+    message: 'Connected to OBS Studio',
     onDismiss: () => {
       obsNotification.value = null;
-    }
+    },
+    spinner: false,
+    timeout: 2000,
+    type: 'positive'
   }
   if (obsNotification.value) {
     updateNotification(obsNotification.value, notificationOptions);
@@ -148,7 +118,7 @@ const obsConnect = async (setup?: boolean) => {
       break;
     }
     try {
-      const { obsWebSocketVersion, negotiatedRpcVersion } = await obsWebSocket?.connect('ws://127.0.0.1:' + obsPort, obsPassword);
+      const { negotiatedRpcVersion, obsWebSocketVersion } = await obsWebSocket?.connect('ws://127.0.0.1:' + obsPort, obsPassword);
       if (obsWebSocketVersion && negotiatedRpcVersion) {
         const sceneList = await obsWebSocket?.call('GetSceneList');
         if (sceneList) {

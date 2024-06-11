@@ -1,13 +1,13 @@
-import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { ValidationRule, date } from 'quasar';
+import { ref } from 'vue';
 
-import { useJwStore } from 'src/stores/jw';
+import { useJwStore } from '../stores/jw';
 const jwStore = useJwStore();
 const { jwLanguages } = storeToRefs(jwStore);
 const filteredJwLanguages = ref(jwLanguages.value.list);
 
-import { useObsStateStore } from 'stores/obs-state';
+import { useObsStateStore } from '../stores/obs-state';
 const obsState = useObsStateStore();
 const { nonMediaScenes, nonStageScenes, scenes } = storeToRefs(obsState)
 
@@ -57,7 +57,7 @@ const getActions = (actions: string[] | undefined) => {
   // return filteredActions && filteredActions.length > 0 ? filteredActions[0]() : undefined;
 };
 
-const meetingTime = (hr: number, min: number | null) => {
+const meetingTime = (hr: number, min: null | number) => {
   if (hr < 8 || hr > 22) {
     return false;
   }
@@ -146,4 +146,4 @@ const getListOptions = (list: string | undefined) => {
   }
 };
 
-export { getRules, getTimeOptions, getDateOptions, getListOptions, filterFn, getActions };
+export { filterFn, getActions, getDateOptions, getListOptions, getRules, getTimeOptions };

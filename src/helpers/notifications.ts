@@ -1,20 +1,16 @@
 import { Notify, QNotifyCreateOptions, QNotifyUpdateOptions } from 'quasar';
-// import { i18n } from 'src/boot/i18n';
-// const global = i18n.global;
-// const {tm} = global
-
 
 const createTemporaryNotification = ({
-  message,
   caption,
+  group,
   icon,
-  type,
-  group
+  message,
+  type
 }: QNotifyCreateOptions) => {
   return Notify.create({
     group: false,
-    timeout: 2000,
     message,
+    timeout: 2000,
     ...(caption && { caption }),
     ...(type && { type }),
     ...(icon && { icon }),
@@ -22,13 +18,13 @@ const createTemporaryNotification = ({
   });
 };
 const createUpdatableNotification = ({
-  message,
   caption,
-  spinner,
   icon,
-  type,
+  message,
+  onDismiss,
   progress,
-  onDismiss
+  spinner,
+  type
 }: QNotifyCreateOptions) => {
   return Notify.create({
     group: false,
@@ -46,7 +42,7 @@ const createUpdatableNotification = ({
 const updateNotification = (
   // @ts-expect-error ddd
   notification,
-  { message, caption, spinner, progress, timeout, icon, type }: QNotifyUpdateOptions
+  { caption, icon, message, progress, spinner, timeout, type }: QNotifyUpdateOptions
 ) => {
   notification({
     ...(caption !== undefined ? { caption } : {}),
@@ -60,7 +56,7 @@ const updateNotification = (
 };
 
 export {
+  createTemporaryNotification,
   createUpdatableNotification,
   updateNotification,
-  createTemporaryNotification,
 };

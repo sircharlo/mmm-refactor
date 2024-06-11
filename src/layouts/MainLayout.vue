@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh Lpr lFf" class="non-selectable">
+  <q-layout class="non-selectable" view="hHh Lpr lFf">
     <q-header bordered class="bg-primary text-white">
       <q-toolbar class="q-pl-none">
         <q-toolbar-title>
@@ -9,49 +9,49 @@
           {{ $t(route.meta.title as string) }}
         </q-toolbar-title>
         <template v-if="route.fullPath === '/media-calendar'">
-          <q-btn :label="selectedDate" :disable="mediaPlaying" icon="mdi-calendar" color="secondary" class="q-ml-sm"
+          <q-btn :disable="mediaPlaying" :label="selectedDate" class="q-ml-sm" color="secondary" icon="mdi-calendar"
             rounded>
             <q-tooltip v-if="!datePickerActive">{{ $t('select-a-date') }}</q-tooltip>
-            <q-popup-proxy v-model="datePickerActive" breakpoint="1000">
-              <q-date landscape v-model="selectedDate" :options="dateOptions" :navigation-min-year-month="minDate()"
-                class="non-selectable" :navigation-max-year-month="maxDate()" :events="getEventDates()"
-                event-color="primary">
+            <q-popup-proxy breakpoint="1000" v-model="datePickerActive">
+              <q-date :events="getEventDates()" :navigation-max-year-month="maxDate()" :navigation-min-year-month="minDate()" :options="dateOptions"
+                class="non-selectable" event-color="primary" landscape
+                v-model="selectedDate">
                 <div class="row items-center justify-end q-gutter-sm">
-                  <q-btn icon="mdi-check" color="primary" outline v-close-popup />
+                  <q-btn color="primary" icon="mdi-check" outline v-close-popup />
                 </div>
               </q-date>
             </q-popup-proxy>
           </q-btn>
-          <q-btn v-if="mediaSortForDay" rounded color="warning" class="q-ml-sm" text-color="black"
-            icon="mdi-sort-numeric-variant" :disable="mediaPlaying" @click="resetSort">
+          <q-btn :disable="mediaPlaying" @click="resetSort" class="q-ml-sm" color="warning" icon="mdi-sort-numeric-variant"
+            rounded text-color="black" v-if="mediaSortForDay">
             <q-tooltip>{{ $t('reset-sort-order') }}</q-tooltip>
           </q-btn>
-          <q-btn rounded color="purple-6" text-color="white" icon="mdi-movie-plus" class="q-ml-sm">
+          <q-btn class="q-ml-sm" color="purple-6" icon="mdi-movie-plus" rounded text-color="white">
             <q-tooltip v-if="!importMediaMenuActive">{{ $t('import-media') }}</q-tooltip>
             <q-menu @before-hide="importMediaMenuActive = false" @before-show="importMediaMenuActive = true">
               <q-list style="min-width: 100px">
                 <q-item-label header>{{ $t('from-jw-org') }}</q-item-label>
-                <q-item clickable v-close-popup @click="chooseSong = true">
+                <q-item @click="chooseSong = true" clickable v-close-popup>
                   <q-item-section avatar>
                     <q-icon color="primary" name="mdi-music-clef-treble" />
                   </q-item-section>
                   <q-item-section>{{ $t('song') }}</q-item-section>
                 </q-item>
-                <q-item clickable v-close-popup @click="localUpload = true">
+                <q-item @click="localUpload = true" clickable v-close-popup>
                   <q-item-section avatar>
                     <q-icon color="primary" name="mdi-movie-open-play" />
                   </q-item-section>
                   <q-item-section>{{ $t('video') }}</q-item-section>
                 </q-item>
                 <q-item-label header>{{ $t('from-local-computer') }}</q-item-label>
-                <template v-for="[icon, name] in [
+                <template :key="name" v-for="[icon, name] in [
                   ['mdi-image', 'Images or videos'],
                   ['mdi-folder-zip', 'JWPub File'],
                   ['mdi-playlist-play', 'JW Playlist'],
-                ]" :key="name">
-                  <q-item clickable v-close-popup @click="localUpload = true">
+                ]">
+                  <q-item @click="localUpload = true" clickable v-close-popup>
                     <q-item-section avatar>
-                      <q-icon color="primary" :name="icon" />
+                      <q-icon :name="icon" color="primary" />
                     </q-item-section>
                     <q-item-section>{{ name }}</q-item-section>
                   </q-item>
@@ -59,16 +59,17 @@
               </q-list>
             </q-menu>
           </q-btn>
-          <q-dialog v-model="localUpload" @dragenter="localUpload = false">
+          <q-dialog @dragenter="localUpload = false" v-model="localUpload">
             <q-card>
               <q-card-section horizontal>
                 <q-card-section>
-                  <q-icon name="mdi-cursor-default" size="lg" color="primary" text-color="white" /></q-card-section>
+                  <q-icon color="primary" name="mdi-cursor-default" size="lg" text-color="white" /></q-card-section>
                 <q-card-section>
-                  <span>{{ $t('to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window') }}</span></q-card-section>
+                  <span>{{ $t('to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window')
+                    }}</span></q-card-section>
               </q-card-section>
               <q-card-actions align="right">
-                <q-btn flat label="$t('got-it')" color="primary" v-close-popup />
+                <q-btn color="primary" flat label="$t('got-it')" v-close-popup />
               </q-card-actions>
             </q-card>
           </q-dialog>
@@ -82,18 +83,18 @@
         <q-space />
         <ScenePicker />
         <MusicButton />
-        <q-separator vertical inset
-          v-if="currentSettings?.enableMediaDisplayButton && currentSettings?.enableMusicButton" />
+        <q-separator inset v-if="currentSettings?.enableMediaDisplayButton && currentSettings?.enableMusicButton"
+          vertical />
         <MediaDisplayButton />
       </q-toolbar>
     </q-footer>
 
     <SongPicker v-model="chooseSong" />
-    <q-drawer :class="'column justify-between no-wrap ' + ($q.dark.isActive ? 'bg-black text-white': 'bg-grey-2')" v-model="drawer" :mini="miniState"
-      @mouseover="miniState = false" @mouseout="miniState = true" mini-to-overlay :width="200" :breakpoint="5"
-      :bordered="miniState" :elevated="!miniState">
-      <q-item clickable v-ripple @click="selectedDate = ''; datePickerActive = true"
-        :to="{ path: '/media-calendar', exact: true }" :disable="!currentSettings || invalidSettings()">
+    <q-drawer :bordered="miniState"
+      :breakpoint="5" :class="'column justify-between no-wrap ' + ($q.dark.isActive ? 'bg-black text-white' : 'bg-grey-2')" :elevated="!miniState" :mini="miniState" :width="200"
+      @mouseout="miniState = true" @mouseover="miniState = false" mini-to-overlay v-model="drawer">
+      <q-item :disable="!currentSettings || invalidSettings()" :to="{ path: '/media-calendar', exact: true }" @click="selectedDate = ''; datePickerActive = true"
+        clickable v-ripple>
         <q-item-section avatar>
           <q-icon name="mdi-calendar-month" />
         </q-item-section>
@@ -103,7 +104,7 @@
 
       <q-space />
 
-      <q-item :disable="mediaPlaying" clickable v-ripple :to="{ path: '/congregation-selector', exact: true }">
+      <q-item :disable="mediaPlaying" :to="{ path: '/congregation-selector', exact: true }" clickable v-ripple>
         <q-item-section avatar>
           <q-icon name="mdi-account-group" />
         </q-item-section>
@@ -114,7 +115,7 @@
       </q-item>
 
       <q-item :disable="!currentSettings || mediaPlaying || route.fullPath.includes('wizard')
-        " clickable v-ripple :to="{ path: '/settings', exact: true }">
+        " :to="{ path: '/settings', exact: true }" clickable v-ripple>
         <q-item-section avatar>
           <q-icon :color="invalidSettings() ? 'negative' : ''" name="settings" />
         </q-item-section>
@@ -131,38 +132,44 @@
   </q-layout>
 </template>
 
-<script lang="ts">
-import { ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+<script setup lang="ts">
 import { storeToRefs } from 'pinia';
+import { Dark, LocalStorage, date } from 'quasar';
+import DownloadStatus from 'src/components/media/DownloadStatus.vue';
+import MusicButton from 'src/components/media/MusicButton.vue';
+import ScenePicker from 'src/components/media/ScenePicker.vue';
+import SongPicker from 'src/components/media/SongPicker.vue';
+import { getLookupPeriod } from 'src/helpers/date';
+import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRoute, useRouter } from 'vue-router';
 
-import { useCurrentStateStore } from 'stores/current-state';
+import MediaDisplayButton from '../components/media/MediaDisplayButton.vue';
+import { electronApi } from '../helpers/electron-api';
+import { downloadBackgroundMusic } from '../helpers/jw-media';
+import { useCongregationSettingsStore } from '../stores/congregation-settings';
+import { useCurrentStateStore } from '../stores/current-state';
+import { useJwStore } from '../stores/jw';
+
+// Store and router initializations
 const currentState = useCurrentStateStore();
 const { invalidSettings } = currentState;
 const {
   currentCongregation,
-  selectedDate,
+  downloadProgress,
   lookupPeriod,
-  mediaPlaying,
   mediaPlayer,
-  downloadProgress
+  mediaPlaying,
+  selectedDate
 } = storeToRefs(currentState);
 
-import { useCongregationSettingsStore } from 'stores/congregation-settings';
 const congregationSettings = useCongregationSettingsStore();
-
-import { Dark, LocalStorage, date } from 'quasar';
-
 congregationSettings.$subscribe((_, state) => {
   LocalStorage.set('congregations', state.congregations);
 });
 
-import { useJwStore } from 'src/stores/jw';
-// const { mediaSort } = storeToRefs(useJwStore());
-import { downloadBackgroundMusic } from 'src/helpers/jw-media';
-import { getLookupPeriod } from 'src/helpers/date';
 const jwStore = useJwStore();
-const { resetSort } = jwStore;
+const { resetSort, updateJwLanguages } = jwStore;
 jwStore.$subscribe((_, state) => {
   LocalStorage.set('jwLanguages', state.jwLanguages);
   LocalStorage.set('jwSongs', state.jwSongs);
@@ -171,127 +178,101 @@ jwStore.$subscribe((_, state) => {
   LocalStorage.set('customDurations', state.customDurations);
   LocalStorage.set('additionalMediaMaps', state.additionalMediaMaps);
 });
-const { updateJwLanguages } = jwStore;
 
+// Ref and reactive initializations
 const chooseSong = ref(false);
-
 const mediaSortForDay = ref(true);
-import { electronApi } from '../helpers/electron-api';
 const { toggleMediaWindow } = electronApi;
-import { useI18n } from 'vue-i18n';
 
+const { locale } = useI18n({ useScope: 'global' });
+const drawer = ref(false);
+updateJwLanguages();
+const { currentSettings } = storeToRefs(currentState);
 
+const route = useRoute();
+const router = useRouter();
+const miniState = ref(true);
 
-export default {
-  setup() {
-    const { locale } = useI18n({ useScope: 'global' })
-    const drawer = ref(false);
-    updateJwLanguages();
-    const { currentSettings } = storeToRefs(currentState);
-    const route = useRoute();
-    const router = useRouter();
+// Function to apply settings
+const applySettings = () => {
+  console.log('applySettings');
 
-    const miniState = ref(true);
-    // const { t } = useI18n()
+  // Media Window
+  const enableMediaDisplayButton = currentSettings.value?.enableMediaDisplayButton;
+  mediaPlayer.value.windowVisible = !!enableMediaDisplayButton;
+  toggleMediaWindow(enableMediaDisplayButton ? 'show' : 'hide');
 
-    // const congregationName = computed(() => {
-    //   return currentSettings.value !== undefined
-    //     ? currentSettings.value['congregationName']
-    //     : ref(t('profileSelection'));
-    // });
+  // Dark Mode
+  Dark.set(currentSettings.value?.darkMode as 'auto' | boolean);
 
-    const applySettings = () => {
-      console.log('applySettings');
-
-      // Media Window
-      const enableMediaDisplayButton = currentSettings.value?.enableMediaDisplayButton;
-      mediaPlayer.value.windowVisible = !!enableMediaDisplayButton;
-      toggleMediaWindow(enableMediaDisplayButton ? 'show' : 'hide');
-
-      // Dark Mode
-      Dark.set(currentSettings.value?.darkMode as boolean | 'auto');
-
-      // I18n
-      const currentLanguage = currentSettings.value?.localAppLang as string;
-      if (currentLanguage) {
-        // date.setLocale(currentLanguage);
-        locale.value = currentLanguage
-      }
-    }
-    watch(currentCongregation, () => {
-      console.log('currentCongregation changed', currentCongregation.value);
-      downloadBackgroundMusic();
-      downloadProgress.value = {};
-    })
-    watch(
-      () => currentSettings.value,
-      (newVal) => {
-        applySettings();
-        lookupPeriod.value = getLookupPeriod();
-        if (!currentCongregation.value && route.fullPath !== '/congregation-selector') {
-          router.push({ path: '/congregation-selector' });
-          return;
-        }
-        drawer.value = !(route.fullPath.includes('wizard') && newVal !== undefined);
-      },
-      { immediate: true, deep: true }
-    );
-    watch(route, (newVal) => {
-      drawer.value = !newVal.fullPath.includes('wizard');
-    })
-
-    return {
-      miniState,
-      chooseSong,
-      // congregationName,
-      currentSettings,
-      drawer,
-      // currentPage: computed(() => {
-      //   return route.meta.title
-      // }),
-      mediaPlaying,
-      // invalidSettings: computed(() => {
-      //   return (
-      //     currentState.getInvalidSettings(currentCongregation.value).length > 0
-      //   );
-      // }),
-      invalidSettings,
-      selectedDate,
-      resetSort,
-      dateOptions: (lookupDate: string) => {
-        const dateArray: Date[] = lookupPeriod.value.map((day) => day.date);
-        // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
-        const minDate = date.getMinDate(...dateArray);
-        // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
-        const maxDate = date.getMaxDate(...dateArray);
-        return (
-          date.getDateDiff(lookupDate, minDate, 'days') >= 0 &&
-          date.getDateDiff(lookupDate, maxDate, 'days') <= 0
-        );
-      },
-      route,
-      minDate: () => {
-        const dateArray: Date[] = lookupPeriod.value.map((day) => day.date);
-        // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
-        const minDate = date.getMinDate(...dateArray);
-        return date.formatDate(minDate, 'YYYY/MM');
-      },
-      maxDate: () => {
-        const dateArray: Date[] = lookupPeriod.value.map((day) => day.date);
-        // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
-        const maxDate = date.getMaxDate(...dateArray);
-        return date.formatDate(maxDate, 'YYYY/MM');
-      },
-      getEventDates: () => {
-        return lookupPeriod.value
-          .filter((day) => day.meeting)
-          .map((day) => date.formatDate(day.date, 'YYYY/MM/DD'));
-      },
-      localUpload: ref(false),
-      importMediaMenuActive: ref(false),
-      datePickerActive: ref(false),
-      mediaSortForDay
-    };
-  },
+  // I18n
+  const currentLanguage = currentSettings.value?.localAppLang as string;
+  if (currentLanguage) {
+    locale.value = currentLanguage;
+  }
 };
+
+// Watchers
+watch(currentCongregation, () => {
+  console.log('currentCongregation changed', currentCongregation.value);
+  downloadBackgroundMusic();
+  downloadProgress.value = {};
+});
+
+watch(
+  () => currentSettings.value,
+  (newVal) => {
+    applySettings();
+    lookupPeriod.value = getLookupPeriod();
+    if (!currentCongregation.value && route.fullPath !== '/congregation-selector') {
+      router.push({ path: '/congregation-selector' });
+      return;
+    }
+    drawer.value = !(route.fullPath.includes('wizard') && newVal !== undefined);
+  },
+  { deep: true, immediate: true }
+);
+
+watch(route, (newVal) => {
+  drawer.value = !newVal.fullPath.includes('wizard');
+});
+
+// Computed and helper functions
+const dateOptions = (lookupDate: string) => {
+  const dateArray: Date[] = lookupPeriod.value.map((day) => day.date);
+  // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
+  const minDate = date.getMinDate(...dateArray);
+  // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
+  const maxDate = date.getMaxDate(...dateArray);
+  return (
+    date.getDateDiff(lookupDate, minDate, 'days') >= 0 &&
+    date.getDateDiff(lookupDate, maxDate, 'days') <= 0
+  );
+};
+
+const minDate = () => {
+  const dateArray: Date[] = lookupPeriod.value.map((day) => day.date);
+  // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
+  const minDate = date.getMinDate(...dateArray);
+  return date.formatDate(minDate, 'YYYY/MM');
+};
+
+const maxDate = () => {
+  const dateArray: Date[] = lookupPeriod.value.map((day) => day.date);
+  // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
+  const maxDate = date.getMaxDate(...dateArray);
+  return date.formatDate(maxDate, 'YYYY/MM');
+};
+
+const getEventDates = () => {
+  return lookupPeriod.value
+    .filter((day) => day.meeting)
+    .map((day) => date.formatDate(day.date, 'YYYY/MM/DD'));
+};
+
+// Ref for UI states
+const localUpload = ref(false);
+const importMediaMenuActive = ref(false);
+const datePickerActive = ref(false);
+
 </script>

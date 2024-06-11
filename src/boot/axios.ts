@@ -1,8 +1,10 @@
 import { boot } from 'quasar/wrappers';
+console.log('axios start')
 import axios, { AxiosRequestConfig } from 'axios';
 export default boot(({ app }) => {
   app.config.globalProperties.$axios = axios;
 });
+
 
 const get = async (url: string, params?: AxiosRequestConfig) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,17 +33,19 @@ const urlWithParamsToString = (url: string, params: object) => {
 const getYeartext = async (lang: string, year?: number) => {
   const url = 'https://wol.jw.org/wol/finder';
   const params = {
-    format: 'json',
     docid: `110${year || new Date().getFullYear()}800`,
-    wtlocale: lang,
+    format: 'json',
     snip: 'yes',
+    wtlocale: lang,
   };
   return await get(urlWithParamsToString(url, params));
 };
 
+console.log('axios end')
+
 export {
-  getYeartext,
-  getLanguages,
   get,
+  getLanguages,
+  getYeartext,
   urlWithParamsToString,
 };

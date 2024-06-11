@@ -1,21 +1,21 @@
 import { QueryResponseItem } from 'src/types/sqlite';
 
 export interface ElectronFileFilter {
-  name: string;
   extensions: string[];
+  name: string;
 }
 
 export interface ElectronApi {
-  openFolderDialog: () => string[];
-  toggleMediaWindow: (action: string) => void;
-  getUserDataPath: () => string;
-  path: typeof import('path');
-  fs: typeof import('fs-extra');
-  klawSync: typeof import('klaw-sync');
-  decompress: typeof import('decompress');
   convert: typeof import('heic-convert');
+  decompress: typeof import('decompress');
   executeQuery: (dbPath: string, query: string) => QueryResponseItem[];
   fileUrlToPath: (url: string) => string;
+  fs: typeof import('fs-extra');
+  getUserDataPath: () => string;
+  klawSync: typeof import('klaw-sync');
+  openFolderDialog: () => string[];
+  path: typeof import('path');
+  toggleMediaWindow: (action: string) => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment

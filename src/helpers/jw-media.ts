@@ -1,24 +1,12 @@
 import { storeToRefs } from 'pinia';
-
-import { useCurrentStateStore } from 'src/stores/current-state';
-const currentState = useCurrentStateStore();
-const { getSettingValue } = currentState;
-const { downloads, downloadProgress, lookupPeriod, currentSongbook, currentCongregation, currentSettings } =
-  storeToRefs(currentState);
 import { LocalStorage, date } from 'quasar';
+import { electronApi } from 'src/helpers/electron-api';
 import {
   MediaImages,
   MediaLink,
   Publication,
   PublicationFetcher,
 } from 'src/types/publications';
-import {
-  getDurationFromMediaPath,
-  getFileUrl,
-  getPublicationDirectory,
-  getThumbnailUrl,
-} from './fs';
-import { electronApi } from 'src/helpers/electron-api';
 import {
   DatedTextItem,
   // DocumentItem,
@@ -31,45 +19,49 @@ import {
   TableItem,
   VideoMarker,
 } from 'src/types/sqlite';
-import { dateFromString, getSpecificWeekday, isCoWeek } from './date';
-import { get, urlWithParamsToString } from 'src/boot/axios';
 
+import { useCurrentStateStore } from '../stores/current-state';
+import {
+  getDurationFromMediaPath,
+  getFileUrl,
+  getPublicationDirectory,
+  getThumbnailUrl,
+} from './fs';
+console.log(123)
+import axios from 'axios';
+import { Buffer } from 'buffer';
+import sanitize from 'sanitize-filename';
+import { get, urlWithParamsToString } from 'src/boot/axios';
+import mepslangs from 'src/defaults/mepslangs';
 import {
   createTemporaryNotification,
-  // createUpdatableNotification,
-  // updateNotification,
 } from 'src/helpers/notifications';
 import {
   DownloadedFile,
   DynamicMediaObject,
   FileDownloader,
 } from 'src/types/media';
+
+import { MAX_SONGS } from '../stores/jw';
+import { dateFromString, getSpecificWeekday, isCoWeek, isMwMeetingDay } from './date';
 import {
-  isImage,
-  isVideo,
-  isSong,
   decompressJwpub,
   findDb,
   isAudio,
+  isImage,
+  isSong,
+  isVideo,
 } from './mediaPlayback';
-const { path, fs, executeQuery, klawSync } = electronApi;
 
-import { Buffer } from 'buffer';
-import axios from 'axios';
-
-import { isMwMeetingDay, isWeMeetingDay } from 'src/helpers/date';
-import mepslangs from 'src/defaults/mepslangs';
-import sanitize from 'sanitize-filename';
-import { MAX_SONGS } from 'src/stores/jw';
-
+const { executeQuery, fs, klawSync, path } = electronApi;
 const FEB_2023 = 20230200;
 const FOOTNOTE_TAR_PAR = 9999;
 
 const downloadFileIfNeeded = async ({
-  url,
   dir,
   filename,
   size,
+  url,
 }: FileDownloader) => {
   fs.ensureDirSync(dir);
   if (!filename) filename = path.basename(url);
@@ -77,7 +69,7 @@ const downloadFileIfNeeded = async ({
   const destinationPath = path.join(dir, filename);
   const remoteSize: number =
     size ||
-    (await axios({ url, method: 'HEAD' }).then(
+    (await axios({ method: 'HEAD', url }).then(
       (response) => +response.headers['content-length'] || 0
     ));
   if (fs.existsSync(destinationPath)) {
@@ -85,27 +77,28 @@ const downloadFileIfNeeded = async ({
     const localSize = stat.size;
     if (localSize === remoteSize) {
       return {
-        path: destinationPath,
         new: false,
+        path: destinationPath,
       };
     }
   }
-  if (!downloads.value[url]) downloads.value[url] = downloadFile({ url, dir, filename, size });
+  const { downloads } = storeToRefs(useCurrentStateStore());
+  if (!downloads.value[url]) downloads.value[url] = downloadFile({ dir, filename, size, url });
   return downloads.value[url];
 };
 
 const downloadFile = async ({
-  url,
   dir,
   filename,
+  url,
   // notify,
 }: FileDownloader) => {
   if (!filename) filename = path.basename(url);
   filename = sanitize(filename);
+  const { downloadProgress } = storeToRefs(useCurrentStateStore());
   const destinationPath = path.join(dir, filename);
   const downloadedDataRequest = await axios
     .get(url, {
-      responseType: 'arraybuffer',
       onDownloadProgress: (progressEvent) => {
         const downloadDone = downloadProgress.value[url]?.complete || false;
         if (!downloadDone) downloadProgress.value[url] = {
@@ -113,6 +106,7 @@ const downloadFile = async ({
           total: (progressEvent.total || progressEvent.loaded),
         };
       },
+      responseType: 'arraybuffer',
     })
     .catch((error) => {
       console.error(error);
@@ -133,27 +127,27 @@ const downloadFile = async ({
     //   icon: 'mdi-cloud-off',
     // });
     return {
-      path: destinationPath,
       error: true,
+      path: destinationPath,
     };
   }
   fs.writeFileSync(destinationPath, Buffer.from(downloadedData));
   return {
-    path: destinationPath,
     new: true,
+    path: destinationPath,
   };
 };
 const fetchMedia = async () => {
-  for (const meeting of lookupPeriod.value.filter((day) => day.meeting)) {
-    console.log('meeting', meeting)
-    const dayDate = meeting.date;
-    meeting.loading = true;
-    if (isWeMeetingDay(dayDate)) {
-      meeting.dynamicMedia = await getWeMedia(dayDate);
-    } else if (isMwMeetingDay(dayDate)) {
-      meeting.dynamicMedia = await getMwMedia(dayDate);
+  const { lookupPeriod } = storeToRefs(useCurrentStateStore());
+  for (const day of lookupPeriod.value.filter((day) => day.meeting)) {
+    const dayDate = day.date;
+    day.loading = true;
+    if (day.meeting === 'we') {
+      day.dynamicMedia = await getWeMedia(dayDate);
+    } else if (day.meeting === 'mw') {
+      day.dynamicMedia = await getMwMedia(dayDate);
     }
-    meeting.loading = false;
+    day.loading = false;
   }
 };
 
@@ -222,6 +216,8 @@ const getMediaVideoMarkers = (source: MultimediaItemsFetcher, mediaId: number) =
 }
 
 const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
+  const currentState = useCurrentStateStore();
+  const { getSettingValue } = currentState;
   const DocumentMultimediaTable = (
     executeQuery(
       source.db,
@@ -301,6 +297,8 @@ const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
 };
 
 const getDocumentExtractItems = async (db: string, docId: number) => {
+  const currentState = useCurrentStateStore();
+  const { getSettingValue } = currentState;
   const extracts = executeQuery(
     // ${currentSongbook.value.pub === 'sjjm'
     //   ? "AND NOT UniqueEnglishSymbol = 'sjj' "
@@ -349,26 +347,26 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
     if (symbol === 'snnw') return []; // That's the "old new songs" songbook; we don't need images from that
     let extractLang = extract.Lang ?? (getSettingValue('lang') as string);
     let extractDb = await getDbFromJWPUB({
-      pub: symbol,
       issue: extract.IssueTagNumber,
       langwritten: extractLang,
+      pub: symbol,
     });
-    const fallbackLang = getSettingValue('fallbackLang') as string;
-    if (!extractDb && fallbackLang) {
+    const langFallback = getSettingValue('langFallback') as string;
+    if (!extractDb && langFallback) {
       extractDb = await getDbFromJWPUB({
-        pub: symbol,
         issue: extract.IssueTagNumber,
-        langwritten: fallbackLang,
+        langwritten: langFallback,
+        pub: symbol,
       });
-      extractLang = fallbackLang;
+      extractLang = langFallback;
     }
 
     if (!extractDb) return [];
 
     const extractItems = getDocumentMultimediaItems({
       db: extractDb,
-      mepsId: extract.RefMepsDocumentId,
       lang: extractLang,
+      mepsId: extract.RefMepsDocumentId,
       ...(extract.RefBeginParagraphOrdinal
         ? { BeginParagraphOrdinal: extract.RefBeginParagraphOrdinal }
         : {}),
@@ -385,9 +383,9 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
       })
       .map((extractItem) =>
         addFullFilePathToMultimediaItem(extractItem, {
-          pub: symbol,
           issue: extract.IssueTagNumber,
           langwritten: extractLang,
+          pub: symbol,
         })
       );
     allExtractItems.push(...extractItems);
@@ -396,6 +394,8 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
 };
 
 const getWtIssue = async (monday: Date, weeksInPast: number) => {
+  const currentState = useCurrentStateStore();
+  const { getSettingValue } = currentState;
   const issue = date.subtractFromDate(monday, {
     days: weeksInPast * 7,
   });
@@ -406,21 +406,21 @@ const getWtIssue = async (monday: Date, weeksInPast: number) => {
       db: '',
       docId: -1,
       issueString,
-      weekNr: -1,
       publication: {
-        pub: '',
         langwritten: '',
+        pub: '',
       },
+      weekNr: -1,
     };
   }
   const publication = {
-    pub: 'w',
     issue: issueString,
     langwritten: getSettingValue('lang') as string,
+    pub: 'w',
   };
   const db = await getDbFromJWPUB(publication);
 
-  if (!db) return { db: '', docId: -1, issueString, weekNr: -1, publication };
+  if (!db) return { db: '', docId: -1, issueString, publication, weekNr: -1 };
   const datedTexts = executeQuery(
     db,
     'SELECT * FROM DatedText'
@@ -431,7 +431,7 @@ const getWtIssue = async (monday: Date, weeksInPast: number) => {
   });
   if (weekNr === -1) {
     console.warn('No week found');
-    return { db: '', docId: -1, issueString, weekNr, publication };
+    return { db: '', docId: -1, issueString, publication, weekNr };
   }
   const docId = (
     executeQuery(
@@ -439,7 +439,7 @@ const getWtIssue = async (monday: Date, weeksInPast: number) => {
       `SELECT Document.DocumentId FROM Document WHERE Document.Class=40 LIMIT 1 OFFSET ${weekNr}`
     ) as { DocumentId: number }[]
   )[0]?.DocumentId;
-  return { db, docId, issueString, weekNr, publication };
+  return { db, docId, issueString, publication, weekNr };
 };
 
 const dynamicMediaMapper = async (
@@ -495,46 +495,49 @@ const dynamicMediaMapper = async (
         // iscoweek
       }
       return {
+        duration: duration,
         fileUrl: getFileUrl(m.FilePath),
+        isAdditional: !!additional,
+        isAudio: audio,
+        isImage: isImage(m.FilePath),
+        isVideo: video,
+        markers: m.VideoMarkers,
+        paragraph: m.TargetParagraphNumberLabel,
+        section, // if is we: wt; else, if >= middle song: LAC; >= (middle song - 8???): AYFM; else: TGW
+        song: mediaIsSong,
         thumbnailUrl,
         title: mediaIsSong ? m.Label.replace(/^\d+\.\s*/, '') : m.Label,
         uniqueId: sanitizeId(
           date.formatDate(lookupDate, 'YYYYMMDD') + '-' + getFileUrl(m.FilePath)
-        ),
-        isImage: isImage(m.FilePath),
-        isVideo: video,
-        isAudio: audio,
-        duration: duration,
-        song: mediaIsSong,
-        paragraph: m.TargetParagraphNumberLabel,
-        section, // if is we: wt; else, if >= middle song: LAC; >= (middle song - 8???): AYFM; else: TGW
-        isAdditional: !!additional,
-        markers: m.VideoMarkers
+        )
       } as DynamicMediaObject;
     });
   return Promise.all(mediaPromises);
 };
 
 const getWeMedia = async (lookupDate: Date) => {
+  const currentState = useCurrentStateStore();
+  const { currentCongregation, currentSongbook } = storeToRefs(currentState);
+  const { getSettingValue } = currentState
   lookupDate = dateFromString(lookupDate.toISOString());
   try {
     const monday = getSpecificWeekday(lookupDate, 0);
-    let { db, docId, issueString, weekNr, publication } = await getWtIssue(
+    let { db, docId, issueString, publication, weekNr } = await getWtIssue(
       monday,
       8
     );
     if (db?.length === 0)
-      ({ db, docId, issueString, weekNr, publication } = await getWtIssue(
+      ({ db, docId, issueString, publication, weekNr } = await getWtIssue(
         monday,
         10
       ));
 
     if (!db || docId < 0) {
       createTemporaryNotification({
-        message: 'error.downloadMedia',
         caption: 'weMeeting',
-        type: 'negative',
         group: 'error.downloadMedia.weMeeting',
+        message: 'error.downloadMedia',
+        type: 'negative',
       })
       console.error('No suitable db or docid found');
       // return [];
@@ -735,6 +738,9 @@ function sanitizeId(id: string) {
 }
 
 const getMwMedia = async (lookupDate: Date) => {
+  const currentState = useCurrentStateStore();
+  const { getSettingValue } = currentState
+  const { currentCongregation, currentSongbook } = storeToRefs(currentState);
   lookupDate = dateFromString(lookupDate.toISOString());
   try {
     // if not monday, get the previous monday
@@ -747,17 +753,17 @@ const getMwMedia = async (lookupDate: Date) => {
     if (!(getSettingValue('lang') as string))
       throw new Error('No language selected');
     const publication = {
-      pub: 'mwb',
       issue: issueString,
       langwritten: getSettingValue('lang') as string,
+      pub: 'mwb',
     };
     const db = await getDbFromJWPUB(publication);
     if (!db) {
       createTemporaryNotification({
-        message: 'error.downloadMedia',
         caption: 'mwMeeting',
-        type: 'negative',
         group: 'error.downloadMedia.mwMeeting',
+        message: 'error.downloadMedia',
+        type: 'negative',
       })
       throw new Error('No db found');
     }
@@ -857,6 +863,8 @@ const getMwMedia = async (lookupDate: Date) => {
 };
 
 async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
+  const currentState = useCurrentStateStore();
+  const { getSettingValue } = currentState;
   for (const media of allMedia.filter(
     (m) => m.KeySymbol && (!m.Label || (!m.FilePath || !fs.existsSync(m.FilePath)))
   )) {
@@ -866,10 +874,10 @@ async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
     }
     const langwritten = media.AlternativeLanguage ?? getSettingValue('lang') as string;
     const publicationFetcher = {
-      pub: media.KeySymbol,
+      fileformat: media.MimeType?.includes('audio') ? 'MP3' : 'MP4',
       issue: media.IssueTagNumber,
       langwritten,
-      fileformat: media.MimeType?.includes('audio') ? 'MP3' : 'MP4',
+      pub: media.KeySymbol,
       ...(typeof media.Track === 'number' &&
         media.Track > 0 && { track: media.Track }),
     }
@@ -888,6 +896,7 @@ async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
 }
 
 const getPubMediaLinks = async (publication: PublicationFetcher) => {
+  const { currentSongbook, downloadProgress } = storeToRefs(useCurrentStateStore());
   const url = 'https://b.jw-cdn.org/apis/pub-media/GETPUBMEDIALINKS';
   if (!publication.fileformat) publication.fileformat = '';
   if (publication.pub === 'sjjm') {
@@ -896,13 +905,13 @@ const getPubMediaLinks = async (publication: PublicationFetcher) => {
   }
   publication.fileformat = publication.fileformat.toUpperCase();
   const params = {
-    output: 'json',
-    pub: publication.pub,
+    alllangs: '0',
     fileformat: publication.fileformat,
     issue: publication.issue?.toString() || '',
-    track: publication.track?.toString() || '',
-    alllangs: '0',
     langwritten: publication.langwritten,
+    output: 'json',
+    pub: publication.pub,
+    track: publication.track?.toString() || '',
     txtCMSLang: 'E',
   };
   const response = await get(urlWithParamsToString(url, params));
@@ -920,6 +929,8 @@ const getPubMediaLinks = async (publication: PublicationFetcher) => {
 };
 
 export function findBestResolution(mediaLinks: MediaLink[]) {
+  const currentState = useCurrentStateStore();
+  const { getSettingValue } = currentState;
   let bestItem = null;
   let bestHeight = 0;
   const maxRes = parseInt(
@@ -942,7 +953,6 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
   if (!responseObject?.files) {
     if (!fs.existsSync(pubDir)) return ''; // Publication not found
     const files = klawSync(pubDir, {
-      nodir: true,
       filter: (file) => {
         let match = true;
         const params = [publication.issue, publication.track, publication.pub]
@@ -961,6 +971,7 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
           match = false;
         return match;
       },
+      nodir: true,
     });
     console.warn(
       'No response, falling back to cache',
@@ -981,9 +992,9 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
     return '';
   }
   const downloadedFile = (await downloadFileIfNeeded({
-    url: bestItem.file.url,
     dir: pubDir,
     size: bestItem.filesize,
+    url: bestItem.file.url,
   })) as DownloadedFile;
 
   // Save thumbnail if available but not present on disk
@@ -997,9 +1008,9 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
       !fs.existsSync(path.join(pubDir, thumbnailFilename)))
   ) {
     await downloadFileIfNeeded({
-      url: thumbnail,
       dir: pubDir,
       filename: thumbnailFilename,
+      url: thumbnail,
     });
   }
   return downloadedFile?.path;
@@ -1054,6 +1065,7 @@ const getJwMediaInfo = async (publication: PublicationFetcher) => {
 };
 
 const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
+  const { downloadProgress } = storeToRefs(useCurrentStateStore());
   const publicationInfo: Publication = await getPubMediaLinks(publication);
   if (!publication.fileformat) return;
   if (!publicationInfo?.files) {
@@ -1086,18 +1098,19 @@ const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
 };
 
 const downloadBackgroundMusic = () => {
+  const { currentSettings, currentSongbook } = storeToRefs(useCurrentStateStore());
   if (!currentSongbook.value || !currentSettings.value?.lang) return;
   console.log('Downloading background music', {
-    pub: currentSongbook.value.pub,
-    langwritten: currentSongbook.value.signLanguage ? currentSettings.value.lang : 'E',
     fileformat: currentSongbook.value.fileformat,
+    langwritten: currentSongbook.value.signLanguage ? currentSettings.value.lang : 'E',
     maxTrack: MAX_SONGS,
+    pub: currentSongbook.value.pub,
   });
   downloadPubMediaFiles({
-    pub: currentSongbook.value.pub,
-    langwritten: currentSongbook.value.signLanguage ? currentSettings.value.lang : 'E',
     fileformat: currentSongbook.value.fileformat,
+    langwritten: currentSongbook.value.signLanguage ? currentSettings.value.lang : 'E',
     maxTrack: MAX_SONGS,
+    pub: currentSongbook.value.pub,
   })
 }
 
@@ -1108,9 +1121,9 @@ async function addToDownloadsWithLimit(mediaLinks: MediaLink[], dir: string, lim
   for (const mediaLink of mediaLinks) {
     console.log('mediaLink', mediaLink)
     const downloadPromise = downloadFileIfNeeded({
-      url: mediaLink.file.url,
       dir,
       size: mediaLink.filesize,
+      url: mediaLink.file.url,
     }) as Promise<DownloadedFile>;
     if (!(downloadPromise instanceof Promise)) continue;
 
@@ -1134,14 +1147,15 @@ async function addToDownloadsWithLimit(mediaLinks: MediaLink[], dir: string, lim
 const downloadJwpub = async (
   publication: PublicationFetcher
 ): Promise<DownloadedFile> => {
+  const { downloadProgress } = storeToRefs(useCurrentStateStore());
   publication.fileformat = 'JWPUB';
   const handleDownloadError = () => {
     downloadProgress.value[[publication.pub, publication.langwritten, publication.issue, publication.track, publication.fileformat].filter(Boolean).join('_')] = {
       error: true
     };
     return {
-      path: '',
       new: false,
+      path: '',
     };
   };
   const publicationInfo: Publication = await getPubMediaLinks(publication);
@@ -1159,24 +1173,24 @@ const downloadJwpub = async (
   }
 
   return (await downloadFileIfNeeded({
-    url: mediaLinks[0].file.url,
     dir: getPublicationDirectory(publication),
     size: mediaLinks[0].filesize,
+    url: mediaLinks[0].file.url,
   })) as DownloadedFile;
 };
 
 export {
-  getMwMedia,
-  getWeMedia,
-  getPubMediaLinks,
-  downloadPubMediaFiles,
-  fetchMedia,
-  sanitizeId,
-  getDocumentMultimediaItems,
-  processMissingMediaInfo,
-  dynamicMediaMapper,
-  getPublicationInfoFromDb,
   addFullFilePathToMultimediaItem,
-  downloadFileIfNeeded,
   downloadBackgroundMusic,
+  downloadFileIfNeeded,
+  downloadPubMediaFiles,
+  dynamicMediaMapper,
+  fetchMedia,
+  getDocumentMultimediaItems,
+  getMwMedia,
+  getPubMediaLinks,
+  getPublicationInfoFromDb,
+  getWeMedia,
+  processMissingMediaInfo,
+  sanitizeId,
 };

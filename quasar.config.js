@@ -22,36 +22,48 @@ module.exports = configure(function (/* ctx */) {
 
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
+    // https://v2.quasar.dev/options/animations
+    animations: ['fadeIn', 'fadeOut'],
+
+    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex
+    bex: {
+      contentScripts: ['my-content-script'],
+
+      // extendBexScriptsConf (esbuildConf) {}
+      // extendBexManifestJson (json) {}
+    },
+
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ['i18n', 'axios', 'components', 'obs'],
-
-    // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
-    css: ['app.scss'],
-
-    // https://github.com/quasarframework/quasar/tree/dev/extras
-    extras: [
-      // 'ionicons-v4',
-      'mdi-v7',
-      // 'bootstrap-icons',
-      'fontawesome-v6',
-      // 'eva-icons',
-      // 'themify',
-      // 'line-awesome',
-      // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
-
-      'roboto-font', // optional, you are not bound to it
-      'material-icons', // optional, you are not bound to it
-    ],
+    boot: ['i18n', 'axios', 'obs'],
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
-      target: {
-        // browser: ['esnext', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
-        browser: ['esnext'],
-        node: 'node20',
+      chainWebpack(chain) {
+        const nodePolyfillWebpackPlugin = require('node-polyfill-webpack-plugin');
+        chain.plugin('node-polyfill').use(nodePolyfillWebpackPlugin);
       },
 
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      extendViteConf(viteConf) {
+        if (!viteConf.optimizeDeps) viteConf.optimizeDeps = {};
+        // if (!viteConf.optimizeDeps.exclude) viteConf.optimizeDeps.exclude = [
+        //   'pdfjs-dist',
+        // ];
+        if (!viteConf.optimizeDeps.esbuildOptions)
+          viteConf.optimizeDeps.esbuildOptions = {};
+        if (!viteConf.optimizeDeps.esbuildOptions.define)
+          viteConf.optimizeDeps.esbuildOptions.define = {};
+        viteConf.optimizeDeps.esbuildOptions.define.global = 'window';
+
+        // if (!viteConf.build) viteConf.build = {};
+        // if (!viteConf.build.rollupOptions) viteConf.build.rollupOptions = {};
+        // viteConf.build.rollupOptions.external = [inject({ Buffer: ['buffer/', 'Buffer'] }) ]
+
+        // if (!viteConf.optimizeDeps.esbuildOptions.plugins)
+        //   viteConf.optimizeDeps.esbuildOptions.plugins = [];
+        // viteConf.optimizeDeps.esbuildOptions.plugins.push(
+        //   nodePolyfills({ protocolImports: true, globals: {  Buffer: true, process: true } })
+        // );
+      },
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
@@ -98,44 +110,15 @@ module.exports = configure(function (/* ctx */) {
       //   cfg.target = 'electron-main';
       // },
 
-      extendViteConf(viteConf) {
-        if (!viteConf.optimizeDeps) viteConf.optimizeDeps = {};
-        // if (!viteConf.optimizeDeps.exclude) viteConf.optimizeDeps.exclude = [
-        //   'pdfjs-dist',
-        // ];
-        if (!viteConf.optimizeDeps.esbuildOptions)
-          viteConf.optimizeDeps.esbuildOptions = {};
-        if (!viteConf.optimizeDeps.esbuildOptions.define)
-          viteConf.optimizeDeps.esbuildOptions.define = {};
-        viteConf.optimizeDeps.esbuildOptions.define.global = 'window';
-
-        // if (!viteConf.build) viteConf.build = {};
-        // if (!viteConf.build.rollupOptions) viteConf.build.rollupOptions = {};
-        // viteConf.build.rollupOptions.external = [inject({ Buffer: ['buffer/', 'Buffer'] }) ]
-
-        // if (!viteConf.optimizeDeps.esbuildOptions.plugins)
-        //   viteConf.optimizeDeps.esbuildOptions.plugins = [];
-        // viteConf.optimizeDeps.esbuildOptions.plugins.push(
-        //   nodePolyfills({ protocolImports: true, globals: {  Buffer: true, process: true } })
-        // );
+      extendWebpack(cfg, {}) {
+        cfg.externals = ['better-sqlite3'];
       },
 
-      chainWebpack(chain) {
-        const nodePolyfillWebpackPlugin = require('node-polyfill-webpack-plugin');
-        chain.plugin('node-polyfill').use(nodePolyfillWebpackPlugin);
+      target: {
+        // browser: ['esnext', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
+        browser: ['esnext'],
+        node: 'node20',
       },
-      // extendWebpack(cfg, {}) {
-      //   cfg.resolve.fallback = { fs: false, process: require('process'), path: false };
-      // },
-
-      // viteVuePluginOptions: { //You may have to add or uncomment this option.
-      //   template: {
-      //     compilerOptions: {
-      //       isCustomElement: (tag) => tag.startsWith('custom')
-      //     }
-      //   }
-      // },
-
       vitePlugins: [
         [
           '@intlify/vite-plugin-vue-i18n',
@@ -154,23 +137,211 @@ module.exports = configure(function (/* ctx */) {
         [
           'vite-plugin-checker',
           {
-            vueTsc: {
-              tsconfigPath: 'tsconfig.vue-tsc.json',
-            },
             eslint: {
               lintCommand: 'eslint "./**/*.{js,ts,mjs,cjs,vue}"',
+            },
+            vueTsc: {
+              tsconfigPath: 'tsconfig.vue-tsc.json',
             },
           },
           { server: false },
         ],
       ],
+
+      // viteVuePluginOptions: { //You may have to add or uncomment this option.
+      //   template: {
+      //     compilerOptions: {
+      //       isCustomElement: (tag) => tag.startsWith('custom')
+      //     }
+      //   }
+      // },
+
+      vueRouterMode: 'hash', // available values: 'hash', 'history'
     },
+
+    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-capacitor-apps/configuring-capacitor
+    capacitor: {
+      hideSplashscreen: true,
+    },
+
+    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-cordova-apps/configuring-cordova
+    cordova: {
+      // noIosLegacyBuildFlag: true, // uncomment only if you know what you are doing
+    },
+
+    // animations: 'all', // --- includes all animations
+    // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
+    css: ['app.scss'],
+
+    // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#sourcefiles
+    // sourceFiles: {
+    //   rootComponent: 'src/App.vue',
+    //   router: 'src/router/index',
+    //   store: 'src/store/index',
+    //   registerServiceWorker: 'src-pwa/register-service-worker',
+    //   serviceWorker: 'src-pwa/custom-service-worker',
+    //   pwaManifestFile: 'src-pwa/manifest.json',
+    //   electronMain: 'src-electron/electron-main',
+    //   electronPreload: 'src-electron/electron-preload'
+    // },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
       // https: true
       open: true, // opens browser window automatically
     },
+
+    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/configuring-electron
+    electron: {
+      // extendElectronMainConf (esbuildConf)
+      // extendElectronPreloadConf (esbuildConf)
+
+      builder: {
+        // https://www.electron.build/configuration/configuration
+
+        appId: 'sircharlo.meeting-media-manager-v2',
+        artifactName: 'meeting-media-manager-${version}.${ext}',
+        buildDependenciesFromSource: true,
+        generateUpdatesFilesForAllChannels: true,
+        linux: {
+          category: 'Utility',
+          icon: 'icons/',
+          publish: ['github'],
+          target: 'AppImage',
+        },
+        // directories: {
+        //   output: 'build',
+        mac: {
+          icon: 'icons/icon.icns',
+          publish: ['github'],
+          target: {
+            arch: ['universal'],
+            target: 'dmg',
+          },
+        },
+        nsis: {
+          artifactName: 'meeting-media-manager-${version}-${arch}.${ext}',
+          oneClick: false,
+        },
+        productName: 'Meeting Media Manager',
+        // },
+        win: {
+          icon: 'icons/icon.ico',
+          publish: ['github'],
+          target: [
+            {
+              arch: ['x64', 'ia32'],
+              target: 'nsis',
+            },
+          ],
+        },
+      },
+
+      bundler: 'builder', // 'packager' or 'builder'
+
+      inspectPort: 5858,
+
+      /*
+
+      const ICONS_DIR = 'build/icons/'
+
+const windowsOS = {
+  win: {
+    icon: ICONS_DIR + 'icon.ico',
+    target: [
+      {
+        target: 'nsis',
+        arch: ['x64', 'ia32'],
+      },
+    ],
+    publish: ['github'],
+  },
+
+  nsis: {
+    oneClick: false,
+    artifactName: 'meeting-media-manager-${version}-${arch}.${ext}',
+  },
+}
+
+const linuxOS = {
+  linux: {
+    icon: ICONS_DIR,
+    target: 'AppImage',
+    category: 'Utility',
+    publish: ['github'],
+  },
+}
+
+const macOS = {
+  mac: {
+    icon: ICONS_DIR + 'icon.icns',
+    target: {
+      target: 'dmg',
+      arch: ['universal'],
+    },
+    publish: ['github'],
+  },
+}
+
+module.exports = {
+  productName: 'Meeting Media Manager',
+  appId: 'sircharlo.meeting-media-manager',
+  artifactName: 'meeting-media-manager-${version}.${ext}',
+  buildDependenciesFromSource: true,
+  generateUpdatesFilesForAllChannels: true,
+  directories: {
+    output: 'build',
+  },
+  // default files: https://www.electron.build/configuration/contents
+  files: [
+    'package.json',
+    {
+      from: 'dist/main/',
+      to: 'dist/main/',
+    },
+    {
+      from: 'dist/renderer/',
+      to: 'dist/renderer/',
+    },
+  ],
+  extraResources: [
+    {
+      from: 'src/extraResources/',
+      to: '',
+    },
+  ],
+  ...windowsOS,
+  ...linuxOS,
+  ...macOS,
+}
+      */
+
+      packager: {
+        // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
+        // OS X / Mac App Store
+        // appBundleId: '',
+        // appCategoryType: '',
+        // osxSign: '',
+        // protocol: 'myapp://path',
+        // Windows only
+        // win32metadata: { ... }
+      },
+    },
+
+    // https://github.com/quasarframework/quasar/tree/dev/extras
+    extras: [
+      // 'ionicons-v4',
+      'mdi-v7',
+      // 'bootstrap-icons',
+      'fontawesome-v6',
+      // 'eva-icons',
+      // 'themify',
+      // 'line-awesome',
+      // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
+
+      'roboto-font', // optional, you are not bound to it
+      'material-icons', // optional, you are not bound to it
+    ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
@@ -192,21 +363,19 @@ module.exports = configure(function (/* ctx */) {
       plugins: ['LocalStorage', 'Notify'],
     },
 
-    // animations: 'all', // --- includes all animations
-    // https://v2.quasar.dev/options/animations
-    animations: ['fadeIn', 'fadeOut'],
-
-    // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#sourcefiles
-    // sourceFiles: {
-    //   rootComponent: 'src/App.vue',
-    //   router: 'src/router/index',
-    //   store: 'src/store/index',
-    //   registerServiceWorker: 'src-pwa/register-service-worker',
-    //   serviceWorker: 'src-pwa/custom-service-worker',
-    //   pwaManifestFile: 'src-pwa/manifest.json',
-    //   electronMain: 'src-electron/electron-main',
-    //   electronPreload: 'src-electron/electron-preload'
-    // },
+    // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
+    pwa: {
+      injectPwaMetaTags: true,
+      manifestFilename: 'manifest.json',
+      swFilename: 'sw.js',
+      useCredentialsForManifestTag: false,
+      workboxMode: 'generateSW', // or 'injectManifest'
+      // useFilenameHashes: true,
+      // extendGenerateSWOptions (cfg) {}
+      // extendInjectManifestOptions (cfg) {},
+      // extendManifestJson (json) {}
+      // extendPWACustomSWConf (esbuildConf) {}
+    },
 
     // https://v2.quasar.dev/quasar-cli-vite/developing-ssr/configuring-ssr
     ssr: {
@@ -216,7 +385,9 @@ module.exports = configure(function (/* ctx */) {
       // extendSSRWebserverConf (esbuildConf) {},
       // extendPackageJson (json) {},
 
-      pwa: false,
+      middlewares: [
+        'render', // keep this as last one
+      ],
 
       // manualStoreHydration: true,
       // manualPostHydrationTrigger: true,
@@ -224,68 +395,7 @@ module.exports = configure(function (/* ctx */) {
       prodPort: 3000, // The default port that the production server should use
       // (gets superseded if process.env.PORT is specified at runtime)
 
-      middlewares: [
-        'render', // keep this as last one
-      ],
-    },
-
-    // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
-    pwa: {
-      workboxMode: 'generateSW', // or 'injectManifest'
-      injectPwaMetaTags: true,
-      swFilename: 'sw.js',
-      manifestFilename: 'manifest.json',
-      useCredentialsForManifestTag: false,
-      // useFilenameHashes: true,
-      // extendGenerateSWOptions (cfg) {}
-      // extendInjectManifestOptions (cfg) {},
-      // extendManifestJson (json) {}
-      // extendPWACustomSWConf (esbuildConf) {}
-    },
-
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-cordova-apps/configuring-cordova
-    cordova: {
-      // noIosLegacyBuildFlag: true, // uncomment only if you know what you are doing
-    },
-
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-capacitor-apps/configuring-capacitor
-    capacitor: {
-      hideSplashscreen: true,
-    },
-
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/configuring-electron
-    electron: {
-      // extendElectronMainConf (esbuildConf)
-      // extendElectronPreloadConf (esbuildConf)
-
-      inspectPort: 5858,
-
-      bundler: 'builder', // 'packager' or 'builder'
-
-      packager: {
-        // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
-        // OS X / Mac App Store
-        // appBundleId: '',
-        // appCategoryType: '',
-        // osxSign: '',
-        // protocol: 'myapp://path',
-        // Windows only
-        // win32metadata: { ... }
-      },
-
-      builder: {
-        // https://www.electron.build/configuration/configuration
-
-        appId: 'mmm-v2',
-      },
-    },
-
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex
-    bex: {
-      contentScripts: ['my-content-script'],
-
-      // extendBexScriptsConf (esbuildConf) {}
-      // extendBexManifestJson (json) {}
+      pwa: false,
     },
   };
 });

@@ -1,12 +1,12 @@
+import { enable, initialize } from '@electron/remote/main';
 import {
-  app,
   BrowserWindow,
   Menu,
+  app,
   session,
 } from 'electron';
-import { initialize, enable } from '@electron/remote/main';
-import path from 'path';
 import os from 'os';
+import path from 'path';
 
 initialize();
 
@@ -17,28 +17,28 @@ let mediaWindow: BrowserWindow | null | undefined;
 
 function createMediaWindow() {
   const window = new BrowserWindow({
-    title: 'Media Window',
-    // roundedCorners: windowOpts.fullscreen,
-    fullscreen: false,
-    x: 50,
-    y: 50,
     alwaysOnTop: true,
     backgroundColor: 'black',
-    width: 1280,
+    frame: false,
+    // roundedCorners: windowOpts.fullscreen,
+    fullscreen: false,
     height: 720,
     minHeight: 110,
     minWidth: 195,
-    frame: false,
+    show: false,
     thickFrame: false,
+    title: 'Media Window',
     webPreferences: {
       backgroundThrottling: false,
       nodeIntegration: true,
-      webSecurity: false,
-      sandbox: false,
       // More info: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/electron-preload-script
       preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD),
+      sandbox: false,
+      webSecurity: false,
     },
-    show: false,
+    width: 1280,
+    x: 50,
+    y: 50,
   });
 
   window.setAspectRatio(16 / 9);
@@ -50,9 +50,10 @@ function createMediaWindow() {
   if (process.env.DEBUGGING) {
     window.webContents.openDevTools();
   } else {
-    window.webContents.on('devtools-opened', () => {
-      mainWindow?.webContents.closeDevTools();
-    });
+    // window.webContents.on('devtools-opened', () => {
+    //   mainWindow?.webContents.closeDevTools();
+    // });
+    window.webContents.openDevTools();
   }
 
   return window;
@@ -104,18 +105,18 @@ function createWindow() {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    icon: path.resolve(__dirname, 'icons/icon.png'), // tray icon
-    width: 1000,
     height: 600,
+    icon: path.resolve(__dirname, 'icons/icon.png'), // tray icon
     // backgroundColor: 'black',
     useContentSize: true,
     webPreferences: {
       backgroundThrottling: false,
       nodeIntegration: true,
-      webSecurity: false,
-      sandbox: false,
       preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD),
+      sandbox: false,
+      webSecurity: false,
     },
+    width: 1000,
   });
 
   Menu.setApplicationMenu(Menu.buildFromTemplate([]));
@@ -130,9 +131,10 @@ function createWindow() {
   if (process.env.DEBUGGING) {
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.webContents.on('devtools-opened', () => {
-      mainWindow?.webContents.closeDevTools();
-    });
+    // mainWindow.webContents.on('devtools-opened', () => {
+    //   mainWindow?.webContents.closeDevTools();
+    // });
+    mainWindow.webContents.openDevTools();
   }
 
   mainWindow.on('closed', () => {

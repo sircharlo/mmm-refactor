@@ -1,14 +1,13 @@
-import { defineStore, storeToRefs } from 'pinia';
-import { jwLanguage } from '../types/languages';
-import { LocalStorage } from 'quasar';
 import { getLanguages, getYeartext } from 'boot/axios';
+import { defineStore } from 'pinia';
+import { LocalStorage } from 'quasar';
 import { date } from 'quasar';
-import { useCurrentStateStore } from 'src/stores/current-state';
 import { findBestResolution, getPubMediaLinks } from 'src/helpers/jw-media';
-import { MediaLink, PublicationFetcher } from 'src/types/publications';
 import { DynamicMediaObject } from 'src/types/media';
-const currentState = useCurrentStateStore();
-const { currentSettings, currentSongbook, currentCongregation, selectedDate } = storeToRefs(currentState);
+import { MediaLink, PublicationFetcher } from 'src/types/publications';
+
+import { useCurrentStateStore } from '../stores/current-state';
+import { jwLanguage } from '../types/languages';
 
 export const MAX_SONGS = 500;
 
@@ -24,53 +23,25 @@ export function uniqueById<T extends { uniqueId: string }>(array: T[]): T[] {
 const oldDate = new Date(0);
 
 export const useJwStore = defineStore('jw-store', {
-  state: () => {
-    return {
-      jwLanguages: (LocalStorage.getItem('jwLanguages') || {
-        updated: oldDate,
-        list: [],
-      }) as { updated: Date; list: jwLanguage[] },
-      jwSongs: (LocalStorage.getItem('jwSongs') || {
-      }) as {
-        [lang: string]: {
-          updated: Date,
-          list: MediaLink[],
-        }
-      },
-      yeartexts: (LocalStorage.getItem('yeartexts') || {}) as {
-        [year: number]: { [langcode: string]: string };
-      },
-      mediaSort: (LocalStorage.getItem('mediaSort') || {}) as {
-        [key: string]: {
-          [key: string]: string[];
-        },
-      },
-      customDurations: (LocalStorage.getItem('customDurations') || {}) as {
-        [key: string]: {
-          [key: string]: {
-            [key: string]: { max: number, min: number }
-          };
-        },
-      },
-      additionalMediaMaps: (LocalStorage.getItem('additionalMediaMaps') || {}) as Record<string, Record<string, DynamicMediaObject[]>>,
-    };
-  },
   actions: {
     addToAdditionMediaMap(mediaArray: DynamicMediaObject[]) {
-      if (!this.additionalMediaMaps[currentCongregation.value]) this.additionalMediaMaps[currentCongregation.value] = {}
-      if (!this.additionalMediaMaps[currentCongregation.value][selectedDate.value]) this.additionalMediaMaps[currentCongregation.value][selectedDate.value] = []
-      const currentArray = this.additionalMediaMaps[currentCongregation.value][selectedDate.value]
-      this.additionalMediaMaps[currentCongregation.value][selectedDate.value] = uniqueById([...currentArray, ...mediaArray])
+      const currentState = useCurrentStateStore();
+      if (!this.additionalMediaMaps[currentState.currentCongregation]) this.additionalMediaMaps[currentState.currentCongregation] = {}
+      if (!this.additionalMediaMaps[currentState.currentCongregation][currentState.selectedDate]) this.additionalMediaMaps[currentState.currentCongregation][currentState.selectedDate] = []
+      const currentArray = this.additionalMediaMaps[currentState.currentCongregation][currentState.selectedDate]
+      this.additionalMediaMaps[currentState.currentCongregation][currentState.selectedDate] = uniqueById([...currentArray, ...mediaArray])
     },
     removeFromAdditionMediaMap(uniqueId: string) {
-      if (currentCongregation.value && selectedDate.value && this.additionalMediaMaps[currentCongregation.value] && this.additionalMediaMaps[currentCongregation.value][selectedDate.value]) {
-        const currentArray = this.additionalMediaMaps[currentCongregation.value][selectedDate.value]
-        this.additionalMediaMaps[currentCongregation.value][selectedDate.value] = uniqueById(currentArray.filter((media) => media.uniqueId !== uniqueId))
+      const currentState = useCurrentStateStore();
+      if (currentState.currentCongregation && currentState.selectedDate && this.additionalMediaMaps[currentState.currentCongregation] && this.additionalMediaMaps[currentState.currentCongregation][currentState.selectedDate]) {
+        const currentArray = this.additionalMediaMaps[currentState.currentCongregation][currentState.selectedDate]
+        this.additionalMediaMaps[currentState.currentCongregation][currentState.selectedDate] = uniqueById(currentArray.filter((media) => media.uniqueId !== uniqueId))
       }
     },
     resetSort() {
-      if (currentCongregation.value && selectedDate.value && this.mediaSort[currentCongregation.value]) {
-        this.mediaSort[currentCongregation.value][selectedDate.value] = []
+      const currentState = useCurrentStateStore();
+      if (currentState.currentCongregation && currentState.selectedDate && this.mediaSort[currentState.currentCongregation]) {
+        this.mediaSort[currentState.currentCongregation][currentState.selectedDate] = []
       }
     },
     async updateJwLanguages() {
@@ -82,21 +53,22 @@ export const useJwStore = defineStore('jw-store', {
       );
       if (monthsSinceUpdated > 3) {
         this.jwLanguages = {
-          updated: now,
           list: await getLanguages(),
+          updated: now,
         };
       }
     },
     async updateJwSongs() {
       try {
-        if (!currentSettings.value?.lang || !currentSongbook.value?.pub) {
+        const currentState = useCurrentStateStore();
+        if (!currentState.currentSettings?.lang || !currentState.currentSongbook?.pub) {
           console.error('No current settings or songbook defined');
           return []
         }
-        const langwritten = currentSettings.value.lang as string
+        const langwritten = currentState.currentSettings.lang as string
         const songbook = {
-          pub: currentSongbook.value.pub,
           langwritten,
+          pub: currentState.currentSongbook.pub,
         } as PublicationFetcher
         const pubMediaLinks = await getPubMediaLinks(songbook)
         if (!pubMediaLinks) {
@@ -112,8 +84,8 @@ export const useJwStore = defineStore('jw-store', {
         const now = new Date();
         if (!this.jwSongs[langwritten]) {
           this.jwSongs[langwritten] = {
-            updated: oldDate,
             list: [],
+            updated: oldDate,
           }
         }
         const monthsSinceUpdated = date.getDateDiff(
@@ -136,8 +108,8 @@ export const useJwStore = defineStore('jw-store', {
             }
           }
           this.jwSongs[langwritten] = {
-            updated: now,
             list: filteredMediaItemLinks,
+            updated: now,
           };
         }
       } catch (error) {
@@ -145,10 +117,11 @@ export const useJwStore = defineStore('jw-store', {
       }
     },
     async updateYeartext(lang?: string) {
-      if (!(currentSettings.value?.lang || lang)) {
+      const currentState = useCurrentStateStore();
+      if (!(currentState.currentSettings?.lang || lang)) {
         return;
       }
-      const currentLang = currentSettings.value.lang as string || lang as string;
+      const currentLang = currentState.currentSettings.lang as string || lang as string;
       const currentYear = new Date().getFullYear();
       if (!this.yeartexts[currentYear]) {
         this.yeartexts[currentYear] = {}
@@ -160,5 +133,36 @@ export const useJwStore = defineStore('jw-store', {
         }
       }
     },
+  },
+  state: () => {
+    return {
+      additionalMediaMaps: (LocalStorage.getItem('additionalMediaMaps') || {}) as Record<string, Record<string, DynamicMediaObject[]>>,
+      customDurations: (LocalStorage.getItem('customDurations') || {}) as {
+        [key: string]: {
+          [key: string]: {
+            [key: string]: { max: number, min: number }
+          };
+        },
+      },
+      jwLanguages: (LocalStorage.getItem('jwLanguages') || {
+        list: [],
+        updated: oldDate,
+      }) as { list: jwLanguage[]; updated: Date },
+      jwSongs: (LocalStorage.getItem('jwSongs') || {
+      }) as {
+        [lang: string]: {
+          list: MediaLink[],
+          updated: Date,
+        }
+      },
+      mediaSort: (LocalStorage.getItem('mediaSort') || {}) as {
+        [key: string]: {
+          [key: string]: string[];
+        },
+      },
+      yeartexts: (LocalStorage.getItem('yeartexts') || {}) as {
+        [year: number]: { [langcode: string]: string };
+      },
+    };
   },
 });

@@ -1,91 +1,91 @@
 export interface MediaLink {
-  title: string;
+  bitRate: number;
+  booknum: number;
+  docid: number;
+  duration: number;
+  edition: string;
+  editionDescr: string;
   file: {
-    url: string;
-    stream: string;
-    modifiedDatetime: string;
     checksum: string;
+    modifiedDatetime: string;
+    stream: string;
+    url: string;
   };
   filesize: number;
-  trackImage: {
-    url: string;
-    modifiedDatetime: string;
-    checksum: string;
-  };
+  format: string;
+  formatDescr: string;
+  frameHeight: number;
+  frameRate: number;
+  frameWidth: number;
+  hasTrack: boolean;
+  label: string;
   markers: {
-    mepsLanguageSpoken: string;
-    mepsLanguageWritten: string;
     documentId: number;
-    markers: Array<{
-      duration: string;
-      startTime: string;
-      mepsParagraphId: number;
-    }>;
-    type: string;
     hash: string;
     introduction: {
       duration: string;
       startTime: string;
     };
+    markers: Array<{
+      duration: string;
+      mepsParagraphId: number;
+      startTime: string;
+    }>;
+    mepsLanguageSpoken: string;
+    mepsLanguageWritten: string;
+    type: string;
   };
-  label: string;
-  track: number;
-  hasTrack: boolean;
-  pub: string;
-  docid: number;
-  booknum: number;
   mimetype: string;
-  edition: string;
-  editionDescr: string;
-  format: string;
-  formatDescr: string;
+  pub: string;
   specialty: string;
   specialtyDescr: string;
   subtitled: boolean;
-  frameWidth: number;
-  frameHeight: number;
-  frameRate: number;
-  duration: number;
-  bitRate: number;
+  title: string;
+  track: number;
+  trackImage: {
+    checksum: string;
+    modifiedDatetime: string;
+    url: string;
+  };
 }
 
 export interface Publication {
-  pubName: string;
-  parentPubName: string;
   booknum: null | number;
-  pub: string;
-  issue: string;
-  formattedDate: string;
   fileformat: string[];
-  track: number | null;
-  specialty: string;
-  pubImage: {
-    url: string;
-    modifiedDatetime: string;
-    checksum: string;
-  };
-  languages: {
-    [key: string]: {
-      name: string;
-      direction: string;
-      locale: string;
-      script: string;
-    };
-  };
   files: {
     [key: string]: {
       [key: string]: MediaLink[];
     };
   };
+  formattedDate: string;
+  issue: string;
+  languages: {
+    [key: string]: {
+      direction: string;
+      locale: string;
+      name: string;
+      script: string;
+    };
+  };
+  parentPubName: string;
+  pub: string;
+  pubImage: {
+    checksum: string;
+    modifiedDatetime: string;
+    url: string;
+  };
+  pubName: string;
+  specialty: string;
+  track: null | number;
 }
 
 export interface PublicationFetcher {
-  langwritten: string;
   fileformat?: string;
-  pub: string;
-  issue?: string | number;
-  track?: number;
+  issue?: number | string;
+  langwritten: string;
   maxTrack?: number;
+  pub: string;
+  track?: number;
 }
 
 export interface ImageSizes {

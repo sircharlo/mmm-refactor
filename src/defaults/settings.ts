@@ -1,25 +1,27 @@
+/* eslint-disable perfectionist/sort-objects */
+
 import {
-  SettingsItems,
   SettingsGroups,
+  SettingsItems,
   SettingsValues,
 } from '../types/settings';
 
 export const settingsGroups: SettingsGroups = {
   app: {
-    name: 'applicationConfiguration',
     description: 'applicationConfigurationDescription',
+    name: 'applicationConfiguration',
   },
   congregationMeetings: {
-    name: 'congregationMeetings',
     description: 'congregationMeetingsDescription',
+    name: 'congregationMeetings',
   },
   mediaRetrievalPlayback: {
-    name: 'mediaRetrievalAndPlayback',
     description: 'mediaRetrievalAndPlaybackDescription',
+    name: 'mediaRetrievalAndPlayback',
   },
   integrations: {
-    name: 'integrations',
     description: 'integrationsDescription',
+    name: 'integrations',
   },
   // advanced: {
   //   name: 'advanced',
@@ -29,182 +31,182 @@ export const settingsGroups: SettingsGroups = {
 };
 
 export const settingsDefinitions: SettingsItems = {
-  // Congregation Meetings
-  congregationName: {
-    rules: ['notEmpty'],
-    type: 'text',
-    group: 'congregationMeetings',
-  },
-  lang: {
-    type: 'list',
-    list: 'jwLanguages',
-    group: 'mediaRetrievalPlayback',
-  },
-  mwDay: {
-    rules: ['notEmpty'],
-    type: 'list',
-    list: 'days',
-    group: 'congregationMeetings',
-  },
-  mwStartTime: {
-    options: ['meetingTime'],
-    rules: ['notEmpty'],
-    type: 'time',
-    group: 'congregationMeetings',
-  },
-  weDay: {
-    rules: ['notEmpty'],
-    type: 'list',
-    list: 'days',
-    group: 'congregationMeetings',
-  },
-  weStartTime: {
-    options: ['meetingTime'],
-    rules: ['notEmpty'],
-    type: 'time',
-    group: 'congregationMeetings',
-  },
-  coWeek: {
-    options: ['coTuesdays'],
-    type: 'date',
-    group: 'congregationMeetings',
-  },
-
-  // Media Retrieval and Playback
-  enableMediaDisplayButton: {
+  autoRunAtBoot: {
+    group: 'app',
     type: 'toggle',
-    group: 'mediaRetrievalPlayback',
-  },
-  preferredOutput: {
-    depends: 'enableMediaDisplayButton',
-    type: 'list',
-    list: 'screens',
-    group: 'mediaRetrievalPlayback',
-  },
-  hideMediaLogo: {
-    type: 'toggle',
-    depends: 'enableMediaDisplayButton',
-    group: 'mediaRetrievalPlayback',
-  },
-  maxRes: {
-    type: 'list',
-    list: 'resolutions',
-    group: 'mediaRetrievalPlayback',
-    depends: 'enableMediaDisplayButton',
-  },
-  excludeFootnotes: {
-    type: 'toggle',
-    group: 'mediaRetrievalPlayback',
-    depends: 'enableMediaDisplayButton',
-  },
-  excludeLffImages: {
-    type: 'toggle',
-    group: 'mediaRetrievalPlayback',
-    depends: 'enableMediaDisplayButton',
-  },
-  excludeTh: {
-    type: 'toggle',
-    group: 'mediaRetrievalPlayback',
-    depends: 'enableMediaDisplayButton',
-  },
-  includePrinted: {
-    type: 'toggle',
-    group: 'mediaRetrievalPlayback',
-    depends: 'enableMediaDisplayButton',
-  },
-  enableMusicButton: {
-    type: 'toggle',
-    group: 'mediaRetrievalPlayback',
   },
   autoStartMusic: {
     depends: 'enableMusicButton',
-    type: 'toggle',
     group: 'mediaRetrievalPlayback',
+    type: 'toggle',
   },
+  coWeek: {
+    group: 'congregationMeetings',
+    options: ['coTuesdays'],
+    type: 'date',
+  },
+  // Congregation Meetings
+  congregationName: {
+    group: 'congregationMeetings',
+    rules: ['notEmpty'],
+    type: 'text',
+  },
+  darkMode: {
+    group: 'app',
+    list: 'darkModes',
+    type: 'list',
+  },
+  // Media Retrieval and Playback
+  enableMediaDisplayButton: {
+    group: 'mediaRetrievalPlayback',
+    type: 'toggle',
+  },
+  enableMusicButton: {
+    group: 'mediaRetrievalPlayback',
+    type: 'toggle',
+  },
+
   enableMusicFadeOut: {
     depends: 'enableMusicButton',
-    type: 'toggle',
     group: 'mediaRetrievalPlayback',
+    type: 'toggle',
+  },
+  enableSubtitles: {
+    group: 'mediaRetrievalPlayback',
+    type: 'toggle',
+  },
+  excludeFootnotes: {
+    depends: 'enableMediaDisplayButton',
+    group: 'mediaRetrievalPlayback',
+    type: 'toggle',
+  },
+  // },
+  excludeTh: {
+    depends: 'enableMediaDisplayButton',
+    group: 'mediaRetrievalPlayback',
+    type: 'toggle',
+  },
+  hideMediaLogo: {
+    depends: 'enableMediaDisplayButton',
+    group: 'mediaRetrievalPlayback',
+    type: 'toggle',
+  },
+  // excludeLffImages: {
+  //   type: 'toggle',
+  //   group: 'mediaRetrievalPlayback',
+  //   depends: 'enableMediaDisplayButton',
+  includePrinted: {
+    depends: 'enableMediaDisplayButton',
+    group: 'mediaRetrievalPlayback',
+    type: 'toggle',
+  },
+  jwlCompanionMode: {
+    group: 'mediaRetrievalPlayback',
+    type: 'toggle',
+  },
+  lang: {
+    group: 'mediaRetrievalPlayback',
+    list: 'jwLanguages',
+    type: 'list',
+  },
+  langFallback: {
+    group: 'mediaRetrievalPlayback',
+    list: 'jwLanguages',
+    type: 'list',
+  },
+  langSubs: {
+    depends: 'enableSubtitles',
+    group: 'mediaRetrievalPlayback',
+    list: 'jwLanguages',
+    type: 'list',
+  },
+  // App
+  localAppLang: {
+    group: 'app',
+    list: 'appLanguages',
+    type: 'list',
+  },
+  maxRes: {
+    depends: 'enableMediaDisplayButton',
+    group: 'mediaRetrievalPlayback',
+    list: 'resolutions',
+    type: 'list',
   },
   musicVolume: {
-    type: 'slider',
     depends: 'enableMusicButton',
     group: 'mediaRetrievalPlayback',
     max: 100,
     min: 0,
     step: 1,
+    type: 'slider',
   },
-  enableSubtitles: {
-    type: 'toggle',
-    group: 'mediaRetrievalPlayback',
-  },
-  langSubs: {
+  mwDay: {
+    group: 'congregationMeetings',
+    list: 'days',
+    rules: ['notEmpty'],
     type: 'list',
-    depends: 'enableSubtitles',
-    list: 'jwLanguages',
-    group: 'mediaRetrievalPlayback',
   },
-  jwlCompanionMode: {
-    type: 'toggle',
-    group: 'mediaRetrievalPlayback',
-  },
-  langFallback: {
-    type: 'list',
-    list: 'jwLanguages',
-    group: 'mediaRetrievalPlayback',
+  mwStartTime: {
+    group: 'congregationMeetings',
+    options: ['meetingTime'],
+    rules: ['notEmpty'],
+    type: 'time',
   },
 
-  // App
-  localAppLang: {
-    group: 'app',
-    type: 'list',
-    list: 'appLanguages',
-  },
-  darkMode: {
-    group: 'app',
-    type: 'list',
-    list: 'darkModes',
-  },
-  autoRunAtBoot: {
-    type: 'toggle',
-    group: 'app',
-  },
-
-  // Integrations
-  obsEnable: {
-    type: 'toggle',
-    group: 'integrations',
-    actions: ['obsConnect'],
-  },
-  obsPort: {
-    depends: 'obsEnable',
-    type: 'text',
-    group: 'integrations',
-    actions: ['obsConnect'],
-  },
-  obsPassword: {
-    depends: 'obsEnable',
-    type: 'text',
-    group: 'integrations',
-    actions: ['obsConnect'],
-  },
   obsCameraScene: {
     depends: 'obsEnable',
-    type: 'list',
-    list: 'obsAllScenes',
     group: 'integrations',
+    list: 'obsAllScenes',
+    type: 'list',
   },
-  obsMediaScene: {
-    depends: 'obsEnable',
-    type: 'list',
-    list: 'obsAllScenes',
+  // Integrations
+  obsEnable: {
+    actions: ['obsConnect'],
     group: 'integrations',
+    type: 'toggle',
   },
   obsImageScene: {
     depends: 'obsEnable',
-    type: 'list',
-    list: 'obsNonStageScenes',
     group: 'integrations',
+    list: 'obsNonStageScenes',
+    type: 'list',
+  },
+
+  obsMediaScene: {
+    depends: 'obsEnable',
+    group: 'integrations',
+    list: 'obsAllScenes',
+    type: 'list',
+  },
+  obsPassword: {
+    actions: ['obsConnect'],
+    depends: 'obsEnable',
+    group: 'integrations',
+    type: 'text',
+  },
+  obsPort: {
+    actions: ['obsConnect'],
+    depends: 'obsEnable',
+    group: 'integrations',
+    type: 'text',
+  },
+  preferredOutput: {
+    depends: 'enableMediaDisplayButton',
+    group: 'mediaRetrievalPlayback',
+    list: 'screens',
+    type: 'list',
+  },
+  weDay: {
+    group: 'congregationMeetings',
+    list: 'days',
+    rules: ['notEmpty'],
+    type: 'list',
+  },
+  weStartTime: {
+    group: 'congregationMeetings',
+    options: ['meetingTime'],
+    rules: ['notEmpty'],
+    type: 'time',
   },
   // Advanced
 
@@ -350,17 +352,18 @@ export const settingsDefinitions: SettingsItems = {
 };
 
 export const defaultSettings: SettingsValues = {
-  autoOpenFolderWhenDone: false,
+  // autoOpenFolderWhenDone: false,
   // autoPlayFirst: false,
   // autoPlayFirstTime: 5,
   // autoQuitWhenDone: false,
   autoRunAtBoot: false,
   autoStartMusic: true,
   // autoStartSync: false,
+  coWeek: '',
   // betaUpdates: false,
   congregationName: '',
-  darkMode: 'auto',
   // disableAutoUpdate: false,
+  darkMode: 'auto',
   // disableHardwareAcceleration: false,
   enableMediaDisplayButton: false,
   // enableMp4Conversion: false,
@@ -373,21 +376,31 @@ export const defaultSettings: SettingsValues = {
   // excludeLffImages: false,
   excludeTh: true,
   hideMediaLogo: false,
-  jwlCompanionMode: false,
   includePrinted: true,
+  jwlCompanionMode: false,
   // keepOriginalsAfterConversion: false,
   lang: 'E',
+  langFallback: '',
+  // mediaWinShortcut: 'Alt+Z',
+  // musicFadeOutTime: 60,
+  langSubs: '',
   localAppLang: 'en-US',
   maxRes: '720p',
-  mediaWinShortcut: 'Alt+Z',
-  // musicFadeOutTime: 60,
   // musicFadeOutType: 'smart',
   musicVolume: 100,
-  obsEnable: false,
-  obsPort: 4455,
-  obsPassword: '',
+  mwDay: '0',
   // outputFolderDateFormat: 'YYYY-MM-DD',
   // presentShortcut: 'Alt+D',
   // shuffleShortcut: 'Alt+K',
+  mwStartTime: '19:30',
+  obsCameraScene: '',
+  obsEnable: false,
+  obsImageScene: '',
+  obsMediaScene: '',
+  obsPassword: '',
+  obsPort: '4455',
+  preferredOutput: '',
   // specialCong: false,
+  weDay: '0',
+  weStartTime: '10:00'
 };

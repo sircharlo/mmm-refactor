@@ -1,22 +1,13 @@
-import { JwPlaylistItem, MultimediaItem, PlaylistTagItem } from 'src/types/sqlite';
-import { electronApi } from 'src/helpers/electron-api';
-const { fs, convert, path, decompress, executeQuery } = electronApi;
 import { Buffer } from 'buffer';
-import { getFileUrl, getTempDirectory } from './fs';
+import { electronApi } from 'src/helpers/electron-api';
+import { JwPlaylistItem, MultimediaItem, PlaylistTagItem } from 'src/types/sqlite';
 import { Ref } from 'vue';
+
 import { FULL_HD } from './converters';
+import { getFileUrl, getTempDirectory } from './fs';
 import { dynamicMediaMapper, processMissingMediaInfo } from './jw-media';
 
-
-// import { useCurrentStateStore } from 'stores/current-state';
-// import { storeToRefs } from 'pinia';
-// const currentState = useCurrentStateStore();
-// const { getDatedAdditionalMediaDirectory } = storeToRefs(currentState);
-
-// const selectedDateObject = computed(() => {
-//   return lookupPeriod.value.find(day => date.getDateDiff(day.date, selectedDate.value, 'days') === 0) || lookupPeriod.value[0]
-// })
-
+const { convert, decompress, executeQuery, fs, path } = electronApi;
 
 const formatTime = (time: number) => {
   if (!time) return '00:00';
@@ -179,13 +170,13 @@ const getMediaFromJwPlaylist = async (jwPlaylistPath: string, selectedDateValue:
       item.ThumbnailFilePath += '.jpg';
     }
     return {
-      KeySymbol: item.KeySymbol,
       FilePath: item.IndependentMediaFilePath ? path.join(outputPath, item.IndependentMediaFilePath) : '',
-      Label: playlistName + ' - ' + item.Label,
-      Track: item.Track,
       IssueTagNumber: item.IssueTagNumber,
+      KeySymbol: item.KeySymbol,
+      Label: playlistName + ' - ' + item.Label,
       MimeType: item.MimeType,
       ThumbnailFilePath: item.ThumbnailFilePath || '',
+      Track: item.Track,
     };
   }) as MultimediaItem[];
 
@@ -270,22 +261,22 @@ const convertSvgToJpg = async (
 };
 
 export {
-  formatTime,
-  isImage,
-  isHeic,
-  isVideo,
-  isAudio,
-  isSong,
-  isArchive,
-  isJwpub,
-  isJwPlaylist,
-  isPdf,
-  decompressJwpub,
-  getMediaFromJwPlaylist,
-  findDb,
   convertHeicToJpg,
   convertSvgToJpg,
-  isSvg,
-  isRemoteUrl,
+  decompressJwpub,
+  findDb,
+  formatTime,
+  getMediaFromJwPlaylist,
+  isArchive,
+  isAudio,
+  isHeic,
+  isImage,
   isImageString,
+  isJwPlaylist,
+  isJwpub,
+  isPdf,
+  isRemoteUrl,
+  isSong,
+  isSvg,
+  isVideo,
 };

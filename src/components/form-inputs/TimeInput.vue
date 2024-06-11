@@ -1,11 +1,11 @@
 <template>
-  <q-input filled v-model="localValue" mask="time" :rules="getRules(rules)" class="q-pb-none" dense readonly
+  <q-input :rules="getRules(rules)" class="q-pb-none" dense filled mask="time" readonly v-model="localValue"
     v-bind="{ label: label || undefined }">
-    <q-popup-proxy breakpoint="1000" transition-show="scale" transition-hide="scale">
-      <q-time format24h v-model="localValue" :options="getTimeOptions(options)"  class="non-selectable">
+    <q-popup-proxy breakpoint="1000" transition-hide="scale" transition-show="scale">
+      <q-time :options="getTimeOptions(options)" class="non-selectable" format24h  v-model="localValue">
         <div class="row items-center justify-end">
-          <q-btn icon="mdi-close" color="negative" flat @click="clearTime" v-close-popup />
-          <q-btn icon="mdi-check" color="positive" flat v-close-popup />
+          <q-btn @click="clearTime" color="negative" flat icon="mdi-close" v-close-popup />
+          <q-btn color="positive" flat icon="mdi-check" v-close-popup />
         </div>
       </q-time>
     </q-popup-proxy>
@@ -13,30 +13,30 @@
 </template>
 
 <script lang="ts">
+import { getRules, getTimeOptions } from 'src/helpers/settings';
 import { defineComponent, ref, watch } from 'vue';
-import { getTimeOptions, getRules } from 'src/helpers/settings';
 
 export default defineComponent({
+  emits: ['update:modelValue'],
   name: 'TimeInput',
   props: {
-    modelValue: {
+    label: {
+      default: null,
       type: String,
-      default: '',
     },
-    rules: {
-      type: Array as () => Array<string>,
-      default: () => [],
+    modelValue: {
+      default: '',
+      type: String,
     },
     options: {
-      type: Array as () => Array<string>,
       default: () => [],
+      type: Array as () => Array<string>,
     },
-    label: {
-      type: String,
-      default: null,
+    rules: {
+      default: () => [],
+      type: Array as () => Array<string>,
     },
   },
-  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const localValue = ref(props.modelValue);
 
@@ -56,10 +56,10 @@ export default defineComponent({
     };
 
     return {
-      localValue,
+      clearTime,
       getRules,
       getTimeOptions,
-      clearTime,
+      localValue,
     };
   },
 });

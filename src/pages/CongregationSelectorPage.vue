@@ -1,106 +1,88 @@
 <template>
   <q-page padding>
-    <q-list bordered separator class="q-mb-md" v-if="Object.keys(congregations).length">
+    <q-list bordered class="q-mb-md" separator v-if="Object.keys(congregations).length">
       <!-- @vue-ignore-->
-      <q-item clickable v-ripple v-for="( prefs, id ) in congregations" :key="id">
+      <q-item :key="id" clickable v-for="( prefs, id ) in congregations" v-ripple>
         <q-item-section @click="chooseCongregation(id)">
           {{ getSettingValue("congregationName", id) || 'no name' }} - {{ id }}
         </q-item-section>
         <q-item-section side>
-          <q-btn @click="congToDelete = id" class="gt-xs" size="0.8em" flat round icon="delete" />
+          <q-btn @click="congToDelete = id" class="gt-xs" flat icon="delete" round size="0.8em" />
         </q-item-section>
       </q-item>
     </q-list>
     <q-btn @click="createNewCongregation()" color="primary" icon="mdi-plus" label="New congregation" />
   </q-page>
-  <q-dialog v-model="deletePending" persistent>
+  <q-dialog persistent v-model="deletePending">
     <q-card>
       <q-card-section class="row items-center">
-        <q-avatar icon="mdi-alert" color="negative" text-color="white" />
+        <q-avatar color="negative" icon="mdi-alert" text-color="white" />
         <span class="q-ml-sm">Are you sure you want to delete this congregation?</span>
       </q-card-section>
       <q-card-actions align="right" class="text-primary">
-        <q-btn flat label="Cancel" @click="congToDelete = ''" />
-        <q-btn flat label="Delete " @click="deleteCongregation(congToDelete); congToDelete = ''" />
+        <q-btn @click="congToDelete = ''" flat label="Cancel" />
+        <q-btn @click="deleteCongregation(congToDelete); congToDelete = ''" flat label="Delete " />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-import { Ref, defineComponent } from 'vue'
-import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router';
+<script setup lang="ts">
 import { storeToRefs } from 'pinia';
+import { Dark } from 'quasar';
+import { computed, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-import { useCongregationSettingsStore } from 'stores/congregation-settings';
+import { useCongregationSettingsStore } from '../stores/congregation-settings';
+import { useCurrentStateStore } from '../stores/current-state';
+import { useJwStore } from '../stores/jw';
+
 const congregationSettings = useCongregationSettingsStore();
-
-import { useCurrentStateStore } from 'stores/current-state';
 const currentState = useCurrentStateStore();
 const { getSettingValue } = currentState;
-
-import { useJwStore } from 'stores/jw';
-import { Dark } from 'quasar';
 const jwStore = useJwStore();
 const { updateYeartext } = jwStore;
+Dark.set('auto');
+const { congregationCount, congregations } = storeToRefs(congregationSettings);
+const { createCongregation, deleteCongregation } = congregationSettings;
+const { setCongregation } = currentState;
+const route = useRoute();
+const router = useRouter();
+const congToDelete = ref<number | string>('');
+const deletePending = computed(() => {
+  return !!congToDelete.value;
+});
 
-
-
-export default defineComponent({
-  setup() {
-    Dark.set('auto');
-    const { congregationCount, congregations } = storeToRefs(congregationSettings);
-    const { createCongregation, deleteCongregation } = congregationSettings
-    const { setCongregation } = currentState
-    const route = useRoute();
-    const router = useRouter();
-    const congToDelete: Ref<number | string> = ref('')
-    const deletePending = computed(() => {
-      return !!congToDelete.value
-    })
-    function chooseCongregation(congregation: string | number, initialLoad?: boolean) {
-      const invalidSettings = setCongregation(congregation)
-      updateYeartext()
-      if (congregation) {
-        if (initialLoad) {
-          // if (initialLoad || invalidSettings) {
-          router.push('/setup-wizard');
-        } else if (invalidSettings) {
-          router.push('/settings');
-        } else {
-          router.push('/media-calendar');
-        }
-      }
+function chooseCongregation(congregation: number | string, initialLoad?: boolean) {
+  const invalidSettings = setCongregation(congregation);
+  updateYeartext();
+  if (congregation) {
+    if (initialLoad) {
+      // if (initialLoad || invalidSettings)
+      router.push('/setup-wizard');
+    } else if (invalidSettings) {
+      router.push('/settings');
+    } else {
+      router.push('/media-calendar');
     }
+  }
+}
 
-    const isHomePage = computed(() => {
-      return route.path === '/';
-    })
+const isHomePage = computed(() => {
+  return route.path === '/';
+});
 
-    function createNewCongregation() {
-      chooseCongregation(createCongregation(), true)
-    }
+function createNewCongregation() {
+  chooseCongregation(createCongregation(), true);
+}
 
-    if (congregationCount.value === 0) {
-      createNewCongregation()
-    } else if (congregationCount.value === 1 && isHomePage.value) {
-      chooseCongregation(Object.keys(congregations.value)[0])
-    } else if (!isHomePage.value) {
-      chooseCongregation('')
-    }
-
-    return {
-      isHomePage,
-      chooseCongregation,
-      deleteCongregation,
-      createNewCongregation,
-      congToDelete,
-      deletePending,
-      congregations,
-      getSettingValue
-    }
-  },
-})
+if (congregationCount.value === 0) {
+  createNewCongregation();
+} else if (congregationCount.value === 1 && isHomePage.value) {
+  chooseCongregation(Object.keys(congregations.value)[0]);
+} else if (!isHomePage.value) {
+  chooseCongregation('');
+}
 
 </script>
+

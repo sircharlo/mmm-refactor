@@ -2,25 +2,25 @@ import { storeToRefs } from 'pinia';
 import { date } from 'quasar';
 import { DateInfo } from 'src/types/dates';
 import { DynamicMediaObject } from 'src/types/media';
-import { useCurrentStateStore } from 'stores/current-state';
-// import { computed } from 'vue';
-const currentState = useCurrentStateStore();
-const { getSettingValue } = currentState
-const { selectedDateObject } = storeToRefs(currentState);
+
+import { useCurrentStateStore } from '../stores/current-state';
+// const currentState = useCurrentStateStore();
+// const { getSettingValue } = currentState
+// const { selectedDateObject } = storeToRefs(currentState);
 
 const daysInFuture = 35;
 
-const dateFromString = (lookupDate?: string | undefined | Date) => {
+const dateFromString = (lookupDate?: Date | string | undefined) => {
   if (!lookupDate) {
     const now = new Date();
     lookupDate = date.buildDate(
       {
-        year: now.getFullYear(),
-        month: now.getMonth() + 1,
         day: now.getDate(),
         hours: 0,
         minutes: 0,
+        month: now.getMonth() + 1,
         seconds: 0,
+        year: now.getFullYear(),
       },
       false
     );
@@ -30,12 +30,12 @@ const dateFromString = (lookupDate?: string | undefined | Date) => {
     dateBuilder = new Date(lookupDate);
     dateBuilder = date.buildDate(
       {
-        year: dateBuilder.getFullYear(),
-        month: dateBuilder.getMonth() + 1,
         day: dateBuilder.getDate(),
         hours: 0,
         minutes: 0,
+        month: dateBuilder.getMonth() + 1,
         seconds: 0,
+        year: dateBuilder.getFullYear(),
       },
       false
     );
@@ -44,12 +44,12 @@ const dateFromString = (lookupDate?: string | undefined | Date) => {
   }
   const outputDate = date.buildDate(
     {
-      year: dateBuilder.getFullYear(),
-      month: dateBuilder.getMonth() + 1,
       day: dateBuilder.getDate(),
       hours: 0,
       minutes: 0,
+      month: dateBuilder.getMonth() + 1,
       seconds: 0,
+      year: dateBuilder.getFullYear(),
     },
     false
   );
@@ -62,6 +62,8 @@ const isInPast = (lookupDate: Date) => {
 };
 
 const getWeekDay = (lookupDate: Date) => {
+  const currentState = useCurrentStateStore();
+  const { selectedDateObject } = storeToRefs(currentState);
   if (!lookupDate) lookupDate = selectedDateObject.value?.date || new Date();
   const dayNumber =
     lookupDate.getDay() === 0
@@ -84,6 +86,8 @@ function datesAreSame(date1: Date, date2: Date) {
 }
 
 function isCoWeek(lookupDate: Date) {
+  const currentState = useCurrentStateStore();
+  const { getSettingValue } = currentState
   const coWeekSet = !!(getSettingValue('coWeek') as string);
   if (!coWeekSet) return false;
   const coWeekTuesday = dateFromString(getSettingValue('coWeek') as string);
@@ -93,6 +97,8 @@ function isCoWeek(lookupDate: Date) {
 }
 
 const isMwMeetingDay = (lookupDate: Date) => {
+  const currentState = useCurrentStateStore();
+  const { getSettingValue } = currentState
   const coWeek = isCoWeek(lookupDate);
   if (coWeek) {
     const coWeekTuesday = dateFromString(getSettingValue('coWeek') as string);
@@ -102,37 +108,38 @@ const isMwMeetingDay = (lookupDate: Date) => {
   }
 };
 
-const isWeMeetingDay = (lookupDate: Date) =>
-  getSettingValue('weDay') == getWeekDay(lookupDate);
-
-function isMeetingDay(lookupDate: Date) {
-  const mwMeetingDay = isMwMeetingDay(lookupDate);
-  const weMeetingDay = isWeMeetingDay(lookupDate);
-  return mwMeetingDay || weMeetingDay;
+const isWeMeetingDay = (lookupDate: Date) => {
+  const currentState = useCurrentStateStore();
+  const { getSettingValue } = currentState
+  return getSettingValue('weDay') == getWeekDay(lookupDate);
 }
+
+// function isMeetingDay(lookupDate: Date) {
+//   const mwMeetingDay = isMwMeetingDay(lookupDate);
+//   const weMeetingDay = isWeMeetingDay(lookupDate);
+//   return mwMeetingDay || weMeetingDay;
+// }
 
 function getLookupPeriod() {
   return Array.from({ length: daysInFuture }, (_, i) => {
     const dayDate = date.addToDate(new Date(), { days: i });
     return {
-      loading: false,
       date: dayDate as Date,
-      meeting: isMeetingDay(dayDate),
       dynamicMedia: [] as DynamicMediaObject[],
+      loading: false,
+      meeting: isMwMeetingDay(dayDate) ? 'mw' : (isWeMeetingDay(dayDate) ? 'we' : false),
     };
   }) as DateInfo[];
 }
 
 export {
   dateFromString,
-  getWeekDay,
-  getSpecificWeekday,
   datesAreSame,
-  isMeetingDay,
-  isMwMeetingDay,
-  isWeMeetingDay,
-  isCoWeek,
-  isInPast,
   daysInFuture,
   getLookupPeriod,
+  getSpecificWeekday,
+  getWeekDay,
+  isCoWeek,
+  isInPast,
+  isMwMeetingDay,
 };

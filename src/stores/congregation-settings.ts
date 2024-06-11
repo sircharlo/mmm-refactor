@@ -1,15 +1,21 @@
 import { defineStore } from 'pinia';
-import { SettingsValues } from '../types/settings';
-import { defaultSettings } from '../defaults/settings';
 import { LocalStorage, uid } from 'quasar';
+
+import { defaultSettings } from '../defaults/settings';
+import { SettingsValues } from '../types/settings';
 
 export const useCongregationSettingsStore = defineStore(
   'congregation-settings',
   {
-    state: () => {
-      return {
-        congregations: (LocalStorage.getItem('congregations') || {}) as { [key: string]: SettingsValues },
-      };
+    actions: {
+      createCongregation() {
+        const newId = uid();
+        this.congregations[newId] = defaultSettings;
+        return newId;
+      },
+      deleteCongregation(id: number | string) {
+        delete this.congregations[id];
+      },
     },
     getters: {
       congregationCount(state) {
@@ -17,15 +23,10 @@ export const useCongregationSettingsStore = defineStore(
       },
     },
 
-    actions: {
-      createCongregation() {
-        const newId = uid();
-        this.congregations[newId] = defaultSettings;
-        return newId;
-      },
-      deleteCongregation(id: string | number) {
-        delete this.congregations[id];
-      },
+    state: () => {
+      return {
+        congregations: (LocalStorage.getItem('congregations') || {}) as { [key: string]: SettingsValues },
+      };
     },
   }
 );

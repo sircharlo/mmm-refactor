@@ -3,13 +3,13 @@ export interface DatedTextItem {
   Caption: string;
   CaptionRich: string;
   DocumentId: number;
-  EndParagraphOrdinal: number | null;
-  FirstBibleCitationId: number | null;
+  EndParagraphOrdinal: null | number;
+  FirstBibleCitationId: null | number;
   FirstDateOffset: number;
-  FirstFootnoteId: number | null;
-  LastBibleCitationId: number | null;
+  FirstFootnoteId: null | number;
+  LastBibleCitationId: null | number;
   LastDateOffset: number;
-  LastFootnoteId: number | null;
+  LastFootnoteId: null | number;
   Link: string;
 }
 
@@ -18,98 +18,98 @@ export interface DocumentItem {
 }
 
 export interface MultimediaItemsFetcher {
-  db: string;
-  docId?: number;
-  mepsId?: number;
-  lang?: string;
   BeginParagraphOrdinal?: number;
   EndParagraphOrdinal?: number;
+  db: string;
+  docId?: number;
+  lang?: string;
+  mepsId?: number;
 }
 
 export interface JwPlaylistItem {
-  PlaylistItemId: number;
-  Label: string;
-  StartTrimOffsetTicks: number;
-  EndTrimOffsetTicks: number;
   Accuracy: number;
-  EndAction: number;
-  ThumbnailFilePath: string;
-  DurationTicks: number;
-  OriginalFilename: string;
-  IndependentMediaFilePath: string;
-  MimeType: string;
-  Hash: string;
-  LocationId: number;
   BookNumber: number;
   ChapterNumber: number;
   DocumentId: number;
-  Track: number;
+  DurationTicks: number;
+  EndAction: number;
+  EndTrimOffsetTicks: number;
+  Hash: string;
+  IndependentMediaFilePath: string;
   IssueTagNumber: number;
   KeySymbol: string;
+  Label: string;
+  LocationId: number;
   MepsLanguage: number;
-  Type: number;
+  MimeType: string;
+  OriginalFilename: string;
+  PlaylistItemId: number;
+  StartTrimOffsetTicks: number;
+  ThumbnailFilePath: string;
   Title: string;
+  Track: number;
+  Type: number;
 }
 
 export interface MultimediaItem {
   AlternativeLanguage?: string;
   BeginParagraphOrdinal: number;
   Caption: string;
-  CaptionContent?: string | null;
-  CaptionRich?: string | null;
+  CaptionContent?: null | string;
+  CaptionRich?: null | string;
   CategoryType: number;
   CreditLine?: string;
-  CreditLineContent?: string | null;
-  CreditLineRich?: string | null;
+  CreditLineContent?: null | string;
+  CreditLineRich?: null | string;
   DataType?: number;
   DocumentId: number;
   DocumentMultimediaId?: number;
   EndParagraphOrdinal?: number;
   FileName?: string;
   FilePath: string;
-  Height?: number | null;
+  Height?: null | number;
   IssueTagNumber?: number;
-  KeySymbol?: string | null;
+  KeySymbol?: null | string;
   Label: string;
-  LabelRich?: string | null;
-  Link?: string | null;
+  LabelRich?: null | string;
+  Link?: null | string;
+  LinkMultimediaId?: null | number;
   LocalPath?: string;
-  LinkMultimediaId?: number | null;
   MajorType: number;
-  MepsDocumentId?: number | null;
+  MepsDocumentId?: null | number;
   MepsLanguageIndex?: number;
   MimeType: string;
   MinorType?: number;
-  Multimeps?: number | null;
   MultimediaId: number;
+  Multimeps?: null | number;
   NextParagraphOrdinal?: number;
-  SizeConstraint?: number | null;
+  SizeConstraint?: null | number;
   SuppressZoom?: number;
-  tableQuestionIsUsed?: boolean;
   TargetParagraphNumberLabel: number;
-  Track?: number | null;
-  Width?: number | null;
   ThumbnailFilePath?: string;
+  Track?: null | number;
   VideoMarkers?: VideoMarker[];
+  Width?: null | number;
+  tableQuestionIsUsed?: boolean;
 }
 
 export interface VideoMarker {
-  VideoMarkerId: number;
-  MultimediaId: number;
-  Label: string;
-  LabelRich: string;
+  BeginTransitionDurationTicks: number;
+  BeginTransitionFrameCount: number;
   Caption: string;
   CaptionRich: string;
-  Style: string;
-  SegmentFormat: number;
-  StartTimeTicks: number;
   DurationTicks: number;
-  StartFrame: number;
-  FrameCount: number;
-  BeginTransitionDurationTicks: number;
   EndTransitionDurationTicks: number;
-  BeginTransitionFrameCount: number;
   EndTransitionFrameCount: number;
+  FrameCount: number;
+  Label: string;
+  LabelRich: string;
+  MultimediaId: number;
+  SegmentFormat: number;
+  StartFrame: number;
+  StartTimeTicks: number;
+  Style: string;
+  VideoMarkerId: number;
 }
 
 export interface MultimediaExtractItem {
@@ -120,23 +120,23 @@ export interface MultimediaExtractItem {
   IssueTagNumber: string;
   Lang: string;
   Link: string;
-  RefBeginParagraphOrdinal: number | null;
-  RefEndParagraphOrdinal: number | null;
+  RefBeginParagraphOrdinal: null | number;
+  RefEndParagraphOrdinal: null | number;
   RefMepsDocumentId: number;
   RefPublicationId: number;
   UniqueEnglishSymbol: string;
 }
 
 export interface DocumentItem {
-  Title: string;
   FeatureTitle: string;
+  Title: string;
 }
 
 export interface PublicationItem {
-  UniqueEnglishSymbol: string;
   IssueTagNumber: number;
-  UndatedSymbol: string;
   MepsLanguageIndex: number;
+  UndatedSymbol: string;
+  UniqueEnglishSymbol: string;
 }
 
 export interface PublicationIssuePropertyItem {
@@ -160,11 +160,11 @@ export interface PlaylistTagItem {
 export type QueryResponseItem =
   | DatedTextItem
   | DocumentItem
-  | MultimediaExtractRefItem
+  | JwPlaylistItem
   | MultimediaExtractItem
+  | MultimediaExtractRefItem
   | MultimediaItem
+  | PlaylistTagItem
   | PublicationItem
   | TableItem
-  | JwPlaylistItem
-  | PlaylistTagItem
   | VideoMarker;

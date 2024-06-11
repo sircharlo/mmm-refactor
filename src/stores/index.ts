@@ -1,7 +1,7 @@
-import { store } from 'quasar/wrappers'
 import { createPinia } from 'pinia'
-import { Router } from 'vue-router';
 import { PiniaSharedState } from 'pinia-shared-state'
+import { store } from 'quasar/wrappers'
+import { Router } from 'vue-router';
 
 /*
  * When adding new properties to stores, you should also

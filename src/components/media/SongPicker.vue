@@ -1,49 +1,46 @@
 <template>
   <q-dialog persistent v-model="localValue">
-    <q-card style="min-width: 500px;" class="non-selectable">
+    <q-card class="non-selectable" style="min-width: 500px;">
       <q-card-section>
         <div class="text-h6">Choose a song {{ selectedSong }}</div>
       </q-card-section>
       <q-card-section class="q-pt-none">
-        <q-select map-options v-model="selectedSong" use-input hide-selected input-debounce="10" fill-input
-          :options="songOptions.map(song => { return { value: song.track, label: song.title } })" @filter="filterFn"
-          @change="selectedSong = $event" label="Song" />
+        <q-select :options="songOptions.map(song => { return { value: song.track, label: song.title } })" @change="selectedSong = $event" @filter="filterFn" fill-input hide-selected input-debounce="10"
+          label="Song" map-options
+          use-input v-model="selectedSong" />
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn flat label="Cancel" color="negative" @click="dismissPopup" />
-        <q-btn flat label="Add song" color="primary" @click="addSong(selectedSong)" />
+        <q-btn @click="dismissPopup" color="negative" flat label="Cancel" />
+        <q-btn @click="addSong(selectedSong)" color="primary" flat label="Add song" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue';
-
 import { storeToRefs } from 'pinia';
-
-import { useCurrentStateStore } from 'stores/current-state';
 import { dynamicMediaMapper, processMissingMediaInfo } from 'src/helpers/jw-media';
 import { MultimediaItem } from 'src/types/sqlite';
-const currentState = useCurrentStateStore();
-const { currentSongs, currentSongbook, selectedDateObject } = storeToRefs(currentState);
+import { defineComponent, ref, watch } from 'vue';
 
-import { useJwStore } from 'src/stores/jw';
-const jwStore = useJwStore();
-const { addToAdditionMediaMap } = jwStore;
-
+import { useCurrentStateStore } from '../../stores/current-state';
+import { useJwStore } from '../../stores/jw';
 
 export default defineComponent({
+  emits: ['update:modelValue'],
   name: 'SongPicker',
   props: {
     modelValue: {
-      type: [Boolean],
       default: null,
+      type: [Boolean],
     },
   },
-  emits: ['update:modelValue'],
 
   setup(props, { emit }) {
+    const currentState = useCurrentStateStore();
+    const { currentSongbook, currentSongs, selectedDateObject } = storeToRefs(currentState);
+    const jwStore = useJwStore();
+    const { addToAdditionMediaMap } = jwStore;
     const localValue = ref(props.modelValue);
 
     watch(localValue, (newValue) => {
@@ -65,16 +62,6 @@ export default defineComponent({
       selectedSong.value = null
     }
     return {
-      localValue,
-      songOptions,
-      selectedSong,
-      filterFn(val: string, update: (arg0: () => void) => void) {
-        update(() => {
-          const needle = val.toLowerCase()
-          songOptions.value = currentSongs.value.filter(v => v.title.toLowerCase().indexOf(needle) > -1)
-        })
-      },
-      dismissPopup,
       async addSong(selectedSong: { label: string, value: number } | null) {
         if (selectedSong?.value) {
           const multimediaItem = {
@@ -87,6 +74,16 @@ export default defineComponent({
         }
         dismissPopup()
       },
+      dismissPopup,
+      filterFn(val: string, update: (arg0: () => void) => void) {
+        update(() => {
+          const needle = val.toLowerCase()
+          songOptions.value = currentSongs.value.filter(v => v.title.toLowerCase().indexOf(needle) > -1)
+        })
+      },
+      localValue,
+      selectedSong,
+      songOptions,
     };
   },
 });

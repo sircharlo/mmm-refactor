@@ -28,14 +28,14 @@
  * }
  */
 
-import { contextBridge, Point } from 'electron';
-import { dialog, app, BrowserWindow, screen } from '@electron/remote';
-import fs from 'fs-extra';
-import path from 'upath';
-import klawSync from 'klaw-sync';
-import decompress from 'decompress';
+import { BrowserWindow, app, dialog, screen } from '@electron/remote';
 import * as sqlite3 from 'better-sqlite3';
+import decompress from 'decompress';
+import { Point, contextBridge } from 'electron';
+import fs from 'fs-extra';
 import convert from 'heic-convert';
+import klawSync from 'klaw-sync';
+import path from 'upath';
 
 const getMainWindow = () => BrowserWindow.getAllWindows().find(
   (w) => !w.webContents.getURL().includes('media-player')
@@ -76,13 +76,13 @@ function getScreenInfo() {
   }
   return {
     displays,
-    winMidpoints,
-    winCoordinates,
     otherScreens: displays.filter(
       (display) =>
         display.id !==
         screen.getDisplayNearestPoint(winMidpoints.main as Point).id
     ),
+    winCoordinates,
+    winMidpoints,
   };
 }
 
@@ -158,20 +158,8 @@ const toggleMediaWindow = (action: string) => {
 };
 
 contextBridge.exposeInMainWorld('electronApi', {
-  toggleMediaWindow,
-  openFolderDialog: () => {
-    return dialog.showOpenDialogSync({
-      properties: ['openDirectory'],
-    });
-  },
-  getUserDataPath: () => {
-    return app.getPath('userData');
-  },
-  path,
-  fs,
-  klawSync,
-  decompress,
   convert,
+  decompress,
   // pdfToImg: require('pdf-to-img'),
   executeQuery: (dbPath: string, query: string) => {
     try {
@@ -199,4 +187,16 @@ contextBridge.exposeInMainWorld('electronApi', {
     const url = require('node:url')
     return url.fileURLToPath(fileurl);
   },
+  fs,
+  getUserDataPath: () => {
+    return app.getPath('userData');
+  },
+  klawSync,
+  openFolderDialog: () => {
+    return dialog.showOpenDialogSync({
+      properties: ['openDirectory'],
+    });
+  },
+  path,
+  toggleMediaWindow,
 });

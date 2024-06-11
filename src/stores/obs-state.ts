@@ -1,31 +1,32 @@
 import { defineStore } from 'pinia';
-import { useCurrentStateStore } from 'src/stores/current-state';
-const currentState = useCurrentStateStore();
-const { getSettingValue } = currentState;
 import { JsonObject } from 'type-fest'
 
+import { useCurrentStateStore } from '../stores/current-state';
 
 export const useObsStateStore = defineStore(
   'obs-state',
   {
-    state: () => {
-      return {
-        scenes: [] as JsonObject[],
-        obsConnected: false,
-        currentScene: '',
-        currentSceneUuid: '',
-      };
-    },
     getters: {
-      nonStageScenes: (state) => {
-        return state.scenes.filter(scene => scene.sceneUuid !== getSettingValue('obsCameraScene'))
+      mediaScene: (state) => {
+        const currentState = useCurrentStateStore();
+        return state.scenes.find(scene => scene.sceneUuid === currentState.currentSettings?.obsMediaScene) as JsonObject
       },
       nonMediaScenes: (state) => {
-        return state.scenes.filter(scene => scene.sceneUuid !== getSettingValue('obsMediaScene'))
+        const currentState = useCurrentStateStore();
+        return state.scenes.filter(scene => scene.sceneUuid !== currentState.currentSettings?.obsMediaScene)
       },
-      mediaScene: (state) => {
-        return state.scenes.find(scene => scene.sceneUuid === getSettingValue('obsMediaScene')) as JsonObject
+      nonStageScenes: (state) => {
+        const currentState = useCurrentStateStore();
+        return state.scenes.filter(scene => scene.sceneUuid !== currentState.currentSettings?.obsCameraScene)
       },
+    },
+    state: () => {
+      return {
+        currentScene: '',
+        currentSceneUuid: '',
+        obsConnected: false,
+        scenes: [] as JsonObject[],
+      };
     },
 
     // actions: {
