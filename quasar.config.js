@@ -148,12 +148,25 @@ module.exports = configure(function (/* ctx */) {
         ],
       ],
 
-      // viteVuePluginOptions: { //You may have to add or uncomment this option.
+      // viteVuePluginOptions: {
+      //   //You may have to add or uncomment this option.
       //   template: {
       //     compilerOptions: {
-      //       isCustomElement: (tag) => tag.startsWith('custom')
-      //     }
-      //   }
+      //       isCustomElement: (tag) =>
+      //         tag.startsWith('DateInput'.toLowerCase()) ||
+      //         tag.startsWith('PathInput'.toLowerCase()) ||
+      //         tag.startsWith('TimeInput'.toLowerCase()) ||
+      //         tag.startsWith('ToggleInput'.toLowerCase()) ||
+      //         tag.startsWith('SelectInput'.toLowerCase()) ||
+      //         tag.startsWith('SliderInput'.toLowerCase()) ||
+      //         tag.startsWith('TextInput'.toLowerCase()) ||
+      //         tag.startsWith('MediaDisplayButton'.toLowerCase()) ||
+      //         tag.startsWith('DownloadStatus'.toLowerCase()) ||
+      //         tag.startsWith('MusicButton'.toLowerCase()) ||
+      //         tag.startsWith('SongPicker'.toLowerCase()) ||
+      //         tag.startsWith('ScenePicker'.toLowerCase()),
+      //     },
+      //   },
       // },
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'

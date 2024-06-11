@@ -32,34 +32,16 @@
   </template>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { defineComponent, ref } from 'vue';
+import { setObsSceneByUuid } from 'src/helpers/obs';
+import { ref } from 'vue';
 
 import { useObsStateStore } from '../../stores/obs-state';
+
 const obsState = useObsStateStore();
-const { currentSceneUuid, mediaScene, nonMediaScenes, obsConnected } =
-  storeToRefs(obsState);
+const { currentSceneUuid, mediaScene, nonMediaScenes, obsConnected } = storeToRefs(obsState);
 
-import { setObsSceneByUuid } from 'src/helpers/obs';
+const menuActive = ref(false);
 
-export default defineComponent({
-  name: 'ScenePicker',
-  props: {
-    disabled: {
-      default: false,
-      type: Boolean,
-    },
-  },
-  setup() {
-    return {
-      currentSceneUuid,
-      mediaScene,
-      menuActive: ref(false),
-      nonMediaScenes,
-      obsConnected,
-      setObsSceneByUuid,
-    };
-  },
-});
 </script>

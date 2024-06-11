@@ -8,15 +8,12 @@
   </q-app>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { onMounted } from 'vue';
 
-document.body.style.overflow = 'hidden'
-document.title = 'Media Player'
-
-export default defineComponent({
-  setup() {
-    return {}
-  }
-})
+onMounted(() => {
+  document.body.style.overflow = 'hidden';
+  document.title = 'Media Player';
+});
 </script>
+

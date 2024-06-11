@@ -40,36 +40,50 @@
     </q-popup-proxy>
   </q-btn>
 </template>
-<script lang="ts">
+
+<script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { electronApi } from 'src/helpers/electron-api';
 import { DownloadProgressItems } from 'src/types/media';
-import { defineComponent } from 'vue';
 
 import { useCurrentStateStore } from '../../stores/current-state';
 
+// Initialize store and destructure reactive properties
+const currentState = useCurrentStateStore();
+const { downloadProgress } = storeToRefs(currentState);
 
-export default defineComponent({
-  name: 'DownloadStatus',
-  setup() {
-    const currentState = useCurrentStateStore();
-    const { downloadProgress } = storeToRefs(currentState);
-    const { path } = electronApi;
-    return {
-      basename: path.basename,
-      downloadProgress,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      filteredDownloads: (obj: DownloadProgressItems, status: 'complete' | 'error' | 'loaded') => Object.fromEntries(Object.entries(obj).filter(([_, item]) => item[status]).sort(([keyA, valA], [keyB, valB]) => path.basename(keyA).localeCompare(path.basename(keyB)))) as DownloadProgressItems,
-      hasStatus: (obj: DownloadProgressItems, status: 'complete' | 'error' | 'loaded') => Object.values(obj).some(item => item[status]),
-      progressValue: (item: { loaded?: number; total?: number; }) => (item.loaded && item.total) ? ((item.loaded / item.total) * 100) : 0,
-      showProgress: (item: { loaded?: number; total?: number; }) => item.loaded && item.total,
-      statusColor: (status: string) => status === 'complete' ? 'positive' : 'negative',
-      statusConfig: [
-        { icon: '', label: 'inProgress', status: 'loaded' },
-        { icon: 'mdi-alert-circle', label: 'errors', status: 'error' },
-        { icon: 'mdi-check-circle', label: 'complete', status: 'complete' },
-      ] as { icon: string; label: string; status: 'complete' | 'error' | 'loaded'; }[],
-    };
-  },
-});
+// Setup component
+const { path } = electronApi;
+const basename = path.basename;
+
+// Method to filter downloads by status
+const filteredDownloads = (obj: DownloadProgressItems, status: 'complete' | 'error' | 'loaded') =>
+  Object.fromEntries(Object.entries(obj)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    .filter(([_, item]) => item[status])
+    .sort(([keyA], [keyB]) => path.basename(keyA).localeCompare(path.basename(keyB)))
+) as DownloadProgressItems;
+
+// Method to check if downloads have a specific status
+const hasStatus = (obj: DownloadProgressItems, status: 'complete' | 'error' | 'loaded') =>
+  Object.values(obj).some(item => item[status]);
+
+// Method to calculate progress value
+const progressValue = (item: { loaded?: number; total?: number; }) =>
+  (item.loaded && item.total) ? ((item.loaded / item.total) * 100) : 0;
+
+// Method to check if progress is available
+const showProgress = (item: { loaded?: number; total?: number; }) =>
+  item.loaded && item.total;
+
+// Method to determine status color
+const statusColor = (status: string) => status === 'complete' ? 'positive' : 'negative';
+
+// Status configuration
+const statusConfig = [
+  { icon: '', label: 'inProgress', status: 'loaded' },
+  { icon: 'mdi-alert-circle', label: 'errors', status: 'error' },
+  { icon: 'mdi-check-circle', label: 'complete', status: 'complete' },
+] as { icon: string; label: string; status: 'complete' | 'error' | 'loaded'; }[];
+
 </script>

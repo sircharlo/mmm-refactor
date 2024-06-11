@@ -19,7 +19,8 @@
               <q-icon name="mdi-music" size="lg" />
             </div>
             <q-img :id="media.uniqueId" :ratio="16 / 9" :src="media.thumbnailUrl"
-              @load="media.isImage && initiatePanzoom(media.uniqueId)" class="rounded-borders" fit="contain" v-else width="150px">
+              @load="media.isImage && initiatePanzoom(media.uniqueId)" class="rounded-borders" fit="contain" v-else
+              width="150px">
               <q-badge :color="customDurations[currentCongregation][selectedDate][
                 media.uniqueId
               ] &&
@@ -62,20 +63,19 @@
                         <q-card-section class="full-width q-pl-lg q-pt-none q-pb-lg">
                           <!-- {{ media.duration }} -->
                           <q-range :left-label-value="formatTime(
+                            customDurations[currentCongregation][selectedDate][
+                              media.uniqueId
+                            ].min
+                          )
+                            " :max="media.duration" :min="0" :right-label-value="formatTime(
                               customDurations[currentCongregation][selectedDate][
                                 media.uniqueId
-                              ].min
+                              ].max
                             )
-                              " :max="media.duration" :min="0" :right-label-value="formatTime(
-                                customDurations[currentCongregation][selectedDate][
-                                  media.uniqueId
-                                ].max
-                              )
-                                " :step="0" class="q-pt-lg" label label-always
-                            switch-label-side v-model="customDurations[currentCongregation][selectedDate][
-                            media.uniqueId
-                          ]
-                            " />
+                              " :step="0" class="q-pt-lg" label label-always switch-label-side v-model="customDurations[currentCongregation][selectedDate][
+                                media.uniqueId
+                              ]
+                                " />
                         </q-card-section>
                         <q-card-section class="q-px-sm q-pt-lg">
                           <q-btn :label="$t('videoTimeReset')" @click="resetMediaDuration(media)" color="negative" round
@@ -83,8 +83,8 @@
                         </q-card-section>
                       </q-card-section>
                       <q-card-actions align="right">
-                        <q-btn :label="$t('videoTimeSave')" @click="mediaDurationPopups[media.uniqueId] = false" color="primary"
-                          flat />
+                        <q-btn :label="$t('videoTimeSave')" @click="mediaDurationPopups[media.uniqueId] = false"
+                          color="primary" flat />
                       </q-card-actions>
                     </q-card>
                   </q-dialog>
@@ -127,7 +127,7 @@
           </q-item-section>
           <q-item-section class="q-px-sm">
             <div class="ellipsis-3-lines">
-              {{ media.title || basename(media.fileUrl || '') }}
+              {{ media.title || path.basename(media.fileUrl || '') }}
             </div>
           </q-item-section>
           <q-item-section side v-if="media.isAdditional">
@@ -146,16 +146,17 @@
                   <q-btn color="primary" label="Handles click" push>
                     <q-menu>
                       <q-list style="min-width: 100px">
-                        <q-item :disable="mediaPlayer.url !== '' && isVideo(mediaPlayer.url)" :key="marker.VideoMarkerId" @click="
+                        <q-item :disable="mediaPlayer.url !== '' && isVideo(mediaPlayer.url)"
+                          :key="marker.VideoMarkerId" @click="
                         if (!customDurations[currentCongregation][selectedDate][media.uniqueId]) customDurations[currentCongregation][selectedDate][media.uniqueId] = {
-                          min: 0,
-                          max: media.duration
-                        };
-                          customDurations[currentCongregation][selectedDate][media.uniqueId].min = (marker.StartTimeTicks / 10000 / 1000);
-                          customDurations[currentCongregation][selectedDate][media.uniqueId].max = (marker.StartTimeTicks + marker.DurationTicks - marker.EndTransitionDurationTicks) / 10000 / 1000;
-                          mediaPlayer.action = 'play'; mediaPlayer.url = media.fileUrl;
-                          mediaPlayer.uniqueId = media.uniqueId;
-                          " clickable v-for="marker in media.markers">
+                            min: 0,
+                            max: media.duration
+                          };
+                            customDurations[currentCongregation][selectedDate][media.uniqueId].min = (marker.StartTimeTicks / 10000 / 1000);
+                            customDurations[currentCongregation][selectedDate][media.uniqueId].max = (marker.StartTimeTicks + marker.DurationTicks - marker.EndTransitionDurationTicks) / 10000 / 1000;
+                            mediaPlayer.action = 'play'; mediaPlayer.url = media.fileUrl;
+                            mediaPlayer.uniqueId = media.uniqueId;
+                            " clickable v-for="marker in media.markers">
                           <q-item-section>{{ marker.Label }}</q-item-section>
                         </q-item>
                       </q-list>
@@ -198,11 +199,11 @@
                   <!-- </transition> -->
                 </div>
                 <q-btn @click="
-                    media.isVideo
-                      ? (mediaToStop = media.uniqueId)
-                      : stopMedia(media.uniqueId)
-                    " class="q-ml-sm" color="negative" icon="mdi-stop"
-                  round v-if="mediaPlayer.action !== '' || mediaPlayer.action === ''" />
+                  media.isVideo
+                    ? (mediaToStop = media.uniqueId)
+                    : stopMedia(media.uniqueId)
+                  " class="q-ml-sm" color="negative" icon="mdi-stop" round
+                  v-if="mediaPlayer.action !== '' || mediaPlayer.action === ''" />
               </template>
             </div>
           </q-item-section>
@@ -229,8 +230,8 @@
             (media.isVideo || media.isAudio)
           ">
             <q-item-section>
-              <q-slider :disable="mediaPlayer.action !== 'pause'" :max="media.duration" :min="0"
-                :step="0" v-model="mediaPlayer.currentPosition" />
+              <q-slider :disable="mediaPlayer.action !== 'pause'" :max="media.duration" :min="0" :step="0"
+                v-model="mediaPlayer.currentPosition" />
             </q-item-section>
           </q-item>
         </transition>
@@ -274,8 +275,8 @@
       <q-card>
         <q-card-section class="row items-center">
           <q-list>
-            <q-item :key="jwpubImportDocument.DocumentId" @click="addJwpubDocumentMediaToFiles(jwpubImportDocument)" clickable
-              v-for="jwpubImportDocument in jwpubImportDocuments">
+            <q-item :key="jwpubImportDocument.DocumentId" @click="addJwpubDocumentMediaToFiles(jwpubImportDocument)"
+              clickable v-for="jwpubImportDocument in jwpubImportDocuments">
               <q-item-section>
                 {{ jwpubImportDocument.Title }}
               </q-item-section>
@@ -301,596 +302,456 @@
   <!-- <embed ref="pdfObject" type="application/pdf" width="500px" height="600px"> -->
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { DNDPlugin } from '@formkit/drag-and-drop';
 
-import { animations } from '@formkit/drag-and-drop';
-import {
-  multiDrag,
-  parents,
-  selections,
-  updateConfig,
-} from '@formkit/drag-and-drop';
+import { animations, multiDrag, parents, selections, updateConfig } from '@formkit/drag-and-drop';
 import { dragAndDrop } from '@formkit/drag-and-drop/vue';
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
+import { Buffer } from 'buffer';
+import mime from 'mime';
 import { storeToRefs } from 'pinia';
 import { date, uid } from 'quasar';
 import { electronApi } from 'src/helpers/electron-api';
-import {
-  getDurationFromMediaPath,
-  getFileUrl,
-  getTempDirectory,
-  getThumbnailUrl,
-} from 'src/helpers/fs';
-import {
-  addFullFilePathToMultimediaItem,
-  downloadFileIfNeeded,
-  dynamicMediaMapper,
-  fetchMedia,
-  getDocumentMultimediaItems,
-  getPublicationInfoFromDb,
-  processMissingMediaInfo,
-  sanitizeId,
-} from 'src/helpers/jw-media'
-import {
-  convertHeicToJpg,
-  convertSvgToJpg,
-  decompressJwpub,
-  findDb,
-  formatTime,
-  getMediaFromJwPlaylist,
-  isArchive,
-  isAudio,
-  isHeic,
-  isImage,
-  isImageString,
-  isJwPlaylist,
-  isJwpub,
-  isPdf,
-  isRemoteUrl,
-  isSvg,
-  isVideo,
-} from 'src/helpers/mediaPlayback';
+import { getDurationFromMediaPath, getFileUrl, getTempDirectory, getThumbnailUrl } from 'src/helpers/fs';
+import { addFullFilePathToMultimediaItem, downloadFileIfNeeded, dynamicMediaMapper, fetchMedia, getDocumentMultimediaItems, getPublicationInfoFromDb, processMissingMediaInfo, sanitizeId } from 'src/helpers/jw-media';
+import { convertHeicToJpg, convertSvgToJpg, decompressJwpub, findDb, formatTime, getMediaFromJwPlaylist, isArchive, isAudio, isHeic, isImage, isImageString, isJwPlaylist, isJwpub, isPdf, isRemoteUrl, isSvg, isVideo } from 'src/helpers/mediaPlayback';
 import { createTemporaryNotification } from 'src/helpers/notifications';
+import { setObsScene } from 'src/helpers/obs';
 import { DynamicMediaObject } from 'src/types/media';
 import { DocumentItem, TableItem } from 'src/types/sqlite';
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-} from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 import { useCurrentStateStore } from '../stores/current-state';
 import { useJwStore } from '../stores/jw';
 import { useObsStateStore } from '../stores/obs-state';
 
 const dragging = ref(false);
-
 const jwpubImportDb = ref('');
-const jwpubImportInProgress = computed(() => {
-  return !!jwpubImportDb.value;
-});
+const jwpubImportInProgress = computed(() => !!jwpubImportDb.value);
 const jwpubImportLoading = ref(false);
 const jwpubImportDocuments = ref([] as DocumentItem[]);
-
 const canvas = ref();
-import { Buffer } from 'buffer';
-import mime from 'mime';
-import { setObsScene } from 'src/helpers/obs';
 
-export default defineComponent({
-  setup() {
-    const obsState = useObsStateStore();
-    const { currentScene, obsConnected } = storeToRefs(obsState);
-    const jwStore = useJwStore();
-    const { addToAdditionMediaMap, removeFromAdditionMediaMap, updateJwSongs } =
-      jwStore;
-    const { additionalMediaMaps, customDurations, mediaSort } =
-      storeToRefs(jwStore);
-    const currentState = useCurrentStateStore();
-    const {
-      currentCongregation,
-      getDatedAdditionalMediaDirectory,
-      lookupPeriod,
-      mediaPlayer,
-      mediaPlaying,
-      selectedDate,
-      selectedDateObject
-    } = storeToRefs(currentState);
-    updateJwSongs();
-    const panzooms: { [key: string]: PanzoomObject } = {};
+const obsState = useObsStateStore();
+const { currentScene, obsConnected } = storeToRefs(obsState);
+const jwStore = useJwStore();
+const { addToAdditionMediaMap, removeFromAdditionMediaMap, updateJwSongs } = jwStore;
+const { additionalMediaMaps, customDurations, mediaSort } = storeToRefs(jwStore);
+const currentState = useCurrentStateStore();
+const { currentCongregation, getDatedAdditionalMediaDirectory, lookupPeriod, mediaPlayer, mediaPlaying, selectedDate, selectedDateObject } = storeToRefs(currentState);
+updateJwSongs();
+const panzooms: { [key: string]: PanzoomObject } = {};
 
-    const mediaToStop = ref('');
-    const mediaStopPending = computed(() => {
-      return !!mediaToStop.value;
-    });
+const mediaToStop = ref('');
+const mediaStopPending = computed(() => !!mediaToStop.value);
 
-    const mediaToDelete = ref('');
-    const mediaDeletePending = computed(() => {
-      return !!mediaToDelete.value;
-    });
-    const { decompress, executeQuery, fs, path } = electronApi;
-    const zoomReset = (elemId: string, forced = false) => {
-      if (panzooms[elemId]?.getScale() <= 1.25 || forced) panzooms[elemId]?.reset();
-    };
-    function stopMedia(elemId: string) {
-      zoomReset(elemId, true);
-      mediaPlayer.value.action = 'stop';
-      mediaPlayer.value.url = '';
-      mediaPlayer.value.uniqueId = '';
-      mediaPlayer.value.action = '';
-      mediaPlayer.value.currentPosition = 0;
-      mediaToStop.value = '';
-    }
+const mediaToDelete = ref('');
+const mediaDeletePending = computed(() => !!mediaToDelete.value);
+const { decompress, executeQuery, fs, path } = electronApi;
 
-    function zoomIn(elemId: string) {
-      panzooms[elemId].zoomIn();
-    }
+const zoomReset = (elemId: string, forced = false) => {
+  if (panzooms[elemId]?.getScale() <= 1.25 || forced) panzooms[elemId]?.reset();
+};
 
-    function zoomOut(elemId: string) {
-      panzooms[elemId].zoomOut();
-      zoomReset(elemId);
-    }
+function stopMedia(elemId: string) {
+  zoomReset(elemId, true);
+  mediaPlayer.value.action = 'stop';
+  mediaPlayer.value.url = '';
+  mediaPlayer.value.uniqueId = '';
+  mediaPlayer.value.action = '';
+  mediaPlayer.value.currentPosition = 0;
+  mediaToStop.value = '';
+}
 
-    const initiatePanzoom = (elemId: string) => {
-      const elem = document.getElementById(elemId);
-      const width = elem?.clientWidth || 0;
-      const height = elem?.clientHeight || 0;
-      if (!elem) return;
-      panzooms[elemId] = Panzoom(elem, {
-        animate: true,
-        maxScale: 5,
-        minScale: 1,
-        // contain: 'outside',
-        panOnlyWhenZoomed: true,
-      });
+function zoomIn(elemId: string) {
+  panzooms[elemId].zoomIn();
+}
 
-      elem.addEventListener('panzoomend', () => {
-        zoomReset(elemId);
-      });
-      // elem.addEventListener('wheel', (e) => {
-      //   panzooms[elemId].zoomWithWheel(e)
-      //   resetZoom(elemId)
-      // })
-      elem.addEventListener(
-        'panzoomchange',
-        (e: HTMLElementEventMap['panzoomchange']) => {
-          mediaPlayer.value.scale = e.detail.scale;
-          if (width > 0) mediaPlayer.value.x = e.detail.x / width;
-          if (height > 0) mediaPlayer.value.y = e.detail.y / height;
-        }
-      );
-    };
-    const mediaList = ref();
-    const sortableMediaItems = ref([] as DynamicMediaObject[]);
-    const datedAdditionalMediaMap = computed(() => {
-      if (!currentCongregation.value || !selectedDate.value) return [];
-      return (
-        additionalMediaMaps.value[currentCongregation.value]?.[
-        selectedDate.value
-        ] || []
-      );
-    });
+function zoomOut(elemId: string) {
+  panzooms[elemId].zoomOut();
+  zoomReset(elemId);
+}
 
-    function deleteMedia() {
-      if (!mediaToDelete.value) return;
-      removeFromAdditionMediaMap(mediaToDelete.value);
-      mediaToDelete.value = '';
-    }
+const initiatePanzoom = (elemId: string) => {
+  const elem = document.getElementById(elemId);
+  const width = elem?.clientWidth || 0;
+  const height = elem?.clientHeight || 0;
+  if (!elem) return;
+  panzooms[elemId] = Panzoom(elem, {
+    animate: true,
+    maxScale: 5,
+    minScale: 1,
+    panOnlyWhenZoomed: true,
+  });
 
-    const mapOrder =
-      (sortOrder: string | string[] | undefined) =>
-        (a: DynamicMediaObject, b: DynamicMediaObject) => {
-          // if (!mediaSort.value[currentCongregation.value]) mediaSort.value[currentCongregation.value] = {}
-          // const sortOrder = mediaSort.value[currentCongregation.value][selectedDate.value]
-          const key = 'uniqueId';
-          if (!sortOrder) return 0;
-          return sortOrder.indexOf(a[key]) > sortOrder.indexOf(b[key]) ? 1 : -1;
-        };
-    const mediaItems = computed(() => {
-      return datedAdditionalMediaMap.value
-        .concat(selectedDateObject.value?.dynamicMedia)
-        .filter((mediaItem) => mediaItem?.fileUrl) as DynamicMediaObject[]
-    });
-    watch(mediaItems, (newValue) => {
-      if (newValue)
-        if (!mediaSort.value[currentCongregation.value]) mediaSort.value[currentCongregation.value] = {};
-      sortableMediaItems.value = newValue.sort(
-        mapOrder(
-          mediaSort.value[currentCongregation.value][selectedDate.value]
-        )
-      );
-    });
-    watch(
-      mediaSort,
-      (newVal) => {
-        if (
-          newVal[currentCongregation.value][selectedDate.value]?.length === 0
-        ) {
-          newVal[currentCongregation.value][selectedDate.value] =
-            datedAdditionalMediaMap.value
-              .concat(selectedDateObject.value?.dynamicMedia)
-              .filter((mediaItem) => mediaItem?.fileUrl)
-              .map((item: DynamicMediaObject) => item.uniqueId);
-        }
-        sortableMediaItems.value.sort(
-          mapOrder(newVal[currentCongregation.value][selectedDate.value])
-        );
-      },
-      { deep: true }
-    );
+  elem.addEventListener('panzoomend', () => {
+    zoomReset(elemId);
+  });
 
-    const updateMediaSortPlugin: DNDPlugin = (parent) => {
-      const parentData = parents.get(parent);
-      if (!parentData) return;
-      function dragend() {
-        if (!mediaSort.value[currentCongregation.value])
-          mediaSort.value[currentCongregation.value] = {};
-        mediaSort.value[currentCongregation.value][selectedDate.value] =
-          sortableMediaItems.value.map(
-            (item: DynamicMediaObject) => item.uniqueId
-          );
-      }
-      return {
-        setupNode(data) {
-          data.node.addEventListener('dragend', dragend);
-        },
-        tearDownNode(data) {
-          data.node.removeEventListener('dragend', dragend);
-        },
-      };
-    };
+  elem.addEventListener('panzoomchange', (e: HTMLElementEventMap['panzoomchange']) => {
+    mediaPlayer.value.scale = e.detail.scale;
+    if (width > 0) mediaPlayer.value.x = e.detail.x / width;
+    if (height > 0) mediaPlayer.value.y = e.detail.y / height;
+  });
+};
 
-    dragAndDrop({
-      parent: mediaList,
+const mediaList = ref();
+const sortableMediaItems = ref([] as DynamicMediaObject[]);
+const datedAdditionalMediaMap = computed(() => {
+  if (!currentCongregation.value || !selectedDate.value) return [];
+  return additionalMediaMaps.value[currentCongregation.value]?.[selectedDate.value] || [];
+});
+
+function deleteMedia() {
+  if (!mediaToDelete.value) return;
+  removeFromAdditionMediaMap(mediaToDelete.value);
+  mediaToDelete.value = '';
+}
+
+const mapOrder = (sortOrder: string | string[] | undefined) => (a: DynamicMediaObject, b: DynamicMediaObject) => {
+  const key = 'uniqueId';
+  if (!sortOrder) return 0;
+  return sortOrder.indexOf(a[key]) > sortOrder.indexOf(b[key]) ? 1 : -1;
+};
+
+const mediaItems = computed(() => {
+  return datedAdditionalMediaMap.value.concat(selectedDateObject.value?.dynamicMedia).filter((mediaItem) => mediaItem?.fileUrl) as DynamicMediaObject[];
+});
+
+watch(mediaItems, (newValue) => {
+  if (newValue) {
+    if (!mediaSort.value[currentCongregation.value]) mediaSort.value[currentCongregation.value] = {};
+    sortableMediaItems.value = newValue.sort(mapOrder(mediaSort.value[currentCongregation.value][selectedDate.value]));
+  }
+});
+
+watch(mediaSort, (newVal) => {
+  if (newVal[currentCongregation.value][selectedDate.value]?.length === 0) {
+    newVal[currentCongregation.value][selectedDate.value] = datedAdditionalMediaMap.value
+      .concat(selectedDateObject.value?.dynamicMedia)
+      .filter((mediaItem) => mediaItem?.fileUrl)
+      .map((item: DynamicMediaObject) => item.uniqueId);
+  }
+  sortableMediaItems.value.sort(mapOrder(newVal[currentCongregation.value][selectedDate.value]));
+}, { deep: true });
+
+const updateMediaSortPlugin: DNDPlugin = (parent) => {
+  const parentData = parents.get(parent);
+  if (!parentData) return;
+
+  function dragend() {
+    if (!mediaSort.value[currentCongregation.value]) mediaSort.value[currentCongregation.value] = {};
+    mediaSort.value[currentCongregation.value][selectedDate.value] = sortableMediaItems.value.map((item: DynamicMediaObject) => item.uniqueId);
+  }
+
+  return {
+    setupNode(data) {
+      data.node.addEventListener('dragend', dragend);
+    },
+    tearDownNode(data) {
+      data.node.removeEventListener('dragend', dragend);
+    },
+  };
+};
+
+dragAndDrop({
+  parent: mediaList,
+  plugins: [
+    updateMediaSortPlugin,
+    animations(),
+    multiDrag({
       plugins: [
-        updateMediaSortPlugin,
-        animations(),
-        multiDrag({
-          plugins: [
-            selections({
-              selectedClass: 'bg-blue-2 text-grey-10',
-            }),
-          ],
+        selections({
+          selectedClass: 'bg-blue-2 text-grey-10',
         }),
       ],
-      values: sortableMediaItems,
-    });
+    }),
+  ],
+  values: sortableMediaItems,
+});
 
-    watch(mediaPlaying, (newValue) => {
-      setObsScene(!newValue ? 'camera' : 'media');
-      updateConfig(mediaList.value, { disabled: !!newValue });
-    });
-    onMounted(() => {
-      watch(selectedDate, (newVal) => {
-        console.log('selectedDate changed', newVal)
-        const congregation = currentCongregation.value;
-        if (!congregation) return;
-        const durations = customDurations.value[congregation] ||= {};
-        durations[newVal] ||= {};
-      });
+watch(mediaPlaying, (newValue) => {
+  setObsScene(!newValue ? 'camera' : 'media');
+  updateConfig(mediaList.value, { disabled: !!newValue });
+});
 
-      selectedDate.value = date.formatDate(
-        lookupPeriod.value
-          .filter((day: { meeting: boolean | string; }) => day.meeting)
-          .map((day) => day.date)[0],
-        'YYYY/MM/DD'
-      );
-      fetchMedia();
-      setObsScene('camera');
-    });
-    onUnmounted(() => {
-      Object.keys(panzooms).forEach((key) => {
-        panzooms[key].destroy();
-      });
-    });
+onMounted(() => {
+  watch(selectedDate, (newVal) => {
+    const congregation = currentCongregation.value;
+    if (!congregation) return;
+    const durations = customDurations.value[congregation] ||= {};
+    durations[newVal] ||= {};
+  });
 
-    function inferExtension(filename: string, filetype?: string) {
-      if (!filetype) return filename;
-      const extension = mime.extension(filetype);
-      if (!extension) {
-        console.warn(
-          'Could not determine the file extension from the provided file type'
-        );
-        return filename;
+  selectedDate.value = date.formatDate(
+    lookupPeriod.value.filter((day: { meeting: boolean | string }) => day.meeting).map((day) => day.date)[0],
+    'YYYY/MM/DD'
+  );
+  fetchMedia();
+  setObsScene('camera');
+});
+
+onUnmounted(() => {
+  Object.keys(panzooms).forEach((key) => {
+    panzooms[key].destroy();
+  });
+});
+
+function inferExtension(filename: string, filetype?: string) {
+  if (!filetype) return filename;
+  const extension = mime.extension(filetype);
+  if (!extension) {
+    console.warn('Could not determine the file extension from the provided file type');
+    return filename;
+  }
+  const hasExtension = /\.[0-9a-z]+$/i.test(filename);
+  if (hasExtension) {
+    return filename;
+  }
+  return `${filename}.${extension}`;
+}
+
+const addJwpubDocumentMediaToFiles = async (document: DocumentItem) => {
+  jwpubImportDocuments.value = [];
+  jwpubImportLoading.value = true;
+  const publication = getPublicationInfoFromDb(jwpubImportDb.value);
+  let multimediaItems = getDocumentMultimediaItems({
+    db: jwpubImportDb.value,
+    docId: document.DocumentId,
+  }).map((multimediaItem) =>
+    addFullFilePathToMultimediaItem(multimediaItem, publication)
+  );
+  await processMissingMediaInfo(multimediaItems);
+  const dynamicMediaItems = await dynamicMediaMapper(
+    multimediaItems,
+    selectedDateObject.value?.date
+  );
+  addToAdditionMediaMap(dynamicMediaItems);
+  jwpubImportDb.value = '';
+  jwpubImportLoading.value = false;
+};
+
+
+const copyToDatedAdditionalMedia = async (files: string[]) => {
+  const datedAdditionalMediaDir = getDatedAdditionalMediaDirectory.value;
+  fs.ensureDirSync(datedAdditionalMediaDir);
+
+  for (const filepath of files) {
+    const datedAdditionalMediaPath = path.join(datedAdditionalMediaDir, path.basename(filepath));
+    try {
+      if (fs.existsSync(datedAdditionalMediaPath)) fs.removeSync(datedAdditionalMediaPath);
+      fs.copySync(filepath, datedAdditionalMediaPath);
+
+      const isVideoFile = isVideo(datedAdditionalMediaPath);
+      const isAudioFile = isAudio(datedAdditionalMediaPath);
+      let duration = 0;
+
+      if (isVideoFile || isAudioFile) {
+        duration = await getDurationFromMediaPath(datedAdditionalMediaPath);
       }
-      const hasExtension = /\.[0-9a-z]+$/i.test(filename);
-      if (hasExtension) {
-        return filename;
-      }
-      return `${filename}.${extension}`;
+
+      addToAdditionMediaMap([{
+        duration,
+        fileUrl: getFileUrl(datedAdditionalMediaPath),
+        isAdditional: true,
+        isAudio: isAudioFile,
+        isImage: isImage(datedAdditionalMediaPath),
+        isVideo: isVideoFile,
+        section: 'additional',
+        thumbnailUrl: await getThumbnailUrl(datedAdditionalMediaPath),
+        title: path.basename(datedAdditionalMediaPath),
+        uniqueId: sanitizeId(
+          date.formatDate(selectedDate.value, 'YYYYMMDD') +
+          '-' +
+          getFileUrl(datedAdditionalMediaPath)
+        ),
+      }]);
+    } catch (error) {
+      console.error(error, filepath, datedAdditionalMediaPath);
     }
+  }
+};
 
-    const addToFiles = async (
-      files: { filetype?: string; path: string }[] | FileList
-    ) => {
-      if (!files) return;
-      for (let i = 0; i < files.length; i++) {
-        let filepath = files[i].path;
-        try {
-          console.log('file', files[i]);
+const addToFiles = async (files: { filetype?: string; path: string }[] | FileList) => {
+  if (!files) return;
 
-          // Check if file is remote URL; if so, download it
-          if (isRemoteUrl(filepath)) {
-            const baseFileName = path.basename(new URL(filepath).pathname);
-            filepath = (
-              await downloadFileIfNeeded({
-                dir: getTempDirectory(),
-                filename: inferExtension(
-                  baseFileName,
-                  (files[i] as { filetype?: string }).filetype
-                ),
-                url: filepath,
-              })
-            ).path;
-            console.log('filepath', filepath);
-          } else if (isImageString(filepath)) {
-            const [preamble, data] = filepath.split(';base64,');
-            const ext = preamble.split('/')[1];
-            const tempFilename = uid() + '.' + ext;
-            const tempFilepath = path.join(getTempDirectory(), tempFilename);
-            fs.writeFileSync(tempFilepath, Buffer.from(data, 'base64'));
-            filepath = tempFilepath;
-          }
+  for (let i = 0; i < files.length; i++) {
+    let filepath = files[i].path;
+    try {
+      console.log('file', files[i]);
 
-          // Check if file is HEIC or SVG first; if so, convert to JPG
-          if (isHeic(filepath)) {
-            filepath = await convertHeicToJpg(filepath);
-          } else if (isSvg(filepath)) {
-            filepath = await convertSvgToJpg(filepath, canvas);
-          }
-          if (isImage(filepath) || isVideo(filepath) || isAudio(filepath)) {
-            copyToDatedAdditionalMedia([filepath]);
-          } else if (isPdf(filepath)) {
-            createTemporaryNotification({
-              icon: 'mdi-file-pdf-box',
-              message: 'PDF files are not supported yet',
-              type: 'warning',
-            });
-            // todo: eventually support PDF import
-          } else if (isJwpub(filepath)) {
-            jwpubImportLoading.value = true;
-            const unzipDir = await decompressJwpub(filepath);
-            const db = findDb(unzipDir);
-            if (!db) return;
-            jwpubImportDb.value = db;
-            if (executeQuery(db, 'SELECT * FROM Multimedia;').length === 0) {
-              createTemporaryNotification({
-                caption: path.basename(filepath),
-                icon: 'mdi-multimedia',
-                message: 'The JWPUB file does not contain any multimedia',
-                type: 'warning',
-              });
-              jwpubImportDb.value = '';
-            } else {
-              const documentMultimediaTableExists =
-                (
-                  executeQuery(
-                    db,
-                    'PRAGMA table_info(DocumentMultimedia);'
-                  ) as TableItem[]
-                ).length > 0;
-              const mmTable = documentMultimediaTableExists
-                ? 'DocumentMultimedia'
-                : 'Multimedia';
-              jwpubImportDocuments.value = executeQuery(
-                db,
-                `SELECT DISTINCT Document.DocumentId, Title FROM Document JOIN ${mmTable} ON Document.DocumentId = ${mmTable}.DocumentId;`
-              ) as DocumentItem[];
-              // } else {
-            }
-            jwpubImportLoading.value = false;
-          } else if (isJwPlaylist(filepath)) {
-            const additionalMedia = await getMediaFromJwPlaylist(filepath, selectedDateObject.value?.date, getDatedAdditionalMediaDirectory.value);
-            addToAdditionMediaMap(additionalMedia);
-          } else if (isArchive(filepath)) {
-            const unzipDirectory = path.join(
-              getTempDirectory(),
-              path.basename(filepath)
-            );
-            if (fs.existsSync(unzipDirectory)) fs.removeSync(unzipDirectory);
-            await decompress(filepath, unzipDirectory);
-            await addToFiles(
-              fs.readdirSync(unzipDirectory).map((file) => {
-                return {
-                  path: path.join(unzipDirectory, file),
-                };
-              })
-            );
-            fs.removeSync(unzipDirectory);
-          } else {
-            createTemporaryNotification({
-              caption: path.basename(filepath),
-              icon: 'mdi-file',
-              message: 'This file type is not yet supported',
-              type: 'error',
-            });
-          }
-        } catch (error) {
+      // Check if file is remote URL; if so, download it
+      if (isRemoteUrl(filepath)) {
+        const baseFileName = path.basename(new URL(filepath).pathname);
+        filepath = (
+          await downloadFileIfNeeded({
+            dir: getTempDirectory(),
+            filename: inferExtension(baseFileName, (files[i] as { filetype?: string }).filetype),
+            url: filepath,
+          })
+        ).path;
+        console.log('filepath', filepath);
+      } else if (isImageString(filepath)) {
+        const [preamble, data] = filepath.split(';base64,');
+        const ext = preamble.split('/')[1];
+        const tempFilename = uid() + '.' + ext;
+        const tempFilepath = path.join(getTempDirectory(), tempFilename);
+        fs.writeFileSync(tempFilepath, Buffer.from(data, 'base64'));
+        filepath = tempFilepath;
+      }
+
+      // Check if file is HEIC or SVG first; if so, convert to JPG
+      if (isHeic(filepath)) {
+        filepath = await convertHeicToJpg(filepath);
+      } else if (isSvg(filepath)) {
+        filepath = await convertSvgToJpg(filepath, canvas);
+      }
+
+      if (isImage(filepath) || isVideo(filepath) || isAudio(filepath)) {
+        copyToDatedAdditionalMedia([filepath]);
+      } else if (isPdf(filepath)) {
+        createTemporaryNotification({
+          icon: 'mdi-file-pdf-box',
+          message: 'PDF files are not supported yet',
+          type: 'warning',
+        });
+        // todo: eventually support PDF import
+      } else if (isJwpub(filepath)) {
+        jwpubImportLoading.value = true;
+        const unzipDir = await decompressJwpub(filepath);
+        const db = findDb(unzipDir);
+        if (!db) return;
+        jwpubImportDb.value = db;
+
+        if (executeQuery(db, 'SELECT * FROM Multimedia;').length === 0) {
           createTemporaryNotification({
             caption: path.basename(filepath),
-            icon: 'mdi-file',
-            message: 'Failed to process this file',
-            type: 'error',
+            icon: 'mdi-multimedia',
+            message: 'The JWPUB file does not contain any multimedia',
+            type: 'warning',
           });
+          jwpubImportDb.value = '';
+        } else {
+          const documentMultimediaTableExists =
+            (executeQuery(db, 'PRAGMA table_info(DocumentMultimedia);') as TableItem[]).length > 0;
+          const mmTable = documentMultimediaTableExists ? 'DocumentMultimedia' : 'Multimedia';
+          jwpubImportDocuments.value = executeQuery(
+            db,
+            `SELECT DISTINCT Document.DocumentId, Title FROM Document JOIN ${mmTable} ON Document.DocumentId = ${mmTable}.DocumentId;`
+          ) as DocumentItem[];
         }
-      }
-    };
-
-    const addJwpubDocumentMediaToFiles = async (document: DocumentItem) => {
-      jwpubImportDocuments.value = [];
-      jwpubImportLoading.value = true;
-      const publication = getPublicationInfoFromDb(jwpubImportDb.value);
-      let multimediaItems = getDocumentMultimediaItems({
-        db: jwpubImportDb.value,
-        docId: document.DocumentId,
-      }).map((multimediaItem) =>
-        addFullFilePathToMultimediaItem(multimediaItem, publication)
-      );
-      await processMissingMediaInfo(multimediaItems);
-      const dynamicMediaItems = await dynamicMediaMapper(
-        multimediaItems,
-        selectedDateObject.value?.date
-      );
-      addToAdditionMediaMap(dynamicMediaItems);
-      jwpubImportDb.value = '';
-      jwpubImportLoading.value = false;
-    };
-
-    const copyToDatedAdditionalMedia = async (files: string[]) => {
-      fs.ensureDirSync(getDatedAdditionalMediaDirectory.value);
-      for (const filepath of files) {
-        const datedAdditionalMediaPath = path.join(
-          getDatedAdditionalMediaDirectory.value,
-          path.basename(filepath)
+        jwpubImportLoading.value = false;
+      } else if (isJwPlaylist(filepath)) {
+        const additionalMedia = await getMediaFromJwPlaylist(
+          filepath,
+          selectedDateObject.value?.date,
+          getDatedAdditionalMediaDirectory.value
         );
-        try {
-          if (fs.existsSync(datedAdditionalMediaPath))
-            fs.removeSync(datedAdditionalMediaPath);
-          fs.copySync(filepath, datedAdditionalMediaPath);
-          const video = isVideo(datedAdditionalMediaPath);
-          const audio = isAudio(datedAdditionalMediaPath);
-          let duration = 0;
-          if (video || audio) {
-            duration = await getDurationFromMediaPath(datedAdditionalMediaPath);
-          }
-          addToAdditionMediaMap([
-            {
-              duration: duration,
-              fileUrl: getFileUrl(datedAdditionalMediaPath),
-              isAdditional: true,
-              isAudio: audio,
-              isImage: isImage(datedAdditionalMediaPath),
-              isVideo: video,
-              section: 'additional',
-              thumbnailUrl: await getThumbnailUrl(datedAdditionalMediaPath),
-              title: path.basename(datedAdditionalMediaPath),
-              uniqueId: sanitizeId(
-                date.formatDate(selectedDate.value, 'YYYYMMDD') +
-                '-' +
-                getFileUrl(datedAdditionalMediaPath)
-              ),
-            },
-          ]);
-        } catch (error) {
-          console.error(error, filepath, datedAdditionalMediaPath);
-        }
+        addToAdditionMediaMap(additionalMedia);
+      } else if (isArchive(filepath)) {
+        const unzipDirectory = path.join(getTempDirectory(), path.basename(filepath));
+        if (fs.existsSync(unzipDirectory)) fs.removeSync(unzipDirectory);
+        await decompress(filepath, unzipDirectory);
+        await addToFiles(
+          fs.readdirSync(unzipDirectory).map((file) => {
+            return {
+              path: path.join(unzipDirectory, file),
+            };
+          })
+        );
+        fs.removeSync(unzipDirectory);
+      } else {
+        createTemporaryNotification({
+          caption: path.basename(filepath),
+          icon: 'mdi-file',
+          message: 'This file type is not yet supported',
+          type: 'error',
+        });
       }
-    };
+    } catch (error) {
+      createTemporaryNotification({
+        caption: path.basename(filepath),
+        icon: 'mdi-file',
+        message: 'Failed to process this file',
+        type: 'error',
+      });
+    }
+  }
+};
 
-    const dropActive = (event: DragEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      if (!event.relatedTarget && event.dataTransfer?.effectAllowed === 'all') {
-        dragging.value = true;
-      }
-    };
-    const dropEnd = (event: DragEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      if (event.dataTransfer?.files.length) {
-        const droppedStuff = Array.from(event.dataTransfer.files) as {
-          filetype?: string;
-          path: string;
-        }[];
-        let noLocalDroppedFiles =
-          droppedStuff.filter((file) => file.path).length === 0;
-        if (noLocalDroppedFiles && droppedStuff.length > 0) {
-          // maybe its a drag and drop from a web browser?
-          let html = event.dataTransfer.getData('text/html');
-          let src = new DOMParser()
-            .parseFromString(html, 'text/html')
-            .querySelector('img')?.src;
-          const filetype = Array.from(event.dataTransfer.items).find(
-            (item) => item.kind === 'file'
-          )?.type;
-          if (src) droppedStuff[0] = { filetype, path: src };
-        }
-        addToFiles(droppedStuff);
-      }
-      dragging.value = false;
-    };
-    const dropIgnore = (event: DragEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-    };
+const dropActive = (event: DragEvent) => {
+  event.preventDefault();
+  event.stopPropagation();
+  if (!event.relatedTarget && event.dataTransfer?.effectAllowed === 'all') {
+    dragging.value = true;
+  }
+};
+const dropEnd = (event: DragEvent) => {
+  event.preventDefault();
+  event.stopPropagation();
+  if (event.dataTransfer?.files.length) {
+    const droppedStuff = Array.from(event.dataTransfer.files) as {
+      filetype?: string;
+      path: string;
+    }[];
+    let noLocalDroppedFiles =
+      droppedStuff.filter((file) => file.path).length === 0;
+    if (noLocalDroppedFiles && droppedStuff.length > 0) {
+      // maybe its a drag and drop from a web browser?
+      let html = event.dataTransfer.getData('text/html');
+      let src = new DOMParser()
+        .parseFromString(html, 'text/html')
+        .querySelector('img')?.src;
+      const filetype = Array.from(event.dataTransfer.items).find(
+        (item) => item.kind === 'file'
+      )?.type;
+      if (src) droppedStuff[0] = { filetype, path: src };
+    }
+    addToFiles(droppedStuff);
+  }
+  dragging.value = false;
+};
+const dropIgnore = (event: DragEvent) => {
+  event.preventDefault();
+  event.stopPropagation();
+};
 
-    const mediaDurationPopups = ref({} as { [key: string]: boolean });
+const mediaDurationPopups = ref({} as { [key: string]: boolean });
 
-    return {
-      addJwpubDocumentMediaToFiles,
-      basename: path.basename,
-      // pdfObject
-      canvas,
-      currentCongregation,
-      currentScene,
-      customDurations,
-      deleteMedia,
-      dragging,
-      dropActive,
-      dropEnd,
-      dropIgnore,
-      formatTime,
-      initiatePanzoom,
-      isVideo,
-      jwpubImportDb,
-      jwpubImportDocuments,
-      jwpubImportInProgress,
-      jwpubImportLoading,
-      mediaDeletePending,
-      mediaDurationPopups,
-      mediaItems,
-      mediaList,
-      mediaPlayer,
-      mediaStopPending,
-      mediaToDelete,
-      mediaToStop,
-      obsConnected,
-      resetMediaDuration: (media: DynamicMediaObject) => {
-        customDurations.value[currentCongregation.value][selectedDate.value][
-          media.uniqueId
-        ] = {
-          max: media.duration,
-          min: 0,
-        };
-      },
-      selectedDate,
-      selectedDateObject,
-      setObsScene,
-      showMediaDurationPopup: (media: DynamicMediaObject) => {
-        if (!currentCongregation.value) return;
-        if (!customDurations.value[currentCongregation.value])
-          customDurations.value[currentCongregation.value] = {};
-        if (
-          !customDurations.value[currentCongregation.value][selectedDate.value]
-        )
-          customDurations.value[currentCongregation.value][selectedDate.value] =
-            {};
-        if (
-          !customDurations.value[currentCongregation.value][selectedDate.value][
-          media.uniqueId
-          ]
-        ) {
-          customDurations.value[currentCongregation.value][selectedDate.value][
-            media.uniqueId
-          ] = {
-            max: media.duration,
-            min: 0,
-          };
-        }
-        mediaDurationPopups.value[media.uniqueId] = true;
-      },
-      sortableMediaItems,
-      stopMedia,
-      zoomIn,
-      zoomOut,
-      zoomReset,
+const showMediaDurationPopup = (media: DynamicMediaObject) => {
+  if (!currentCongregation.value) return;
+  if (!customDurations.value[currentCongregation.value])
+    customDurations.value[currentCongregation.value] = {};
+  if (
+    !customDurations.value[currentCongregation.value][selectedDate.value]
+  )
+    customDurations.value[currentCongregation.value][selectedDate.value] =
+      {};
+  if (
+    !customDurations.value[currentCongregation.value][selectedDate.value][
+    media.uniqueId
+    ]
+  ) {
+    customDurations.value[currentCongregation.value][selectedDate.value][
+      media.uniqueId
+    ] = {
+      max: media.duration,
+      min: 0,
     };
-  },
-});
+  }
+  mediaDurationPopups.value[media.uniqueId] = true;
+}
+
+const resetMediaDuration = (media: DynamicMediaObject) => {
+  customDurations.value[currentCongregation.value][selectedDate.value][
+    media.uniqueId
+  ] = {
+    max: media.duration,
+    min: 0,
+  };
+}
+
 </script>
 
 <style scoped>

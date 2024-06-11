@@ -17,74 +17,62 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { dynamicMediaMapper, processMissingMediaInfo } from 'src/helpers/jw-media';
 import { MultimediaItem } from 'src/types/sqlite';
-import { defineComponent, ref, watch } from 'vue';
+import { defineEmits, defineProps, ref, watch } from 'vue';
 
 import { useCurrentStateStore } from '../../stores/current-state';
 import { useJwStore } from '../../stores/jw';
 
-export default defineComponent({
-  emits: ['update:modelValue'],
-  name: 'SongPicker',
-  props: {
-    modelValue: {
-      default: null,
-      type: [Boolean],
-    },
-  },
+// Define props and emits
+const props = defineProps<{
+  modelValue: boolean | null;
+}>();
 
-  setup(props, { emit }) {
-    const currentState = useCurrentStateStore();
-    const { currentSongbook, currentSongs, selectedDateObject } = storeToRefs(currentState);
-    const jwStore = useJwStore();
-    const { addToAdditionMediaMap } = jwStore;
-    const localValue = ref(props.modelValue);
+const emit = defineEmits(['update:modelValue']);
 
-    watch(localValue, (newValue) => {
-      emit('update:modelValue', newValue);
-    });
+// Setup logic
+const currentState = useCurrentStateStore();
+const { currentSongbook, currentSongs, selectedDateObject } = storeToRefs(currentState);
+const jwStore = useJwStore();
+const { addToAdditionMediaMap } = jwStore;
 
-    watch(
-      () => props.modelValue,
-      (newValue) => {
-        localValue.value = newValue;
-      }
-    )
-    const songOptions = ref(currentSongs.value)
-    const selectedSong = ref(null)
+const localValue = ref(props.modelValue);
+const songOptions = ref(currentSongs.value);
+const selectedSong = ref<{ label: string; value: number } | null>(null);
 
+const dismissPopup = () => {
+  localValue.value = false;
+  selectedSong.value = null;
+};
 
-    const dismissPopup = () => {
-      localValue.value = false
-      selectedSong.value = null
-    }
-    return {
-      async addSong(selectedSong: { label: string, value: number } | null) {
-        if (selectedSong?.value) {
-          const multimediaItem = {
-            KeySymbol: currentSongbook.value.pub,
-            Track: selectedSong?.value
-          } as MultimediaItem
-          await processMissingMediaInfo([multimediaItem])
-          const additionalMedia = await dynamicMediaMapper([multimediaItem], selectedDateObject.value?.date, true)
-          addToAdditionMediaMap(additionalMedia);
-        }
-        dismissPopup()
-      },
-      dismissPopup,
-      filterFn(val: string, update: (arg0: () => void) => void) {
-        update(() => {
-          const needle = val.toLowerCase()
-          songOptions.value = currentSongs.value.filter(v => v.title.toLowerCase().indexOf(needle) > -1)
-        })
-      },
-      localValue,
-      selectedSong,
-      songOptions,
-    };
-  },
+const addSong = async (selectedSong: { label: string; value: number } | null) => {
+  if (selectedSong?.value) {
+    const multimediaItem = {
+      KeySymbol: currentSongbook.value.pub,
+      Track: selectedSong.value,
+    } as MultimediaItem;
+    await processMissingMediaInfo([multimediaItem]);
+    const additionalMedia = await dynamicMediaMapper([multimediaItem], selectedDateObject.value?.date, true);
+    addToAdditionMediaMap(additionalMedia);
+  }
+  dismissPopup();
+};
+
+const filterFn = (val: string, update: (callback: () => void) => void) => {
+  update(() => {
+    const needle = val.toLowerCase();
+    songOptions.value = currentSongs.value.filter(v => v.title.toLowerCase().includes(needle));
+  });
+};
+
+watch(localValue, newValue => {
+  emit('update:modelValue', newValue);
+});
+
+watch(() => props.modelValue, newValue => {
+  localValue.value = newValue;
 });
 </script>

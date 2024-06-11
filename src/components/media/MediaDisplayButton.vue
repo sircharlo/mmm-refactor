@@ -1,7 +1,7 @@
 <template>
-  <q-btn :color="mediaPlayer.windowVisible ? '' : 'red-5'" :disable="disabled"
+  <q-btn :color="mediaPlayer.windowVisible ? '' : 'red-5'" :disable="!!disabled"
     :flat="!disabled" :icon="mediaPlayer.windowVisible ? 'mdi-television' : 'mdi-television-off'"
-    :outline="disabled" @click="mediaDisplayPopup = false" size="md" v-if="currentSettings?.enableMediaDisplayButton">
+    :outline="!!disabled" @click="mediaDisplayPopup = false" size="md" v-if="currentSettings?.enableMediaDisplayButton">
     <q-tooltip anchor="bottom left" self="top left" v-if="!disabled && !mediaDisplayPopup">
       Media display
     </q-tooltip>
@@ -25,38 +25,25 @@
   </q-btn>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { electronApi } from 'src/helpers/electron-api';
-import { defineComponent, ref } from 'vue';
+import { ref } from 'vue';
 
 import { useCurrentStateStore } from '../../stores/current-state';
 
-export default defineComponent({
-  name: 'MediaDisplayButton',
-  props: {
-    disabled: {
-      default: false,
-      type: Boolean,
-    }
-  },
-  setup() {
-    const currentState = useCurrentStateStore();
-    const { currentSettings, mediaPlayer } = storeToRefs(currentState);
+defineProps<{
+  disabled?: boolean,
+}>()
 
-    const { toggleMediaWindow } = electronApi;
-    const mediaDisplayPopup = ref();
+const currentState = useCurrentStateStore();
+const { currentSettings, mediaPlayer } = storeToRefs(currentState);
 
-    const showMediaWindow = (state: boolean) => {
-      mediaPlayer.value.windowVisible = state;
-      toggleMediaWindow(state ? 'show' : 'hide');
-    };
-    return {
-      currentSettings,
-      mediaDisplayPopup,
-      mediaPlayer,
-      showMediaWindow
-    };
-  },
-});
+const mediaDisplayPopup = ref();
+
+const showMediaWindow = (state: boolean) => {
+  mediaPlayer.value.windowVisible = state;
+  electronApi.toggleMediaWindow(state ? 'show' : 'hide');
+};
+
 </script>

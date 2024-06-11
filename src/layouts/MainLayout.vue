@@ -228,7 +228,7 @@ watch(
       router.push({ path: '/congregation-selector' });
       return;
     }
-    drawer.value = !(route.fullPath.includes('wizard') && newVal !== undefined);
+    drawer.value = !(route.fullPath.includes('wizard') && newVal !== undefined && !(route.fullPath.includes('wizard') && Object.keys(congregationSettings.congregations).length > 1));
   },
   { deep: true, immediate: true }
 );

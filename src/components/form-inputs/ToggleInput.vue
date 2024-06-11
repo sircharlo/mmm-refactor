@@ -2,40 +2,27 @@
   <q-toggle v-model="localValue" />
 </template>
 
-<script>
+<script setup lang="ts">
 import { getActions } from 'src/helpers/settings';
-import { defineComponent, ref, watch } from 'vue';
+import { defineEmits, defineProps, ref, watch } from 'vue';
 
-export default defineComponent({
-  emits: ['update:modelValue'],
-  name: 'ToggleInput',
-  props: {
-    actions: {
-      default: () => [],
-      type: Array,
-    },
-    modelValue: {
-      default: false,
-      type: Boolean,
-    },
-  },
-  setup(props, { emit }) {
-    const localValue = ref(props.modelValue);
-    watch(localValue, (newValue) => {
-      emit('update:modelValue', newValue);
-      getActions(props.actions)
-    });
+// Define props and emits
+const props = defineProps<{
+  actions: string[] | undefined,
+  modelValue: boolean,
+}>()
 
-    watch(
-      () => props.modelValue,
-      (newValue) => {
-        localValue.value = newValue;
-      }
-    );
+const emit = defineEmits(['update:modelValue']);
 
-    return {
-      localValue,
-    };
-  },
+// Setup component
+const localValue = ref(props.modelValue);
+
+watch(localValue, newValue => {
+  emit('update:modelValue', newValue);
+  getActions(props.actions);
+});
+
+watch(() => props.modelValue, newValue => {
+  localValue.value = newValue;
 });
 </script>

@@ -204,7 +204,7 @@
   <!-- <pre>{{ currentSettings }}</pre> -->
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import SelectInput from 'src/components/form-inputs/SelectInput.vue';
 import TextInput from 'src/components/form-inputs/TextInput.vue';
@@ -212,70 +212,48 @@ import TimeInput from 'src/components/form-inputs/TimeInput.vue';
 import MediaDisplayButton from 'src/components/media/MediaDisplayButton.vue';
 import MusicButton from 'src/components/media/MusicButton.vue';
 import { downloadBackgroundMusic, fetchMedia } from 'src/helpers/jw-media';
-import { defineComponent, ref, watch } from 'vue'
+import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useCurrentStateStore } from '../stores/current-state';
 import { useJwStore } from '../stores/jw';
 
+const currentState = useCurrentStateStore();
+const { currentSettings } = storeToRefs(currentState);
 
+const usingAtKh = ref(false);
+const companionToJwl = ref(true);
+const obsUsed = ref(false);
+const obsIntegrate = ref(false);
 
-export default defineComponent({
-  setup() {
-    const currentState = useCurrentStateStore();
-    const { currentSettings } = storeToRefs(currentState);
+const jwStore = useJwStore();
+const { updateYeartext } = jwStore;
+const router = useRouter();
 
-    const usingAtKh = ref(false)
-    const companionToJwl = ref(true)
-    const obsUsed = ref(false)
-    const obsIntegrate = ref(false)
+watch(usingAtKh, () => {
+  enableExternalDisplayAndMusic();
+});
 
+watch(companionToJwl, () => {
+  enableExternalDisplayAndMusic();
+});
 
-    const jwStore = useJwStore();
-    const { updateYeartext } = jwStore;
-    const router = useRouter();
-    watch(usingAtKh, () => {
-      enableExternalDisplayAndMusic()
-    })
+async function enableExternalDisplayAndMusic() {
+  await updateYeartext(currentSettings.value.lang as string);
+  currentSettings.value.enableMediaDisplayButton = usingAtKh.value;
+  currentSettings.value.jwlCompanionMode = companionToJwl.value;
 
-    watch(companionToJwl, () => {
-      enableExternalDisplayAndMusic()
-    })
-
-    async function enableExternalDisplayAndMusic() {
-      await updateYeartext(currentSettings.value.lang as string)
-      currentSettings.value.enableMediaDisplayButton = usingAtKh.value
-      currentSettings.value.jwlCompanionMode = companionToJwl.value
-
-      if (usingAtKh.value) {
-        currentSettings.value.autoStartMusic = !companionToJwl.value
-        currentSettings.value.enableMusicFadeOut = !companionToJwl.value
-        currentSettings.value.jwlCompanionMode = companionToJwl.value
-      }
-
-    }
-    const goToPage = (path: string) => {
-      router.push({ path })
-    }
-    const step = ref(0)
-    return {
-      MediaDisplayButton,
-      MusicButton,
-      SelectInput,
-      TextInput,
-      TimeInput,
-      companionToJwl,
-      currentSettings,
-      downloadBackgroundMusic,
-      fetchMedia,
-      goToPage,
-      obsIntegrate,
-      obsUsed,
-      step,
-      usingAtKh
-    }
+  if (usingAtKh.value) {
+    currentSettings.value.autoStartMusic = !companionToJwl.value;
+    currentSettings.value.enableMusicFadeOut = !companionToJwl.value;
+    currentSettings.value.jwlCompanionMode = companionToJwl.value;
   }
-})
+}
 
+const goToPage = (path: string) => {
+  router.push({ path });
+};
+
+const step = ref(0);
 
 </script>
