@@ -27,7 +27,8 @@ jobs:
 
       - run: pip install setuptools
       - run: yarn install && yarn global add @quasar/cli
-      - run: quasar build -m electron -P always
+      
+      - run: yarn quasar build -m electron -P always
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
