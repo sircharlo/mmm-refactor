@@ -11,6 +11,7 @@
         class="non-selectable"
       >
         <q-list style="min-width: 100px">
+          <template v-if="mediaScene">
           <q-item-label header>Media scene</q-item-label>
           <q-item
             :active="currentSceneUuid === mediaScene.sceneUuid"
@@ -23,7 +24,8 @@
             </q-item-section>
             <q-item-section>{{ mediaScene.sceneName }}</q-item-section>
           </q-item>
-          <q-item-label header>Other scenes</q-item-label>
+        <q-item-label header>Other scenes</q-item-label>
+        </template>
           <template
             :key="scene.sceneUuid"
             v-for="[i, scene] in Object.entries(nonMediaScenes)"

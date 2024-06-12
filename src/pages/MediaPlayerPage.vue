@@ -1,5 +1,5 @@
 <template>
-  {{ mediaPlayer }}
+  <!-- {{ mediaPlayer }} -->
   <q-page-container
     class="q-electron-drag vertical-middle overflow-hidden"
     padding

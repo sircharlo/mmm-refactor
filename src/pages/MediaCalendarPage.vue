@@ -372,7 +372,7 @@
             </div>
           </q-item-section>
         </q-item>
-        <q-item v-if="media.markers && media.markers.length > 0">
+        <!-- <q-item v-if="media.markers && media.markers.length > 0">
           <q-markup-table>
             <q-tr>
               <q-th>Start</q-th>
@@ -392,7 +392,7 @@
               <q-td>{{ marker.Label }}</q-td>
             </q-tr>
           </q-markup-table>
-        </q-item>
+        </q-item> -->
         <transition
           appear
           enter-active-class="animated fadeIn"
@@ -1054,6 +1054,7 @@ const resetMediaDuration = (media: DynamicMediaObject) => {
 };
 
 const imageLoadingError = (media: DynamicMediaObject) => {
+  console.error('imageLoadingError', media);
   const thumbnailUrl = media.thumbnailUrl;
   media.thumbnailUrl = '';
   media.thumbnailUrl = thumbnailUrl ?? getThumbnailUrl(media.fileUrl);
