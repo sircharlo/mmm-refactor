@@ -19,6 +19,12 @@ jobs:
         with:
           node-version: 18
 
+
+          
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          cache: 'pip' # caching pip dependencies
       - run: pip install setuptools
       - run: yarn install && yarn global add @quasar/cli
       - run: quasar build -m electron -P always
