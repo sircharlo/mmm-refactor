@@ -1,10 +1,5 @@
 import { enable, initialize } from '@electron/remote/main';
-import {
-  BrowserWindow,
-  Menu,
-  app,
-  session,
-} from 'electron';
+import { BrowserWindow, Menu, app, session } from 'electron';
 import os from 'os';
 import path from 'path';
 
@@ -121,10 +116,9 @@ function createWindow() {
 
   Menu.setApplicationMenu(Menu.buildFromTemplate([]));
 
-
   enable(mainWindow.webContents);
   mainWindow.webContents.setUserAgent(
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
   );
   mainWindow.loadURL(process.env.APP_URL);
 
@@ -156,7 +150,7 @@ function createWindow() {
       // e.preventDefault();
     });
     const mediaUrl = new URL(
-      path.posix.join(process.env.APP_URL, '#', 'media-player')
+      path.posix.join(process.env.APP_URL, '#', 'media-player'),
     );
     enable(mediaWindow.webContents);
     mediaWindow.loadURL(mediaUrl.toString());

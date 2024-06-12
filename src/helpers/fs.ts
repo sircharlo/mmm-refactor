@@ -9,35 +9,36 @@ const { fs, getUserDataPath, klawSync, path } = electronApi;
 
 const getPublicationsPath = () => path.join(getUserDataPath(), 'Publications');
 
-
 const getTempDirectory = () => {
   return path.join(getUserDataPath(), 'Temp');
 };
 
 const getPublicationDirectory = (
   publication: PublicationFetcher,
-  create?: boolean
+  create?: boolean,
 ) => {
   const dir = path.join(
     getPublicationsPath(),
     publication.pub +
       '_' +
       publication.langwritten +
-      (publication.issue ? '_' + publication.issue.toString() : '')
+      (publication.issue ? '_' + publication.issue.toString() : ''),
   );
   if (create) fs.ensureDirSync(dir);
   return dir;
 };
 const getPublicationDirectoryContents = (
   publication: PublicationFetcher,
-  filter?: string
+  filter?: string,
 ) => {
   const dir = getPublicationDirectory(publication);
   if (!fs.existsSync(dir)) return [];
   const files = klawSync(dir, {
     filter: (file) => {
       if (!filter) return true;
-      return path.basename(file.path.toLowerCase()).includes(filter.toLowerCase());
+      return path
+        .basename(file.path.toLowerCase())
+        .includes(filter.toLowerCase());
     },
     nodir: true,
   });
@@ -49,15 +50,18 @@ const getFileUrl = (path: string) => {
   return new URL(path).href;
 };
 
-
-const getDurationFromMediaPath: (mediaPath: string) => Promise<number> = (mediaPath: string) => {
+const getDurationFromMediaPath: (mediaPath: string) => Promise<number> = (
+  mediaPath: string,
+) => {
   return new Promise((resolve, reject) => {
     if (!mediaPath) {
       reject(new Error('No media path provided'));
       return;
     }
 
-    const mediaRef = document.createElement(isVideo(mediaPath) ? 'video' : 'audio');
+    const mediaRef = document.createElement(
+      isVideo(mediaPath) ? 'video' : 'audio',
+    );
     mediaRef.src = getFileUrl(mediaPath);
     mediaRef.load();
 
@@ -73,7 +77,9 @@ const getDurationFromMediaPath: (mediaPath: string) => Promise<number> = (mediaP
   });
 };
 
-const getThumbnailFromVideoPath: (videoPath: string) => Promise<string> = (videoPath: string) => {
+const getThumbnailFromVideoPath: (videoPath: string) => Promise<string> = (
+  videoPath: string,
+) => {
   return new Promise((resolve, reject) => {
     if (!videoPath) {
       reject(new Error('No video path provided'));
@@ -114,7 +120,7 @@ const getThumbnailFromVideoPath: (videoPath: string) => Promise<string> = (video
             reject(new Error('Failed to get canvas context'));
           }
         },
-        { once: true }
+        { once: true },
       );
       videoRef.currentTime = 5;
     });
@@ -122,7 +128,9 @@ const getThumbnailFromVideoPath: (videoPath: string) => Promise<string> = (video
     videoRef.addEventListener('error', (err) => {
       // Cleanup in case of error
       videoRef.remove();
-      reject(new Error('Error loading video: ' + err.message + ' ' + videoPath));
+      reject(
+        new Error('Error loading video: ' + err.message + ' ' + videoPath),
+      );
     });
   });
 };
@@ -148,5 +156,5 @@ export {
   getPublicationDirectory,
   getPublicationDirectoryContents,
   getTempDirectory,
-  getThumbnailUrl
+  getThumbnailUrl,
 };

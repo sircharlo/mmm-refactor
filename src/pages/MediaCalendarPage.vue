@@ -3,36 +3,64 @@
     <canvas ref="canvas" style="display: none"></canvas>
 
     <q-list class="shadow-2 rounded-borders" ref="mediaList">
-      <q-banner class="bg-orange text-white" inline-actions rounded v-if="sortableMediaItems.length === 0">
+      <q-banner
+        class="bg-orange text-white"
+        inline-actions
+        rounded
+        v-if="sortableMediaItems.length === 0"
+      >
         <template v-slot:avatar>
           <q-icon name="mdi-exclamation-thick" />
         </template>
         {{ $t('noMedia') }}
       </q-banner>
 
-      <template :key="media.uniqueId" v-else v-for="media in sortableMediaItems">
-        <q-item :class="'meeting-section meeting-section-' + media.section" draggable="false">
+      <template
+        :key="media.uniqueId"
+        v-else
+        v-for="media in sortableMediaItems"
+      >
+        <q-item
+          :class="'meeting-section meeting-section-' + media.section"
+          draggable="false"
+        >
           <!-- <q-item-section horizontal class="q-pa-none"> -->
           <q-item-section class="q-pr-none" side>
-            <div class="rounded-borders bg-grey-9 text-white flex flex-center" style="width: 150px; height: 84px"
-              v-if="media.isAudio">
+            <div
+              class="rounded-borders bg-grey-9 text-white flex flex-center"
+              style="width: 150px; height: 84px"
+              v-if="media.isAudio"
+            >
               <q-icon name="mdi-music" size="lg" />
             </div>
-            <q-img :id="media.uniqueId" :ratio="16 / 9" :src="media.thumbnailUrl"
-              @load="media.isImage && initiatePanzoom(media.uniqueId)" class="rounded-borders" fit="contain" v-else
-              width="150px">
-              <q-badge :color="customDurations[currentCongregation][selectedDate][
-                media.uniqueId
-              ] &&
-                (customDurations[currentCongregation][selectedDate][
-                  media.uniqueId
-                ].min > 0 ||
+            <q-img
+              :id="media.uniqueId"
+              :ratio="16 / 9"
+              :src="media.thumbnailUrl"
+              @load="media.isImage && initiatePanzoom(media.uniqueId)"
+              class="rounded-borders"
+              fit="contain"
+              v-else
+              width="150px"
+            >
+              <q-badge
+                :color="
                   customDurations[currentCongregation][selectedDate][
                     media.uniqueId
-                  ].max < media.duration)
-                ? 'negative'
-                : 'black'
-                " @click="showMediaDurationPopup(media)" style="padding: 5px !important" v-if="media.isVideo">
+                  ] &&
+                  (customDurations[currentCongregation][selectedDate][
+                    media.uniqueId
+                  ].min > 0 ||
+                    customDurations[currentCongregation][selectedDate][
+                      media.uniqueId
+                    ].max < media.duration)
+                    ? 'negative'
+                    : 'black'
+                "
+                @click="showMediaDurationPopup(media)"
+                style="padding: 5px !important"
+                v-if="media.isVideo"
+              >
                 <q-icon class="q-mr-xs" color="white" name="mdi-play" />
                 {{
                   ((customDurations[currentCongregation][selectedDate][
@@ -43,62 +71,121 @@
                     ].min > 0 ||
                       customDurations[currentCongregation][selectedDate][
                         media.uniqueId
-                      ].max < media.duration) && formatTime(customDurations[currentCongregation][selectedDate][
-                        media.uniqueId].min) + ' - ') || '') + formatTime(
-                          (customDurations[currentCongregation][selectedDate][media.uniqueId] &&
-                            customDurations[currentCongregation][selectedDate][media.uniqueId].max) || media.duration) }}
-                  </q-badge>
-                  <q-dialog persistent v-model="mediaDurationPopups[media.uniqueId]">
-                    <q-card style="width: 300px">
-                      <q-card-section>
-                        <div class="text-h6">{{ media.title }}</div>
-                      </q-card-section>
-                      <q-card-section class="q-py-none" padding>
-                        <p class="q-my-none">
-                          Use the slider below to adjust the start and end time of
-                          this media item.
-                        </p>
-                      </q-card-section>
-                      <q-card-section class="q-pr-sm" horizontal>
-                        <q-card-section class="full-width q-pl-lg q-pt-none q-pb-lg">
-                          <!-- {{ media.duration }} -->
-                          <q-range :left-label-value="formatTime(
+                      ].max < media.duration) &&
+                    formatTime(
+                      customDurations[currentCongregation][selectedDate][
+                        media.uniqueId
+                      ].min,
+                    ) + ' - ') ||
+                    '') +
+                  formatTime(
+                    (customDurations[currentCongregation][selectedDate][
+                      media.uniqueId
+                    ] &&
+                      customDurations[currentCongregation][selectedDate][
+                        media.uniqueId
+                      ].max) ||
+                      media.duration,
+                  )
+                }}
+              </q-badge>
+              <q-dialog
+                persistent
+                v-model="mediaDurationPopups[media.uniqueId]"
+              >
+                <q-card style="width: 300px">
+                  <q-card-section>
+                    <div class="text-h6">{{ media.title }}</div>
+                  </q-card-section>
+                  <q-card-section class="q-py-none" padding>
+                    <p class="q-my-none">
+                      Use the slider below to adjust the start and end time of
+                      this media item.
+                    </p>
+                  </q-card-section>
+                  <q-card-section class="q-pr-sm" horizontal>
+                    <q-card-section
+                      class="full-width q-pl-lg q-pt-none q-pb-lg"
+                    >
+                      <!-- {{ media.duration }} -->
+                      <q-range
+                        :left-label-value="
+                          formatTime(
                             customDurations[currentCongregation][selectedDate][
                               media.uniqueId
-                            ].min
+                            ].min,
                           )
-                            " :max="media.duration" :min="0" :right-label-value="formatTime(
-                              customDurations[currentCongregation][selectedDate][
-                                media.uniqueId
-                              ].max
-                            )
-                              " :step="0" class="q-pt-lg" label label-always switch-label-side v-model="customDurations[currentCongregation][selectedDate][
-                                media.uniqueId
-                              ]
-                                " />
-                        </q-card-section>
-                        <q-card-section class="q-px-sm q-pt-lg">
-                          <q-btn :label="$t('videoTimeReset')" @click="resetMediaDuration(media)" color="negative" round
-                            size="sm" />
-                        </q-card-section>
-                      </q-card-section>
-                      <q-card-actions align="right">
-                        <q-btn :label="$t('videoTimeSave')" @click="mediaDurationPopups[media.uniqueId] = false"
-                          color="primary" flat />
-                      </q-card-actions>
-                    </q-card>
-                  </q-dialog>
+                        "
+                        :max="media.duration"
+                        :min="0"
+                        :right-label-value="
+                          formatTime(
+                            customDurations[currentCongregation][selectedDate][
+                              media.uniqueId
+                            ].max,
+                          )
+                        "
+                        :step="0"
+                        class="q-pt-lg"
+                        label
+                        label-always
+                        switch-label-side
+                        v-model="
+                          customDurations[currentCongregation][selectedDate][
+                            media.uniqueId
+                          ]
+                        "
+                      />
+                    </q-card-section>
+                    <q-card-section class="q-px-sm q-pt-lg">
+                      <q-btn
+                        :label="$t('videoTimeReset')"
+                        @click="resetMediaDuration(media)"
+                        color="negative"
+                        round
+                        size="sm"
+                      />
+                    </q-card-section>
+                  </q-card-section>
+                  <q-card-actions align="right">
+                    <q-btn
+                      :label="$t('videoTimeSave')"
+                      @click="mediaDurationPopups[media.uniqueId] = false"
+                      color="primary"
+                      flat
+                    />
+                  </q-card-actions>
+                </q-card>
+              </q-dialog>
             </q-img>
           </q-item-section>
-          <q-item-section class="q-pl-xs" side v-if="mediaPlayer.url === media.fileUrl && media.isImage">
+          <q-item-section
+            class="q-pl-xs"
+            side
+            v-if="mediaPlayer.url === media.fileUrl && media.isImage"
+          >
             <div class="column">
               <div class="col">
-                <q-btn @click="zoomIn(media.uniqueId)" color="primary" flat icon="mdi-magnify-plus" round size="xs">
+                <q-btn
+                  @click="zoomIn(media.uniqueId)"
+                  color="primary"
+                  flat
+                  icon="mdi-magnify-plus"
+                  round
+                  size="xs"
+                >
                   <q-tooltip>Zoom in</q-tooltip>
                 </q-btn>
               </div>
               <div class="col">
-                <q-btn @click="zoomOut(media.uniqueId)" color="primary" flat icon="mdi-magnify-minus" round size="xs">
+                <q-btn
+                  @click="zoomOut(media.uniqueId)"
+                  color="primary"
+                  flat
+                  icon="mdi-magnify-minus"
+                  round
+                  size="xs"
+                >
                   <q-tooltip>Zoom out</q-tooltip>
                 </q-btn>
               </div>
@@ -108,22 +195,47 @@
                 </q-btn>
               </div> -->
               <div class="col" v-if="obsConnected">
-                <q-btn @click="setObsScene('camera')" color="negative" flat icon="mdi-grid-off" round size="xs"
-                  v-if="currentScene === 'media'">
+                <q-btn
+                  @click="setObsScene('camera')"
+                  color="negative"
+                  flat
+                  icon="mdi-grid-off"
+                  round
+                  size="xs"
+                  v-if="currentScene === 'media'"
+                >
                   <q-tooltip>Hide image for Zoom participants</q-tooltip>
                 </q-btn>
-                <q-btn @click="setObsScene('media')" color="positive" flat icon="mdi-grid" round size="xs" v-else>
+                <q-btn
+                  @click="setObsScene('media')"
+                  color="positive"
+                  flat
+                  icon="mdi-grid"
+                  round
+                  size="xs"
+                  v-else
+                >
                   <q-tooltip>Show image for Zoom participants</q-tooltip>
                 </q-btn>
               </div>
             </div>
           </q-item-section>
           <q-item-section class="q-px-sm" side v-if="media.paragraph">
-            <q-chip :clickable="false" :label="media.paragraph" icon="fas fa-paragraph" square />
+            <q-chip
+              :clickable="false"
+              :label="media.paragraph"
+              icon="fas fa-paragraph"
+              square
+            />
           </q-item-section>
           <q-item-section class="q-px-sm" side v-else-if="media.song">
-            <q-chip :clickable="false" :label="media.song.toString()" color="secondary" icon="mdi-music-clef-treble"
-              square />
+            <q-chip
+              :clickable="false"
+              :label="media.song.toString()"
+              color="secondary"
+              icon="mdi-music-clef-treble"
+              square
+            />
           </q-item-section>
           <q-item-section class="q-px-sm">
             <div class="ellipsis-3-lines">
@@ -131,32 +243,70 @@
             </div>
           </q-item-section>
           <q-item-section side v-if="media.isAdditional">
-            <q-btn @click="mediaToDelete = media.uniqueId" color="negative" flat icon="mdi-delete" round />
+            <q-btn
+              @click="mediaToDelete = media.uniqueId"
+              color="negative"
+              flat
+              icon="mdi-delete"
+              round
+            />
           </q-item-section>
           <q-item-section side>
             <div class="row">
               <div class="col" v-if="mediaPlayer.url !== media.fileUrl">
                 <template v-if="!media.markers || media.markers.length === 0">
-                  <q-btn :disable="mediaPlayer.url !== '' && isVideo(mediaPlayer.url)" @click="
-                    mediaPlayer.url = media.fileUrl;
-                  mediaPlayer.uniqueId = media.uniqueId;
-                  " color="primary" icon="mdi-play" round />
+                  <q-btn
+                    :disable="
+                      mediaPlayer.url !== '' && isVideo(mediaPlayer.url)
+                    "
+                    @click="
+                      mediaPlayer.url = media.fileUrl;
+                      mediaPlayer.uniqueId = media.uniqueId;
+                    "
+                    color="primary"
+                    icon="mdi-play"
+                    round
+                  />
                 </template>
                 <template v-else>
                   <q-btn color="primary" label="Handles click" push>
                     <q-menu>
                       <q-list style="min-width: 100px">
-                        <q-item :disable="mediaPlayer.url !== '' && isVideo(mediaPlayer.url)"
-                          :key="marker.VideoMarkerId" @click="
-                        if (!customDurations[currentCongregation][selectedDate][media.uniqueId]) customDurations[currentCongregation][selectedDate][media.uniqueId] = {
-                            min: 0,
-                            max: media.duration
-                          };
-                            customDurations[currentCongregation][selectedDate][media.uniqueId].min = (marker.StartTimeTicks / 10000 / 1000);
-                            customDurations[currentCongregation][selectedDate][media.uniqueId].max = (marker.StartTimeTicks + marker.DurationTicks - marker.EndTransitionDurationTicks) / 10000 / 1000;
-                            mediaPlayer.action = 'play'; mediaPlayer.url = media.fileUrl;
+                        <q-item
+                          :disable="
+                            mediaPlayer.url !== '' && isVideo(mediaPlayer.url)
+                          "
+                          :key="marker.VideoMarkerId"
+                          @click="
+                            if (
+                              !customDurations[currentCongregation][
+                                selectedDate
+                              ][media.uniqueId]
+                            )
+                              customDurations[currentCongregation][
+                                selectedDate
+                              ][media.uniqueId] = {
+                                min: 0,
+                                max: media.duration,
+                              };
+                            customDurations[currentCongregation][selectedDate][
+                              media.uniqueId
+                            ].min = marker.StartTimeTicks / 10000 / 1000;
+                            customDurations[currentCongregation][selectedDate][
+                              media.uniqueId
+                            ].max =
+                              (marker.StartTimeTicks +
+                                marker.DurationTicks -
+                                marker.EndTransitionDurationTicks) /
+                              10000 /
+                              1000;
+                            mediaPlayer.action = 'play';
+                            mediaPlayer.url = media.fileUrl;
                             mediaPlayer.uniqueId = media.uniqueId;
-                            " clickable v-for="marker in media.markers">
+                          "
+                          clickable
+                          v-for="marker in media.markers"
+                        >
                           <q-item-section>{{ marker.Label }}</q-item-section>
                         </q-item>
                       </q-list>
@@ -186,24 +336,39 @@
                           </q-card>
                           </q-popup-proxy> -->
                   </q-btn>
-
                 </template>
               </div>
               <template v-else>
                 <div class="col">
                   <!-- <transition name="fade" mode="out-in" appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut"> -->
-                  <q-btn @click="mediaPlayer.action = 'play'" color="warning" icon="mdi-play" round
-                    v-if="mediaPlayer.action === 'pause'" />
-                  <q-btn @click="mediaPlayer.action = 'pause'" color="warning" icon="mdi-pause" round
-                    v-else-if="mediaPlayer.action === 'play'" />
+                  <q-btn
+                    @click="mediaPlayer.action = 'play'"
+                    color="warning"
+                    icon="mdi-play"
+                    round
+                    v-if="mediaPlayer.action === 'pause'"
+                  />
+                  <q-btn
+                    @click="mediaPlayer.action = 'pause'"
+                    color="warning"
+                    icon="mdi-pause"
+                    round
+                    v-else-if="mediaPlayer.action === 'play'"
+                  />
                   <!-- </transition> -->
                 </div>
-                <q-btn @click="
-                  media.isVideo
-                    ? (mediaToStop = media.uniqueId)
-                    : stopMedia(media.uniqueId)
-                  " class="q-ml-sm" color="negative" icon="mdi-stop" round
-                  v-if="mediaPlayer.action !== '' || mediaPlayer.action === ''" />
+                <q-btn
+                  @click="
+                    media.isVideo
+                      ? (mediaToStop = media.uniqueId)
+                      : stopMedia(media.uniqueId)
+                  "
+                  class="q-ml-sm"
+                  color="negative"
+                  icon="mdi-stop"
+                  round
+                  v-if="mediaPlayer.action !== '' || mediaPlayer.action === ''"
+                />
               </template>
             </div>
           </q-item-section>
@@ -216,29 +381,48 @@
               <q-th>Duration</q-th>
             </q-tr>
             <q-tr :key="marker.VideoMarkerId" v-for="marker in media.markers">
-              <q-td>{{ formatTime(marker.StartTimeTicks / 10000 / 1000) }}</q-td>
-              <q-td>{{ formatTime((marker.StartTimeTicks + marker.DurationTicks) / 10000 / 1000) }}</q-td>
+              <q-td>{{
+                formatTime(marker.StartTimeTicks / 10000 / 1000)
+              }}</q-td>
+              <q-td>{{
+                formatTime(
+                  (marker.StartTimeTicks + marker.DurationTicks) / 10000 / 1000,
+                )
+              }}</q-td>
               <q-td>{{ formatTime(marker.DurationTicks / 10000 / 1000) }}</q-td>
               <q-td>{{ marker.Label }}</q-td>
             </q-tr>
           </q-markup-table>
         </q-item>
-        <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut" mode="out-in"
-          name="fade">
-          <q-item class="q-pa-none" v-if="
-            mediaPlayer.url === media.fileUrl &&
-            (media.isVideo || media.isAudio)
-          ">
+        <transition
+          appear
+          enter-active-class="animated fadeIn"
+          leave-active-class="animated fadeOut"
+          mode="out-in"
+          name="fade"
+        >
+          <q-item
+            class="q-pa-none"
+            v-if="
+              mediaPlayer.url === media.fileUrl &&
+              (media.isVideo || media.isAudio)
+            "
+          >
             <q-item-section>
-              <q-slider :disable="mediaPlayer.action !== 'pause'" :max="media.duration" :min="0" :step="0"
-                v-model="mediaPlayer.currentPosition" />
+              <q-slider
+                :disable="mediaPlayer.action !== 'pause'"
+                :max="media.duration"
+                :min="0"
+                :step="0"
+                v-model="mediaPlayer.currentPosition"
+              />
             </q-item-section>
           </q-item>
         </transition>
       </template>
-      <q-inner-loading :showing="!selectedDateObject ||
-        selectedDateObject?.loading
-        " />
+      <q-inner-loading
+        :showing="!selectedDateObject || selectedDateObject?.loading"
+      />
     </q-list>
     <q-dialog persistent v-model="mediaStopPending">
       <q-card>
@@ -256,11 +440,14 @@
       <q-card>
         <q-card-section class="row items-center">
           <q-avatar color="negative" icon="mdi-alert" text-color="white" />
-          <span class="q-ml-sm">Are you sure you want to delete
+          <span class="q-ml-sm"
+            >Are you sure you want to delete
             <strong>{{
               sortableMediaItems.find((m) => m.uniqueId === mediaToDelete)
                 ?.title
-            }}</strong>?</span>
+            }}</strong
+            >?</span
+          >
         </q-card-section>
         <q-card-actions align="right" class="text-primary">
           <q-btn @click="mediaToDelete = ''" flat label="Cancel" />
@@ -275,8 +462,12 @@
       <q-card>
         <q-card-section class="row items-center">
           <q-list>
-            <q-item :key="jwpubImportDocument.DocumentId" @click="addJwpubDocumentMediaToFiles(jwpubImportDocument)"
-              clickable v-for="jwpubImportDocument in jwpubImportDocuments">
+            <q-item
+              :key="jwpubImportDocument.DocumentId"
+              @click="addJwpubDocumentMediaToFiles(jwpubImportDocument)"
+              clickable
+              v-for="jwpubImportDocument in jwpubImportDocuments"
+            >
               <q-item-section>
                 {{ jwpubImportDocument.Title }}
               </q-item-section>
@@ -305,7 +496,13 @@
 <script setup lang="ts">
 import type { DNDPlugin } from '@formkit/drag-and-drop';
 
-import { animations, multiDrag, parents, selections, updateConfig } from '@formkit/drag-and-drop';
+import {
+  animations,
+  multiDrag,
+  parents,
+  selections,
+  updateConfig,
+} from '@formkit/drag-and-drop';
 import { dragAndDrop } from '@formkit/drag-and-drop/vue';
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { Buffer } from 'buffer';
@@ -313,9 +510,41 @@ import mime from 'mime';
 import { storeToRefs } from 'pinia';
 import { date, uid } from 'quasar';
 import { electronApi } from 'src/helpers/electron-api';
-import { getDurationFromMediaPath, getFileUrl, getTempDirectory, getThumbnailUrl } from 'src/helpers/fs';
-import { addFullFilePathToMultimediaItem, downloadFileIfNeeded, dynamicMediaMapper, fetchMedia, getDocumentMultimediaItems, getPublicationInfoFromDb, processMissingMediaInfo, sanitizeId } from 'src/helpers/jw-media';
-import { convertHeicToJpg, convertSvgToJpg, decompressJwpub, findDb, formatTime, getMediaFromJwPlaylist, isArchive, isAudio, isHeic, isImage, isImageString, isJwPlaylist, isJwpub, isPdf, isRemoteUrl, isSvg, isVideo } from 'src/helpers/mediaPlayback';
+import {
+  getDurationFromMediaPath,
+  getFileUrl,
+  getTempDirectory,
+  getThumbnailUrl,
+} from 'src/helpers/fs';
+import {
+  addFullFilePathToMultimediaItem,
+  downloadFileIfNeeded,
+  dynamicMediaMapper,
+  fetchMedia,
+  getDocumentMultimediaItems,
+  getPublicationInfoFromDb,
+  processMissingMediaInfo,
+  sanitizeId,
+} from 'src/helpers/jw-media';
+import {
+  convertHeicToJpg,
+  convertSvgToJpg,
+  decompressJwpub,
+  findDb,
+  formatTime,
+  getMediaFromJwPlaylist,
+  isArchive,
+  isAudio,
+  isHeic,
+  isImage,
+  isImageString,
+  isJwPlaylist,
+  isJwpub,
+  isPdf,
+  isRemoteUrl,
+  isSvg,
+  isVideo,
+} from 'src/helpers/mediaPlayback';
 import { createTemporaryNotification } from 'src/helpers/notifications';
 import { setObsScene } from 'src/helpers/obs';
 import { DynamicMediaObject } from 'src/types/media';
@@ -336,10 +565,20 @@ const canvas = ref();
 const obsState = useObsStateStore();
 const { currentScene, obsConnected } = storeToRefs(obsState);
 const jwStore = useJwStore();
-const { addToAdditionMediaMap, removeFromAdditionMediaMap, updateJwSongs } = jwStore;
-const { additionalMediaMaps, customDurations, mediaSort } = storeToRefs(jwStore);
+const { addToAdditionMediaMap, removeFromAdditionMediaMap, updateJwSongs } =
+  jwStore;
+const { additionalMediaMaps, customDurations, mediaSort } =
+  storeToRefs(jwStore);
 const currentState = useCurrentStateStore();
-const { currentCongregation, getDatedAdditionalMediaDirectory, lookupPeriod, mediaPlayer, mediaPlaying, selectedDate, selectedDateObject } = storeToRefs(currentState);
+const {
+  currentCongregation,
+  getDatedAdditionalMediaDirectory,
+  lookupPeriod,
+  mediaPlayer,
+  mediaPlaying,
+  selectedDate,
+  selectedDateObject,
+} = storeToRefs(currentState);
 updateJwSongs();
 const panzooms: { [key: string]: PanzoomObject } = {};
 
@@ -389,18 +628,25 @@ const initiatePanzoom = (elemId: string) => {
     zoomReset(elemId);
   });
 
-  elem.addEventListener('panzoomchange', (e: HTMLElementEventMap['panzoomchange']) => {
-    mediaPlayer.value.scale = e.detail.scale;
-    if (width > 0) mediaPlayer.value.x = e.detail.x / width;
-    if (height > 0) mediaPlayer.value.y = e.detail.y / height;
-  });
+  elem.addEventListener(
+    'panzoomchange',
+    (e: HTMLElementEventMap['panzoomchange']) => {
+      mediaPlayer.value.scale = e.detail.scale;
+      if (width > 0) mediaPlayer.value.x = e.detail.x / width;
+      if (height > 0) mediaPlayer.value.y = e.detail.y / height;
+    },
+  );
 };
 
 const mediaList = ref();
 const sortableMediaItems = ref([] as DynamicMediaObject[]);
 const datedAdditionalMediaMap = computed(() => {
   if (!currentCongregation.value || !selectedDate.value) return [];
-  return additionalMediaMaps.value[currentCongregation.value]?.[selectedDate.value] || [];
+  return (
+    additionalMediaMaps.value[currentCongregation.value]?.[
+      selectedDate.value
+    ] || []
+  );
 });
 
 function deleteMedia() {
@@ -409,40 +655,56 @@ function deleteMedia() {
   mediaToDelete.value = '';
 }
 
-const mapOrder = (sortOrder: string | string[] | undefined) => (a: DynamicMediaObject, b: DynamicMediaObject) => {
-  const key = 'uniqueId';
-  if (!sortOrder) return 0;
-  return sortOrder.indexOf(a[key]) > sortOrder.indexOf(b[key]) ? 1 : -1;
-};
+const mapOrder =
+  (sortOrder: string | string[] | undefined) =>
+  (a: DynamicMediaObject, b: DynamicMediaObject) => {
+    const key = 'uniqueId';
+    if (!sortOrder) return 0;
+    return sortOrder.indexOf(a[key]) > sortOrder.indexOf(b[key]) ? 1 : -1;
+  };
 
 const mediaItems = computed(() => {
-  return datedAdditionalMediaMap.value.concat(selectedDateObject.value?.dynamicMedia).filter((mediaItem) => mediaItem?.fileUrl) as DynamicMediaObject[];
+  return datedAdditionalMediaMap.value
+    .concat(selectedDateObject.value?.dynamicMedia)
+    .filter((mediaItem) => mediaItem?.fileUrl) as DynamicMediaObject[];
 });
 
 watch(mediaItems, (newValue) => {
   if (newValue) {
-    if (!mediaSort.value[currentCongregation.value]) mediaSort.value[currentCongregation.value] = {};
-    sortableMediaItems.value = newValue.sort(mapOrder(mediaSort.value[currentCongregation.value][selectedDate.value]));
+    if (!mediaSort.value[currentCongregation.value])
+      mediaSort.value[currentCongregation.value] = {};
+    sortableMediaItems.value = newValue.sort(
+      mapOrder(mediaSort.value[currentCongregation.value][selectedDate.value]),
+    );
   }
 });
 
-watch(mediaSort, (newVal) => {
-  if (newVal[currentCongregation.value][selectedDate.value]?.length === 0) {
-    newVal[currentCongregation.value][selectedDate.value] = datedAdditionalMediaMap.value
-      .concat(selectedDateObject.value?.dynamicMedia)
-      .filter((mediaItem) => mediaItem?.fileUrl)
-      .map((item: DynamicMediaObject) => item.uniqueId);
-  }
-  sortableMediaItems.value.sort(mapOrder(newVal[currentCongregation.value][selectedDate.value]));
-}, { deep: true });
+watch(
+  mediaSort,
+  (newVal) => {
+    if (newVal[currentCongregation.value][selectedDate.value]?.length === 0) {
+      newVal[currentCongregation.value][selectedDate.value] =
+        datedAdditionalMediaMap.value
+          .concat(selectedDateObject.value?.dynamicMedia)
+          .filter((mediaItem) => mediaItem?.fileUrl)
+          .map((item: DynamicMediaObject) => item.uniqueId);
+    }
+    sortableMediaItems.value.sort(
+      mapOrder(newVal[currentCongregation.value][selectedDate.value]),
+    );
+  },
+  { deep: true },
+);
 
 const updateMediaSortPlugin: DNDPlugin = (parent) => {
   const parentData = parents.get(parent);
   if (!parentData) return;
 
   function dragend() {
-    if (!mediaSort.value[currentCongregation.value]) mediaSort.value[currentCongregation.value] = {};
-    mediaSort.value[currentCongregation.value][selectedDate.value] = sortableMediaItems.value.map((item: DynamicMediaObject) => item.uniqueId);
+    if (!mediaSort.value[currentCongregation.value])
+      mediaSort.value[currentCongregation.value] = {};
+    mediaSort.value[currentCongregation.value][selectedDate.value] =
+      sortableMediaItems.value.map((item: DynamicMediaObject) => item.uniqueId);
   }
 
   return {
@@ -480,13 +742,15 @@ onMounted(() => {
   watch(selectedDate, (newVal) => {
     const congregation = currentCongregation.value;
     if (!congregation) return;
-    const durations = customDurations.value[congregation] ||= {};
+    const durations = (customDurations.value[congregation] ||= {});
     durations[newVal] ||= {};
   });
 
   selectedDate.value = date.formatDate(
-    lookupPeriod.value.filter((day: { meeting: boolean | string }) => day.meeting).map((day) => day.date)[0],
-    'YYYY/MM/DD'
+    lookupPeriod.value
+      .filter((day: { meeting: boolean | string }) => day.meeting)
+      .map((day) => day.date)[0],
+    'YYYY/MM/DD',
   );
   fetchMedia();
   setObsScene('camera');
@@ -502,7 +766,9 @@ function inferExtension(filename: string, filetype?: string) {
   if (!filetype) return filename;
   const extension = mime.extension(filetype);
   if (!extension) {
-    console.warn('Could not determine the file extension from the provided file type');
+    console.warn(
+      'Could not determine the file extension from the provided file type',
+    );
     return filename;
   }
   const hasExtension = /\.[0-9a-z]+$/i.test(filename);
@@ -520,27 +786,30 @@ const addJwpubDocumentMediaToFiles = async (document: DocumentItem) => {
     db: jwpubImportDb.value,
     docId: document.DocumentId,
   }).map((multimediaItem) =>
-    addFullFilePathToMultimediaItem(multimediaItem, publication)
+    addFullFilePathToMultimediaItem(multimediaItem, publication),
   );
   await processMissingMediaInfo(multimediaItems);
   const dynamicMediaItems = await dynamicMediaMapper(
     multimediaItems,
-    selectedDateObject.value?.date
+    selectedDateObject.value?.date,
   );
   addToAdditionMediaMap(dynamicMediaItems);
   jwpubImportDb.value = '';
   jwpubImportLoading.value = false;
 };
 
-
 const copyToDatedAdditionalMedia = async (files: string[]) => {
   const datedAdditionalMediaDir = getDatedAdditionalMediaDirectory.value;
   fs.ensureDirSync(datedAdditionalMediaDir);
 
   for (const filepath of files) {
-    const datedAdditionalMediaPath = path.join(datedAdditionalMediaDir, path.basename(filepath));
+    const datedAdditionalMediaPath = path.join(
+      datedAdditionalMediaDir,
+      path.basename(filepath),
+    );
     try {
-      if (fs.existsSync(datedAdditionalMediaPath)) fs.removeSync(datedAdditionalMediaPath);
+      if (fs.existsSync(datedAdditionalMediaPath))
+        fs.removeSync(datedAdditionalMediaPath);
       fs.copySync(filepath, datedAdditionalMediaPath);
 
       const isVideoFile = isVideo(datedAdditionalMediaPath);
@@ -551,29 +820,33 @@ const copyToDatedAdditionalMedia = async (files: string[]) => {
         duration = await getDurationFromMediaPath(datedAdditionalMediaPath);
       }
 
-      addToAdditionMediaMap([{
-        duration,
-        fileUrl: getFileUrl(datedAdditionalMediaPath),
-        isAdditional: true,
-        isAudio: isAudioFile,
-        isImage: isImage(datedAdditionalMediaPath),
-        isVideo: isVideoFile,
-        section: 'additional',
-        thumbnailUrl: await getThumbnailUrl(datedAdditionalMediaPath),
-        title: path.basename(datedAdditionalMediaPath),
-        uniqueId: sanitizeId(
-          date.formatDate(selectedDate.value, 'YYYYMMDD') +
-          '-' +
-          getFileUrl(datedAdditionalMediaPath)
-        ),
-      }]);
+      addToAdditionMediaMap([
+        {
+          duration,
+          fileUrl: getFileUrl(datedAdditionalMediaPath),
+          isAdditional: true,
+          isAudio: isAudioFile,
+          isImage: isImage(datedAdditionalMediaPath),
+          isVideo: isVideoFile,
+          section: 'additional',
+          thumbnailUrl: await getThumbnailUrl(datedAdditionalMediaPath),
+          title: path.basename(datedAdditionalMediaPath),
+          uniqueId: sanitizeId(
+            date.formatDate(selectedDate.value, 'YYYYMMDD') +
+              '-' +
+              getFileUrl(datedAdditionalMediaPath),
+          ),
+        },
+      ]);
     } catch (error) {
       console.error(error, filepath, datedAdditionalMediaPath);
     }
   }
 };
 
-const addToFiles = async (files: { filetype?: string; path: string }[] | FileList) => {
+const addToFiles = async (
+  files: { filetype?: string; path: string }[] | FileList,
+) => {
   if (!files) return;
 
   for (let i = 0; i < files.length; i++) {
@@ -587,7 +860,10 @@ const addToFiles = async (files: { filetype?: string; path: string }[] | FileLis
         filepath = (
           await downloadFileIfNeeded({
             dir: getTempDirectory(),
-            filename: inferExtension(baseFileName, (files[i] as { filetype?: string }).filetype),
+            filename: inferExtension(
+              baseFileName,
+              (files[i] as { filetype?: string }).filetype,
+            ),
             url: filepath,
           })
         ).path;
@@ -634,11 +910,18 @@ const addToFiles = async (files: { filetype?: string; path: string }[] | FileLis
           jwpubImportDb.value = '';
         } else {
           const documentMultimediaTableExists =
-            (executeQuery(db, 'PRAGMA table_info(DocumentMultimedia);') as TableItem[]).length > 0;
-          const mmTable = documentMultimediaTableExists ? 'DocumentMultimedia' : 'Multimedia';
+            (
+              executeQuery(
+                db,
+                'PRAGMA table_info(DocumentMultimedia);',
+              ) as TableItem[]
+            ).length > 0;
+          const mmTable = documentMultimediaTableExists
+            ? 'DocumentMultimedia'
+            : 'Multimedia';
           jwpubImportDocuments.value = executeQuery(
             db,
-            `SELECT DISTINCT Document.DocumentId, Title FROM Document JOIN ${mmTable} ON Document.DocumentId = ${mmTable}.DocumentId;`
+            `SELECT DISTINCT Document.DocumentId, Title FROM Document JOIN ${mmTable} ON Document.DocumentId = ${mmTable}.DocumentId;`,
           ) as DocumentItem[];
         }
         jwpubImportLoading.value = false;
@@ -646,11 +929,14 @@ const addToFiles = async (files: { filetype?: string; path: string }[] | FileLis
         const additionalMedia = await getMediaFromJwPlaylist(
           filepath,
           selectedDateObject.value?.date,
-          getDatedAdditionalMediaDirectory.value
+          getDatedAdditionalMediaDirectory.value,
         );
         addToAdditionMediaMap(additionalMedia);
       } else if (isArchive(filepath)) {
-        const unzipDirectory = path.join(getTempDirectory(), path.basename(filepath));
+        const unzipDirectory = path.join(
+          getTempDirectory(),
+          path.basename(filepath),
+        );
         if (fs.existsSync(unzipDirectory)) fs.removeSync(unzipDirectory);
         await decompress(filepath, unzipDirectory);
         await addToFiles(
@@ -658,7 +944,7 @@ const addToFiles = async (files: { filetype?: string; path: string }[] | FileLis
             return {
               path: path.join(unzipDirectory, file),
             };
-          })
+          }),
         );
         fs.removeSync(unzipDirectory);
       } else {
@@ -704,7 +990,7 @@ const dropEnd = (event: DragEvent) => {
         .parseFromString(html, 'text/html')
         .querySelector('img')?.src;
       const filetype = Array.from(event.dataTransfer.items).find(
-        (item) => item.kind === 'file'
+        (item) => item.kind === 'file',
       )?.type;
       if (src) droppedStuff[0] = { filetype, path: src };
     }
@@ -723,14 +1009,11 @@ const showMediaDurationPopup = (media: DynamicMediaObject) => {
   if (!currentCongregation.value) return;
   if (!customDurations.value[currentCongregation.value])
     customDurations.value[currentCongregation.value] = {};
-  if (
-    !customDurations.value[currentCongregation.value][selectedDate.value]
-  )
-    customDurations.value[currentCongregation.value][selectedDate.value] =
-      {};
+  if (!customDurations.value[currentCongregation.value][selectedDate.value])
+    customDurations.value[currentCongregation.value][selectedDate.value] = {};
   if (
     !customDurations.value[currentCongregation.value][selectedDate.value][
-    media.uniqueId
+      media.uniqueId
     ]
   ) {
     customDurations.value[currentCongregation.value][selectedDate.value][
@@ -741,7 +1024,7 @@ const showMediaDurationPopup = (media: DynamicMediaObject) => {
     };
   }
   mediaDurationPopups.value[media.uniqueId] = true;
-}
+};
 
 const resetMediaDuration = (media: DynamicMediaObject) => {
   customDurations.value[currentCongregation.value][selectedDate.value][
@@ -750,8 +1033,7 @@ const resetMediaDuration = (media: DynamicMediaObject) => {
     max: media.duration,
     min: 0,
   };
-}
-
+};
 </script>
 
 <style scoped>

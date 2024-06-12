@@ -210,7 +210,6 @@ export const settingsDefinitions: SettingsItems = {
   },
   // Advanced
 
-
   // enableMp4Conversion: {
   //   type: 'toggle',
   //   depends: 'advanced',
@@ -246,16 +245,12 @@ export const settingsDefinitions: SettingsItems = {
   //   step: 5,
   // },
 
-
-
   // keepOriginalsAfterConversion: {
   //   type: 'toggle',
   //   depends: 'advanced',
   //   group: 'mediaRetrievalPlayback',
   //   name: 'keep Originals After Conversion',
   // },
-
-
 
   // autoOpenFolderWhenDone: {
   //   type: 'toggle',
@@ -402,5 +397,5 @@ export const defaultSettings: SettingsValues = {
   preferredOutput: '',
   // specialCong: false,
   weDay: '0',
-  weStartTime: '10:00'
+  weStartTime: '10:00',
 };

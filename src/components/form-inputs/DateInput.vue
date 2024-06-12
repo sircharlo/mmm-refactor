@@ -1,10 +1,33 @@
 <template>
-  <q-input :rules="getRules(rules)" class="q-pb-none" dense filled mask="date" readonly v-model="localValue"
-    v-bind="{ label: label || undefined }">
-    <q-popup-proxy breakpoint="1000" transition-hide="scale" transition-show="scale">
-      <q-date :options="getDateOptions(options)" :rules="rules" dense v-model="localValue">
+  <q-input
+    :rules="getRules(rules)"
+    class="q-pb-none"
+    dense
+    filled
+    mask="date"
+    readonly
+    v-model="localValue"
+    v-bind="{ label: label || undefined }"
+  >
+    <q-popup-proxy
+      breakpoint="1000"
+      transition-hide="scale"
+      transition-show="scale"
+    >
+      <q-date
+        :options="getDateOptions(options)"
+        :rules="rules"
+        dense
+        v-model="localValue"
+      >
         <div class="row items-center justify-end q-gutter-sm">
-          <q-btn @click="clearDate" color="negative" flat icon="mdi-close" v-close-popup />
+          <q-btn
+            @click="clearDate"
+            color="negative"
+            flat
+            icon="mdi-close"
+            v-close-popup
+          />
           <q-btn color="positive" flat icon="mdi-check" v-close-popup />
         </div>
       </q-date>
@@ -35,11 +58,10 @@ watch(
   () => props.modelValue,
   (newValue) => {
     localValue.value = newValue;
-  }
+  },
 );
 
 const clearDate = () => {
   localValue.value = '';
 };
-
 </script>

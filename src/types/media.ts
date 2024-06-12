@@ -4,15 +4,15 @@ export interface DynamicMediaObject {
   customDuration?: { max: number; min: number };
   duration: number;
   fileUrl: string;
-  footnote?: boolean
-  isAdditional?: boolean
+  footnote?: boolean;
+  isAdditional?: boolean;
   isAudio: boolean;
   isImage: boolean;
   isVideo: boolean;
-  markers?: VideoMarker[]
+  markers?: VideoMarker[];
   paragraph?: number;
   section: string;
-  song?: boolean | string
+  song?: boolean | string;
   thumbnailUrl: string;
   title: string;
   uniqueId: string;

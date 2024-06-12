@@ -5,7 +5,7 @@ const createTemporaryNotification = ({
   group,
   icon,
   message,
-  type
+  type,
 }: QNotifyCreateOptions) => {
   return Notify.create({
     group: false,
@@ -24,7 +24,7 @@ const createUpdatableNotification = ({
   onDismiss,
   progress,
   spinner,
-  type
+  type,
 }: QNotifyCreateOptions) => {
   return Notify.create({
     group: false,
@@ -42,7 +42,15 @@ const createUpdatableNotification = ({
 const updateNotification = (
   // @ts-expect-error ddd
   notification,
-  { caption, icon, message, progress, spinner, timeout, type }: QNotifyUpdateOptions
+  {
+    caption,
+    icon,
+    message,
+    progress,
+    spinner,
+    timeout,
+    type,
+  }: QNotifyUpdateOptions,
 ) => {
   notification({
     ...(caption !== undefined ? { caption } : {}),

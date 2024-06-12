@@ -12,7 +12,6 @@ import { SettingsValues } from 'src/types/settings';
 
 import { useJwStore } from '../stores/jw';
 
-
 export const useCurrentStateStore = defineStore('current-state', {
   actions: {
     getInvalidSettings(congregation?: number | string) {
@@ -21,10 +20,15 @@ export const useCurrentStateStore = defineStore('current-state', {
       this.currentCongregation;
       const invalidSettings = [];
       for (const [settingsDefinitionId, settingsDefinition] of Object.entries(
-        settingsDefinitions
+        settingsDefinitions,
       )) {
         if (settingsDefinition.rules?.includes('notEmpty')) {
-          if (!this.getSettingValue(settingsDefinitionId as keyof SettingsValues, congregation)) {
+          if (
+            !this.getSettingValue(
+              settingsDefinitionId as keyof SettingsValues,
+              congregation,
+            )
+          ) {
             invalidSettings.push(settingsDefinitionId);
           }
         }
@@ -44,7 +48,9 @@ export const useCurrentStateStore = defineStore('current-state', {
     },
     removeCompletedDownloadProgress() {
       this.downloadProgress = Object.fromEntries(
-        Object.entries(this.downloadProgress).filter(([, value]) => !value.complete)
+        Object.entries(this.downloadProgress).filter(
+          ([, value]) => !value.complete,
+        ),
       );
     },
     setCongregation(value: number | string) {
@@ -65,16 +71,27 @@ export const useCurrentStateStore = defineStore('current-state', {
         : ({} as SettingsValues);
     },
     currentSongbook() {
-      const notSignLanguageSongbook = { fileformat: 'mp3', pub: 'sjjm', signLanguage: false }
-      const signLanguageSongbook = { fileformat: 'mp4', pub: 'sjj', signLanguage: true }
+      const notSignLanguageSongbook = {
+        fileformat: 'mp3',
+        pub: 'sjjm',
+        signLanguage: false,
+      };
+      const signLanguageSongbook = {
+        fileformat: 'mp4',
+        pub: 'sjj',
+        signLanguage: true,
+      };
       const jwStore = useJwStore();
       const { jwLanguages } = storeToRefs(jwStore);
       const currentLanguage = this.currentSettings?.lang as string;
-      if (!currentLanguage || !jwLanguages.value) return notSignLanguageSongbook;
+      if (!currentLanguage || !jwLanguages.value)
+        return notSignLanguageSongbook;
       const currentLanguageIsSignLanguage = !!jwLanguages.value.list.find(
-        (l) => l.langcode === currentLanguage
+        (l) => l.langcode === currentLanguage,
       )?.isSignLanguage;
-      return currentLanguageIsSignLanguage ? signLanguageSongbook : notSignLanguageSongbook
+      return currentLanguageIsSignLanguage
+        ? signLanguageSongbook
+        : notSignLanguageSongbook;
     },
     currentSongs() {
       const jwStore = useJwStore();
@@ -85,15 +102,27 @@ export const useCurrentStateStore = defineStore('current-state', {
     },
     getDatedAdditionalMediaDirectory(state) {
       if (!state.selectedDate) return '';
-      const dateString = date.formatDate(new Date(state.selectedDate), 'YYYYMMDD');
-      return path.join(getUserDataPath(), 'Additional Media', state.currentCongregation, dateString);
+      const dateString = date.formatDate(
+        new Date(state.selectedDate),
+        'YYYYMMDD',
+      );
+      return path.join(
+        getUserDataPath(),
+        'Additional Media',
+        state.currentCongregation,
+        dateString,
+      );
     },
     mediaPlaying(state) {
       return state.mediaPlayer.url !== '';
     },
     selectedDateObject(state) {
-      if (state.lookupPeriod.length === 0) return {} as DateInfo
-      return state.lookupPeriod.find(day => date.getDateDiff(day.date, state.selectedDate, 'days') === 0) || state.lookupPeriod[0]
+      if (state.lookupPeriod.length === 0) return {} as DateInfo;
+      return (
+        state.lookupPeriod.find(
+          (day) => date.getDateDiff(day.date, state.selectedDate, 'days') === 0,
+        ) || state.lookupPeriod[0]
+      );
     },
   },
 
@@ -101,7 +130,9 @@ export const useCurrentStateStore = defineStore('current-state', {
     return {
       currentCongregation: '' as string,
       downloadProgress: {} as DownloadProgressItems,
-      downloads: {} as { [key: string]: DownloadedFile | Promise<DownloadedFile> },
+      downloads: {} as {
+        [key: string]: DownloadedFile | Promise<DownloadedFile>;
+      },
       lookupPeriod: [] as DateInfo[],
       mediaPlayer: {
         action: '',

@@ -27,15 +27,13 @@ import {
   getPublicationDirectory,
   getThumbnailUrl,
 } from './fs';
-console.log(123)
+console.log(123);
 import axios from 'axios';
 import { Buffer } from 'buffer';
 import sanitize from 'sanitize-filename';
 import { get, urlWithParamsToString } from 'src/boot/axios';
 import mepslangs from 'src/defaults/mepslangs';
-import {
-  createTemporaryNotification,
-} from 'src/helpers/notifications';
+import { createTemporaryNotification } from 'src/helpers/notifications';
 import {
   DownloadedFile,
   DynamicMediaObject,
@@ -43,7 +41,12 @@ import {
 } from 'src/types/media';
 
 import { MAX_SONGS } from '../stores/jw';
-import { dateFromString, getSpecificWeekday, isCoWeek, isMwMeetingDay } from './date';
+import {
+  dateFromString,
+  getSpecificWeekday,
+  isCoWeek,
+  isMwMeetingDay,
+} from './date';
 import {
   decompressJwpub,
   findDb,
@@ -70,7 +73,7 @@ const downloadFileIfNeeded = async ({
   const remoteSize: number =
     size ||
     (await axios({ method: 'HEAD', url }).then(
-      (response) => +response.headers['content-length'] || 0
+      (response) => +response.headers['content-length'] || 0,
     ));
   if (fs.existsSync(destinationPath)) {
     const stat = fs.statSync(destinationPath);
@@ -83,7 +86,8 @@ const downloadFileIfNeeded = async ({
     }
   }
   const { downloads } = storeToRefs(useCurrentStateStore());
-  if (!downloads.value[url]) downloads.value[url] = downloadFile({ dir, filename, size, url });
+  if (!downloads.value[url])
+    downloads.value[url] = downloadFile({ dir, filename, size, url });
   return downloads.value[url];
 };
 
@@ -91,8 +95,8 @@ const downloadFile = async ({
   dir,
   filename,
   url,
-  // notify,
-}: FileDownloader) => {
+}: // notify,
+FileDownloader) => {
   if (!filename) filename = path.basename(url);
   filename = sanitize(filename);
   const { downloadProgress } = storeToRefs(useCurrentStateStore());
@@ -101,23 +105,24 @@ const downloadFile = async ({
     .get(url, {
       onDownloadProgress: (progressEvent) => {
         const downloadDone = downloadProgress.value[url]?.complete || false;
-        if (!downloadDone) downloadProgress.value[url] = {
-          loaded: progressEvent.loaded,
-          total: (progressEvent.total || progressEvent.loaded),
-        };
+        if (!downloadDone)
+          downloadProgress.value[url] = {
+            loaded: progressEvent.loaded,
+            total: progressEvent.total || progressEvent.loaded,
+          };
       },
       responseType: 'arraybuffer',
     })
     .catch((error) => {
       console.error(error);
       downloadProgress.value[url] = {
-        error: true
-      }
+        error: true,
+      };
       return { data: '' };
     });
   const downloadedData = downloadedDataRequest.data;
   downloadProgress.value[url] = {
-    complete: true
+    complete: true,
   };
   if (!downloadedData) {
     // createTemporaryNotification({
@@ -180,40 +185,39 @@ const getPublicationInfoFromDb = (db: string) => {
 
 function addFullFilePathToMultimediaItem(
   multimediaItem: MultimediaItem,
-  publication: PublicationFetcher
+  publication: PublicationFetcher,
 ) {
   return {
     ...multimediaItem,
     ...(multimediaItem.FilePath
       ? {
-        FilePath: path.join(
-          getPublicationDirectory(publication),
-          multimediaItem.FilePath
-        ),
-      }
+          FilePath: path.join(
+            getPublicationDirectory(publication),
+            multimediaItem.FilePath,
+          ),
+        }
       : {}),
   };
 }
 
 const getMultimediaMepsLangs = (source: MultimediaItemsFetcher) => {
-  const multimediaMepsLangs = (
-    executeQuery(
-      source.db,
-      'SELECT KeySymbol, Track, IssueTagNumber, MepsLanguageIndex from ExtractMultimedia ORDER by KeySymbol, IssueTagNumber, Track'
-    ) as MultimediaItem[]
-  );
+  const multimediaMepsLangs = executeQuery(
+    source.db,
+    'SELECT KeySymbol, Track, IssueTagNumber, MepsLanguageIndex from ExtractMultimedia ORDER by KeySymbol, IssueTagNumber, Track',
+  ) as MultimediaItem[];
   return multimediaMepsLangs;
-}
+};
 
-const getMediaVideoMarkers = (source: MultimediaItemsFetcher, mediaId: number) => {
-  const mediaVideoMarkers = (
-    executeQuery(
-      source.db,
-      `SELECT * from VideoMarker WHERE MultimediaId = ${mediaId} ORDER by StartTimeTicks`
-    ) as VideoMarker[]
-  );
+const getMediaVideoMarkers = (
+  source: MultimediaItemsFetcher,
+  mediaId: number,
+) => {
+  const mediaVideoMarkers = executeQuery(
+    source.db,
+    `SELECT * from VideoMarker WHERE MultimediaId = ${mediaId} ORDER by StartTimeTicks`,
+  ) as VideoMarker[];
   return mediaVideoMarkers;
-}
+};
 
 const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
   const currentState = useCurrentStateStore();
@@ -221,7 +225,7 @@ const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
   const DocumentMultimediaTable = (
     executeQuery(
       source.db,
-      "SELECT * FROM sqlite_master WHERE type='table' AND name='DocumentMultimedia'"
+      "SELECT * FROM sqlite_master WHERE type='table' AND name='DocumentMultimedia'",
     ) as TableItem[]
   ).map((item) => item.name);
   const mmTable =
@@ -230,11 +234,11 @@ const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
       : (DocumentMultimediaTable[0] as string);
   const columnQueryResult = executeQuery(
     source.db,
-    `PRAGMA table_info(${mmTable})`
+    `PRAGMA table_info(${mmTable})`,
   ) as TableItem[];
 
   const ParagraphColumnsExist = columnQueryResult.some(
-    (column) => column.name === 'BeginParagraphOrdinal'
+    (column) => column.name === 'BeginParagraphOrdinal',
   );
 
   const targetParNrExists = (
@@ -257,17 +261,19 @@ const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
       'INNER JOIN DocumentMultimedia ON DocumentMultimedia.MultimediaId = Multimedia.MultimediaId ';
   from += `INNER JOIN Document ON ${mmTable}.DocumentId = Document.DocumentId `;
 
-  let where = ` WHERE ${source.docId || source.docId === 0
-    ? `Document.DocumentId = ${source.docId}`
-    : `Document.MepsDocumentId = ${source.mepsId}`
-    }`;
+  let where = ` WHERE ${
+    source.docId || source.docId === 0
+      ? `Document.DocumentId = ${source.docId}`
+      : `Document.MepsDocumentId = ${source.mepsId}`
+  }`;
 
   const videoString =
     "(Multimedia.MimeType LIKE '%video%' OR Multimedia.MimeType LIKE '%audio%')";
-  const imgString = `(Multimedia.MimeType LIKE '%image%' ${getSettingValue('includePrinted')
-    ? ''
-    : ' AND Multimedia.CategoryType <> 4 AND Multimedia.CategoryType <> 6'
-    } AND Multimedia.CategoryType <> 9 AND Multimedia.CategoryType <> 10 AND Multimedia.CategoryType <> 25)`;
+  const imgString = `(Multimedia.MimeType LIKE '%image%' ${
+    getSettingValue('includePrinted')
+      ? ''
+      : ' AND Multimedia.CategoryType <> 4 AND Multimedia.CategoryType <> 6'
+  } AND Multimedia.CategoryType <> 9 AND Multimedia.CategoryType <> 10 AND Multimedia.CategoryType <> 25)`;
 
   where += ` AND (${videoString} OR ${imgString})`;
 
@@ -291,7 +297,7 @@ const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
   }
   const items = executeQuery(
     source.db,
-    `${select} ${from} ${where} ${groupAndSort}`
+    `${select} ${from} ${where} ${groupAndSort}`,
   ) as MultimediaItem[];
   return items;
 };
@@ -315,11 +321,12 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
     WHERE DocumentExtract.DocumentId = ${docId}
     AND NOT UniqueEnglishSymbol LIKE 'mwbr%'
     AND NOT UniqueEnglishSymbol = 'sjj'
-    ${(getSettingValue('excludeTh') as boolean)
-      ? "AND NOT UniqueEnglishSymbol = 'th' "
-      : ''
+    ${
+      (getSettingValue('excludeTh') as boolean)
+        ? "AND NOT UniqueEnglishSymbol = 'th' "
+        : ''
     }
-      ORDER BY DocumentExtract.BeginParagraphOrdinal`
+      ORDER BY DocumentExtract.BeginParagraphOrdinal`,
   ) as MultimediaExtractItem[];
 
   // AND NOT RefPublication.PublicationCategorySymbol = 'web'
@@ -386,7 +393,7 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
           issue: extract.IssueTagNumber,
           langwritten: extractLang,
           pub: symbol,
-        })
+        }),
       );
     allExtractItems.push(...extractItems);
   }
@@ -423,7 +430,7 @@ const getWtIssue = async (monday: Date, weeksInPast: number) => {
   if (!db) return { db: '', docId: -1, issueString, publication, weekNr: -1 };
   const datedTexts = executeQuery(
     db,
-    'SELECT * FROM DatedText'
+    'SELECT * FROM DatedText',
   ) as DatedTextItem[];
   const weekNr = datedTexts.findIndex((weekItem) => {
     const mondayAsNumber = parseInt(date.formatDate(monday, 'YYYYMMDD'));
@@ -436,7 +443,7 @@ const getWtIssue = async (monday: Date, weeksInPast: number) => {
   const docId = (
     executeQuery(
       db,
-      `SELECT Document.DocumentId FROM Document WHERE Document.Class=40 LIMIT 1 OFFSET ${weekNr}`
+      `SELECT Document.DocumentId FROM Document WHERE Document.Class=40 LIMIT 1 OFFSET ${weekNr}`,
     ) as { DocumentId: number }[]
   )[0]?.DocumentId;
   return { db, docId, issueString, publication, weekNr };
@@ -445,7 +452,7 @@ const getWtIssue = async (monday: Date, weeksInPast: number) => {
 const dynamicMediaMapper = async (
   allMedia: MultimediaItem[],
   lookupDate: Date,
-  additional?: boolean
+  additional?: boolean,
 ): Promise<DynamicMediaObject[]> => {
   let middleSongParagraphOrdinal = 0;
   if (!additional) {
@@ -461,7 +468,7 @@ const dynamicMediaMapper = async (
       if (isMwMeetingDay(lookupDate)) {
         // Also remove CBS media if it's the MW meeting, since the CBS is skipped during the CO visit
         allMedia = allMedia.filter(
-          (m) => m.BeginParagraphOrdinal < lastParagraphOrdinal - 2
+          (m) => m.BeginParagraphOrdinal < lastParagraphOrdinal - 2,
         );
       }
     }
@@ -471,7 +478,7 @@ const dynamicMediaMapper = async (
     .map(async (m) => {
       const mediaIsSong = isSong(m);
       const thumbnailUrl = await getThumbnailUrl(
-        m.ThumbnailFilePath || m.FilePath
+        m.ThumbnailFilePath || m.FilePath,
       );
       const video = isVideo(m.FilePath);
       const audio = isAudio(m.FilePath);
@@ -508,8 +515,10 @@ const dynamicMediaMapper = async (
         thumbnailUrl,
         title: mediaIsSong ? m.Label.replace(/^\d+\.\s*/, '') : m.Label,
         uniqueId: sanitizeId(
-          date.formatDate(lookupDate, 'YYYYMMDD') + '-' + getFileUrl(m.FilePath)
-        )
+          date.formatDate(lookupDate, 'YYYYMMDD') +
+            '-' +
+            getFileUrl(m.FilePath),
+        ),
       } as DynamicMediaObject;
     });
   return Promise.all(mediaPromises);
@@ -518,18 +527,18 @@ const dynamicMediaMapper = async (
 const getWeMedia = async (lookupDate: Date) => {
   const currentState = useCurrentStateStore();
   const { currentCongregation, currentSongbook } = storeToRefs(currentState);
-  const { getSettingValue } = currentState
+  const { getSettingValue } = currentState;
   lookupDate = dateFromString(lookupDate.toISOString());
   try {
     const monday = getSpecificWeekday(lookupDate, 0);
     let { db, docId, issueString, publication, weekNr } = await getWtIssue(
       monday,
-      8
+      8,
     );
     if (db?.length === 0)
       ({ db, docId, issueString, publication, weekNr } = await getWtIssue(
         monday,
-        10
+        10,
       ));
 
     if (!db || docId < 0) {
@@ -538,7 +547,7 @@ const getWeMedia = async (lookupDate: Date) => {
         group: 'error.downloadMedia.weMeeting',
         message: 'error.downloadMedia',
         type: 'negative',
-      })
+      });
       console.error('No suitable db or docid found');
       // return [];
       throw new Error('No db found');
@@ -565,13 +574,13 @@ const getWeMedia = async (lookupDate: Date) => {
            AND Question.TargetParagraphOrdinal = DocumentMultimedia.BeginParagraphOrdinal
          WHERE DocumentMultimedia.DocumentId = ${docId}
            AND CategoryType = -1
-         GROUP BY DocumentMultimedia.MultimediaId`
+         GROUP BY DocumentMultimedia.MultimediaId`,
     ) as MultimediaItem[];
     const videosInParagraphs = videos.filter(
-      (video) => !!video.TargetParagraphNumberLabel
+      (video) => !!video.TargetParagraphNumberLabel,
     );
     const videosNotInParagraphs = videos.filter(
-      (video) => !video.TargetParagraphNumberLabel
+      (video) => !video.TargetParagraphNumberLabel,
     );
 
     const media = (
@@ -589,11 +598,11 @@ const getWeMedia = async (lookupDate: Date) => {
            AND CategoryType <> -1
            AND (KeySymbol != '${currentSongbook.value.pub}' OR KeySymbol IS NULL)
          GROUP BY DocumentMultimedia.MultimediaId
-         ORDER BY BeginParagraphOrdinal` // pictures
+         ORDER BY BeginParagraphOrdinal`, // pictures
       ) as MultimediaItem[]
     )
       .map((multimediaItem) =>
-        addFullFilePathToMultimediaItem(multimediaItem, publication)
+        addFullFilePathToMultimediaItem(multimediaItem, publication),
       )
       .concat(videosInParagraphs)
       .concat(
@@ -603,20 +612,20 @@ const getWeMedia = async (lookupDate: Date) => {
           .map((mediaObj) =>
             mediaObj.TargetParagraphNumberLabel === null
               ? { ...mediaObj, TargetParagraphNumberLabel: FOOTNOTE_TAR_PAR } // assign special number so we know videos are referenced by a footnote
-              : mediaObj
+              : mediaObj,
           )
           .filter((v) => {
             return (
               !(getSettingValue('excludeFootnotes') as boolean) ||
               v.TargetParagraphNumberLabel < FOOTNOTE_TAR_PAR
             );
-          })
+          }),
       ) as MultimediaItem[];
 
     const updatedMedia = media.map((item) => {
       if (item.MultimediaId !== null && item.LinkMultimediaId !== null) {
         const linkedItem = media.find(
-          (i) => i.MultimediaId === item.LinkMultimediaId
+          (i) => i.MultimediaId === item.LinkMultimediaId,
         );
         if (linkedItem && linkedItem.FilePath) {
           item.FilePath = linkedItem.FilePath;
@@ -628,7 +637,7 @@ const getWeMedia = async (lookupDate: Date) => {
     });
 
     const finalMedia = updatedMedia.filter(
-      (item) => item.LinkMultimediaId === null
+      (item) => item.LinkMultimediaId === null,
     );
 
     let songs: MultimediaItem[] = [];
@@ -643,7 +652,7 @@ const getWeMedia = async (lookupDate: Date) => {
               ON Multimedia.MultimediaId = DocumentMultimedia.MultimediaId
             WHERE DataType = 2
             ORDER BY BeginParagraphOrdinal
-            LIMIT 2 OFFSET ${2 * weekNr}`
+            LIMIT 2 OFFSET ${2 * weekNr}`,
       ) as MultimediaItem[];
     } else {
       songs = videosNotInParagraphs.slice(0, 2); // after FEB_2023, the first two videos from DocumentMultimedia are the songs
@@ -659,7 +668,7 @@ const getWeMedia = async (lookupDate: Date) => {
         WHERE Extract.RefMepsDocumentClass = 31
         ORDER BY Extract.ExtractId
         LIMIT 2
-        OFFSET ${2 * weekNr}`
+        OFFSET ${2 * weekNr}`,
         ) as MultimediaExtractItem[]
       )
         .sort((a, b) => a.BeginParagraphOrdinal - b.BeginParagraphOrdinal)
@@ -688,13 +697,24 @@ const getWeMedia = async (lookupDate: Date) => {
 
     const multimediaMepsLangs = getMultimediaMepsLangs({ db, docId });
     for (const media of allMedia) {
-      const mediaKeySymbol = media.KeySymbol === 'sjjm' ? currentSongbook.value.pub : media.KeySymbol;
-      const multimediaMepsLangItem = multimediaMepsLangs.find((item) => item.KeySymbol === mediaKeySymbol && item.Track === media.Track && item.IssueTagNumber === media.IssueTagNumber);
+      const mediaKeySymbol =
+        media.KeySymbol === 'sjjm'
+          ? currentSongbook.value.pub
+          : media.KeySymbol;
+      const multimediaMepsLangItem = multimediaMepsLangs.find(
+        (item) =>
+          item.KeySymbol === mediaKeySymbol &&
+          item.Track === media.Track &&
+          item.IssueTagNumber === media.IssueTagNumber,
+      );
       if (multimediaMepsLangItem?.MepsLanguageIndex) {
         const mepsLang = mepslangs[multimediaMepsLangItem.MepsLanguageIndex];
         if (mepsLang) media.AlternativeLanguage = mepsLang;
       }
-      const videoMarkers = getMediaVideoMarkers({ db, docId }, media.MultimediaId);
+      const videoMarkers = getMediaVideoMarkers(
+        { db, docId },
+        media.MultimediaId,
+      );
       if (videoMarkers) media.VideoMarkers = videoMarkers;
     }
 
@@ -724,7 +744,10 @@ const getWeMedia = async (lookupDate: Date) => {
       string,
       Record<string, DynamicMediaObject[]>
     > = LocalStorage.getItem('dynamicMedia') || {};
-    const returnVal = dynamicMedia[currentCongregation.value]?.[date.formatDate(lookupDate, 'YYYYMMDD')] ?? [];
+    const returnVal =
+      dynamicMedia[currentCongregation.value]?.[
+        date.formatDate(lookupDate, 'YYYYMMDD')
+      ] ?? [];
     return returnVal;
   }
 };
@@ -739,7 +762,7 @@ function sanitizeId(id: string) {
 
 const getMwMedia = async (lookupDate: Date) => {
   const currentState = useCurrentStateStore();
-  const { getSettingValue } = currentState
+  const { getSettingValue } = currentState;
   const { currentCongregation, currentSongbook } = storeToRefs(currentState);
   lookupDate = dateFromString(lookupDate.toISOString());
   try {
@@ -764,7 +787,7 @@ const getMwMedia = async (lookupDate: Date) => {
         group: 'error.downloadMedia.mwMeeting',
         message: 'error.downloadMedia',
         type: 'negative',
-      })
+      });
       throw new Error('No db found');
     }
     const docId = (
@@ -772,8 +795,8 @@ const getMwMedia = async (lookupDate: Date) => {
         db,
         `SELECT DocumentId FROM DatedText WHERE FirstDateOffset = ${date.formatDate(
           monday,
-          'YYYYMMDD'
-        )}`
+          'YYYYMMDD',
+        )}`,
       ) as { DocumentId: number }[]
     )[0]?.DocumentId;
 
@@ -803,10 +826,13 @@ const getMwMedia = async (lookupDate: Date) => {
     // }
     const mms = await getDocumentMultimediaItems({ db, docId }).map(
       (multimediaItem) => {
-        const videoMarkers = getMediaVideoMarkers({ db, docId }, multimediaItem.MultimediaId);
+        const videoMarkers = getMediaVideoMarkers(
+          { db, docId },
+          multimediaItem.MultimediaId,
+        );
         if (videoMarkers) multimediaItem.VideoMarkers = videoMarkers;
-        return addFullFilePathToMultimediaItem(multimediaItem, publication)
-      }
+        return addFullFilePathToMultimediaItem(multimediaItem, publication);
+      },
     );
 
     const extracts = await getDocumentExtractItems(db, docId);
@@ -817,14 +843,21 @@ const getMwMedia = async (lookupDate: Date) => {
 
     const multimediaMepsLangs = getMultimediaMepsLangs({ db, docId });
     for (const media of allMedia) {
-      const mediaKeySymbol = media.KeySymbol === 'sjjm' ? currentSongbook.value.pub : media.KeySymbol;
-      const multimediaMepsLangItem = multimediaMepsLangs.find((item) => item.KeySymbol === mediaKeySymbol && item.Track === media.Track && item.IssueTagNumber === media.IssueTagNumber);
+      const mediaKeySymbol =
+        media.KeySymbol === 'sjjm'
+          ? currentSongbook.value.pub
+          : media.KeySymbol;
+      const multimediaMepsLangItem = multimediaMepsLangs.find(
+        (item) =>
+          item.KeySymbol === mediaKeySymbol &&
+          item.Track === media.Track &&
+          item.IssueTagNumber === media.IssueTagNumber,
+      );
       if (multimediaMepsLangItem?.MepsLanguageIndex) {
         const mepsLang = mepslangs[multimediaMepsLangItem.MepsLanguageIndex];
         if (mepsLang) media.AlternativeLanguage = mepsLang;
       }
     }
-
 
     await processMissingMediaInfo(allMedia);
 
@@ -857,7 +890,10 @@ const getMwMedia = async (lookupDate: Date) => {
     // date.formatDate(lookupDate, 'YYYYMMDD')
     // ] || ([] as DynamicMediaObject[])
     // );
-    const returnVal = dynamicMedia[currentCongregation.value]?.[date.formatDate(lookupDate, 'YYYYMMDD')] ?? [];
+    const returnVal =
+      dynamicMedia[currentCongregation.value]?.[
+        date.formatDate(lookupDate, 'YYYYMMDD')
+      ] ?? [];
     return returnVal;
   }
 };
@@ -866,13 +902,15 @@ async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
   const currentState = useCurrentStateStore();
   const { getSettingValue } = currentState;
   for (const media of allMedia.filter(
-    (m) => m.KeySymbol && (!m.Label || (!m.FilePath || !fs.existsSync(m.FilePath)))
+    (m) =>
+      m.KeySymbol && (!m.Label || !m.FilePath || !fs.existsSync(m.FilePath)),
   )) {
     if (!media.KeySymbol) {
       console.log('MISSING media.KeySymbol', media);
       continue;
     }
-    const langwritten = media.AlternativeLanguage ?? getSettingValue('lang') as string;
+    const langwritten =
+      media.AlternativeLanguage ?? (getSettingValue('lang') as string);
     const publicationFetcher = {
       fileformat: media.MimeType?.includes('audio') ? 'MP3' : 'MP4',
       issue: media.IssueTagNumber,
@@ -880,7 +918,7 @@ async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
       pub: media.KeySymbol,
       ...(typeof media.Track === 'number' &&
         media.Track > 0 && { track: media.Track }),
-    }
+    };
     if (!media.FilePath || !fs.existsSync(media.FilePath)) {
       media.FilePath = await downloadMissingMedia(publicationFetcher);
     }
@@ -888,15 +926,15 @@ async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
       media.Label =
         media.Label ||
         media.Caption ||
-        (
-          await getJwMediaInfo(publicationFetcher)
-        ).title;
+        (await getJwMediaInfo(publicationFetcher)).title;
     }
   }
 }
 
 const getPubMediaLinks = async (publication: PublicationFetcher) => {
-  const { currentSongbook, downloadProgress } = storeToRefs(useCurrentStateStore());
+  const { currentSongbook, downloadProgress } = storeToRefs(
+    useCurrentStateStore(),
+  );
   const url = 'https://b.jw-cdn.org/apis/pub-media/GETPUBMEDIALINKS';
   if (!publication.fileformat) publication.fileformat = '';
   if (publication.pub === 'sjjm') {
@@ -921,9 +959,19 @@ const getPubMediaLinks = async (publication: PublicationFetcher) => {
     //   caption: [publication.pub, publication.langwritten, publication.issue, publication.track, publication.fileformat].filter(Boolean).join('_'),
     //   type: 'negative',
     // })
-    downloadProgress.value[[publication.pub, publication.langwritten, publication.issue, publication.track, publication.fileformat].filter(Boolean).join('_')] = {
-      error: true
-    }
+    downloadProgress.value[
+      [
+        publication.pub,
+        publication.langwritten,
+        publication.issue,
+        publication.track,
+        publication.fileformat,
+      ]
+        .filter(Boolean)
+        .join('_')
+    ] = {
+      error: true,
+    };
   }
   return response;
 };
@@ -934,12 +982,15 @@ export function findBestResolution(mediaLinks: MediaLink[]) {
   let bestItem = null;
   let bestHeight = 0;
   const maxRes = parseInt(
-    (getSettingValue('maxRes') as string).replace(/\D/g, '')
+    (getSettingValue('maxRes') as string).replace(/\D/g, ''),
   );
   if (mediaLinks.some((m) => !m.subtitled))
     mediaLinks = mediaLinks.filter((m) => !m.subtitled);
   for (const mediaLink of mediaLinks) {
-    if (mediaLink.frameHeight <= maxRes && mediaLink.frameHeight >= bestHeight) {
+    if (
+      mediaLink.frameHeight <= maxRes &&
+      mediaLink.frameHeight >= bestHeight
+    ) {
       bestItem = mediaLink;
       bestHeight = mediaLink.frameHeight;
     }
@@ -977,13 +1028,13 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
       'No response, falling back to cache',
       publication,
       pubDir,
-      files
+      files,
     );
     return files.length > 0 ? files[0].path : '';
   }
   if (!publication.fileformat)
     publication.fileformat = Object.keys(
-      responseObject.files[publication.langwritten]
+      responseObject.files[publication.langwritten],
     )[0];
   const mediaItemLinks: MediaLink[] =
     responseObject.files[publication.langwritten][publication.fileformat];
@@ -1028,7 +1079,7 @@ function getBestImageUrl(images: MediaImages) {
       }
       // If none of the preferred sizes are found, return any other size
       const otherSizes = Object.keys(images[key]).filter(
-        (size) => !sizes.includes(size)
+        (size) => !sizes.includes(size),
       );
       if (otherSizes.length > 0) {
         return images[key][otherSizes[0]];
@@ -1069,57 +1120,79 @@ const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
   const publicationInfo: Publication = await getPubMediaLinks(publication);
   if (!publication.fileformat) return;
   if (!publicationInfo?.files) {
-    downloadProgress.value[[publication.pub, publication.langwritten, publication.issue, publication.track, publication.fileformat].filter(Boolean).join('_')] = {
-      error: true
-    }
+    downloadProgress.value[
+      [
+        publication.pub,
+        publication.langwritten,
+        publication.issue,
+        publication.track,
+        publication.fileformat,
+      ]
+        .filter(Boolean)
+        .join('_')
+    ] = {
+      error: true,
+    };
     return;
   }
-  console.log('publicationInfo.files', publicationInfo.files)
+  console.log('publicationInfo.files', publicationInfo.files);
   const mediaLinks: MediaLink[] = publicationInfo.files[
     publication.langwritten
   ][publication.fileformat].filter(
     (mediaLink) =>
-      !publication.maxTrack || mediaLink.track < publication.maxTrack
+      !publication.maxTrack || mediaLink.track < publication.maxTrack,
   );
-  console.log('mediaLinks', mediaLinks)
+  console.log('mediaLinks', mediaLinks);
 
   const dir = getPublicationDirectory(publication, true);
-  const filteredMediaItemLinks = [] as MediaLink[]
+  const filteredMediaItemLinks = [] as MediaLink[];
   for (const mediaItemLink of mediaLinks) {
-    const currentTrack = mediaItemLink.track
-    if (!filteredMediaItemLinks.some(m => m.track === currentTrack)) {
-      const bestItem = findBestResolution(mediaLinks.filter(m => m.track === currentTrack));
-      if (bestItem) filteredMediaItemLinks.push(bestItem)
+    const currentTrack = mediaItemLink.track;
+    if (!filteredMediaItemLinks.some((m) => m.track === currentTrack)) {
+      const bestItem = findBestResolution(
+        mediaLinks.filter((m) => m.track === currentTrack),
+      );
+      if (bestItem) filteredMediaItemLinks.push(bestItem);
     }
   }
-  console.log('filteredMediaItemLinks', filteredMediaItemLinks)
+  console.log('filteredMediaItemLinks', filteredMediaItemLinks);
 
-  await addToDownloadsWithLimit(filteredMediaItemLinks, dir)
+  await addToDownloadsWithLimit(filteredMediaItemLinks, dir);
 };
 
 const downloadBackgroundMusic = () => {
-  const { currentSettings, currentSongbook } = storeToRefs(useCurrentStateStore());
+  const { currentSettings, currentSongbook } = storeToRefs(
+    useCurrentStateStore(),
+  );
   if (!currentSongbook.value || !currentSettings.value?.lang) return;
   console.log('Downloading background music', {
     fileformat: currentSongbook.value.fileformat,
-    langwritten: currentSongbook.value.signLanguage ? currentSettings.value.lang : 'E',
+    langwritten: currentSongbook.value.signLanguage
+      ? currentSettings.value.lang
+      : 'E',
     maxTrack: MAX_SONGS,
     pub: currentSongbook.value.pub,
   });
   downloadPubMediaFiles({
     fileformat: currentSongbook.value.fileformat,
-    langwritten: currentSongbook.value.signLanguage ? currentSettings.value.lang : 'E',
+    langwritten: currentSongbook.value.signLanguage
+      ? currentSettings.value.lang
+      : 'E',
     maxTrack: MAX_SONGS,
     pub: currentSongbook.value.pub,
-  })
-}
+  });
+};
 
-async function addToDownloadsWithLimit(mediaLinks: MediaLink[], dir: string, limit = 10) {
+async function addToDownloadsWithLimit(
+  mediaLinks: MediaLink[],
+  dir: string,
+  limit = 10,
+) {
   const queue = [];
   const results = [];
 
   for (const mediaLink of mediaLinks) {
-    console.log('mediaLink', mediaLink)
+    console.log('mediaLink', mediaLink);
     const downloadPromise = downloadFileIfNeeded({
       dir,
       size: mediaLink.filesize,
@@ -1131,7 +1204,9 @@ async function addToDownloadsWithLimit(mediaLinks: MediaLink[], dir: string, lim
 
     // When the queue is at the limit, wait for one to finish
     if (queue.length >= limit) {
-      const finishedPromise: Promise<DownloadedFile> = Promise.race(queue) as Promise<DownloadedFile>;
+      const finishedPromise: Promise<DownloadedFile> = Promise.race(
+        queue,
+      ) as Promise<DownloadedFile>;
       results.push(await finishedPromise);
       // Remove the finished promise from the queue
       queue.splice(queue.indexOf(finishedPromise), 1);
@@ -1139,19 +1214,29 @@ async function addToDownloadsWithLimit(mediaLinks: MediaLink[], dir: string, lim
   }
 
   // Wait for the remaining promises in the queue
-  results.push(...await Promise.all(queue));
+  results.push(...(await Promise.all(queue)));
 
   return results;
 }
 
 const downloadJwpub = async (
-  publication: PublicationFetcher
+  publication: PublicationFetcher,
 ): Promise<DownloadedFile> => {
   const { downloadProgress } = storeToRefs(useCurrentStateStore());
   publication.fileformat = 'JWPUB';
   const handleDownloadError = () => {
-    downloadProgress.value[[publication.pub, publication.langwritten, publication.issue, publication.track, publication.fileformat].filter(Boolean).join('_')] = {
-      error: true
+    downloadProgress.value[
+      [
+        publication.pub,
+        publication.langwritten,
+        publication.issue,
+        publication.track,
+        publication.fileformat,
+      ]
+        .filter(Boolean)
+        .join('_')
+    ] = {
+      error: true,
     };
     return {
       new: false,
@@ -1162,12 +1247,13 @@ const downloadJwpub = async (
   if (!publicationInfo?.files) {
     return handleDownloadError();
   }
-  const mediaLinks: MediaLink[] = publicationInfo.files[
-    publication.langwritten
-  ][publication.fileformat].filter(
-    (mediaLink) =>
-      !publication.maxTrack || mediaLink.track < publication.maxTrack
-  ) || [];
+  const mediaLinks: MediaLink[] =
+    publicationInfo.files[publication.langwritten][
+      publication.fileformat
+    ].filter(
+      (mediaLink) =>
+        !publication.maxTrack || mediaLink.track < publication.maxTrack,
+    ) || [];
   if (!mediaLinks.length) {
     return handleDownloadError();
   }

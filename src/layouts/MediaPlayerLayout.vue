@@ -1,10 +1,9 @@
 <template>
   <q-app class="no-scroll fitSnugly">
-  <q-layout class="bg-black text-white" style="align-content: center;">
+    <q-layout class="bg-black text-white" style="align-content: center">
       <!-- This is where pages get injected -->
       <router-view />
-
-  </q-layout>
+    </q-layout>
   </q-app>
 </template>
 
@@ -16,4 +15,3 @@ onMounted(() => {
   document.title = 'Media Player';
 });
 </script>
-

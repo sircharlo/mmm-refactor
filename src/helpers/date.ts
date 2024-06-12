@@ -22,7 +22,7 @@ const dateFromString = (lookupDate?: Date | string | undefined) => {
         seconds: 0,
         year: now.getFullYear(),
       },
-      false
+      false,
     );
   }
   let dateBuilder;
@@ -37,7 +37,7 @@ const dateFromString = (lookupDate?: Date | string | undefined) => {
         seconds: 0,
         year: dateBuilder.getFullYear(),
       },
-      false
+      false,
     );
   } else {
     dateBuilder = lookupDate;
@@ -51,7 +51,7 @@ const dateFromString = (lookupDate?: Date | string | undefined) => {
       seconds: 0,
       year: dateBuilder.getFullYear(),
     },
-    false
+    false,
   );
   return outputDate;
 };
@@ -87,7 +87,7 @@ function datesAreSame(date1: Date, date2: Date) {
 
 function isCoWeek(lookupDate: Date) {
   const currentState = useCurrentStateStore();
-  const { getSettingValue } = currentState
+  const { getSettingValue } = currentState;
   const coWeekSet = !!(getSettingValue('coWeek') as string);
   if (!coWeekSet) return false;
   const coWeekTuesday = dateFromString(getSettingValue('coWeek') as string);
@@ -98,7 +98,7 @@ function isCoWeek(lookupDate: Date) {
 
 const isMwMeetingDay = (lookupDate: Date) => {
   const currentState = useCurrentStateStore();
-  const { getSettingValue } = currentState
+  const { getSettingValue } = currentState;
   const coWeek = isCoWeek(lookupDate);
   if (coWeek) {
     const coWeekTuesday = dateFromString(getSettingValue('coWeek') as string);
@@ -110,9 +110,9 @@ const isMwMeetingDay = (lookupDate: Date) => {
 
 const isWeMeetingDay = (lookupDate: Date) => {
   const currentState = useCurrentStateStore();
-  const { getSettingValue } = currentState
+  const { getSettingValue } = currentState;
   return getSettingValue('weDay') == getWeekDay(lookupDate);
-}
+};
 
 // function isMeetingDay(lookupDate: Date) {
 //   const mwMeetingDay = isMwMeetingDay(lookupDate);
@@ -127,7 +127,11 @@ function getLookupPeriod() {
       date: dayDate as Date,
       dynamicMedia: [] as DynamicMediaObject[],
       loading: false,
-      meeting: isMwMeetingDay(dayDate) ? 'mw' : (isWeMeetingDay(dayDate) ? 'we' : false),
+      meeting: isMwMeetingDay(dayDate)
+        ? 'mw'
+        : isWeMeetingDay(dayDate)
+        ? 'we'
+        : false,
     };
   }) as DateInfo[];
 }

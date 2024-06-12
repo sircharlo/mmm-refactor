@@ -1,6 +1,13 @@
 <template>
-  <q-input @click="localValue = getFolderPath()" dense filled readonly v-model="localValue"
-    v-bind="{ label: label || undefined, rules: rules || undefined }" class="q-pb-none">
+  <q-input
+    @click="localValue = getFolderPath()"
+    dense
+    filled
+    readonly
+    v-model="localValue"
+    v-bind="{ label: label || undefined, rules: rules || undefined }"
+    class="q-pb-none"
+  >
     <template v-slot:append>
       <q-icon name="mdi-folder" />
     </template>
@@ -29,7 +36,7 @@ watch(
   () => props.modelValue,
   (newValue) => {
     localValue.value = newValue;
-  }
+  },
 );
 
 const { openFolderDialog } = electronApi;
@@ -41,5 +48,4 @@ const getFolderPath = () => {
     return undefined;
   }
 };
-
 </script>

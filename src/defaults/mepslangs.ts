@@ -566,6 +566,6 @@ const mepslangs: Record<number, string> = {
   1258: 'STN',
   1268: 'BRS',
   1286: 'LBS',
-}
+};
 
-export default mepslangs
+export default mepslangs;

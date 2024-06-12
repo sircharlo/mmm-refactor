@@ -1,5 +1,13 @@
 <template>
-  <q-slider :max="max" :min="min" :step="step" class="q-pb-none" dense filled v-model="localValue" />
+  <q-slider
+    :max="max"
+    :min="min"
+    :step="step"
+    class="q-pb-none"
+    dense
+    filled
+    v-model="localValue"
+  />
 </template>
 
 <script setup lang="ts">
@@ -24,7 +32,6 @@ watch(
   () => props.modelValue,
   (newValue) => {
     localValue.value = newValue;
-  }
+  },
 );
-
 </script>

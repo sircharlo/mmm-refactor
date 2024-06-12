@@ -1,6 +1,12 @@
 <template>
-  <q-input :rules="getRules(rules)" class="q-pb-none" dense filled v-model="localValue"
-    v-bind="{ label: label || undefined }" />
+  <q-input
+    :rules="getRules(rules)"
+    class="q-pb-none"
+    dense
+    filled
+    v-model="localValue"
+    v-bind="{ label: label || undefined }"
+  />
 </template>
 
 <script setup lang="ts">
@@ -27,7 +33,6 @@ watch(
   () => props.modelValue,
   (newValue) => {
     localValue.value = newValue;
-  }
+  },
 );
-
 </script>

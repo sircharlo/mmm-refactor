@@ -9,26 +9,65 @@
           {{ $t(route.meta.title as string) }}
         </q-toolbar-title>
         <template v-if="route.fullPath === '/media-calendar'">
-          <q-btn :disable="mediaPlaying" :label="selectedDate" class="q-ml-sm" color="secondary" icon="mdi-calendar"
-            rounded>
-            <q-tooltip v-if="!datePickerActive">{{ $t('select-a-date') }}</q-tooltip>
+          <q-btn
+            :disable="mediaPlaying"
+            :label="selectedDate"
+            class="q-ml-sm"
+            color="secondary"
+            icon="mdi-calendar"
+            rounded
+          >
+            <q-tooltip v-if="!datePickerActive">{{
+              $t('select-a-date')
+            }}</q-tooltip>
             <q-popup-proxy breakpoint="1000" v-model="datePickerActive">
-              <q-date :events="getEventDates()" :navigation-max-year-month="maxDate()" :navigation-min-year-month="minDate()" :options="dateOptions"
-                class="non-selectable" event-color="primary" landscape
-                v-model="selectedDate">
+              <q-date
+                :events="getEventDates()"
+                :navigation-max-year-month="maxDate()"
+                :navigation-min-year-month="minDate()"
+                :options="dateOptions"
+                class="non-selectable"
+                event-color="primary"
+                landscape
+                v-model="selectedDate"
+              >
                 <div class="row items-center justify-end q-gutter-sm">
-                  <q-btn color="primary" icon="mdi-check" outline v-close-popup />
+                  <q-btn
+                    color="primary"
+                    icon="mdi-check"
+                    outline
+                    v-close-popup
+                  />
                 </div>
               </q-date>
             </q-popup-proxy>
           </q-btn>
-          <q-btn :disable="mediaPlaying" @click="resetSort" class="q-ml-sm" color="warning" icon="mdi-sort-numeric-variant"
-            rounded text-color="black" v-if="mediaSortForDay">
+          <q-btn
+            :disable="mediaPlaying"
+            @click="resetSort"
+            class="q-ml-sm"
+            color="warning"
+            icon="mdi-sort-numeric-variant"
+            rounded
+            text-color="black"
+            v-if="mediaSortForDay"
+          >
             <q-tooltip>{{ $t('reset-sort-order') }}</q-tooltip>
           </q-btn>
-          <q-btn class="q-ml-sm" color="purple-6" icon="mdi-movie-plus" rounded text-color="white">
-            <q-tooltip v-if="!importMediaMenuActive">{{ $t('import-media') }}</q-tooltip>
-            <q-menu @before-hide="importMediaMenuActive = false" @before-show="importMediaMenuActive = true">
+          <q-btn
+            class="q-ml-sm"
+            color="purple-6"
+            icon="mdi-movie-plus"
+            rounded
+            text-color="white"
+          >
+            <q-tooltip v-if="!importMediaMenuActive">{{
+              $t('import-media')
+            }}</q-tooltip>
+            <q-menu
+              @before-hide="importMediaMenuActive = false"
+              @before-show="importMediaMenuActive = true"
+            >
               <q-list style="min-width: 100px">
                 <q-item-label header>{{ $t('from-jw-org') }}</q-item-label>
                 <q-item @click="chooseSong = true" clickable v-close-popup>
@@ -43,12 +82,17 @@
                   </q-item-section>
                   <q-item-section>{{ $t('video') }}</q-item-section>
                 </q-item>
-                <q-item-label header>{{ $t('from-local-computer') }}</q-item-label>
-                <template :key="name" v-for="[icon, name] in [
-                  ['mdi-image', 'Images or videos'],
-                  ['mdi-folder-zip', 'JWPub File'],
-                  ['mdi-playlist-play', 'JW Playlist'],
-                ]">
+                <q-item-label header>{{
+                  $t('from-local-computer')
+                }}</q-item-label>
+                <template
+                  :key="name"
+                  v-for="[icon, name] in [
+                    ['mdi-image', 'Images or videos'],
+                    ['mdi-folder-zip', 'JWPub File'],
+                    ['mdi-playlist-play', 'JW Playlist'],
+                  ]"
+                >
                   <q-item @click="localUpload = true" clickable v-close-popup>
                     <q-item-section avatar>
                       <q-icon :name="icon" color="primary" />
@@ -63,13 +107,27 @@
             <q-card>
               <q-card-section horizontal>
                 <q-card-section>
-                  <q-icon color="primary" name="mdi-cursor-default" size="lg" text-color="white" /></q-card-section>
+                  <q-icon
+                    color="primary"
+                    name="mdi-cursor-default"
+                    size="lg"
+                    text-color="white"
+                /></q-card-section>
                 <q-card-section>
-                  <span>{{ $t('to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window')
-                    }}</span></q-card-section>
+                  <span>{{
+                    $t(
+                      'to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window',
+                    )
+                  }}</span></q-card-section
+                >
               </q-card-section>
               <q-card-actions align="right">
-                <q-btn color="primary" flat label="$t('got-it')" v-close-popup />
+                <q-btn
+                  color="primary"
+                  flat
+                  label="$t('got-it')"
+                  v-close-popup
+                />
               </q-card-actions>
             </q-card>
           </q-dialog>
@@ -77,51 +135,99 @@
       </q-toolbar>
     </q-header>
 
-    <q-footer v-if="currentSettings?.enableMediaDisplayButton || currentSettings?.enableMusicButton">
-      <q-toolbar class="bg-blue-9 text-white" style="min-height: initial;">
+    <q-footer
+      v-if="
+        currentSettings?.enableMediaDisplayButton ||
+        currentSettings?.enableMusicButton
+      "
+    >
+      <q-toolbar class="bg-blue-9 text-white" style="min-height: initial">
         <DownloadStatus />
         <q-space />
         <ScenePicker />
         <MusicButton />
-        <q-separator inset v-if="currentSettings?.enableMediaDisplayButton && currentSettings?.enableMusicButton"
-          vertical />
+        <q-separator
+          inset
+          v-if="
+            currentSettings?.enableMediaDisplayButton &&
+            currentSettings?.enableMusicButton
+          "
+          vertical
+        />
         <MediaDisplayButton />
       </q-toolbar>
     </q-footer>
 
     <SongPicker v-model="chooseSong" />
-    <q-drawer :bordered="miniState"
-      :breakpoint="5" :class="'column justify-between no-wrap ' + ($q.dark.isActive ? 'bg-black text-white' : 'bg-grey-2')" :elevated="!miniState" :mini="miniState" :width="200"
-      @mouseout="miniState = true" @mouseover="miniState = false" mini-to-overlay v-model="drawer">
-      <q-item :disable="!currentSettings || invalidSettings()" :to="{ path: '/media-calendar', exact: true }" @click="selectedDate = ''; datePickerActive = true"
-        clickable v-ripple>
+    <q-drawer
+      :bordered="miniState"
+      :breakpoint="5"
+      :class="
+        'column justify-between no-wrap ' +
+        ($q.dark.isActive ? 'bg-black text-white' : 'bg-grey-2')
+      "
+      :elevated="!miniState"
+      :mini="miniState"
+      :width="200"
+      @mouseout="miniState = true"
+      @mouseover="miniState = false"
+      mini-to-overlay
+      v-model="drawer"
+    >
+      <q-item
+        :disable="!currentSettings || invalidSettings()"
+        :to="{ path: '/media-calendar', exact: true }"
+        @click="
+          selectedDate = '';
+          datePickerActive = true;
+        "
+        clickable
+        v-ripple
+      >
         <q-item-section avatar>
           <q-icon name="mdi-calendar-month" />
         </q-item-section>
 
-        <q-item-section>{{ $t("titles.mediaCalendar") }}</q-item-section>
+        <q-item-section>{{ $t('titles.mediaCalendar') }}</q-item-section>
       </q-item>
 
       <q-space />
 
-      <q-item :disable="mediaPlaying" :to="{ path: '/congregation-selector', exact: true }" clickable v-ripple>
+      <q-item
+        :disable="mediaPlaying"
+        :to="{ path: '/congregation-selector', exact: true }"
+        clickable
+        v-ripple
+      >
         <q-item-section avatar>
           <q-icon name="mdi-account-group" />
         </q-item-section>
 
         <q-item-section>
-          {{ (currentSettings && currentSettings.congregationName) ?? $t("titles.profileSelection") }}
+          {{
+            (currentSettings && currentSettings.congregationName) ??
+            $t('titles.profileSelection')
+          }}
         </q-item-section>
       </q-item>
 
-      <q-item :disable="!currentSettings || mediaPlaying || route.fullPath.includes('wizard')
-        " :to="{ path: '/settings', exact: true }" clickable v-ripple>
+      <q-item
+        :disable="
+          !currentSettings || mediaPlaying || route.fullPath.includes('wizard')
+        "
+        :to="{ path: '/settings', exact: true }"
+        clickable
+        v-ripple
+      >
         <q-item-section avatar>
-          <q-icon :color="invalidSettings() ? 'negative' : ''" name="settings" />
+          <q-icon
+            :color="invalidSettings() ? 'negative' : ''"
+            name="settings"
+          />
         </q-item-section>
 
         <q-item-section :class="invalidSettings() ? 'text-negative' : ''">
-          {{ $t("titles.settings") }}
+          {{ $t('titles.settings') }}
         </q-item-section>
       </q-item>
     </q-drawer>
@@ -160,7 +266,7 @@ const {
   lookupPeriod,
   mediaPlayer,
   mediaPlaying,
-  selectedDate
+  selectedDate,
 } = storeToRefs(currentState);
 
 const congregationSettings = useCongregationSettingsStore();
@@ -198,7 +304,8 @@ const applySettings = () => {
   console.log('applySettings');
 
   // Media Window
-  const enableMediaDisplayButton = currentSettings.value?.enableMediaDisplayButton;
+  const enableMediaDisplayButton =
+    currentSettings.value?.enableMediaDisplayButton;
   mediaPlayer.value.windowVisible = !!enableMediaDisplayButton;
   toggleMediaWindow(enableMediaDisplayButton ? 'show' : 'hide');
 
@@ -224,13 +331,23 @@ watch(
   (newVal) => {
     applySettings();
     lookupPeriod.value = getLookupPeriod();
-    if (!currentCongregation.value && route.fullPath !== '/congregation-selector') {
+    if (
+      !currentCongregation.value &&
+      route.fullPath !== '/congregation-selector'
+    ) {
       router.push({ path: '/congregation-selector' });
       return;
     }
-    drawer.value = !(route.fullPath.includes('wizard') && newVal !== undefined && !(route.fullPath.includes('wizard') && Object.keys(congregationSettings.congregations).length > 1));
+    drawer.value = !(
+      route.fullPath.includes('wizard') &&
+      newVal !== undefined &&
+      !(
+        route.fullPath.includes('wizard') &&
+        Object.keys(congregationSettings.congregations).length > 1
+      )
+    );
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 );
 
 watch(route, (newVal) => {
@@ -274,5 +391,4 @@ const getEventDates = () => {
 const localUpload = ref(false);
 const importMediaMenuActive = ref(false);
 const datePickerActive = ref(false);
-
 </script>

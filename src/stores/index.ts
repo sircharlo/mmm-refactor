@@ -1,6 +1,6 @@
-import { createPinia } from 'pinia'
-import { PiniaSharedState } from 'pinia-shared-state'
-import { store } from 'quasar/wrappers'
+import { createPinia } from 'pinia';
+import { PiniaSharedState } from 'pinia-shared-state';
+import { store } from 'quasar/wrappers';
 import { Router } from 'vue-router';
 
 /*
@@ -24,7 +24,7 @@ declare module 'pinia' {
  */
 
 export default store((/* { ssrContext } */) => {
-  const pinia = createPinia()
+  const pinia = createPinia();
 
   // You can add Pinia plugins here
   pinia.use(
@@ -36,8 +36,7 @@ export default store((/* { ssrContext } */) => {
       // Enforce a type. One of native, idb, localstorage or node. Defaults to native.
       // type: 'idb',
     }),
-  )
+  );
 
-
-  return pinia
-})
+  return pinia;
+});

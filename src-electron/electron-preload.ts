@@ -37,12 +37,14 @@ import convert from 'heic-convert';
 import klawSync from 'klaw-sync';
 import path from 'upath';
 
-const getMainWindow = () => BrowserWindow.getAllWindows().find(
-  (w) => !w.webContents.getURL().includes('media-player')
-)
-const getMediaWindow = () => BrowserWindow.getAllWindows().find((w) =>
-  w.webContents.getURL().includes('media-player')
-);
+const getMainWindow = () =>
+  BrowserWindow.getAllWindows().find(
+    (w) => !w.webContents.getURL().includes('media-player'),
+  );
+const getMediaWindow = () =>
+  BrowserWindow.getAllWindows().find((w) =>
+    w.webContents.getURL().includes('media-player'),
+  );
 
 function getScreenInfo() {
   let displays: Electron.Display[] = [];
@@ -79,7 +81,7 @@ function getScreenInfo() {
     otherScreens: displays.filter(
       (display) =>
         display.id !==
-        screen.getDisplayNearestPoint(winMidpoints.main as Point).id
+        screen.getDisplayNearestPoint(winMidpoints.main as Point).id,
     ),
     winCoordinates,
     winMidpoints,
@@ -94,7 +96,7 @@ const moveMediaWindow = () => {
     if (!mediaWindow?.isFullScreen()) {
       mediaWindow?.setPosition(
         otherScreens[0].workArea.x,
-        otherScreens[0].workArea.y
+        otherScreens[0].workArea.y,
       );
       mediaWindow?.setFullScreen(true);
     }
@@ -107,7 +109,7 @@ const moveMediaWindow = () => {
 
 getMainWindow()?.on('move', moveMediaWindow);
 
-window.addEventListener('beforeunload', ()=>{
+window.addEventListener('beforeunload', () => {
   getMainWindow()?.removeAllListeners('move');
 });
 
@@ -128,15 +130,15 @@ screen.on('display-removed', () => {
 });
 
 const isWritable = (filePath: fs.PathLike) => {
-  let fileAccess = false
+  let fileAccess = false;
   try {
-      fs.closeSync(fs.openSync(filePath, 'r+'))
-      fileAccess = true
+    fs.closeSync(fs.openSync(filePath, 'r+'));
+    fileAccess = true;
   } catch (err) {
-      console.log('can not open file:' + filePath, 'error:' + err)
+    console.log('can not open file:' + filePath, 'error:' + err);
   }
-  return fileAccess
-}
+  return fileAccess;
+};
 
 function sleepSync(ms: number) {
   const start = Date.now();
@@ -181,10 +183,9 @@ contextBridge.exposeInMainWorld('electronApi', {
       console.error(error + '\n' + query + '\n' + dbPath);
       return {};
     }
-
   },
   fileUrlToPath: (fileurl: string) => {
-    const url = require('node:url')
+    const url = require('node:url');
     return url.fileURLToPath(fileurl);
   },
   fs,

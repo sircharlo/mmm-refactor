@@ -1,16 +1,15 @@
 import { boot } from 'quasar/wrappers';
-console.log('axios start')
+console.log('axios start');
 import axios, { AxiosRequestConfig } from 'axios';
 export default boot(({ app }) => {
   app.config.globalProperties.$axios = axios;
 });
 
-
 const get = async (url: string, params?: AxiosRequestConfig) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let returnVal: { data: any | undefined } = { data: undefined };
   try {
-    returnVal = (await axios.get(url, { params }));
+    returnVal = await axios.get(url, { params });
   } catch (error) {
     console.warn(error);
   }
@@ -18,9 +17,9 @@ const get = async (url: string, params?: AxiosRequestConfig) => {
 };
 
 const getLanguages = async () => {
-  const req  = await get('https://www.jw.org/en/languages/')
+  const req = await get('https://www.jw.org/en/languages/');
   return req?.languages;
-}
+};
 
 const urlWithParamsToString = (url: string, params: object) => {
   const urlWithParams = new URL(url);
@@ -41,11 +40,6 @@ const getYeartext = async (lang: string, year?: number) => {
   return await get(urlWithParamsToString(url, params));
 };
 
-console.log('axios end')
+console.log('axios end');
 
-export {
-  get,
-  getLanguages,
-  getYeartext,
-  urlWithParamsToString,
-};
+export { get, getLanguages, getYeartext, urlWithParamsToString };

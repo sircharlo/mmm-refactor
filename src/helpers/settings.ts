@@ -9,8 +9,7 @@ const filteredJwLanguages = ref(jwLanguages.value.list);
 
 import { useObsStateStore } from '../stores/obs-state';
 const obsState = useObsStateStore();
-const { nonMediaScenes, nonStageScenes, scenes } = storeToRefs(obsState)
-
+const { nonMediaScenes, nonStageScenes, scenes } = storeToRefs(obsState);
 
 import { obsConnect } from 'src/helpers/obs';
 import { localeOptions } from 'src/i18n';
@@ -20,7 +19,10 @@ const requiredRule: ValidationRule = (val: string) =>
 
 const coTuesdays = (lookupDate: string) => {
   if (!lookupDate) return false;
-  return new Date(lookupDate).getDay() === 2 && date.getDateDiff(lookupDate, new Date(), 'days') >= 0;
+  return (
+    new Date(lookupDate).getDay() === 2 &&
+    date.getDateDiff(lookupDate, new Date(), 'days') >= 0
+  );
 };
 
 const getDateOptions = (options: string[] | undefined) => {
@@ -85,7 +87,7 @@ const getTimeOptions = (options: string[] | undefined) => {
 
 const filterFn = (
   val: string,
-  update: (arg0: { (): void; (): void }) => void
+  update: (arg0: { (): void; (): void }) => void,
 ) => {
   if (val === '') {
     update(() => {
@@ -96,7 +98,9 @@ const filterFn = (
   update(() => {
     const needle = val.toLowerCase();
     filteredJwLanguages.value = jwLanguages.value.list.filter(
-      (v) => (v.name.toLowerCase().indexOf(needle) > -1) || (v.vernacularName.toLowerCase().indexOf(needle) > -1)
+      (v) =>
+        v.name.toLowerCase().indexOf(needle) > -1 ||
+        v.vernacularName.toLowerCase().indexOf(needle) > -1,
     );
   });
 };
@@ -104,7 +108,10 @@ const filterFn = (
 const getListOptions = (list: string | undefined) => {
   if (list == 'jwLanguages') {
     return filteredJwLanguages.value.map((language) => {
-      return { label: `${language.vernacularName} (${language.name})`, value: language.langcode };
+      return {
+        label: `${language.vernacularName} (${language.name})`,
+        value: language.langcode,
+      };
     });
   } else if (list === 'appLanguages') {
     return localeOptions;
@@ -140,10 +147,17 @@ const getListOptions = (list: string | undefined) => {
     }
     return sceneArray.map((scene) => {
       return { label: scene.sceneName, value: scene.sceneUuid };
-    })
+    });
   } else {
     return undefined;
   }
 };
 
-export { filterFn, getActions, getDateOptions, getListOptions, getRules, getTimeOptions };
+export {
+  filterFn,
+  getActions,
+  getDateOptions,
+  getListOptions,
+  getRules,
+  getTimeOptions,
+};

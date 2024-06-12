@@ -1,6 +1,6 @@
 import { OBSWebSocketError } from 'obs-websocket-js';
 import { storeToRefs } from 'pinia';
-import { obsNotification, obsWebSocket } from 'src/boot/obs'
+import { obsNotification, obsWebSocket } from 'src/boot/obs';
 import { JsonObject } from 'type-fest';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
@@ -8,14 +8,18 @@ import { useRouter } from 'vue-router';
 import { useCurrentStateStore } from '../stores/current-state';
 import { useObsStateStore } from '../stores/obs-state';
 import { isImage } from './mediaPlayback';
-import { createUpdatableNotification, updateNotification } from './notifications';
+import {
+  createUpdatableNotification,
+  updateNotification,
+} from './notifications';
 
 const currentState = useCurrentStateStore();
 const { getSettingValue } = currentState;
 const { mediaPlayer } = storeToRefs(currentState);
 const obsState = useObsStateStore();
-const { currentScene, currentSceneUuid, obsConnected, scenes } = storeToRefs(obsState);
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const { currentScene, currentSceneUuid, obsConnected, scenes } =
+  storeToRefs(obsState);
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const notifyObsError = (errorMessage?: string) => {
   if (getSettingValue('obsEnable')) {
@@ -28,8 +32,8 @@ const notifyObsError = (errorMessage?: string) => {
       },
       spinner: false,
       timeout: 15000,
-      type: 'negative'
-    }
+      type: 'negative',
+    };
     if (obsNotification.value) {
       updateNotification(obsNotification.value, notificationOptions);
     } else {
@@ -55,8 +59,8 @@ obsWebSocket.on('Identified', async () => {
     },
     spinner: false,
     timeout: 2000,
-    type: 'positive'
-  }
+    type: 'positive',
+  };
   if (obsNotification.value) {
     updateNotification(obsNotification.value, notificationOptions);
   } else {
@@ -71,7 +75,7 @@ const obsErrorHandler = (err: OBSWebSocketError) => {
   if (err.message) {
     notifyObsError(err.message);
   }
-}
+};
 
 obsWebSocket.on('ConnectionClosed', obsErrorHandler);
 obsWebSocket.on('ConnectionError', obsErrorHandler);
@@ -87,7 +91,7 @@ const currentRoute = computed(() => useRouter()?.currentRoute.value.fullPath);
 const obsConnect = async (setup?: boolean) => {
   const obsPort = getSettingValue('obsPort') as string;
   const obsPortDigits = obsPort?.toString().replace(/\D/g, '');
-  if (obsPortDigits?.length === 0) return
+  if (obsPortDigits?.length === 0) return;
   if (!getSettingValue('obsEnable')) {
     await obsWebSocket?.disconnect();
     obsNotification.value = null;
@@ -98,7 +102,7 @@ const obsConnect = async (setup?: boolean) => {
   const notificationOptions = {
     message: 'Connecting to OBS Studio...',
     spinner: true,
-  }
+  };
   if (!obsNotification.value) {
     obsNotification.value = createUpdatableNotification(notificationOptions);
   } else {
@@ -118,7 +122,8 @@ const obsConnect = async (setup?: boolean) => {
       break;
     }
     try {
-      const { negotiatedRpcVersion, obsWebSocketVersion } = await obsWebSocket?.connect('ws://127.0.0.1:' + obsPort, obsPassword);
+      const { negotiatedRpcVersion, obsWebSocketVersion } =
+        await obsWebSocket?.connect('ws://127.0.0.1:' + obsPort, obsPassword);
       if (obsWebSocketVersion && negotiatedRpcVersion) {
         const sceneList = await obsWebSocket?.call('GetSceneList');
         if (sceneList) {
@@ -129,7 +134,11 @@ const obsConnect = async (setup?: boolean) => {
       }
     } catch (error) {
       console.error('Failed to connect to OBS', error);
-      notifyObsError(setup ? error as string : `Attempt ${attempt + 1} of ${maxAttempts}: ${error}`);
+      notifyObsError(
+        setup
+          ? (error as string)
+          : `Attempt ${attempt + 1} of ${maxAttempts}: ${error}`,
+      );
     } finally {
       attempt++;
       if (attempt < maxAttempts) {

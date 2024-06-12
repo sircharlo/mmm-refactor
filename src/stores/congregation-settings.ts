@@ -25,8 +25,10 @@ export const useCongregationSettingsStore = defineStore(
 
     state: () => {
       return {
-        congregations: (LocalStorage.getItem('congregations') || {}) as { [key: string]: SettingsValues },
+        congregations: (LocalStorage.getItem('congregations') || {}) as {
+          [key: string]: SettingsValues;
+        },
       };
     },
-  }
+  },
 );

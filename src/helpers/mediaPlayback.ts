@@ -1,6 +1,10 @@
 import { Buffer } from 'buffer';
 import { electronApi } from 'src/helpers/electron-api';
-import { JwPlaylistItem, MultimediaItem, PlaylistTagItem } from 'src/types/sqlite';
+import {
+  JwPlaylistItem,
+  MultimediaItem,
+  PlaylistTagItem,
+} from 'src/types/sqlite';
 import { Ref } from 'vue';
 
 import { FULL_HD } from './converters';
@@ -118,15 +122,21 @@ const decompressJwpub = async (jwpubPath: string, outputPath?: string) => {
   return outputPath;
 };
 
-const getMediaFromJwPlaylist = async (jwPlaylistPath: string, selectedDateValue: Date, destPath: string) => {
-  const outputPath = path.join(
-    destPath,
-    path.basename(jwPlaylistPath)
-  );
+const getMediaFromJwPlaylist = async (
+  jwPlaylistPath: string,
+  selectedDateValue: Date,
+  destPath: string,
+) => {
+  const outputPath = path.join(destPath, path.basename(jwPlaylistPath));
   await decompress(jwPlaylistPath, outputPath);
   const dbFile = findDb(outputPath);
   if (!dbFile) return [];
-  const playlistName = (executeQuery(dbFile, 'SELECT Name FROM Tag ORDER BY TagId ASC LIMIT 1;') as PlaylistTagItem[])[0].Name;
+  const playlistName = (
+    executeQuery(
+      dbFile,
+      'SELECT Name FROM Tag ORDER BY TagId ASC LIMIT 1;',
+    ) as PlaylistTagItem[]
+  )[0].Name;
   const playlistItems = executeQuery(
     dbFile,
     `SELECT
@@ -161,16 +171,21 @@ const getMediaFromJwPlaylist = async (jwPlaylistPath: string, selectedDateValue:
       LEFT JOIN
         PlaylistItemLocationMap plm ON pi.PlaylistItemId = plm.PlaylistItemId
       LEFT JOIN
-        Location l ON plm.LocationId = l.LocationId`
+        Location l ON plm.LocationId = l.LocationId`,
   ) as JwPlaylistItem[];
   const playlistMediaItems = playlistItems.map((item) => {
-    item.ThumbnailFilePath = path.join(outputPath, item.ThumbnailFilePath)
-    if (fs.existsSync(item.ThumbnailFilePath) && !item.ThumbnailFilePath.includes('.jpg')) {
+    item.ThumbnailFilePath = path.join(outputPath, item.ThumbnailFilePath);
+    if (
+      fs.existsSync(item.ThumbnailFilePath) &&
+      !item.ThumbnailFilePath.includes('.jpg')
+    ) {
       fs.renameSync(item.ThumbnailFilePath, item.ThumbnailFilePath + '.jpg');
       item.ThumbnailFilePath += '.jpg';
     }
     return {
-      FilePath: item.IndependentMediaFilePath ? path.join(outputPath, item.IndependentMediaFilePath) : '',
+      FilePath: item.IndependentMediaFilePath
+        ? path.join(outputPath, item.IndependentMediaFilePath)
+        : '',
       IssueTagNumber: item.IssueTagNumber,
       KeySymbol: item.KeySymbol,
       Label: playlistName + ' - ' + item.Label,
@@ -181,7 +196,11 @@ const getMediaFromJwPlaylist = async (jwPlaylistPath: string, selectedDateValue:
   }) as MultimediaItem[];
 
   await processMissingMediaInfo(playlistMediaItems);
-  const dynamicPlaylistMediaItems = await dynamicMediaMapper(playlistMediaItems, selectedDateValue, true);
+  const dynamicPlaylistMediaItems = await dynamicMediaMapper(
+    playlistMediaItems,
+    selectedDateValue,
+    true,
+  );
   return dynamicPlaylistMediaItems;
 };
 
@@ -210,7 +229,7 @@ const convertHeicToJpg = async (filepath: string) => {
 
 const convertSvgToJpg = async (
   filepath: string,
-  canvas: Ref<HTMLCanvasElement>
+  canvas: Ref<HTMLCanvasElement>,
 ): Promise<string> => {
   if (!isSvg(filepath) || !canvas.value) return filepath;
 
@@ -246,7 +265,7 @@ const convertSvgToJpg = async (
       try {
         fs.writeFileSync(
           newPath,
-          Buffer.from(outputImg.split(',')[1], 'base64')
+          Buffer.from(outputImg.split(',')[1], 'base64'),
         );
         resolve(newPath);
       } catch (error) {
