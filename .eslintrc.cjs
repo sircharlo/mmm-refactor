@@ -36,14 +36,12 @@ module.exports = {
 
     // https://github.com/prettier/eslint-config-prettier#installation
     // usage with Prettier, provided by 'eslint-config-prettier'.
+    'plugin:perfectionist/recommended-natural',
     'prettier',
-    "plugin:perfectionist/recommended-natural",
   ],
 
   plugins: [
     // required to apply rules which need type information
-    '@typescript-eslint',
-    'perfectionist',
 
     // https://eslint.vuejs.org/user-guide/#why-doesn-t-it-work-on-vue-files
     // required to lint *.vue files
@@ -52,6 +50,8 @@ module.exports = {
     // https://github.com/typescript-eslint/typescript-eslint/issues/389#issuecomment-509292674
     // Prettier has not been included as plugin to avoid performance impact
     // add it as an extension for your IDE
+    'perfectionist',
+    '@typescript-eslint',
   ],
 
   globals: {
@@ -85,6 +85,6 @@ module.exports = {
 
     // allow debugger during development only
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    "perfectionist/sort-interfaces": "error",
+    'perfectionist/sort-interfaces': 'error',
   },
 };

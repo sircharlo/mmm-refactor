@@ -288,5 +288,11 @@
   "zoomStartMeeting": "Démarrer la réunion Zoom",
   "zoomStopMeeting": "Arrêter la réunion Zoom",
   "zoomToggleComponent": "Basculer la visibilité du composant Zoom",
-  "music.stopping": "Arrêt en cours..."
+  "music.stopping": "Arrêt en cours...",
+  "noName": "Sans nom",
+  "to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window": "Pour ajouter des fichiers depuis votre ordinateur, glissez-les glisser directement dans cette fenêtre.",
+  "errorDownloadingMeetingMedia": "Erreur lors du téléchargement des médias pour la réunion",
+  "tryConfiguringFallbackLanguage": "Essayez de configurer une langue secondaire dans les paramètres",
+  "entireFile": "Jouez du début à la fin",
+  "sureStopVideo": "Êtes-vous sûr de vouloir arrêter la vidéo ?"
 }

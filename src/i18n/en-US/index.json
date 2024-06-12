@@ -119,5 +119,15 @@
   "will-you-be-using-this-app-as-a-companion-to-jw-library": "Will you be using this app alongside JW Library?",
   "would-you-like-to-integrate-m-with-obs-studio": "Would you like to integrate M³ with OBS Studio?",
   "yes": "Yes",
-  "music.stopping": "Stopping..."
+  "music.stopping": "Stopping...",
+  "noName": "No name",
+  "to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window": "To add files from your computer, drag-and-drop them directly into this window.",
+  "pdfFilesNotSupported": "PDF files are not supported yet",
+  "jwpubNoMultimedia": "The JWPUB file does not contain any multimedia",
+  "filetypeNotSupported": "This file type is not yet supported",
+  "fileProcessError": "There was an error processing this file",
+  "errorDownloadingMeetingMedia": "Error downloading media for meeting",
+  "tryConfiguringFallbackLanguage": "Try configuring a fallback language in the settings",
+  "entireFile": "Play from start to finish",
+  "sureStopVideo": "Are you sure you want to stop the video?"
 }

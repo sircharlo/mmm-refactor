@@ -37,6 +37,7 @@
               :id="media.uniqueId"
               :ratio="16 / 9"
               :src="media.thumbnailUrl"
+              @error="imageLoadingError(media)"
               @load="media.isImage && initiatePanzoom(media.uniqueId)"
               class="rounded-borders"
               fit="contain"
@@ -194,7 +195,7 @@
                   <q-tooltip>Reset image zoom</q-tooltip>
                 </q-btn>
               </div> -->
-              <div class="col" v-if="obsConnected">
+              <div class="col" v-if="obsConnectionState === 'connected'">
                 <q-btn
                   @click="setObsScene('camera')"
                   color="negative"
@@ -269,13 +270,35 @@
                   />
                 </template>
                 <template v-else>
-                  <q-btn color="primary" label="Handles click" push>
+                  <q-btn
+                    :disable="
+                      mediaPlayer.url !== '' && isVideo(mediaPlayer.url)
+                    "
+                    color="primary"
+                    icon="mdi-play-box-multiple"
+                    push
+                    round
+                  >
                     <q-menu>
                       <q-list style="min-width: 100px">
                         <q-item
-                          :disable="
-                            mediaPlayer.url !== '' && isVideo(mediaPlayer.url)
+                          @click="
+                            customDurations[currentCongregation][selectedDate][
+                              media.uniqueId
+                            ] = {
+                              min: 0,
+                              max: media.duration,
+                            };
+                            mediaPlayer.action = 'play';
+                            mediaPlayer.url = media.fileUrl;
+                            mediaPlayer.uniqueId = media.uniqueId;
                           "
+                          clickable
+                        >
+                          <q-item-section>{{ $t('entireFile') }}</q-item-section>
+                        </q-item>
+                        <q-separator />
+                        <q-item
                           :key="marker.VideoMarkerId"
                           @click="
                             if (
@@ -311,30 +334,6 @@
                         </q-item>
                       </q-list>
                     </q-menu>
-                    <!-- <q-popup-proxy>
-                      <q-card>
-                        <q-card-section>
-                          <q-markup-table dense>
-                            <thead>
-                              <tr>
-                                <th class=" text-left">Start</th>
-                          <th class="text-left">End</th>
-                          <th class="text-left">Duration</th>
-                          </tr>
-                          </thead>
-                          <tbody>
-                            <tr v-for="marker in media.markers" :key="marker.DurationTicks">
-                              <td class="text-left">{{ formatTime(marker.StartTimeTicks / 10000 / 1000) }}</td>
-                              <td class="text-left">{{ formatTime((marker.StartTimeTicks + marker.DurationTicks) /
-                                10000 / 1000)
-                                }}</td>
-                              <td class="text-left">{{ formatTime(marker.DurationTicks / 10000 / 1000) }}</td>
-                            </tr>
-                          </tbody>
-                          </q-markup-table>
-                          </q-card-section>
-                          </q-card>
-                          </q-popup-proxy> -->
                   </q-btn>
                 </template>
               </div>
@@ -428,7 +427,7 @@
       <q-card>
         <q-card-section class="row items-center">
           <q-avatar color="negative" icon="mdi-alert" text-color="white" />
-          <span class="q-ml-sm">Are you sure you want to stop the video?</span>
+          <span class="q-ml-sm">{{ $t('sureStopVideo') }}</span>
         </q-card-section>
         <q-card-actions align="right" class="text-primary">
           <q-btn @click="mediaToStop = ''" flat label="Cancel" />
@@ -550,6 +549,7 @@ import { setObsScene } from 'src/helpers/obs';
 import { DynamicMediaObject } from 'src/types/media';
 import { DocumentItem, TableItem } from 'src/types/sqlite';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { useCurrentStateStore } from '../stores/current-state';
 import { useJwStore } from '../stores/jw';
@@ -562,8 +562,10 @@ const jwpubImportLoading = ref(false);
 const jwpubImportDocuments = ref([] as DocumentItem[]);
 const canvas = ref();
 
+const { t } = useI18n();
+
 const obsState = useObsStateStore();
-const { currentScene, obsConnected } = storeToRefs(obsState);
+const { currentScene, obsConnectionState } = storeToRefs(obsState);
 const jwStore = useJwStore();
 const { addToAdditionMediaMap, removeFromAdditionMediaMap, updateJwSongs } =
   jwStore;
@@ -572,6 +574,7 @@ const { additionalMediaMaps, customDurations, mediaSort } =
 const currentState = useCurrentStateStore();
 const {
   currentCongregation,
+  currentSettings,
   getDatedAdditionalMediaDirectory,
   lookupPeriod,
   mediaPlayer,
@@ -594,6 +597,7 @@ const zoomReset = (elemId: string, forced = false) => {
 };
 
 function stopMedia(elemId: string) {
+  console.log('stopMedia', elemId);
   zoomReset(elemId, true);
   mediaPlayer.value.action = 'stop';
   mediaPlayer.value.url = '';
@@ -738,7 +742,7 @@ watch(mediaPlaying, (newValue) => {
   updateConfig(mediaList.value, { disabled: !!newValue });
 });
 
-onMounted(() => {
+onMounted(async () => {
   watch(selectedDate, (newVal) => {
     const congregation = currentCongregation.value;
     if (!congregation) return;
@@ -752,8 +756,22 @@ onMounted(() => {
       .map((day) => day.date)[0],
     'YYYY/MM/DD',
   );
-  fetchMedia();
   setObsScene('camera');
+  const fetchResult = await fetchMedia();
+  if (Object.keys(fetchResult).length > 0) {
+    for (const [date, error] of Object.entries(fetchResult)) {
+      if (error) {
+        createTemporaryNotification({
+          caption: !currentSettings.value?.langFallback
+            ? t('tryConfiguringFallbackLanguage')
+            : '',
+          message: date + ' | ' + t('errorDownloadingMeetingMedia'),
+          timeout: 10000,
+          type: 'negative',
+        });
+      }
+    }
+  }
 });
 
 onUnmounted(() => {
@@ -889,7 +907,7 @@ const addToFiles = async (
       } else if (isPdf(filepath)) {
         createTemporaryNotification({
           icon: 'mdi-file-pdf-box',
-          message: 'PDF files are not supported yet',
+          message: t('pdfFilesNotSupported'),
           type: 'warning',
         });
         // todo: eventually support PDF import
@@ -904,7 +922,7 @@ const addToFiles = async (
           createTemporaryNotification({
             caption: path.basename(filepath),
             icon: 'mdi-multimedia',
-            message: 'The JWPUB file does not contain any multimedia',
+            message: t('jwpubNoMultimedia'),
             type: 'warning',
           });
           jwpubImportDb.value = '';
@@ -951,7 +969,7 @@ const addToFiles = async (
         createTemporaryNotification({
           caption: path.basename(filepath),
           icon: 'mdi-file',
-          message: 'This file type is not yet supported',
+          message: t('filetypeNotSupported'),
           type: 'error',
         });
       }
@@ -959,7 +977,7 @@ const addToFiles = async (
       createTemporaryNotification({
         caption: path.basename(filepath),
         icon: 'mdi-file',
-        message: 'Failed to process this file',
+        message: t('fileProcessError'),
         type: 'error',
       });
     }
@@ -1033,6 +1051,12 @@ const resetMediaDuration = (media: DynamicMediaObject) => {
     max: media.duration,
     min: 0,
   };
+};
+
+const imageLoadingError = (media: DynamicMediaObject) => {
+  const thumbnailUrl = media.thumbnailUrl;
+  media.thumbnailUrl = '';
+  media.thumbnailUrl = thumbnailUrl ?? getThumbnailUrl(media.fileUrl);
 };
 </script>
 

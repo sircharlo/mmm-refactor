@@ -4,7 +4,7 @@
       <q-toolbar class="q-pl-none">
         <q-toolbar-title>
           <q-avatar class="q-px-sm q-mr-md">
-            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg" />
+            <img src="../assets/master-icon.png" />
           </q-avatar>
           {{ $t(route.meta.title as string) }}
         </q-toolbar-title>
@@ -143,6 +143,7 @@
     >
       <q-toolbar class="bg-blue-9 text-white" style="min-height: initial">
         <DownloadStatus />
+        <ObsStatus />
         <q-space />
         <ScenePicker />
         <MusicButton />
@@ -205,7 +206,9 @@
 
         <q-item-section>
           {{
-            (currentSettings && currentSettings.congregationName) ??
+            (!route.fullPath.includes('wizard') &&
+              currentSettings &&
+              currentSettings.congregationName) ||
             $t('titles.profileSelection')
           }}
         </q-item-section>
@@ -243,6 +246,7 @@ import { storeToRefs } from 'pinia';
 import { Dark, LocalStorage, date } from 'quasar';
 import DownloadStatus from 'src/components/media/DownloadStatus.vue';
 import MusicButton from 'src/components/media/MusicButton.vue';
+import ObsStatus from 'src/components/media/ObsStatus.vue';
 import ScenePicker from 'src/components/media/ScenePicker.vue';
 import SongPicker from 'src/components/media/SongPicker.vue';
 import { getLookupPeriod } from 'src/helpers/date';
@@ -262,11 +266,12 @@ const currentState = useCurrentStateStore();
 const { invalidSettings } = currentState;
 const {
   currentCongregation,
+  currentSettings,
   downloadProgress,
   lookupPeriod,
   mediaPlayer,
   mediaPlaying,
-  selectedDate,
+  selectedDate
 } = storeToRefs(currentState);
 
 const congregationSettings = useCongregationSettingsStore();
@@ -291,9 +296,8 @@ const mediaSortForDay = ref(true);
 const { toggleMediaWindow } = electronApi;
 
 const { locale } = useI18n({ useScope: 'global' });
-const drawer = ref(false);
+const drawer = ref(true);
 updateJwLanguages();
-const { currentSettings } = storeToRefs(currentState);
 
 const route = useRoute();
 const router = useRouter();
@@ -325,10 +329,16 @@ watch(currentCongregation, () => {
   downloadBackgroundMusic();
   downloadProgress.value = {};
 });
+watch(route, (newVal) => {
+  drawer.value = !(
+    newVal.fullPath.includes('wizard') &&
+    Object.keys(congregationSettings.congregations).length < 2
+  );
+});
 
 watch(
-  () => currentSettings.value,
-  (newVal) => {
+  currentSettings,
+  () => {
     applySettings();
     lookupPeriod.value = getLookupPeriod();
     if (
@@ -338,21 +348,9 @@ watch(
       router.push({ path: '/congregation-selector' });
       return;
     }
-    drawer.value = !(
-      route.fullPath.includes('wizard') &&
-      newVal !== undefined &&
-      !(
-        route.fullPath.includes('wizard') &&
-        Object.keys(congregationSettings.congregations).length > 1
-      )
-    );
   },
   { deep: true, immediate: true },
 );
-
-watch(route, (newVal) => {
-  drawer.value = !newVal.fullPath.includes('wizard');
-});
 
 // Computed and helper functions
 const dateOptions = (lookupDate: string) => {

@@ -1,5 +1,5 @@
 <template>
-  <template v-if="obsConnected && nonMediaScenes.length > 1">
+  <template v-if="obsConnectionState && nonMediaScenes.length > 1">
     <q-btn flat icon="mdi-lectern" size="sm">
       <!-- :flat="!disabled"
     :outline="disabled"
@@ -57,7 +57,7 @@ import { ref } from 'vue';
 import { useObsStateStore } from '../../stores/obs-state';
 
 const obsState = useObsStateStore();
-const { currentSceneUuid, mediaScene, nonMediaScenes, obsConnected } =
+const { currentSceneUuid, mediaScene, nonMediaScenes, obsConnectionState } =
   storeToRefs(obsState);
 
 const menuActive = ref(false);

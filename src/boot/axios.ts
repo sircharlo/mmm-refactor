@@ -1,6 +1,5 @@
-import { boot } from 'quasar/wrappers';
-console.log('axios start');
 import axios, { AxiosRequestConfig } from 'axios';
+import { boot } from 'quasar/wrappers';
 export default boot(({ app }) => {
   app.config.globalProperties.$axios = axios;
 });
@@ -39,7 +38,5 @@ const getYeartext = async (lang: string, year?: number) => {
   };
   return await get(urlWithParamsToString(url, params));
 };
-
-console.log('axios end');
 
 export { get, getLanguages, getYeartext, urlWithParamsToString };

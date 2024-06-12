@@ -42,7 +42,7 @@ import {
   processMissingMediaInfo,
 } from 'src/helpers/jw-media';
 import { MultimediaItem } from 'src/types/sqlite';
-import { defineEmits, defineProps, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 
 import { useCurrentStateStore } from '../../stores/current-state';
 import { useJwStore } from '../../stores/jw';

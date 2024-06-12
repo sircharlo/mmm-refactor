@@ -1,5 +1,5 @@
 <template>
-  <!-- {{ mediaPlayer }} -->
+  {{ mediaPlayer }}
   <q-page-container
     class="q-electron-drag vertical-middle overflow-hidden"
     padding
@@ -113,7 +113,7 @@ watch(
       }
     }
   },
-  { deep: true },
+  { deep: true, immediate: true },
 );
 
 const playMedia = () => {
@@ -129,6 +129,8 @@ const playMedia = () => {
     mediaPlayer.value.url = '';
     mediaPlayer.value.uniqueId = '';
   };
+
+  // todo: look into watching mediaElement.value.currentTime instead of mediaElement.value.ontimeupdate
   mediaElement.value.ontimeupdate = () => {
     mediaPlayer.value.currentPosition = mediaElement.value?.currentTime || 0;
     if (

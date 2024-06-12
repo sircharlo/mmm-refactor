@@ -135,7 +135,7 @@ const isWritable = (filePath: fs.PathLike) => {
     fs.closeSync(fs.openSync(filePath, 'r+'));
     fileAccess = true;
   } catch (err) {
-    console.log('can not open file:' + filePath, 'error:' + err);
+    console.error('can not open file:' + filePath, 'error:' + err);
   }
   return fileAccess;
 };

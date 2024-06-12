@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { getActions } from 'src/helpers/settings';
-import { defineEmits, defineProps, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 
 // Define props and emits
 const props = defineProps<{

@@ -9,7 +9,7 @@ const routes: RouteRecordRaw[] = [
       },
     ],
     component: () => import('layouts/MainLayout.vue'),
-    meta: { title: 'titles.congregationSelector' },
+    meta: { title: 'titles.profileSelection' },
     path: '/',
   },
 
@@ -21,7 +21,7 @@ const routes: RouteRecordRaw[] = [
       },
     ],
     component: () => import('layouts/MainLayout.vue'),
-    meta: { title: 'titles.congregationSelector' },
+    meta: { title: 'titles.profileSelection' },
     path: '/congregation-selector',
   },
 

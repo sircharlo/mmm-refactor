@@ -11,6 +11,7 @@
     "icns",
     "iscoweek",
     "jwlplaylist",
+    "jwpub",
     "Jwpub",
     "klaw",
     "langwritten",
@@ -31,5 +32,16 @@
   ],
   "i18n-ally.localesPaths": ["src/i18n"],
   "i18n-ally.sourceLanguage": "en-US",
-  "i18n-ally.keystyle": "flat"
+  "i18n-ally.keystyle": "flat",
+
+  "prettier.useEditorConfig": false,
+  "prettier.useTabs": false,
+  "prettier.configPath": ".prettierrc",
+
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "notebook.formatOnSave.enabled": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

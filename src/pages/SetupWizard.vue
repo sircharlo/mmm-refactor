@@ -634,6 +634,12 @@ watch(companionToJwl, () => {
   enableExternalDisplayAndMusic();
 });
 
+watch (obsIntegrate, () => {
+  if (obsIntegrate.value && obsUsed.value) {
+    currentSettings.value.obsEnable = true;
+  }
+});
+
 async function enableExternalDisplayAndMusic() {
   await updateYeartext(currentSettings.value.lang as string);
   currentSettings.value.enableMediaDisplayButton = usingAtKh.value;

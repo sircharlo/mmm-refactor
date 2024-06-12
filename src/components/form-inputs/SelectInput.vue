@@ -17,6 +17,7 @@
     map-options
     v-model="localValue"
     v-bind="{ label: label || undefined }"
+    spellcheck=false
   >
   </q-select>
 </template>

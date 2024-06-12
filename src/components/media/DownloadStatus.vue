@@ -28,6 +28,7 @@
           dense
           separator
         >
+          <!-- <q-slide-transition> -->
           <q-item
             style="align-items: center"
             v-if="Object.values(downloadProgress).length === 0"
@@ -45,12 +46,13 @@
             v-for="statusObject in statusConfig"
           >
             <q-item-label
-              class="q-pt-md text-weight-bold text-uppercase"
+              class="q-pt-md q-pl-md text-weight-bold text-uppercase"
               overline
               v-if="hasStatus(downloadProgress, statusObject.status)"
             >
               {{ $t(statusObject.label) }}
             </q-item-label>
+            <!-- <q-slide-transition> -->
             <q-item
               :key="url"
               style="align-items: center"
@@ -79,7 +81,9 @@
                 />
               </q-item-section>
             </q-item>
+            <!-- </q-slide-transition> -->
           </template>
+          <!-- </q-slide-transition> -->
         </q-list>
       </div>
     </q-popup-proxy>

@@ -1,6 +1,16 @@
+import axios from 'axios';
+import { Buffer } from 'buffer';
 import { storeToRefs } from 'pinia';
 import { LocalStorage, date } from 'quasar';
+import sanitize from 'sanitize-filename';
+import { get, urlWithParamsToString } from 'src/boot/axios';
+import mepslangs from 'src/defaults/mepslangs';
 import { electronApi } from 'src/helpers/electron-api';
+import {
+  DownloadedFile,
+  DynamicMediaObject,
+  FileDownloader,
+} from 'src/types/media';
 import {
   MediaImages,
   MediaLink,
@@ -9,37 +19,15 @@ import {
 } from 'src/types/publications';
 import {
   DatedTextItem,
-  // DocumentItem,
   MultimediaExtractItem,
   MultimediaItem,
   MultimediaItemsFetcher,
-  // PublicationIssuePropertyItem,
   PublicationItem,
-  // PublicationItem,
   TableItem,
   VideoMarker,
 } from 'src/types/sqlite';
 
 import { useCurrentStateStore } from '../stores/current-state';
-import {
-  getDurationFromMediaPath,
-  getFileUrl,
-  getPublicationDirectory,
-  getThumbnailUrl,
-} from './fs';
-console.log(123);
-import axios from 'axios';
-import { Buffer } from 'buffer';
-import sanitize from 'sanitize-filename';
-import { get, urlWithParamsToString } from 'src/boot/axios';
-import mepslangs from 'src/defaults/mepslangs';
-import { createTemporaryNotification } from 'src/helpers/notifications';
-import {
-  DownloadedFile,
-  DynamicMediaObject,
-  FileDownloader,
-} from 'src/types/media';
-
 import { MAX_SONGS } from '../stores/jw';
 import {
   dateFromString,
@@ -47,6 +35,12 @@ import {
   isCoWeek,
   isMwMeetingDay,
 } from './date';
+import {
+  getDurationFromMediaPath,
+  getFileUrl,
+  getPublicationDirectory,
+  getThumbnailUrl,
+} from './fs';
 import {
   decompressJwpub,
   findDb,
@@ -125,12 +119,6 @@ FileDownloader) => {
     complete: true,
   };
   if (!downloadedData) {
-    // createTemporaryNotification({
-    //   message: 'Error downloading file',
-    //   caption: filename,
-    //   type: 'negative',
-    //   icon: 'mdi-cloud-off',
-    // });
     return {
       error: true,
       path: destinationPath,
@@ -144,31 +132,48 @@ FileDownloader) => {
 };
 const fetchMedia = async () => {
   const { lookupPeriod } = storeToRefs(useCurrentStateStore());
+  const fetchErrors = {} as Record<string, boolean>;
   for (const day of lookupPeriod.value.filter((day) => day.meeting)) {
     const dayDate = day.date;
     day.loading = true;
+    let fetchResult = null;
     if (day.meeting === 'we') {
-      day.dynamicMedia = await getWeMedia(dayDate);
+      fetchResult = await getWeMedia(dayDate);
+      // day.dynamicMedia = weMedia.media;
+      //formatDate
+      // if (weMedia.error) fetchErrors[date.formatDate(dayDate, 'YYYYMMDD')] = weMedia.error;
     } else if (day.meeting === 'mw') {
-      day.dynamicMedia = await getMwMedia(dayDate);
+      fetchResult = await getMwMedia(dayDate);
+      // day.dynamicMedia = mwMedia.media;
+      // if (mwMedia.error) fetchErrors[date.formatDate(dayDate, 'YYYYMMDD')] = mwMedia.error;
+    }
+    if (fetchResult) {
+      day.dynamicMedia = fetchResult.media;
+      if (fetchResult.error)
+        fetchErrors[date.formatDate(dayDate, 'YYYY/MM/DD')] = fetchResult.error;
     }
     day.loading = false;
   }
+  return fetchErrors;
 };
 
 const getDbFromJWPUB = async (publication: PublicationFetcher) => {
-  const jwpub = await downloadJwpub(publication);
-  if (jwpub.error) console.error('JWPUB download error: ' + publication);
-  const publicationDirectory = getPublicationDirectory(publication);
-  if (jwpub.new || !findDb(publicationDirectory)) {
-    await decompressJwpub(jwpub.path, publicationDirectory);
-  }
-  const dbFile = findDb(publicationDirectory);
-  if (!dbFile) {
-    console.error('No db file found', publicationDirectory);
+  try {
+    const jwpub = await downloadJwpub(publication);
+    if (jwpub.error) throw new Error('JWPUB download error: ' + publication);
+    const publicationDirectory = getPublicationDirectory(publication);
+    if (jwpub.new || !findDb(publicationDirectory)) {
+      await decompressJwpub(jwpub.path, publicationDirectory);
+    }
+    const dbFile = findDb(publicationDirectory);
+    if (!dbFile) {
+      throw new Error('No db file found: ' + publicationDirectory);
+    } else {
+      return dbFile;
+    }
+  } catch (error) {
+    console.error(error);
     return null;
-  } else {
-    return dbFile;
   }
 };
 
@@ -201,10 +206,41 @@ function addFullFilePathToMultimediaItem(
 }
 
 const getMultimediaMepsLangs = (source: MultimediaItemsFetcher) => {
-  const multimediaMepsLangs = executeQuery(
-    source.db,
-    'SELECT KeySymbol, Track, IssueTagNumber, MepsLanguageIndex from ExtractMultimedia ORDER by KeySymbol, IssueTagNumber, Track',
-  ) as MultimediaItem[];
+  const multimediaMepsLangs = [] as MultimediaItem[];
+  for (const table of [
+    'Multimedia',
+    'DocumentMultimedia',
+    'ExtractMultimedia',
+  ]) {
+    // exists
+    const tableExists =
+      (
+        executeQuery(
+          source.db,
+          `SELECT * FROM sqlite_master WHERE type='table' AND name='${table}'`,
+        ) as TableItem[]
+      ).map((item) => item.name).length > 0;
+    if (!tableExists) continue;
+    const columnQueryResult = executeQuery(
+      source.db,
+      `PRAGMA table_info(${table})`,
+    ) as TableItem[];
+
+    const columnMLIExists = columnQueryResult.some(
+      (column) => column.name === 'MepsLanguageIndex',
+    );
+    const columnKSExists = columnQueryResult.some(
+      (column) => column.name === 'KeySymbol',
+    );
+
+    if (columnKSExists && columnMLIExists)
+      multimediaMepsLangs.push(
+        ...(executeQuery(
+          source.db,
+          `SELECT DISTINCT KeySymbol, Track, IssueTagNumber, MepsLanguageIndex from ${table} ORDER by KeySymbol, IssueTagNumber, Track`,
+        ) as MultimediaItem[]),
+      );
+  }
   return multimediaMepsLangs;
 };
 
@@ -303,15 +339,16 @@ const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
 };
 
 const getDocumentExtractItems = async (db: string, docId: number) => {
-  const currentState = useCurrentStateStore();
-  const { getSettingValue } = currentState;
-  const extracts = executeQuery(
-    // ${currentSongbook.value.pub === 'sjjm'
-    //   ? "AND NOT UniqueEnglishSymbol = 'sjj' "
-    //   : ''
-    // }
-    db,
-    `SELECT DocumentExtract.BeginParagraphOrdinal,DocumentExtract.EndParagraphOrdinal,DocumentExtract.DocumentId,
+  try {
+    const currentState = useCurrentStateStore();
+    const { getSettingValue } = currentState;
+    const extracts = executeQuery(
+      // ${currentSongbook.value.pub === 'sjjm'
+      //   ? "AND NOT UniqueEnglishSymbol = 'sjj' "
+      //   : ''
+      // }
+      db,
+      `SELECT DocumentExtract.BeginParagraphOrdinal,DocumentExtract.EndParagraphOrdinal,DocumentExtract.DocumentId,
       Extract.RefMepsDocumentId,Extract.RefPublicationId,Extract.RefMepsDocumentId,UniqueEnglishSymbol,IssueTagNumber,
       Extract.RefBeginParagraphOrdinal,Extract.RefEndParagraphOrdinal, Extract.Link
     FROM DocumentExtract
@@ -327,92 +364,125 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
         : ''
     }
       ORDER BY DocumentExtract.BeginParagraphOrdinal`,
-  ) as MultimediaExtractItem[];
+    ) as MultimediaExtractItem[];
 
-  // AND NOT RefPublication.PublicationCategorySymbol = 'web'
-  // TODO: add toggle to enable/disable web publication multimedia
-  // Right now, enabled
+    // AND NOT RefPublication.PublicationCategorySymbol = 'web'
+    // TODO: add toggle to enable/disable web publication multimedia
+    // Right now, enabled
 
-  const allExtractItems = [];
-  for (const extract of extracts) {
-    extract.Lang = getSettingValue('lang') as string;
-    if (extract.Link) {
-      try {
-        const matches = extract.Link.match(/\/(.*)\//);
-        if (matches && matches.length > 0) {
-          extract.Lang = (matches.pop() as string).split(':')[0];
+    const allExtractItems = [];
+    for (const extract of extracts) {
+      extract.Lang = getSettingValue('lang') as string;
+      if (extract.Link) {
+        try {
+          const matches = extract.Link.match(/\/(.*)\//);
+          if (matches && matches.length > 0) {
+            extract.Lang = (matches.pop() as string).split(':')[0];
+          }
+        } catch (e: unknown) {
+          console.error(e);
         }
-      } catch (e: unknown) {
-        console.error(e);
       }
-    }
 
-    const symbol = /[^a-zA-Z0-9]/.test(extract.UniqueEnglishSymbol)
-      ? extract.UniqueEnglishSymbol
-      : extract.UniqueEnglishSymbol.replace(/\d/g, '');
+      const symbol = /[^a-zA-Z0-9]/.test(extract.UniqueEnglishSymbol)
+        ? extract.UniqueEnglishSymbol
+        : extract.UniqueEnglishSymbol.replace(/\d/g, '');
 
-    if (symbol === 'snnw') return []; // That's the "old new songs" songbook; we don't need images from that
-    let extractLang = extract.Lang ?? (getSettingValue('lang') as string);
-    let extractDb = await getDbFromJWPUB({
-      issue: extract.IssueTagNumber,
-      langwritten: extractLang,
-      pub: symbol,
-    });
-    const langFallback = getSettingValue('langFallback') as string;
-    if (!extractDb && langFallback) {
-      extractDb = await getDbFromJWPUB({
+      if (symbol === 'snnw') return []; // That's the "old new songs" songbook; we don't need images from that
+      let extractLang = extract.Lang ?? (getSettingValue('lang') as string);
+      let extractDb = await getDbFromJWPUB({
         issue: extract.IssueTagNumber,
-        langwritten: langFallback,
+        langwritten: extractLang,
         pub: symbol,
       });
-      extractLang = langFallback;
-    }
-
-    if (!extractDb) return [];
-
-    const extractItems = getDocumentMultimediaItems({
-      db: extractDb,
-      lang: extractLang,
-      mepsId: extract.RefMepsDocumentId,
-      ...(extract.RefBeginParagraphOrdinal
-        ? { BeginParagraphOrdinal: extract.RefBeginParagraphOrdinal }
-        : {}),
-      ...(extract.RefEndParagraphOrdinal
-        ? { EndParagraphOrdinal: extract.RefEndParagraphOrdinal }
-        : {}),
-    })
-      .map((extractItem) => {
-        return {
-          ...extractItem,
-          BeginParagraphOrdinal: extract.BeginParagraphOrdinal,
-          EndParagraphOrdinal: extract.EndParagraphOrdinal,
-        };
-      })
-      .map((extractItem) =>
-        addFullFilePathToMultimediaItem(extractItem, {
+      const langFallback = getSettingValue('langFallback') as string;
+      if (!extractDb && langFallback) {
+        extractDb = await getDbFromJWPUB({
           issue: extract.IssueTagNumber,
-          langwritten: extractLang,
+          langwritten: langFallback,
           pub: symbol,
-        }),
-      );
-    allExtractItems.push(...extractItems);
+        });
+        extractLang = langFallback;
+      }
+
+      if (!extractDb) return [];
+
+      const extractItems = getDocumentMultimediaItems({
+        db: extractDb,
+        lang: extractLang,
+        mepsId: extract.RefMepsDocumentId,
+        ...(extract.RefBeginParagraphOrdinal
+          ? { BeginParagraphOrdinal: extract.RefBeginParagraphOrdinal }
+          : {}),
+        ...(extract.RefEndParagraphOrdinal
+          ? { EndParagraphOrdinal: extract.RefEndParagraphOrdinal }
+          : {}),
+      })
+        .map((extractItem) => {
+          return {
+            ...extractItem,
+            BeginParagraphOrdinal: extract.BeginParagraphOrdinal,
+            EndParagraphOrdinal: extract.EndParagraphOrdinal,
+          };
+        })
+        .map((extractItem) =>
+          addFullFilePathToMultimediaItem(extractItem, {
+            issue: extract.IssueTagNumber,
+            langwritten: extractLang,
+            pub: symbol,
+          }),
+        );
+      allExtractItems.push(...extractItems);
+    }
+    return allExtractItems;
+  } catch (e: unknown) {
+    console.error(e);
+    return [];
   }
-  return allExtractItems;
 };
 
-const getWtIssue = async (monday: Date, weeksInPast: number) => {
-  const currentState = useCurrentStateStore();
-  const { getSettingValue } = currentState;
-  const issue = date.subtractFromDate(monday, {
-    days: weeksInPast * 7,
-  });
-  const issueString = date.formatDate(issue, 'YYYYMM') + '00';
-  if (!(getSettingValue('lang') as string)) {
-    console.error('No language selected');
+const getWtIssue = async (
+  monday: Date,
+  weeksInPast: number,
+  langwritten: string,
+) => {
+  try {
+    const issue = date.subtractFromDate(monday, {
+      days: weeksInPast * 7,
+    });
+    const issueString = date.formatDate(issue, 'YYYYMM') + '00';
+    if (!langwritten) throw new Error('No language selected');
+    const publication = {
+      issue: issueString,
+      langwritten,
+      pub: 'w',
+    };
+    const db = await getDbFromJWPUB(publication);
+    if (!db) throw new Error('No db file found: ' + issueString);
+    const datedTexts = executeQuery(
+      db,
+      'SELECT * FROM DatedText',
+    ) as DatedTextItem[];
+    const weekNr = datedTexts.findIndex((weekItem) => {
+      const mondayAsNumber = parseInt(date.formatDate(monday, 'YYYYMMDD'));
+      return weekItem.FirstDateOffset === mondayAsNumber;
+    });
+    if (weekNr === -1) {
+      throw new Error('No week found: ' + issueString);
+    }
+    const docId = (
+      executeQuery(
+        db,
+        `SELECT Document.DocumentId FROM Document WHERE Document.Class=40 LIMIT 1 OFFSET ${weekNr}`,
+      ) as { DocumentId: number }[]
+    )[0]?.DocumentId;
+    return { db, docId, issueString, publication, weekNr };
+  } catch (e: unknown) {
+    console.error(e);
     return {
       db: '',
       docId: -1,
-      issueString,
+      issueString: '',
       publication: {
         langwritten: '',
         pub: '',
@@ -420,33 +490,6 @@ const getWtIssue = async (monday: Date, weeksInPast: number) => {
       weekNr: -1,
     };
   }
-  const publication = {
-    issue: issueString,
-    langwritten: getSettingValue('lang') as string,
-    pub: 'w',
-  };
-  const db = await getDbFromJWPUB(publication);
-
-  if (!db) return { db: '', docId: -1, issueString, publication, weekNr: -1 };
-  const datedTexts = executeQuery(
-    db,
-    'SELECT * FROM DatedText',
-  ) as DatedTextItem[];
-  const weekNr = datedTexts.findIndex((weekItem) => {
-    const mondayAsNumber = parseInt(date.formatDate(monday, 'YYYYMMDD'));
-    return weekItem.FirstDateOffset === mondayAsNumber;
-  });
-  if (weekNr === -1) {
-    console.warn('No week found');
-    return { db: '', docId: -1, issueString, publication, weekNr };
-  }
-  const docId = (
-    executeQuery(
-      db,
-      `SELECT Document.DocumentId FROM Document WHERE Document.Class=40 LIMIT 1 OFFSET ${weekNr}`,
-    ) as { DocumentId: number }[]
-  )[0]?.DocumentId;
-  return { db, docId, issueString, publication, weekNr };
 };
 
 const dynamicMediaMapper = async (
@@ -531,38 +574,28 @@ const getWeMedia = async (lookupDate: Date) => {
   lookupDate = dateFromString(lookupDate.toISOString());
   try {
     const monday = getSpecificWeekday(lookupDate, 0);
-    let { db, docId, issueString, publication, weekNr } = await getWtIssue(
+
+    const getIssue = async (monday: Date, lang: string) => {
+      let result = await getWtIssue(monday, 8, lang);
+      if (result.db?.length === 0) {
+        result = await getWtIssue(monday, 10, lang);
+      }
+      return result;
+    };
+
+    let { db, docId, issueString, publication, weekNr } = await getIssue(
       monday,
-      8,
+      getSettingValue('lang') as string,
     );
-    if (db?.length === 0)
-      ({ db, docId, issueString, publication, weekNr } = await getWtIssue(
+    if (db?.length === 0) {
+      ({ db, docId, issueString, publication, weekNr } = await getIssue(
         monday,
-        10,
+        getSettingValue('langFallback') as string,
       ));
-
-    if (!db || docId < 0) {
-      createTemporaryNotification({
-        caption: 'weMeeting',
-        group: 'error.downloadMedia.weMeeting',
-        message: 'error.downloadMedia',
-        type: 'negative',
-      });
-      console.error('No suitable db or docid found');
-      // return [];
-      throw new Error('No db found');
     }
-    // const magazine = executeQuery(
-    //   db,
-    //   'SELECT Title FROM PublicationIssueProperty LIMIT 1'
-    // )[0] as PublicationIssuePropertyItem;
-    // const article = executeQuery(
-    //   db,
-    //   `SELECT Title FROM Document WHERE DocumentId = ${docId}`
-    // )[0] as DocumentItem;
-    // const displayTitle = `${magazine.Title} - ${article.Title}`;
-    // console.log('displayTitle', displayTitle);
-
+    if (!db || docId < 0) {
+      throw new Error('error.downloadMedia.weMeeting');
+    }
     const videos = executeQuery(
       db,
       `SELECT DocumentMultimedia.MultimediaId, DocumentMultimedia.DocumentId, MepsDocumentId, CategoryType, KeySymbol, Track, IssueTagNumber, MimeType, BeginParagraphOrdinal, TargetParagraphNumberLabel
@@ -674,13 +707,8 @@ const getWeMedia = async (lookupDate: Date) => {
         .sort((a, b) => a.BeginParagraphOrdinal - b.BeginParagraphOrdinal)
         .map((item) => {
           const match = item.Link.match(/\/(.*)\//);
-          let langOverride = '';
-          if (match) {
-            langOverride = match.pop()?.split(':')[0] ?? '';
-          }
-          if (langOverride === (getSettingValue('lang') as string))
-            langOverride = '';
-          return langOverride;
+          const langOverride = match ? match[1].split(':')[0] : '';
+          return langOverride === getSettingValue('lang') ? '' : langOverride;
         });
     } catch (e: unknown) {
       console.error(e);
@@ -707,12 +735,12 @@ const getWeMedia = async (lookupDate: Date) => {
           item.Track === media.Track &&
           item.IssueTagNumber === media.IssueTagNumber,
       );
-      if (multimediaMepsLangItem?.MepsLanguageIndex) {
+      if (multimediaMepsLangItem?.MepsLanguageIndex !== undefined) {
         const mepsLang = mepslangs[multimediaMepsLangItem.MepsLanguageIndex];
         if (mepsLang) media.AlternativeLanguage = mepsLang;
       }
       const videoMarkers = getMediaVideoMarkers(
-        { db, docId },
+        { db, docId } as MultimediaItemsFetcher,
         media.MultimediaId,
       );
       if (videoMarkers) media.VideoMarkers = videoMarkers;
@@ -737,7 +765,10 @@ const getWeMedia = async (lookupDate: Date) => {
     ] = dynamicMediaForDay;
     LocalStorage.set('dynamicMedia', dynamicMedia);
 
-    return dynamicMediaForDay;
+    return {
+      error: false,
+      media: dynamicMediaForDay,
+    };
   } catch (e) {
     console.error('getWeMedia', e);
     const dynamicMedia: Record<
@@ -748,7 +779,10 @@ const getWeMedia = async (lookupDate: Date) => {
       dynamicMedia[currentCongregation.value]?.[
         date.formatDate(lookupDate, 'YYYYMMDD')
       ] ?? [];
-    return returnVal;
+    return {
+      error: true,
+      media: returnVal,
+    };
   }
 };
 
@@ -768,66 +802,46 @@ const getMwMedia = async (lookupDate: Date) => {
   try {
     // if not monday, get the previous monday
     const monday = getSpecificWeekday(lookupDate, 0);
-
     const issue = date.subtractFromDate(monday, {
       months: (monday.getMonth() + 1) % 2 === 0 ? 1 : 0,
     });
     const issueString = date.formatDate(issue, 'YYYYMM') + '00';
-    if (!(getSettingValue('lang') as string))
-      throw new Error('No language selected');
-    const publication = {
-      issue: issueString,
-      langwritten: getSettingValue('lang') as string,
-      pub: 'mwb',
+    let publication = {} as PublicationFetcher;
+    const getMwbIssue = async (langwritten: string) => {
+      if (!langwritten) return '';
+      publication = {
+        issue: issueString,
+        langwritten,
+        pub: 'mwb',
+      };
+      return await getDbFromJWPUB(publication);
     };
-    const db = await getDbFromJWPUB(publication);
+
+    let db = await getMwbIssue(getSettingValue('lang') as string);
     if (!db) {
-      createTemporaryNotification({
-        caption: 'mwMeeting',
-        group: 'error.downloadMedia.mwMeeting',
-        message: 'error.downloadMedia',
-        type: 'negative',
-      });
+      db = await getMwbIssue(getSettingValue('langFallback') as string);
+    }
+    if (!db) {
       throw new Error('No db found');
     }
-    const docId = (
-      executeQuery(
-        db,
-        `SELECT DocumentId FROM DatedText WHERE FirstDateOffset = ${date.formatDate(
-          monday,
-          'YYYYMMDD',
-        )}`,
-      ) as { DocumentId: number }[]
-    )[0]?.DocumentId;
+    const docId =
+      (
+        executeQuery(
+          db,
+          `SELECT DocumentId FROM DatedText WHERE FirstDateOffset = ${date.formatDate(
+            monday,
+            'YYYYMMDD',
+          )}`,
+        ) as { DocumentId: number }[]
+      )[0]?.DocumentId ?? -1;
 
-    if (!docId)
+    if (docId < 0)
       throw new Error('No document id found for ' + monday + ' ' + issueString);
 
-    // const treasures = executeQuery(
-    //   db,
-    //   'SELECT FeatureTitle FROM Document WHERE Class = 21'
-    // )[0] as DocumentItem;
-    // const apply = executeQuery(
-    //   db,
-    //   'SELECT FeatureTitle FROM Document WHERE Class = 94'
-    // )[0] as DocumentItem;
-    // const living = executeQuery(
-    //   db,
-    //   'SELECT FeatureTitle FROM Document WHERE Class = 10 ORDER BY FeatureTitle'
-    // ) as DocumentItem[];
-    // let livingTitle = living[0]?.FeatureTitle;
-    // if (living.length > 1) {
-    //   livingTitle = living[Math.floor(living.length / 2)]?.FeatureTitle;
-    // }
-
-    // look into maybe extracting titles from something like this: https://wol.jw.org/wol/d/r1/lp-e/202023001
-
-    // if (treasures?.FeatureTitle && apply?.FeatureTitle && livingTitle) {
-    // }
-    const mms = await getDocumentMultimediaItems({ db, docId }).map(
+    const mms = getDocumentMultimediaItems({ db, docId }).map(
       (multimediaItem) => {
         const videoMarkers = getMediaVideoMarkers(
-          { db, docId },
+          { db, docId } as MultimediaItemsFetcher,
           multimediaItem.MultimediaId,
         );
         if (videoMarkers) multimediaItem.VideoMarkers = videoMarkers;
@@ -858,10 +872,12 @@ const getMwMedia = async (lookupDate: Date) => {
         if (mepsLang) media.AlternativeLanguage = mepsLang;
       }
     }
-
+    console.log('multimediaMepsLangs', multimediaMepsLangs);
     await processMissingMediaInfo(allMedia);
+    console.log('allMedia', allMedia);
 
     const dynamicMediaForDay = await dynamicMediaMapper(allMedia, lookupDate);
+    console.log('dynamicMediaForDay', dynamicMediaForDay);
 
     const dynamicMedia: Record<
       string,
@@ -878,23 +894,21 @@ const getMwMedia = async (lookupDate: Date) => {
     ] = dynamicMediaForDay;
 
     LocalStorage.set('dynamicMedia', dynamicMedia);
-    return dynamicMediaForDay;
+    return {
+      error: false,
+      media: dynamicMediaForDay,
+    };
   } catch (e) {
     console.error('getMwMedia', e);
     const dynamicMedia: Record<
       string,
       Record<string, DynamicMediaObject[]>
     > = LocalStorage.getItem('dynamicMedia') || {};
-    // return (
-    // dynamicMedia[currentCongregation.value][
-    // date.formatDate(lookupDate, 'YYYYMMDD')
-    // ] || ([] as DynamicMediaObject[])
-    // );
     const returnVal =
       dynamicMedia[currentCongregation.value]?.[
         date.formatDate(lookupDate, 'YYYYMMDD')
       ] ?? [];
-    return returnVal;
+    return { error: true, media: returnVal };
   }
 };
 
@@ -906,28 +920,46 @@ async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
       m.KeySymbol && (!m.Label || !m.FilePath || !fs.existsSync(m.FilePath)),
   )) {
     if (!media.KeySymbol) {
-      console.log('MISSING media.KeySymbol', media);
       continue;
     }
-    const langwritten =
-      media.AlternativeLanguage ?? (getSettingValue('lang') as string);
-    const publicationFetcher = {
-      fileformat: media.MimeType?.includes('audio') ? 'MP3' : 'MP4',
-      issue: media.IssueTagNumber,
-      langwritten,
-      pub: media.KeySymbol,
-      ...(typeof media.Track === 'number' &&
-        media.Track > 0 && { track: media.Track }),
-    };
-    if (!media.FilePath || !fs.existsSync(media.FilePath)) {
-      media.FilePath = await downloadMissingMedia(publicationFetcher);
+    const langsWritten = [
+      media.AlternativeLanguage,
+      getSettingValue('lang') as string,
+      getSettingValue('langFallback') as string,
+    ];
+    for (const langwritten of langsWritten) {
+      if (!langwritten) {
+        continue;
+      }
+      const publicationFetcher = {
+        fileformat: media.MimeType?.includes('audio') ? 'MP3' : 'MP4',
+        issue: media.IssueTagNumber,
+        langwritten,
+        pub: media.KeySymbol,
+        ...(typeof media.Track === 'number' &&
+          media.Track > 0 && { track: media.Track }),
+      };
+      if (!media.FilePath || !fs.existsSync(media.FilePath)) {
+        media.FilePath = await downloadMissingMedia(publicationFetcher);
+      }
+      if (!media.Label) {
+        media.Label =
+          media.Label ||
+          media.Caption ||
+          (await getJwMediaInfo(publicationFetcher)).title;
+      }
     }
-    if (!media.Label) {
-      media.Label =
-        media.Label ||
-        media.Caption ||
-        (await getJwMediaInfo(publicationFetcher)).title;
-    }
+    // const publicationFetcher = {
+    //   fileformat: media.MimeType?.includes('audio') ? 'MP3' : 'MP4',
+    //   issue: media.IssueTagNumber,
+    //   langwritten,
+    //   pub: media.KeySymbol,
+    //   ...(typeof media.Track === 'number' &&
+    //     media.Track > 0 && { track: media.Track }),
+    // };
+    // if (!media.FilePath || !fs.existsSync(media.FilePath)) {
+    //   media.FilePath = await downloadMissingMedia(publicationFetcher);
+    // }
   }
 }
 
@@ -954,11 +986,6 @@ const getPubMediaLinks = async (publication: PublicationFetcher) => {
   };
   const response = await get(urlWithParamsToString(url, params));
   if (!response) {
-    // createTemporaryNotification({
-    //   message: 'error.pubNotFound',
-    //   caption: [publication.pub, publication.langwritten, publication.issue, publication.track, publication.fileformat].filter(Boolean).join('_'),
-    //   type: 'negative',
-    // })
     downloadProgress.value[
       [
         publication.pub,
@@ -1101,10 +1128,8 @@ const getJwMediaInfo = async (publication: PublicationFetcher) => {
     if (publication.fileformat?.includes('MP4')) url += '_VIDEO';
     else if (publication.fileformat?.includes('MP3')) url += '_AUDIO';
     const responseObject = await get(url);
-    if (!responseObject.media || responseObject.media.length === 0) {
-      console.warn('No thumbnail found:' + url);
-      return { thumbnail: '', title: '' };
-    }
+    if (!responseObject.media || responseObject.media.length === 0)
+      throw new Error('No thumbnail found:' + url);
     return {
       thumbnail: getBestImageUrl(responseObject.media[0].images),
       title: responseObject.media[0].title,
@@ -1135,14 +1160,12 @@ const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
     };
     return;
   }
-  console.log('publicationInfo.files', publicationInfo.files);
   const mediaLinks: MediaLink[] = publicationInfo.files[
     publication.langwritten
   ][publication.fileformat].filter(
     (mediaLink) =>
       !publication.maxTrack || mediaLink.track < publication.maxTrack,
   );
-  console.log('mediaLinks', mediaLinks);
 
   const dir = getPublicationDirectory(publication, true);
   const filteredMediaItemLinks = [] as MediaLink[];
@@ -1155,8 +1178,6 @@ const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
       if (bestItem) filteredMediaItemLinks.push(bestItem);
     }
   }
-  console.log('filteredMediaItemLinks', filteredMediaItemLinks);
-
   await addToDownloadsWithLimit(filteredMediaItemLinks, dir);
 };
 
@@ -1165,14 +1186,6 @@ const downloadBackgroundMusic = () => {
     useCurrentStateStore(),
   );
   if (!currentSongbook.value || !currentSettings.value?.lang) return;
-  console.log('Downloading background music', {
-    fileformat: currentSongbook.value.fileformat,
-    langwritten: currentSongbook.value.signLanguage
-      ? currentSettings.value.lang
-      : 'E',
-    maxTrack: MAX_SONGS,
-    pub: currentSongbook.value.pub,
-  });
   downloadPubMediaFiles({
     fileformat: currentSongbook.value.fileformat,
     langwritten: currentSongbook.value.signLanguage
@@ -1192,7 +1205,6 @@ async function addToDownloadsWithLimit(
   const results = [];
 
   for (const mediaLink of mediaLinks) {
-    console.log('mediaLink', mediaLink);
     const downloadPromise = downloadFileIfNeeded({
       dir,
       size: mediaLink.filesize,
@@ -1201,7 +1213,6 @@ async function addToDownloadsWithLimit(
     if (!(downloadPromise instanceof Promise)) continue;
 
     queue.push(downloadPromise);
-
     // When the queue is at the limit, wait for one to finish
     if (queue.length >= limit) {
       const finishedPromise: Promise<DownloadedFile> = Promise.race(
@@ -1212,7 +1223,6 @@ async function addToDownloadsWithLimit(
       queue.splice(queue.indexOf(finishedPromise), 1);
     }
   }
-
   // Wait for the remaining promises in the queue
   results.push(...(await Promise.all(queue)));
 

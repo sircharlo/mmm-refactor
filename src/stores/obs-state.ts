@@ -31,7 +31,8 @@ export const useObsStateStore = defineStore('obs-state', {
     return {
       currentScene: '',
       currentSceneUuid: '',
-      obsConnected: false,
+      obsConnectionState: 'notConnected',
+      obsMessage: '',
       scenes: [] as JsonObject[],
     };
   },
