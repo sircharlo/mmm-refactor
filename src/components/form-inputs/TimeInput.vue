@@ -1,33 +1,10 @@
 <template>
-  <q-input
-    :rules="getRules(rules)"
-    class="q-pb-none"
-    dense
-    filled
-    mask="time"
-    readonly
-    v-model="localValue"
-    v-bind="{ label: label || undefined }"
-  >
-    <q-popup-proxy
-      breakpoint="1000"
-      transition-hide="scale"
-      transition-show="scale"
-    >
-      <q-time
-        :options="getTimeOptions(options)"
-        class="non-selectable"
-        format24h
-        v-model="localValue"
-      >
+  <q-input :rules="getRules(rules)" class="q-pb-none" dense filled mask="time" readonly v-model="localValue"
+    v-bind="{ label: label || undefined }">
+    <q-popup-proxy breakpoint="1000" transition-hide="scale" transition-show="scale">
+      <q-time :options="getTimeOptions(options)" class="non-selectable" format24h v-model="localValue">
         <div class="row items-center justify-end">
-          <q-btn
-            @click="clearTime"
-            color="negative"
-            flat
-            icon="mdi-close"
-            v-close-popup
-          />
+          <q-btn @click="clearTime" color="negative" flat icon="mdi-close" v-close-popup />
           <q-btn color="positive" flat icon="mdi-check" v-close-popup />
         </div>
       </q-time>
@@ -40,10 +17,10 @@ import { getRules, getTimeOptions } from 'src/helpers/settings';
 import { ref, watch } from 'vue';
 
 const props = defineProps<{
-  label?: string;
-  modelValue: string;
-  options: string[] | undefined;
-  rules: string[] | undefined;
+  label?: string,
+  modelValue: string,
+  options: string[] | undefined,
+  rules?: string[] | undefined,
 }>();
 
 const emit = defineEmits(['update:modelValue']);
