@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@electron/remote": "^2.1.2",
-    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@formkit/drag-and-drop": "^0.0.38",
     "@panzoom/panzoom": "^4.5.1",
     "@quasar/cli": "^2.4.0",

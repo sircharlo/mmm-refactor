@@ -8,9 +8,6 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
-// import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill'
-// import rollupNodePolyFill from 'rollup-plugin-polyfill-node'
-
 const { configure } = require('quasar/wrappers');
 const path = require('path');
 // const inject  = require('@rollup/plugin-inject')
@@ -53,16 +50,6 @@ module.exports = configure(function (/* ctx */) {
         if (!viteConf.optimizeDeps.esbuildOptions.define)
           viteConf.optimizeDeps.esbuildOptions.define = {};
         viteConf.optimizeDeps.esbuildOptions.define.global = 'window';
-
-        // if (!viteConf.build) viteConf.build = {};
-        // if (!viteConf.build.rollupOptions) viteConf.build.rollupOptions = {};
-        // viteConf.build.rollupOptions.external = [inject({ Buffer: ['buffer/', 'Buffer'] }) ]
-
-        // if (!viteConf.optimizeDeps.esbuildOptions.plugins)
-        //   viteConf.optimizeDeps.esbuildOptions.plugins = [];
-        // viteConf.optimizeDeps.esbuildOptions.plugins.push(
-        //   nodePolyfills({ protocolImports: true, globals: {  Buffer: true, process: true } })
-        // );
       },
       // vueRouterBase,
       // vueDevtools,
@@ -79,11 +66,6 @@ module.exports = configure(function (/* ctx */) {
       // polyfillModulePreload: true,
       // distDir
 
-      // extendViteConf (viteConf) {},
-      // chainWebpack(chain) {
-      //   const nodePolyfillWebpackPlugin = require('node-polyfill-webpack-plugin');
-      //   chain.plugin('node-polyfill').use(nodePolyfillWebpackPlugin);
-      // },
       // extendViteConf(viteConf) {
       //   // do something with viteConf... change it in-place
       //   viteConf.resolve = {
@@ -94,22 +76,6 @@ module.exports = configure(function (/* ctx */) {
       //     },
       //   };
       // },
-      // chainWebpack (chain) {
-      //   const nodePolyfillWebpackPlugin = require('node-polyfill-webpack-plugin')
-      //   chain.plugin('node-polyfill').use(nodePolyfillWebpackPlugin)
-      // },
-      // extendWebpack(cfg) {
-      //   cfg.module.rules.push({
-      //     test: /(fs-extra|graceful)/,
-      //     loader: 'null-loader'
-      //     })
-      //   cfg.resolve.fallback = {
-      //     fs: require.resolve('rollup-plugin-node-builtins'),
-      //     'fs-extra': require.resolve('fs-extra'),
-      //   };
-      //   cfg.target = 'electron-main';
-      // },
-
       extendWebpack(cfg, {}) {
         cfg.externals = ['better-sqlite3'];
       },
@@ -123,14 +89,6 @@ module.exports = configure(function (/* ctx */) {
         [
           '@intlify/vite-plugin-vue-i18n',
           {
-            // if you want to use Vue I18n Legacy API, you need to set `compositionOnly: false`
-            // compositionOnly: false,
-
-            // if you want to use named tokens in your Vue I18n messages, such as 'Hello {name}',
-            // you need to set `runtimeOnly: false`
-            // runtimeOnly: false,
-
-            // you need to set i18n resource including paths !
             include: path.resolve(__dirname, './src/i18n/**'),
           },
         ],
@@ -147,28 +105,6 @@ module.exports = configure(function (/* ctx */) {
           { server: false },
         ],
       ],
-
-      // viteVuePluginOptions: {
-      //   //You may have to add or uncomment this option.
-      //   template: {
-      //     compilerOptions: {
-      //       isCustomElement: (tag) =>
-      //         tag.startsWith('DateInput'.toLowerCase()) ||
-      //         tag.startsWith('PathInput'.toLowerCase()) ||
-      //         tag.startsWith('TimeInput'.toLowerCase()) ||
-      //         tag.startsWith('ToggleInput'.toLowerCase()) ||
-      //         tag.startsWith('SelectInput'.toLowerCase()) ||
-      //         tag.startsWith('SliderInput'.toLowerCase()) ||
-      //         tag.startsWith('TextInput'.toLowerCase()) ||
-      //         tag.startsWith('MediaDisplayButton'.toLowerCase()) ||
-      //         tag.startsWith('DownloadStatus'.toLowerCase()) ||
-      //         tag.startsWith('MusicButton'.toLowerCase()) ||
-      //         tag.startsWith('SongPicker'.toLowerCase()) ||
-      //         tag.startsWith('ScenePicker'.toLowerCase()),
-      //     },
-      //   },
-      // },
-
       vueRouterMode: 'hash', // available values: 'hash', 'history'
     },
 
@@ -254,81 +190,6 @@ module.exports = configure(function (/* ctx */) {
 
       inspectPort: 5858,
 
-      /*
-
-      const ICONS_DIR = 'build/icons/'
-
-const windowsOS = {
-  win: {
-    icon: ICONS_DIR + 'icon.ico',
-    target: [
-      {
-        target: 'nsis',
-        arch: ['x64', 'ia32'],
-      },
-    ],
-    publish: ['github'],
-  },
-
-  nsis: {
-    oneClick: false,
-    artifactName: 'meeting-media-manager-${version}-${arch}.${ext}',
-  },
-}
-
-const linuxOS = {
-  linux: {
-    icon: ICONS_DIR,
-    target: 'AppImage',
-    category: 'Utility',
-    publish: ['github'],
-  },
-}
-
-const macOS = {
-  mac: {
-    icon: ICONS_DIR + 'icon.icns',
-    target: {
-      target: 'dmg',
-      arch: ['universal'],
-    },
-    publish: ['github'],
-  },
-}
-
-module.exports = {
-  productName: 'Meeting Media Manager',
-  appId: 'sircharlo.meeting-media-manager',
-  artifactName: 'meeting-media-manager-${version}.${ext}',
-  buildDependenciesFromSource: true,
-  generateUpdatesFilesForAllChannels: true,
-  directories: {
-    output: 'build',
-  },
-  // default files: https://www.electron.build/configuration/contents
-  files: [
-    'package.json',
-    {
-      from: 'dist/main/',
-      to: 'dist/main/',
-    },
-    {
-      from: 'dist/renderer/',
-      to: 'dist/renderer/',
-    },
-  ],
-  extraResources: [
-    {
-      from: 'src/extraResources/',
-      to: '',
-    },
-  ],
-  ...windowsOS,
-  ...linuxOS,
-  ...macOS,
-}
-      */
-
       packager: {
         // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
         // OS X / Mac App Store
@@ -343,17 +204,16 @@ module.exports = {
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
-      // 'ionicons-v4',
-      'mdi-v7',
-      // 'bootstrap-icons',
       'fontawesome-v6',
+      'material-icons', // optional, you are not bound to it
+      'mdi-v7',
+      // 'ionicons-v4',
+      // 'bootstrap-icons',
       // 'eva-icons',
       // 'themify',
       // 'line-awesome',
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
-
-      'roboto-font', // optional, you are not bound to it
-      'material-icons', // optional, you are not bound to it
+      // 'roboto-font', // optional, you are not bound to it
     ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework

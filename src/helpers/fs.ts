@@ -174,9 +174,7 @@ const getSubtitlesUrl = async (multimediaItem: MultimediaItem) => {
     };
     const { subtitles } = await getJwMediaInfo(subtitleFetcher);
     if (!subtitles) return '';
-    const subtitlesFilename = path.basename(
-      multimediaItem.FilePath.split('.')[0] + '.vtt',
-    );
+    const subtitlesFilename = path.basename(subtitles);
     const subDirectory = getPublicationDirectory(subtitleFetcher);
     await downloadFileIfNeeded({
       dir: subDirectory,

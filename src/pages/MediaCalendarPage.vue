@@ -288,6 +288,7 @@
                     @click="
                       mediaPlayer.url = media.fileUrl;
                       mediaPlayer.uniqueId = media.uniqueId;
+                      mediaPlayer.subtitlesUrl = media.subtitlesUrl ?? '';
                     "
                     color="primary"
                     icon="mdi-play"
@@ -317,6 +318,7 @@
                             mediaPlayer.action = 'play';
                             mediaPlayer.url = media.fileUrl;
                             mediaPlayer.uniqueId = media.uniqueId;
+                            mediaPlayer.subtitlesUrl = media.subtitlesUrl ?? '';
                           "
                           clickable
                         >
@@ -361,6 +363,7 @@
                             mediaPlayer.action = 'play';
                             mediaPlayer.url = media.fileUrl;
                             mediaPlayer.uniqueId = media.uniqueId;
+                            mediaPlayer.subtitlesUrl = media.subtitlesUrl ?? '';
                           "
                           clickable
                           v-for="marker in media.markers"
@@ -387,7 +390,9 @@
                     color="warning"
                     icon="mdi-pause"
                     round
-                    v-else-if="mediaPlayer.action === 'play'"
+                    v-else-if="
+                      mediaPlayer.action === 'play' || !mediaPlayer.action
+                    "
                   />
                   <!-- </transition> -->
                 </div>
