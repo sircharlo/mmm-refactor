@@ -1,5 +1,10 @@
 <template>
-  <q-toggle v-model="localValue" />
+  <q-toggle
+    checked-icon="check"
+    color="green"
+    unchecked-icon="clear"
+    v-model="localValue"
+  />
 </template>
 
 <script setup lang="ts">

@@ -10,56 +10,12 @@
         </q-toolbar-title>
         <template v-if="route.fullPath === '/media-calendar'">
           <q-btn
-            :disable="mediaPlaying"
-            :label="selectedDate"
-            class="q-ml-sm"
-            color="secondary"
-            icon="mdi-calendar"
-            rounded
-          >
-            <q-tooltip v-if="!datePickerActive">{{
-              $t('select-a-date')
-            }}</q-tooltip>
-            <q-popup-proxy breakpoint="1000" v-model="datePickerActive">
-              <q-date
-                :events="getEventDates()"
-                :navigation-max-year-month="maxDate()"
-                :navigation-min-year-month="minDate()"
-                :options="dateOptions"
-                class="non-selectable"
-                event-color="primary"
-                landscape
-                v-model="selectedDate"
-              >
-                <div class="row items-center justify-end q-gutter-sm">
-                  <q-btn
-                    color="primary"
-                    icon="mdi-check"
-                    outline
-                    v-close-popup
-                  />
-                </div>
-              </q-date>
-            </q-popup-proxy>
-          </q-btn>
-          <q-btn
-            :disable="mediaPlaying"
-            @click="resetSort"
-            class="q-ml-sm"
-            color="warning"
-            icon="mdi-sort-numeric-variant"
-            rounded
-            text-color="black"
-            v-if="mediaSortForDay"
-          >
-            <q-tooltip>{{ $t('reset-sort-order') }}</q-tooltip>
-          </q-btn>
-          <q-btn
             class="q-ml-sm"
             color="purple-6"
             icon="mdi-movie-plus"
             rounded
             text-color="white"
+            v-if="selectedDate"
           >
             <q-tooltip v-if="!importMediaMenuActive">{{
               $t('import-media')
@@ -103,6 +59,51 @@
               </q-list>
             </q-menu>
           </q-btn>
+          <q-btn
+            :disable="mediaPlaying"
+            @click="resetSort"
+            class="q-ml-sm"
+            color="warning"
+            icon="mdi-sort-numeric-variant"
+            rounded
+            text-color="black"
+            v-if="mediaSortForDay && selectedDate"
+          >
+            <q-tooltip>{{ $t('reset-sort-order') }}</q-tooltip>
+          </q-btn>
+          <q-btn
+            :disable="mediaPlaying"
+            :label="selectedDate"
+            class="q-ml-sm"
+            color="secondary"
+            icon="mdi-calendar"
+            rounded
+          >
+            <q-tooltip v-if="!datePickerActive">{{
+              $t('select-a-date')
+            }}</q-tooltip>
+            <q-popup-proxy breakpoint="1000" v-model="datePickerActive">
+              <q-date
+                :events="getEventDates()"
+                :navigation-max-year-month="maxDate()"
+                :navigation-min-year-month="minDate()"
+                :options="dateOptions"
+                class="non-selectable"
+                event-color="primary"
+                landscape
+                v-model="selectedDate"
+              >
+                <div class="row items-center justify-end q-gutter-sm">
+                  <q-btn
+                    color="primary"
+                    icon="mdi-check"
+                    outline
+                    v-close-popup
+                  />
+                </div>
+              </q-date>
+            </q-popup-proxy>
+          </q-btn>
           <q-dialog @dragenter="localUpload = false" v-model="localUpload">
             <q-card>
               <q-card-section horizontal>
@@ -123,14 +124,27 @@
               </q-card-section>
               <q-card-actions align="right">
                 <q-btn
+                  :label="$t('got-it')"
                   color="primary"
                   flat
-                  label="$t('got-it')"
                   v-close-popup
                 />
               </q-card-actions>
             </q-card>
           </q-dialog>
+        </template>
+        <template v-else-if="route.fullPath === '/settings'">
+          <!-- <q-btn color="negative" v-if="invalidSettings()"> -->
+          <q-toggle
+            :label="$t('only-show-settings-that-are-not-valid')"
+            color="red"
+            icon="clear"
+            left-label
+            v-if="invalidSettings()"
+            v-model="onlyShowInvalid"
+          >
+          </q-toggle>
+          <!-- </q-badge> -->
         </template>
       </q-toolbar>
     </q-header>
@@ -272,6 +286,7 @@ const {
   lookupPeriod,
   mediaPlayer,
   mediaPlaying,
+  onlyShowInvalid,
   selectedDate,
 } = storeToRefs(currentState);
 
@@ -305,13 +320,13 @@ const router = useRouter();
 const miniState = ref(true);
 
 watch(currentCongregation, (newCongregation) => {
+  console.log('currentCongregation changed', currentCongregation.value);
   if (!newCongregation) {
     if (route.fullPath !== '/congregation-selector') {
       router.push({ path: '/congregation-selector' });
       return;
     }
   } else {
-    console.log('currentCongregation changed', currentCongregation.value);
     downloadProgress.value = {};
     lookupPeriod.value = getLookupPeriod();
     downloadBackgroundMusic();

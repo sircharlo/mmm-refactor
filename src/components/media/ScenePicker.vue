@@ -1,6 +1,6 @@
 <template>
   <template v-if="obsConnectionState && nonMediaScenes.length > 1">
-    <q-btn flat icon="mdi-lectern" size="sm">
+    <q-btn class="q-ml-sm" flat icon="mdi-lectern" rounded size="sm">
       <!-- :flat="!disabled"
     :outline="disabled"
     :disable="disabled" -->

@@ -15,7 +15,7 @@ import { obsConnect } from 'src/helpers/obs';
 import { localeOptions } from 'src/i18n';
 
 const requiredRule: ValidationRule = (val: string) =>
-  (val && val.length > 0) || 'required';
+  (val && val.length > 0) || '';
 
 const coTuesdays = (lookupDate: string) => {
   if (!lookupDate) return false;

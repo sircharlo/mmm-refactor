@@ -1,13 +1,27 @@
 <template>
   <q-page @dragenter="dropActive" @dragover="dropActive" padding>
     <canvas ref="canvas" style="display: none"></canvas>
-
-    <q-list class="shadow-2 rounded-borders" ref="mediaList">
+    <q-banner
+      class="bg-orange-9 text-white"
+      inline-actions
+      rounded
+      v-if="!selectedDate"
+    >
+      <template v-slot:avatar>
+        <q-icon name="mdi-exclamation-thick" />
+      </template>
+      {{ $t('noDateSelected') }}
+    </q-banner>
+    <q-list
+      class="shadow-2 rounded-borders"
+      ref="mediaList"
+      v-else-if="selectedDate && currentCongregation"
+    >
       <q-banner
-        class="bg-orange text-white"
+        class="bg-orange-9 text-white"
         inline-actions
         rounded
-        v-if="sortableMediaItems.length === 0"
+        v-if="sortableMediaItems.length === 0 && !selectedDateObject.loading"
       >
         <template v-slot:avatar>
           <q-icon name="mdi-exclamation-thick" />
@@ -66,9 +80,11 @@
               >
                 <q-icon class="q-mr-xs" color="white" name="mdi-play" />
                 {{
-                  ((customDurations[currentCongregation][selectedDate][
-                    media.uniqueId
-                  ] &&
+                  ((customDurations[currentCongregation] &&
+                    customDurations[currentCongregation][selectedDate] &&
+                    customDurations[currentCongregation][selectedDate][
+                      media.uniqueId
+                    ] &&
                     (customDurations[currentCongregation][selectedDate][
                       media.uniqueId
                     ].min > 0 ||
@@ -315,6 +331,14 @@
                             if (
                               !customDurations[currentCongregation][
                                 selectedDate
+                              ]
+                            )
+                              customDurations[currentCongregation][
+                                selectedDate
+                              ] = {};
+                            if (
+                              !customDurations[currentCongregation][
+                                selectedDate
                               ][media.uniqueId]
                             )
                               customDurations[currentCongregation][
@@ -431,6 +455,7 @@
         </transition>
       </template>
       <q-inner-loading
+        :label="$t('please-wait-downloading-media-for-this-day')"
         :showing="!selectedDateObject || selectedDateObject?.loading"
       />
     </q-list>

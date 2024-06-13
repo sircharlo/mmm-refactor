@@ -166,7 +166,6 @@
             :label="$t('continue')"
             @click="
               fetchMedia();
-              downloadBackgroundMusic();
               step++;
             "
             color="primary"
@@ -190,6 +189,7 @@
             :label="$t('yes')"
             @click="
               usingAtKh = true;
+              downloadBackgroundMusic();
               step = 100;
             "
             color="primary"
@@ -455,7 +455,6 @@
                 :label="$t('obsPassword')"
                 v-model="currentSettings.obsPassword"
               />
-              <!-- TODO: test if port and password are valid -->
               <q-stepper-navigation>
                 <q-btn
                   :disable="

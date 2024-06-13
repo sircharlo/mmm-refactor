@@ -163,5 +163,7 @@
   "yes": "Yes",
   "zoom-in": "Zoom in",
   "zoom-out": "Zoom out",
-  "download-status": "Download status"
+  "download-status": "Download status",
+  "please-wait-downloading-media-for-this-day": "Please wait, downloading media for this day...",
+  "noDateSelected": "No date is currently selected. Please select a date before continuing."
 }

@@ -148,6 +148,7 @@ export const useCurrentStateStore = defineStore('current-state', {
         x: 0,
         y: 0,
       },
+      onlyShowInvalid: false,
       selectedDate: date.formatDate(new Date(), 'YYYY/MM/DD') as string,
     };
   },

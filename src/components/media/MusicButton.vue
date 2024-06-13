@@ -5,8 +5,10 @@
     :label="musicPlaying ? musicRemainingTime : ''"
     :outline="disabled"
     @click="musicPopup = false"
+    class="q-ml-sm"
     icon="mdi-music"
     no-caps
+    rounded
     v-if="currentSettings?.enableMusicButton"
   >
     <q-tooltip v-if="!disabled && !musicPopup">

@@ -86,12 +86,7 @@ const downloadFileIfNeeded = async ({
   return downloads.value[url];
 };
 
-const downloadFile = async ({
-  dir,
-  filename,
-  url,
-}: // notify,
-FileDownloader) => {
+const downloadFile = async ({ dir, filename, url }: FileDownloader) => {
   if (!filename) filename = path.basename(url);
   filename = sanitize(filename);
   const { downloadProgress } = storeToRefs(useCurrentStateStore());
@@ -591,7 +586,7 @@ const getWeMedia = async (lookupDate: Date) => {
       ));
     }
     if (!db || docId < 0) {
-      throw new Error('error.downloadMedia.weMeeting');
+      throw new Error('error.downloadMedia');
     }
     const videos = executeQuery(
       db,
@@ -1165,7 +1160,7 @@ const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
       if (bestItem) filteredMediaItemLinks.push(bestItem);
     }
   }
-  await addToDownloadsWithLimit(filteredMediaItemLinks, dir);
+  addToDownloadsWithLimit(filteredMediaItemLinks, dir);
 };
 
 const downloadBackgroundMusic = () => {
@@ -1186,7 +1181,7 @@ const downloadBackgroundMusic = () => {
 async function addToDownloadsWithLimit(
   mediaLinks: MediaLink[],
   dir: string,
-  limit = 10,
+  limit = 3,
 ) {
   const queue = [];
   const results = [];

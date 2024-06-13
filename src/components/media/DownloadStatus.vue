@@ -10,7 +10,7 @@
     "
     flat
     push
-    round
+    rounded
   >
     <template v-slot:loading>
       <q-spinner-pie />

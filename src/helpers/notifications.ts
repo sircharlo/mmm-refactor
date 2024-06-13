@@ -9,6 +9,13 @@ const createTemporaryNotification = ({
   type,
 }: QNotifyCreateOptions) => {
   return Notify.create({
+    actions: [
+      {
+        color: 'white',
+        icon: 'mdi-close',
+        round: true,
+      },
+    ],
     group: false,
     message,
     timeout,

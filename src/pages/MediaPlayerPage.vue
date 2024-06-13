@@ -151,7 +151,6 @@ const playMedia = () => {
         : '';
   };
 
-  // todo: look into watching mediaElement.value.currentTime instead of mediaElement.value.ontimeupdate
   mediaElement.value.ontimeupdate = () => {
     mediaPlayer.value.currentPosition = mediaElement.value?.currentTime || 0;
     if (

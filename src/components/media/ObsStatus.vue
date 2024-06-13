@@ -1,7 +1,9 @@
 <template>
   <q-btn
     @click="obsConnectionState === 'disconnected' && obsConnect()"
+    class="q-ml-sm"
     flat
+    rounded
     v-if="currentSettings.obsEnable"
   >
     <q-icon>

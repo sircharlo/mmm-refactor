@@ -6,6 +6,8 @@
     :icon="mediaPlayer.windowVisible ? 'mdi-television' : 'mdi-television-off'"
     :outline="!!disabled"
     @click="mediaDisplayPopup = false"
+    class="q-ml-sm"
+    rounded
     v-if="currentSettings?.enableMediaDisplayButton"
   >
     <q-tooltip

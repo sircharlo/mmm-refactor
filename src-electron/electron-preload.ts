@@ -46,10 +46,51 @@ const getMediaWindow = () =>
     w.webContents.getURL().includes('media-player'),
   );
 
-function getScreenInfo() {
+// function getScreenInfo() {
+//   let displays: Electron.Display[] = [];
+//   const winMidpoints: { main?: Point; media?: Point } = {};
+//   const winCoordinates: { main?: Point; media?: Point } = {};
+//   const mainWindow = getMainWindow();
+//   const mediaWindow = getMediaWindow();
+//   if (mainWindow) {
+//     try {
+//       let posSize = mainWindow.getPosition().concat(mainWindow.getSize());
+//       winMidpoints.main = {
+//         x: posSize[0] + posSize[2] / 2,
+//         y: posSize[1] + posSize[3] / 2,
+//       };
+//       if (mediaWindow) {
+//         posSize = mediaWindow.getPosition().concat(mainWindow.getSize());
+//         winMidpoints.media = {
+//           x: posSize[0] + posSize[2] / 2,
+//           y: posSize[1] + posSize[3] / 2,
+//         };
+//       }
+//       displays = screen.getAllDisplays().map((display, i) => {
+//         return {
+//           ...display,
+//           humanFriendlyNumber: i + 1,
+//         };
+//       });
+//     } catch (err) {
+//       console.error(err);
+//     }
+//   }
+//   return {
+//     displays,
+//     otherScreens: displays.filter(
+//       (display) =>
+//         display.id !==
+//         screen.getDisplayNearestPoint(winMidpoints.main as Point).id,
+//     ),
+//     winCoordinates,
+//     winMidpoints,
+//   };
+// }
+
+function getOtherScreens() {
   let displays: Electron.Display[] = [];
   const winMidpoints: { main?: Point; media?: Point } = {};
-  const winCoordinates: { main?: Point; media?: Point } = {};
   const mainWindow = getMainWindow();
   const mediaWindow = getMediaWindow();
   if (mainWindow) {
@@ -76,21 +117,16 @@ function getScreenInfo() {
       console.error(err);
     }
   }
-  return {
-    displays,
-    otherScreens: displays.filter(
-      (display) =>
-        display.id !==
-        screen.getDisplayNearestPoint(winMidpoints.main as Point).id,
-    ),
-    winCoordinates,
-    winMidpoints,
-  };
+  return displays.filter(
+    (display) =>
+      display.id !==
+      screen.getDisplayNearestPoint(winMidpoints.main as Point).id,
+  );
 }
 
+
 const moveMediaWindow = () => {
-  const { otherScreens } = getScreenInfo();
-  // TODO: simplify this, prune down getScreenInfo
+  const otherScreens = getOtherScreens();
   const mediaWindow = getMediaWindow();
   if (otherScreens.length > 0) {
     if (!mediaWindow?.isFullScreen()) {

@@ -7,15 +7,14 @@
       ref="settingsFormDynamic"
       v-if="currentSettings"
     >
-      <q-badge color="negative" v-if="invalidSettingsLength">
+      <!-- <q-badge color="negative" v-if="invalidSettingsLength">
         <q-toggle
           :label="$t('only-show-settings-that-are-not-valid')"
           color="white"
           v-model="onlyShowInvalid"
         >
         </q-toggle>
-      </q-badge>
-      <!-- {{ currentSettings }} -->
+      </q-badge> -->
       <template
         :key="groupId"
         v-for="[groupId, { name, description }] in Object.entries(
@@ -122,7 +121,7 @@ import { useJwStore } from '../stores/jw';
 
 // Store initializations
 const currentState = useCurrentStateStore();
-const { currentSettings } = storeToRefs(currentState);
+const { currentSettings, onlyShowInvalid } = storeToRefs(currentState);
 const { getInvalidSettings } = currentState;
 
 const jwStore = useJwStore();
@@ -132,7 +131,6 @@ const { updateYeartext } = jwStore;
 const expansionState = ref({} as { [key in keyof SettingsItems]: boolean });
 const settingsFormDynamic = ref();
 const settingsValid = ref(true);
-const onlyShowInvalid = ref(false);
 
 // Validation function
 const validateSettingsLocal = () => {

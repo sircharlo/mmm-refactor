@@ -1,8 +1,10 @@
 <template>
   <q-btn
     @click="mediaPlayer.subtitlesVisible = !mediaPlayer.subtitlesVisible"
+    class="q-ml-sm"
     flat
     icon="mdi-subtitles"
+    rounded
     v-if="currentSettings.enableSubtitles"
   >
     <q-tooltip>{{ $t('subtitles') }}</q-tooltip>
