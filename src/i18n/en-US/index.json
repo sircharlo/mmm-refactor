@@ -129,5 +129,6 @@
   "errorDownloadingMeetingMedia": "Error downloading media for meeting",
   "tryConfiguringFallbackLanguage": "Try configuring a fallback language in the settings",
   "entireFile": "Play from start to finish",
-  "sureStopVideo": "Are you sure you want to stop the video?"
+  "sureStopVideo": "Are you sure you want to stop the video?",
+  "subtitles": "Subtitles"
 }

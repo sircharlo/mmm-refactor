@@ -85,7 +85,7 @@
                 />
                 <SelectInput
                   :options="item.list"
-                  :use-input="settingId === 'lang'"
+                  :use-input="settingId === 'lang' || settingId === 'langFallback' || settingId === 'langSubtitles'"
                   v-else-if="item.type === 'list'"
                   v-model="currentSettings[settingId as keyof SettingsItems] as string"
                 />

@@ -30,7 +30,7 @@ export interface SettingsValues {
   langFallback: string;
   // mediaWinShortcut: string;
   // musicFadeOutTime: number;
-  langSubs: string;
+  langSubtitles: string;
   localAppLang: string;
   maxRes: string;
   // musicFadeOutType: string;

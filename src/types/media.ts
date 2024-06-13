@@ -13,6 +13,7 @@ export interface DynamicMediaObject {
   paragraph?: number;
   section: string;
   song?: boolean | string;
+  subtitlesUrl?: string;
   thumbnailUrl: string;
   title: string;
   uniqueId: string;

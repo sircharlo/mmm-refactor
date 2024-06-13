@@ -294,5 +294,6 @@
   "errorDownloadingMeetingMedia": "Erreur lors du téléchargement des médias pour la réunion",
   "tryConfiguringFallbackLanguage": "Essayez de configurer une langue secondaire dans les paramètres",
   "entireFile": "Jouez du début à la fin",
-  "sureStopVideo": "Êtes-vous sûr de vouloir arrêter la vidéo ?"
+  "sureStopVideo": "Êtes-vous sûr de vouloir arrêter la vidéo ?",
+  "subtitles": "Sous-titres"
 }

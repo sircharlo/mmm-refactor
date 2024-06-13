@@ -40,6 +40,11 @@ export interface MediaLink {
   specialty: string;
   specialtyDescr: string;
   subtitled: boolean;
+  subtitles: {
+    checksum: string;
+    modifiedDatetime: string;
+    url: string;
+  };
   title: string;
   track: number;
   trackImage: {

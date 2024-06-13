@@ -147,14 +147,15 @@
         <q-space />
         <ScenePicker />
         <MusicButton />
-        <q-separator
+        <SubtitlesButton />
+        <!-- <q-separator
           inset
           v-if="
             currentSettings?.enableMediaDisplayButton &&
             currentSettings?.enableMusicButton
           "
           vertical
-        />
+        /> -->
         <MediaDisplayButton />
       </q-toolbar>
     </q-footer>
@@ -249,6 +250,7 @@ import MusicButton from 'src/components/media/MusicButton.vue';
 import ObsStatus from 'src/components/media/ObsStatus.vue';
 import ScenePicker from 'src/components/media/ScenePicker.vue';
 import SongPicker from 'src/components/media/SongPicker.vue';
+import SubtitlesButton from 'src/components/media/SubtitlesButton.vue';
 import { getLookupPeriod } from 'src/helpers/date';
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';

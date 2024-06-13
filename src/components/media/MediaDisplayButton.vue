@@ -1,11 +1,12 @@
 <template>
+  <!-- :color="mediaPlayer.windowVisible ? '' : 'red-5'" -->
   <q-btn
-    :color="mediaPlayer.windowVisible ? '' : 'red-5'"
     :disable="!!disabled"
     :flat="!disabled"
     :icon="mediaPlayer.windowVisible ? 'mdi-television' : 'mdi-television-off'"
     :outline="!!disabled"
     @click="mediaDisplayPopup = false"
+    round
     size="md"
     v-if="currentSettings?.enableMediaDisplayButton"
   >
@@ -45,6 +46,12 @@
         </q-card-actions>
       </q-card>
     </q-popup-proxy>
+    <q-badge
+      :color="mediaPlayer.windowVisible ? 'positive' : 'negative'"
+      floating
+      rounded
+      style="margin-top: 1.5em"
+    />
   </q-btn>
 </template>
 

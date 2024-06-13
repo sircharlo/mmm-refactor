@@ -140,6 +140,8 @@ export const useCurrentStateStore = defineStore('current-state', {
         currentPosition: 0,
         scale: 1,
         seekTo: 0,
+        subtitlesUrl: '',
+        subtitlesVisible: false,
         uniqueId: '',
         url: '',
         windowVisible: true,

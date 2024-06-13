@@ -1,8 +1,11 @@
 import { Item } from 'klaw-sync';
 import { electronApi } from 'src/helpers/electron-api';
+import { useCurrentStateStore } from 'src/stores/current-state';
 import { PublicationFetcher } from 'src/types/publications';
+import { MultimediaItem } from 'src/types/sqlite';
 
 import { FULL_HD } from './converters';
+import { downloadFileIfNeeded, getJwMediaInfo } from './jw-media';
 import { isImage, isVideo } from './mediaPlayback';
 
 const { fs, getUserDataPath, klawSync, path } = electronApi;
@@ -150,11 +153,54 @@ const getThumbnailUrl = async (filepath: string) => {
   return thumbnailUrl;
 };
 
+const getSubtitlesUrl = async (multimediaItem: MultimediaItem) => {
+  const currentState = useCurrentStateStore();
+  const { getSettingValue } = currentState;
+  if (!getSettingValue('enableSubtitles')) return '';
+  let subtitlesUrl = '';
+  if (
+    isVideo(multimediaItem.FilePath) &&
+    multimediaItem.KeySymbol &&
+    multimediaItem.Track
+  ) {
+    let subtitlesPath = multimediaItem.FilePath.split('.')[0] + '.vtt';
+    const subtitleLang = getSettingValue('langSubtitles') as string;
+    const subtitleFetcher: PublicationFetcher = {
+      fileformat: 'mp4',
+      issue: multimediaItem.IssueTagNumber,
+      langwritten: subtitleLang ?? (getSettingValue('lang') as string),
+      pub: multimediaItem.KeySymbol,
+      track: multimediaItem.Track,
+    };
+    const { subtitles } = await getJwMediaInfo(subtitleFetcher);
+    if (!subtitles) return '';
+    const subtitlesFilename = path.basename(
+      multimediaItem.FilePath.split('.')[0] + '.vtt',
+    );
+    const subDirectory = getPublicationDirectory(subtitleFetcher);
+    await downloadFileIfNeeded({
+      dir: subDirectory,
+      filename: subtitlesFilename,
+      url: subtitles,
+    });
+    subtitlesPath = path.join(subDirectory, subtitlesFilename);
+    if (fs.existsSync(subtitlesPath)) {
+      subtitlesUrl = getFileUrl(subtitlesPath);
+    } else {
+      return '';
+    }
+  } else {
+    return '';
+  }
+  return subtitlesUrl;
+};
+
 export {
   getDurationFromMediaPath,
   getFileUrl,
   getPublicationDirectory,
   getPublicationDirectoryContents,
+  getSubtitlesUrl,
   getTempDirectory,
   getThumbnailUrl,
 };

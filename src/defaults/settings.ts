@@ -114,7 +114,7 @@ export const settingsDefinitions: SettingsItems = {
     list: 'jwLanguages',
     type: 'list',
   },
-  langSubs: {
+  langSubtitles: {
     depends: 'enableSubtitles',
     group: 'mediaRetrievalPlayback',
     list: 'jwLanguages',
@@ -378,7 +378,7 @@ export const defaultSettings: SettingsValues = {
   langFallback: '',
   // mediaWinShortcut: 'Alt+Z',
   // musicFadeOutTime: 60,
-  langSubs: '',
+  langSubtitles: '',
   localAppLang: 'en-US',
   maxRes: '720p',
   // musicFadeOutType: 'smart',

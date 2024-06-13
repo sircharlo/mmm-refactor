@@ -39,6 +39,7 @@ import {
   getDurationFromMediaPath,
   getFileUrl,
   getPublicationDirectory,
+  getSubtitlesUrl,
   getThumbnailUrl,
 } from './fs';
 import {
@@ -139,13 +140,8 @@ const fetchMedia = async () => {
     let fetchResult = null;
     if (day.meeting === 'we') {
       fetchResult = await getWeMedia(dayDate);
-      // day.dynamicMedia = weMedia.media;
-      //formatDate
-      // if (weMedia.error) fetchErrors[date.formatDate(dayDate, 'YYYYMMDD')] = weMedia.error;
     } else if (day.meeting === 'mw') {
       fetchResult = await getMwMedia(dayDate);
-      // day.dynamicMedia = mwMedia.media;
-      // if (mwMedia.error) fetchErrors[date.formatDate(dayDate, 'YYYYMMDD')] = mwMedia.error;
     }
     if (fetchResult) {
       day.dynamicMedia = fetchResult.media;
@@ -555,6 +551,7 @@ const dynamicMediaMapper = async (
         paragraph: m.TargetParagraphNumberLabel,
         section, // if is we: wt; else, if >= middle song: LAC; >= (middle song - 8???): AYFM; else: TGW
         song: mediaIsSong,
+        subtitlesUrl: await getSubtitlesUrl(m),
         thumbnailUrl,
         title: mediaIsSong ? m.Label.replace(/^\d+\.\s*/, '') : m.Label,
         uniqueId: sanitizeId(
@@ -872,12 +869,9 @@ const getMwMedia = async (lookupDate: Date) => {
         if (mepsLang) media.AlternativeLanguage = mepsLang;
       }
     }
-    console.log('multimediaMepsLangs', multimediaMepsLangs);
     await processMissingMediaInfo(allMedia);
-    console.log('allMedia', allMedia);
 
     const dynamicMediaForDay = await dynamicMediaMapper(allMedia, lookupDate);
-    console.log('dynamicMediaForDay', dynamicMediaForDay);
 
     const dynamicMedia: Record<
       string,
@@ -949,17 +943,6 @@ async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
           (await getJwMediaInfo(publicationFetcher)).title;
       }
     }
-    // const publicationFetcher = {
-    //   fileformat: media.MimeType?.includes('audio') ? 'MP3' : 'MP4',
-    //   issue: media.IssueTagNumber,
-    //   langwritten,
-    //   pub: media.KeySymbol,
-    //   ...(typeof media.Track === 'number' &&
-    //     media.Track > 0 && { track: media.Track }),
-    // };
-    // if (!media.FilePath || !fs.existsSync(media.FilePath)) {
-    //   media.FilePath = await downloadMissingMedia(publicationFetcher);
-    // }
   }
 }
 
@@ -1075,21 +1058,22 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
     url: bestItem.file.url,
   })) as DownloadedFile;
 
-  // Save thumbnail if available but not present on disk
-  const { thumbnail } = await getJwMediaInfo(publication);
-  const thumbnailFilename =
-    path.basename(bestItem.file.url).split('.')[0] + path.extname(thumbnail);
-  if (
-    thumbnail &&
-    bestItem.file?.url &&
-    (downloadedFile?.new ||
-      !fs.existsSync(path.join(pubDir, thumbnailFilename)))
-  ) {
-    await downloadFileIfNeeded({
-      dir: pubDir,
-      filename: thumbnailFilename,
-      url: thumbnail,
-    });
+  const jwMediaInfo = await getJwMediaInfo(publication);
+  for (const itemUrl of [jwMediaInfo.subtitles, jwMediaInfo.thumbnail]) {
+    if (!itemUrl) continue;
+    const itemFilename =
+      path.basename(bestItem.file.url).split('.')[0] + path.extname(itemUrl);
+    if (
+      itemUrl &&
+      bestItem.file?.url &&
+      (downloadedFile?.new || !fs.existsSync(path.join(pubDir, itemFilename)))
+    ) {
+      await downloadFileIfNeeded({
+        dir: pubDir,
+        filename: itemFilename,
+        url: itemUrl,
+      });
+    }
   }
   return downloadedFile?.path;
 };
@@ -1125,18 +1109,21 @@ const getJwMediaInfo = async (publication: PublicationFetcher) => {
     if (issue && issue.endsWith('00')) issue = issue.slice(0, -2);
     if (issue && issue !== '0') url += '_' + issue;
     if (publication.track) url += '_' + publication.track;
-    if (publication.fileformat?.includes('MP4')) url += '_VIDEO';
-    else if (publication.fileformat?.includes('MP3')) url += '_AUDIO';
+    if (publication.fileformat?.toLowerCase().includes('mp4')) url += '_VIDEO';
+    else if (publication.fileformat?.toLowerCase().includes('mp3'))
+      url += '_AUDIO';
     const responseObject = await get(url);
     if (!responseObject.media || responseObject.media.length === 0)
       throw new Error('No thumbnail found:' + url);
     return {
+      subtitles:
+        findBestResolution(responseObject.media[0].files)?.subtitles?.url ?? '',
       thumbnail: getBestImageUrl(responseObject.media[0].images),
       title: responseObject.media[0].title,
     };
   } catch (error) {
     console.error(error);
-    return { thumbnail: '', title: '' };
+    return { subtitles: '', thumbnail: '', title: '' };
   }
 };
 
@@ -1283,6 +1270,7 @@ export {
   dynamicMediaMapper,
   fetchMedia,
   getDocumentMultimediaItems,
+  getJwMediaInfo,
   getMwMedia,
   getPubMediaLinks,
   getPublicationInfoFromDb,
