@@ -64,7 +64,7 @@
   "hide-image-for-zoom-participants": "Hide image for Zoom participants",
   "hide-media-display": "Hide media display",
   "hideMediaLogo": "Hide logo from media presentation window",
-  "hints.jwlCompanionMode": "This will not show the yeartext; the media display window will be hidden after media is played to allow JW Library to be visible on the external monitors.",
+  "hints.jwlCompanionMode": "This will not show the yeartext and the media display window will be hidden after media is played to allow JW Library to be visible on the external monitors.",
   "import-media": "Import media",
   "in-what-language-should-media-be-downloaded": "In what language should media be downloaded?",
   "inactive": "Inactive",
@@ -163,5 +163,5 @@
   "yes": "Yes",
   "zoom-in": "Zoom in",
   "zoom-out": "Zoom out",
-  "download-status": "Download Status"
+  "download-status": "Download status"
 }

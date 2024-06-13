@@ -3,7 +3,6 @@
     @click="mediaPlayer.subtitlesVisible = !mediaPlayer.subtitlesVisible"
     flat
     icon="mdi-subtitles"
-    round
     v-if="currentSettings.enableSubtitles"
   >
     <q-tooltip>{{ $t('subtitles') }}</q-tooltip>
@@ -11,7 +10,7 @@
       :color="mediaPlayer.subtitlesVisible ? 'positive' : 'negative'"
       floating
       rounded
-      style="margin-top: 1.5em"
+      style="margin-top: 1.25em; margin-right: 0.25em"
     />
   </q-btn>
 </template>

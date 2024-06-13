@@ -6,7 +6,7 @@
     :outline="disabled"
     @click="musicPopup = false"
     icon="mdi-music"
-    size="md"
+    no-caps
     v-if="currentSettings?.enableMusicButton"
   >
     <q-tooltip v-if="!disabled && !musicPopup">
@@ -50,6 +50,14 @@
         </q-card-actions>
       </q-card>
     </q-popup-proxy>
+    <q-badge
+      :color="
+        musicPlaying ? (musicStopping ? 'warning' : 'positive') : 'negative'
+      "
+      floating
+      rounded
+      style="margin-top: 1.25em; margin-right: 0.25em"
+    />
   </q-btn>
   <audio class="hidden" controls ref="musicPlayer">
     <source ref="musicPlayerSource" type="audio/mpeg" />
@@ -81,8 +89,10 @@ const musicPlayerSource = ref<HTMLSourceElement | undefined>();
 const musicPlaying = ref(false);
 const fadeOutTimer = ref();
 const musicStopping = ref(false);
+const musicStoppedAutomatically = ref(false);
 const songList = ref([] as klawSync.Item[]);
 const currentSongRemainingTime = ref('..:..');
+const timeRemainingBeforeMusicStop = ref();
 
 function stopMusic() {
   if (!musicPlayer.value) return;
@@ -134,18 +144,27 @@ function playMusic() {
     const remainingTime = Math.floor(
       musicPlayer.value.duration - musicPlayer.value.currentTime,
     );
-    currentSongRemainingTime.value = Number.isNaN(remainingTime)
-      ? '..:..'
-      : formatTime(remainingTime);
+    currentSongRemainingTime.value = formatTime(remainingTime);
+    const timeBeforeMeeting = remainingTimeBeforeMeetingStart();
+    if (timeBeforeMeeting && !musicStoppedAutomatically.value) {
+      timeRemainingBeforeMusicStop.value = (timeBeforeMeeting as number) - 60;
+      if (timeRemainingBeforeMusicStop.value <= 0 && !musicStopping.value) {
+        stopMusic();
+        musicStoppedAutomatically.value = true;
+      }
+    }
   };
 }
 
-const musicRemainingTime = computed(() => {
-  if (!musicPlayer.value) return '..:..';
-  let remainingTime = currentSongRemainingTime.value;
-  const now = new Date();
+/**
+ * Calculates the remaining time before the meeting starts based on the selected meeting day and start time settings.
+ *
+ * @return {string|null} The remaining time in hours and minutes, optionally formatted, or null if there is no meeting day selected.
+ */
+const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
   const meetingDay = selectedDateObject.value.meeting;
   if (meetingDay) {
+    const now = new Date();
     const weMeeting = meetingDay === 'we';
     const meetingStartTime = weMeeting
       ? (getSettingValue('weStartTime') as string)
@@ -153,11 +172,30 @@ const musicRemainingTime = computed(() => {
     const [hours, minutes] = meetingStartTime.split(':').map(Number);
     const meetingStartDateTime = new Date(now);
     meetingStartDateTime.setHours(hours, minutes, 0, 0);
-    remainingTime = formatTime(
-      date.getDateDiff(meetingStartDateTime, now, 'seconds'),
-    );
+    const dateDiff = date.getDateDiff(meetingStartDateTime, now, 'seconds');
+    if (dateDiff < 0) {
+      return null;
+    } else {
+      if (formatted) {
+        return formatTime(dateDiff);
+      } else {
+        return dateDiff;
+      }
+    }
+  } else {
+    return null;
   }
-  return musicStopping.value ? ref(t('music.stopping')).value : remainingTime;
+};
+
+const musicRemainingTime = computed(() => {
+  if (!musicPlayer.value) return '..:..';
+  if (musicStopping.value) return ref(t('music.stopping')).value;
+  if (
+    selectedDateObject.value.meeting &&
+    timeRemainingBeforeMusicStop.value > 0
+  )
+    return formatTime(timeRemainingBeforeMusicStop.value);
+  return currentSongRemainingTime.value;
 });
 
 const musicPopup = ref(false);

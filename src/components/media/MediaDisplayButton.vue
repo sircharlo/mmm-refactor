@@ -6,8 +6,6 @@
     :icon="mediaPlayer.windowVisible ? 'mdi-television' : 'mdi-television-off'"
     :outline="!!disabled"
     @click="mediaDisplayPopup = false"
-    round
-    size="md"
     v-if="currentSettings?.enableMediaDisplayButton"
   >
     <q-tooltip
@@ -49,7 +47,7 @@
       :color="mediaPlayer.windowVisible ? 'positive' : 'negative'"
       floating
       rounded
-      style="margin-top: 1.5em"
+      style="margin-top: 1.25em; margin-right: 0.25em"
     />
   </q-btn>
 </template>

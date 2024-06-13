@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer';
+import { format } from 'quasar';
 import { electronApi } from 'src/helpers/electron-api';
 import {
   JwPlaylistItem,
@@ -12,14 +13,14 @@ import { getFileUrl, getTempDirectory } from './fs';
 import { dynamicMediaMapper, processMissingMediaInfo } from './jw-media';
 
 const { convert, decompress, executeQuery, fs, path } = electronApi;
+const { pad } = format;
 
 const formatTime = (time: number) => {
   if (!time) return '00:00';
+  if (Number.isNaN(time)) return '..:..';
   const minutes = Math.floor(time / 60);
   const seconds = Math.floor(time % 60);
-  return `${minutes.toString().padStart(2, '0')}:${seconds
-    .toString()
-    .padStart(2, '0')}`;
+  return `${pad(minutes.toString(), 2, '0')}:${pad(seconds.toString(), 2)}`;
 };
 
 const isImage = (filepath: string) => {

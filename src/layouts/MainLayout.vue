@@ -170,7 +170,6 @@
       "
       :elevated="!miniState"
       :mini="miniState"
-      :width="200"
       @mouseout="miniState = true"
       @mouseover="miniState = false"
       mini-to-overlay
@@ -273,7 +272,7 @@ const {
   lookupPeriod,
   mediaPlayer,
   mediaPlaying,
-  selectedDate
+  selectedDate,
 } = storeToRefs(currentState);
 
 const congregationSettings = useCongregationSettingsStore();
@@ -327,6 +326,7 @@ watch(route, (newVal) => {
 });
 
 watch(currentSettings, (newSettings) => {
+  console.log('currentSettings changed', newSettings);
   if (!newSettings) {
     if (route.fullPath !== '/congregation-selector') {
       router.push({ path: '/congregation-selector' });
@@ -348,6 +348,19 @@ watch(
     if (newAppLang) {
       locale.value = newAppLang;
     }
+  },
+);
+
+watch(
+  () => [
+    currentSettings.value?.lang,
+    currentSettings.value?.langFallback,
+    currentSettings.value?.langSubtitles,
+    currentSettings.value?.mwDay,
+    currentSettings.value?.weDay,
+  ],
+  () => {
+    lookupPeriod.value = getLookupPeriod();
   },
 );
 

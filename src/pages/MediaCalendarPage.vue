@@ -494,7 +494,9 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        {{ $t('drop-multimedia-files-here-to-add-them-to-the-list-for-this-day') }}
+        {{
+          $t('drop-multimedia-files-here-to-add-them-to-the-list-for-this-day')
+        }}
       </q-card-section>
 
       <q-card-actions align="right">
@@ -521,7 +523,6 @@ import { Buffer } from 'buffer';
 import mime from 'mime';
 import { storeToRefs } from 'pinia';
 import { date, uid } from 'quasar';
-import { getLookupPeriod } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import {
   getDurationFromMediaPath,
@@ -793,20 +794,6 @@ onMounted(async () => {
   );
   setObsScene('camera');
   fetchMediaFromCalendar();
-
-  watch(
-    () => [
-      currentSettings.value?.lang,
-      currentSettings.value?.langFallback,
-      currentSettings.value?.langSubtitles,
-      currentSettings.value?.mwDay,
-      currentSettings.value?.weDay,
-    ],
-    () => {
-      lookupPeriod.value = getLookupPeriod();
-      fetchMediaFromCalendar();
-    },
-  );
 });
 
 onUnmounted(() => {

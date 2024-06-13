@@ -11,7 +11,6 @@
     flat
     push
     round
-    size="md"
   >
     <template v-slot:loading>
       <q-spinner-pie />
@@ -44,7 +43,7 @@
               {{ $t('noDownloadsInProgress') }}
             </q-item-section>
             <q-space />
-            <q-item-section avatar class="q-pr-none" style="align-items: end">
+            <q-item-section avatar class="q-pt-md q-pl-md" style="align-items: end">
               <q-icon color="positive" name="mdi-check-circle" />
             </q-item-section>
           </q-item>

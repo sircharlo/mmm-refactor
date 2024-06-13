@@ -51,7 +51,13 @@
           "
           v-if="!currentSettings?.jwlCompanionMode"
         />
-        <div id="yeartextLogoContainer" v-if="!currentSettings?.hideMediaLogo">
+        <div
+          id="yeartextLogoContainer"
+          v-if="
+            !currentSettings?.hideMediaLogo &&
+            !currentSettings?.jwlCompanionMode
+          "
+        >
           <p id="yeartextLogo"></p>
         </div>
       </div>
