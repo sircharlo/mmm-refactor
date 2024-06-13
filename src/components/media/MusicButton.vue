@@ -9,7 +9,9 @@
     size="md"
     v-if="currentSettings?.enableMusicButton"
   >
-    <q-tooltip v-if="!disabled && !musicPopup"> Background music </q-tooltip>
+    <q-tooltip v-if="!disabled && !musicPopup">
+      {{ $t('setupWizard.backgroundMusic') }}
+    </q-tooltip>
     <q-popup-proxy
       anchor="top middle"
       self="bottom middle"
@@ -17,12 +19,14 @@
     >
       <q-card class="non-selectable">
         <q-card-section>
-          <div class="text-overline">Background music</div>
+          <div class="text-overline">
+            {{ $t('setupWizard.backgroundMusic') }}
+          </div>
           <div class="text-h5">
             {{ musicPlaying ? musicRemainingTime : 'Inactive' }}
           </div>
           <div class="text-caption text-grey-9" v-if="musicPlaying">
-            Current song remaining: {{ currentSongRemainingTime }}
+            {{ $t('current-song-remaining') }} {{ currentSongRemainingTime }}
           </div>
         </q-card-section>
         <q-separator />
@@ -33,7 +37,7 @@
             flat
             v-close-popup
             v-if="!musicPlaying"
-            >Play music</q-btn
+            >{{ $t('play-music') }}</q-btn
           >
           <q-btn
             :disable="musicStopping"
@@ -41,7 +45,7 @@
             flat
             v-close-popup
             v-else
-            >Stop music</q-btn
+            >{{ $t('stop-music') }}</q-btn
           >
         </q-card-actions>
       </q-card>

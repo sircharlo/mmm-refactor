@@ -9,8 +9,8 @@
     >
       <q-badge color="negative" v-if="invalidSettingsLength">
         <q-toggle
+          :label="$t('only-show-settings-that-are-not-valid')"
           color="white"
-          label="Only show settings that are not valid"
           v-model="onlyShowInvalid"
         >
         </q-toggle>
@@ -85,7 +85,11 @@
                 />
                 <SelectInput
                   :options="item.list"
-                  :use-input="settingId === 'lang' || settingId === 'langFallback' || settingId === 'langSubtitles'"
+                  :use-input="
+                    settingId === 'lang' ||
+                    settingId === 'langFallback' ||
+                    settingId === 'langSubtitles'
+                  "
                   v-else-if="item.type === 'list'"
                   v-model="currentSettings[settingId as keyof SettingsItems] as string"
                 />
@@ -152,15 +156,11 @@ onMounted(() => {
 
 watch(
   () => currentSettings.value?.lang,
-  (newVal) => {
-    if (newVal) {
-      updateYeartext();
-    }
+  (newLang) => {
+    if (newLang) updateYeartext();
   },
 );
 
-// Computed properties
 const invalidSettings = computed(() => getInvalidSettings());
-
-const invalidSettingsLength = computed(() => getInvalidSettings().length > 0);
+const invalidSettingsLength = computed(() => invalidSettings.value.length > 0);
 </script>

@@ -5,12 +5,12 @@
     <div>
       <div style="font-size: 30vh">404</div>
 
-      <div class="text-h2" style="opacity: 0.4">Oops. Nothing here...</div>
+      <div class="text-h2" style="opacity: 0.4">{{ $t('oops-nothing-here') }}</div>
 
       <q-btn
+        :label="$t('go-home')"
         class="q-mt-xl"
         color="white"
-        label="Go Home"
         no-caps
         text-color="blue"
         to="/"

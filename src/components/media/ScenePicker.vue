@@ -4,7 +4,7 @@
       <!-- :flat="!disabled"
     :outline="disabled"
     :disable="disabled" -->
-      <q-tooltip v-if="!menuActive"> Scene selection </q-tooltip>
+      <q-tooltip v-if="!menuActive"> {{ $t('scene-selection') }} </q-tooltip>
       <q-menu
         @before-hide="menuActive = false"
         @before-show="menuActive = true"
@@ -12,20 +12,20 @@
       >
         <q-list style="min-width: 100px">
           <template v-if="mediaScene">
-          <q-item-label header>Media scene</q-item-label>
-          <q-item
-            :active="currentSceneUuid === mediaScene.sceneUuid"
-            @click="setObsSceneByUuid(mediaScene.sceneUuid as string)"
-            clickable
-            v-close-popup
-          >
-            <q-item-section avatar>
-              <q-icon :name="'mdi-alpha-m-circle'" />
-            </q-item-section>
-            <q-item-section>{{ mediaScene.sceneName }}</q-item-section>
-          </q-item>
-        <q-item-label header>Other scenes</q-item-label>
-        </template>
+            <q-item-label header>{{ $t('media-scene') }}</q-item-label>
+            <q-item
+              :active="currentSceneUuid === mediaScene.sceneUuid"
+              @click="setObsSceneByUuid(mediaScene.sceneUuid as string)"
+              clickable
+              v-close-popup
+            >
+              <q-item-section avatar>
+                <q-icon :name="'mdi-alpha-m-circle'" />
+              </q-item-section>
+              <q-item-section>{{ mediaScene.sceneName }}</q-item-section>
+            </q-item>
+            <q-item-label header>{{ $t('other-scenes') }}</q-item-label>
+          </template>
           <template
             :key="scene.sceneUuid"
             v-for="[i, scene] in Object.entries(nonMediaScenes)"

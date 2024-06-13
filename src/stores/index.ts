@@ -34,7 +34,7 @@ export default store((/* { ssrContext } */) => {
       // If set to true this tab tries to immediately recover the shared state from another tab. Defaults to true.
       initialize: true,
       // Enforce a type. One of native, idb, localstorage or node. Defaults to native.
-      // type: 'idb',
+      type: 'native',
     }),
   );
 

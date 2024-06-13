@@ -15,7 +15,7 @@
       self="top left"
       v-if="!disabled && !mediaDisplayPopup"
     >
-      Media display
+      {{ $t('media-display') }}
     </q-tooltip>
     <q-popup-proxy
       anchor="bottom right"
@@ -25,12 +25,11 @@
     >
       <q-card class="non-selectable">
         <q-card-section>
-          <div class="text-overline">Media display</div>
+          <div class="text-overline">{{ $t('media-display') }}</div>
           <div class="text-h5 text-primary" v-if="mediaPlayer.windowVisible">
-            Projecting
-          </div>
-          <div class="text-h5 text-negative" v-else>Inactive</div>
-          <div class="text-caption text-grey">External screen</div>
+            {{ $t('projecting') }} </div>
+          <div class="text-h5 text-negative" v-else>{{ $t('inactive') }}</div>
+          <div class="text-caption text-grey">{{ $t('external-screen') }}</div>
         </q-card-section>
         <q-separator />
         <q-card-actions>
@@ -38,10 +37,10 @@
             @click="showMediaWindow(false)"
             flat
             v-if="mediaPlayer.windowVisible"
-            >Hide media display</q-btn
+            >{{ $t('hide-media-display') }}</q-btn
           >
           <q-btn @click="showMediaWindow(true)" flat v-else
-            >Show media display</q-btn
+            >{{ $t('show-media-display') }}</q-btn
           >
         </q-card-actions>
       </q-card>

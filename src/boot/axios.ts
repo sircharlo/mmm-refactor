@@ -1,8 +1,8 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { boot } from 'quasar/wrappers';
-export default boot(({ app }) => {
-  app.config.globalProperties.$axios = axios;
-});
+// import { boot } from 'quasar/wrappers';
+// export default boot(({ app }) => {
+//   app.config.globalProperties.$axios = axios;
+// });
 
 const get = async (url: string, params?: AxiosRequestConfig) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -12,7 +12,7 @@ const get = async (url: string, params?: AxiosRequestConfig) => {
   } catch (error) {
     console.warn(error);
   }
-  return returnVal.data;
+  return returnVal?.data ?? undefined;
 };
 
 const getLanguages = async () => {
@@ -21,6 +21,8 @@ const getLanguages = async () => {
 };
 
 const urlWithParamsToString = (url: string, params: object) => {
+  if (!url) return '';
+  if (!params) return url;
   const urlWithParams = new URL(url);
   for (const [key, value] of Object.entries(params)) {
     urlWithParams.searchParams.append(key, value);

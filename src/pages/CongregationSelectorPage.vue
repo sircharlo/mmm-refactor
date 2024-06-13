@@ -24,10 +24,10 @@
       </q-item>
     </q-list>
     <q-btn
+      :label="$t('new-profile')"
       @click="createNewCongregation()"
       color="primary"
       icon="mdi-plus"
-      label="New congregation"
     />
   </q-page>
   <q-dialog persistent v-model="deletePending">
@@ -35,18 +35,18 @@
       <q-card-section class="row items-center">
         <q-avatar color="negative" icon="mdi-alert" text-color="white" />
         <span class="q-ml-sm"
-          >Are you sure you want to delete this congregation?</span
+          >{{ $t('are-you-sure-you-want-to-delete-this-profile') }}</span
         >
       </q-card-section>
       <q-card-actions align="right" class="text-primary">
-        <q-btn @click="congToDelete = ''" flat label="Cancel" />
+        <q-btn :label="$t('cancel')" @click="congToDelete = ''" flat />
         <q-btn
+          :label="$t('delete')"
           @click="
             deleteCongregation(congToDelete);
             congToDelete = '';
           "
           flat
-          label="Delete "
         />
       </q-card-actions>
     </q-card>
@@ -84,8 +84,8 @@ function chooseCongregation(
   initialLoad?: boolean,
 ) {
   const invalidSettings = setCongregation(congregation);
-  updateYeartext();
   if (congregation) {
+    updateYeartext();
     if (initialLoad) {
       // if (initialLoad || invalidSettings)
       router.push('/setup-wizard');

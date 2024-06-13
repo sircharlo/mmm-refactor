@@ -1,5 +1,5 @@
 <template>
-  <!-- {{ mediaPlayer }} -->
+  {{ mediaPlayer }}
   <q-page-container
     class="q-electron-drag vertical-middle overflow-hidden"
     padding
@@ -92,28 +92,39 @@ const mediaImage: Ref<HTMLImageElement | undefined> = ref();
 const panzoomOptions = { animate: true, duration: 1000 };
 
 watch(
-  mediaPlayer,
-  (newVal) => {
-    if (currentSettings.value?.jwlCompanionMode) {
-      toggleMediaWindow(newVal.url ? 'show' : 'hide');
-    }
+  () => mediaPlayer.value?.url,
+  (newUrl) => {
+    if (currentSettings.value?.jwlCompanionMode)
+      toggleMediaWindow(newUrl ? 'show' : 'hide');
+  },
+);
+
+watch(
+  () => [mediaPlayer.value?.scale, mediaPlayer.value?.x, mediaPlayer.value?.y],
+  ([newScale, newX, newY]) => {
     if (!mediaElement.value) {
       const imageElem = document.getElementById('mediaImage');
       const width = imageElem?.clientWidth || 0;
       const height = imageElem?.clientHeight || 0;
-      panzoom.value?.zoom(newVal.scale, panzoomOptions);
+      panzoom.value?.zoom(newScale, panzoomOptions);
       if (width > 0 && height > 0)
-        panzoom.value?.pan(newVal.x * width, newVal.y * height, panzoomOptions);
-    } else {
-      if (newVal.action === 'pause') {
-        mediaElement.value?.pause();
-        mediaElement.value.currentTime = newVal.currentPosition;
-      } else if (newVal.action === 'play') {
-        mediaElement.value?.play();
-      }
+        panzoom.value?.pan(newX * width, newY * height, panzoomOptions);
     }
   },
-  { deep: true, immediate: true },
+);
+
+watch(
+  () => mediaPlayer.value?.action,
+  (newAction) => {
+    console.log('action', newAction);
+    if (!mediaElement.value) return;
+    if (newAction.toLowerCase().includes('pause')) {
+      mediaElement.value.pause();
+      // mediaElement.value.currentTime = mediaPlayer.value.currentPosition;
+    } else if (newAction.toLowerCase().includes('play')) {
+      mediaElement.value.play();
+    }
+  },
 );
 
 const playMedia = () => {
@@ -121,13 +132,17 @@ const playMedia = () => {
     return;
   }
 
-  mediaElement.value.onpause = () => {
-    mediaPlayer.value.currentPosition = mediaElement.value?.currentTime || 0;
-  };
+  // mediaElement.value.onpause = () => {
+  //   mediaPlayer.value.currentPosition = mediaElement.value?.currentTime || 0;
+  // };
   mediaElement.value.onended = () => {
     mediaPlayer.value.currentPosition = 0;
     mediaPlayer.value.url = '';
     mediaPlayer.value.uniqueId = '';
+    mediaPlayer.value.action =
+      mediaPlayer.value.action === 'backgroundMusicPlay'
+        ? 'backgroundMusicCurrentEnded'
+        : '';
   };
 
   // todo: look into watching mediaElement.value.currentTime instead of mediaElement.value.ontimeupdate
@@ -146,12 +161,11 @@ const playMedia = () => {
         mediaElement.value?.currentTime &&
         mediaElement.value?.currentTime >= customStartStop.max
       ) {
-        mediaPlayer.value.currentPosition = customStartStop.min;
+        // updateMediaPlayer('currentPosition', customStartStop.min);
         mediaPlayer.value.url = '';
       }
     }
   };
-  mediaPlayer.value.action = 'play';
   let customStartStop = { max: 0, min: 0 };
   if (
     customDurations.value[currentCongregation.value][selectedDate.value][

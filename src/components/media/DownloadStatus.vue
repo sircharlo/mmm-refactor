@@ -16,6 +16,13 @@
     <template v-slot:loading>
       <q-spinner-pie />
     </template>
+    <q-tooltip
+      anchor="bottom left"
+      self="top left"
+      >
+      <!-- v-if="!disabled && !mediaDisplayPopup" -->
+      {{ $t('download-status') }}
+    </q-tooltip>
     <q-popup-proxy>
       <div
         :class="'rounded-borders bg-grey-' + $q.dark.isActive ? '2' : '9'"

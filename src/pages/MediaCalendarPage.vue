@@ -46,6 +46,8 @@
             >
               <q-badge
                 :color="
+                  customDurations[currentCongregation] &&
+                  customDurations[currentCongregation][selectedDate] &&
                   customDurations[currentCongregation][selectedDate][
                     media.uniqueId
                   ] &&
@@ -100,8 +102,11 @@
                   </q-card-section>
                   <q-card-section class="q-py-none" padding>
                     <p class="q-my-none">
-                      Use the slider below to adjust the start and end time of
-                      this media item.
+                      {{
+                        $t(
+                          'use-the-slider-below-to-adjust-the-start-and-end-time-of-this-media-item',
+                        )
+                      }}
                     </p>
                   </q-card-section>
                   <q-card-section class="q-pr-sm" horizontal>
@@ -175,7 +180,7 @@
                   round
                   size="xs"
                 >
-                  <q-tooltip>Zoom in</q-tooltip>
+                  <q-tooltip>{{ $t('zoom-in') }}</q-tooltip>
                 </q-btn>
               </div>
               <div class="col">
@@ -187,7 +192,7 @@
                   round
                   size="xs"
                 >
-                  <q-tooltip>Zoom out</q-tooltip>
+                  <q-tooltip>{{ $t('zoom-out') }}</q-tooltip>
                 </q-btn>
               </div>
               <!-- <div class="col">
@@ -205,7 +210,9 @@
                   size="xs"
                   v-if="currentScene === 'media'"
                 >
-                  <q-tooltip>Hide image for Zoom participants</q-tooltip>
+                  <q-tooltip>{{
+                    $t('hide-image-for-zoom-participants')
+                  }}</q-tooltip>
                 </q-btn>
                 <q-btn
                   @click="setObsScene('media')"
@@ -216,7 +223,9 @@
                   size="xs"
                   v-else
                 >
-                  <q-tooltip>Show image for Zoom participants</q-tooltip>
+                  <q-tooltip>{{
+                    $t('show-image-for-zoom-participants')
+                  }}</q-tooltip>
                 </q-btn>
               </div>
             </div>
@@ -295,7 +304,9 @@
                           "
                           clickable
                         >
-                          <q-item-section>{{ $t('entireFile') }}</q-item-section>
+                          <q-item-section>{{
+                            $t('entireFile')
+                          }}</q-item-section>
                         </q-item>
                         <q-separator />
                         <q-item
@@ -430,8 +441,8 @@
           <span class="q-ml-sm">{{ $t('sureStopVideo') }}</span>
         </q-card-section>
         <q-card-actions align="right" class="text-primary">
-          <q-btn @click="mediaToStop = ''" flat label="Cancel" />
-          <q-btn @click="stopMedia(mediaToStop)" flat label="Stop" />
+          <q-btn :label="$t('cancel')" @click="mediaToStop = ''" flat />
+          <q-btn :label="$t('stop')" @click="stopMedia(mediaToStop)" flat />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -440,17 +451,17 @@
         <q-card-section class="row items-center">
           <q-avatar color="negative" icon="mdi-alert" text-color="white" />
           <span class="q-ml-sm"
-            >Are you sure you want to delete
+            >{{ $t('are-you-sure-you-want-to-delete') }}
             <strong>{{
               sortableMediaItems.find((m) => m.uniqueId === mediaToDelete)
                 ?.title
             }}</strong
-            >?</span
+            >{{ $t('question-mark') }}</span
           >
         </q-card-section>
         <q-card-actions align="right" class="text-primary">
-          <q-btn @click="mediaToDelete = ''" flat label="Cancel" />
-          <q-btn @click="deleteMedia()" flat label="Delete" />
+          <q-btn :label="$t('cancel')" @click="mediaToDelete = ''" flat />
+          <q-btn :label="$t('delete')" @click="deleteMedia()" flat />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -477,15 +488,17 @@
     </template>
   </q-dialog>
   <q-dialog @drop="dropIgnore" v-model="dragging">
-    <q-card @drop="dropEnd">
+    <q-card @drop="dropEnd" style="width: 300px; height: 300px">
       <q-card-section>
-        <div class="text-h6">Drop area</div>
+        <div class="text-h6">{{ $t('add-media-files') }}</div>
       </q-card-section>
 
-      <q-card-section class="q-pt-none"> Drop here! </q-card-section>
+      <q-card-section class="q-pt-none">
+        {{ $t('drop-multimedia-files-here-to-add-them-to-the-list-for-this-day') }}
+      </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn color="negative" flat label="Cancel" v-close-popup />
+        <q-btn :label="$t('cancel')" color="negative" flat v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -508,6 +521,7 @@ import { Buffer } from 'buffer';
 import mime from 'mime';
 import { storeToRefs } from 'pinia';
 import { date, uid } from 'quasar';
+import { getLookupPeriod } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import {
   getDurationFromMediaPath,
@@ -646,12 +660,11 @@ const initiatePanzoom = (elemId: string) => {
 const mediaList = ref();
 const sortableMediaItems = ref([] as DynamicMediaObject[]);
 const datedAdditionalMediaMap = computed(() => {
-  if (!currentCongregation.value || !selectedDate.value) return [];
-  return (
-    additionalMediaMaps.value[currentCongregation.value]?.[
-      selectedDate.value
-    ] || []
-  );
+  return currentCongregation.value && selectedDate.value
+    ? additionalMediaMaps.value[currentCongregation.value]?.[
+        selectedDate.value
+      ] || []
+    : [];
 });
 
 function deleteMedia() {
@@ -675,7 +688,7 @@ const mediaItems = computed(() => {
 });
 
 watch(mediaItems, (newValue) => {
-  if (newValue) {
+  if (newValue && currentCongregation.value && selectedDate.value) {
     if (!mediaSort.value[currentCongregation.value])
       mediaSort.value[currentCongregation.value] = {};
     sortableMediaItems.value = newValue.sort(
@@ -687,7 +700,11 @@ watch(mediaItems, (newValue) => {
 watch(
   mediaSort,
   (newVal) => {
-    if (newVal[currentCongregation.value][selectedDate.value]?.length === 0) {
+    if (
+      currentCongregation.value &&
+      selectedDate.value &&
+      newVal[currentCongregation.value][selectedDate.value]?.length === 0
+    ) {
       newVal[currentCongregation.value][selectedDate.value] =
         datedAdditionalMediaMap.value
           .concat(selectedDateObject.value?.dynamicMedia)
@@ -743,21 +760,7 @@ watch(mediaPlaying, (newValue) => {
   updateConfig(mediaList.value, { disabled: !!newValue });
 });
 
-onMounted(async () => {
-  watch(selectedDate, (newVal) => {
-    const congregation = currentCongregation.value;
-    if (!congregation) return;
-    const durations = (customDurations.value[congregation] ||= {});
-    durations[newVal] ||= {};
-  });
-
-  selectedDate.value = date.formatDate(
-    lookupPeriod.value
-      .filter((day: { meeting: boolean | string }) => day.meeting)
-      .map((day) => day.date)[0],
-    'YYYY/MM/DD',
-  );
-  setObsScene('camera');
+const fetchMediaFromCalendar = async () => {
   const fetchResult = await fetchMedia();
   if (Object.keys(fetchResult).length > 0) {
     for (const [date, error] of Object.entries(fetchResult)) {
@@ -773,6 +776,37 @@ onMounted(async () => {
       }
     }
   }
+};
+
+onMounted(async () => {
+  watch(selectedDate, (newVal) => {
+    if (!currentCongregation.value || !newVal) return;
+    const durations = (customDurations.value[currentCongregation.value] ||= {});
+    durations[newVal] ||= {};
+  });
+
+  selectedDate.value = date.formatDate(
+    lookupPeriod.value
+      .filter((day: { meeting: boolean | string }) => day.meeting)
+      .map((day) => day.date)[0],
+    'YYYY/MM/DD',
+  );
+  setObsScene('camera');
+  fetchMediaFromCalendar();
+
+  watch(
+    () => [
+      currentSettings.value?.lang,
+      currentSettings.value?.langFallback,
+      currentSettings.value?.langSubtitles,
+      currentSettings.value?.mwDay,
+      currentSettings.value?.weDay,
+    ],
+    () => {
+      lookupPeriod.value = getLookupPeriod();
+      fetchMediaFromCalendar();
+    },
+  );
 });
 
 onUnmounted(() => {

@@ -252,7 +252,7 @@ import ScenePicker from 'src/components/media/ScenePicker.vue';
 import SongPicker from 'src/components/media/SongPicker.vue';
 import SubtitlesButton from 'src/components/media/SubtitlesButton.vue';
 import { getLookupPeriod } from 'src/helpers/date';
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -305,32 +305,20 @@ const route = useRoute();
 const router = useRouter();
 const miniState = ref(true);
 
-// Function to apply settings
-const applySettings = () => {
-  console.log('applySettings');
-
-  // Media Window
-  const enableMediaDisplayButton =
-    currentSettings.value?.enableMediaDisplayButton;
-  mediaPlayer.value.windowVisible = !!enableMediaDisplayButton;
-  toggleMediaWindow(enableMediaDisplayButton ? 'show' : 'hide');
-
-  // Dark Mode
-  Dark.set(currentSettings.value?.darkMode as 'auto' | boolean);
-
-  // I18n
-  const currentLanguage = currentSettings.value?.localAppLang as string;
-  if (currentLanguage) {
-    locale.value = currentLanguage;
+watch(currentCongregation, (newCongregation) => {
+  if (!newCongregation) {
+    if (route.fullPath !== '/congregation-selector') {
+      router.push({ path: '/congregation-selector' });
+      return;
+    }
+  } else {
+    console.log('currentCongregation changed', currentCongregation.value);
+    downloadProgress.value = {};
+    lookupPeriod.value = getLookupPeriod();
+    downloadBackgroundMusic();
   }
-};
-
-// Watchers
-watch(currentCongregation, () => {
-  console.log('currentCongregation changed', currentCongregation.value);
-  downloadBackgroundMusic();
-  downloadProgress.value = {};
 });
+
 watch(route, (newVal) => {
   drawer.value = !(
     newVal.fullPath.includes('wizard') &&
@@ -338,23 +326,44 @@ watch(route, (newVal) => {
   );
 });
 
-watch(
-  currentSettings,
-  () => {
-    applySettings();
-    lookupPeriod.value = getLookupPeriod();
-    if (
-      !currentCongregation.value &&
-      route.fullPath !== '/congregation-selector'
-    ) {
+watch(currentSettings, (newSettings) => {
+  if (!newSettings) {
+    if (route.fullPath !== '/congregation-selector') {
       router.push({ path: '/congregation-selector' });
       return;
     }
+  }
+});
+
+watch(
+  () => currentSettings.value?.darkMode,
+  (newDarkMode) => {
+    Dark.set(newDarkMode as 'auto' | boolean);
   },
-  { deep: true, immediate: true },
 );
 
-// Computed and helper functions
+watch(
+  () => currentSettings.value?.localAppLang,
+  (newAppLang) => {
+    if (newAppLang) {
+      locale.value = newAppLang;
+    }
+  },
+);
+
+watch(
+  () => [
+    currentSettings.value?.enableMediaDisplayButton,
+    currentSettings.value?.jwlCompanionMode,
+  ],
+  ([newMediaDisplayEnabled, newJwlCompanionMode]) => {
+    if (newMediaDisplayEnabled && !newJwlCompanionMode) {
+      mediaPlayer.value.windowVisible = newMediaDisplayEnabled;
+      toggleMediaWindow(newMediaDisplayEnabled ? 'show' : 'hide');
+    }
+  },
+);
+
 const dateOptions = (lookupDate: string) => {
   const dateArray: Date[] = lookupPeriod.value.map((day) => day.date);
   // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
@@ -391,4 +400,8 @@ const getEventDates = () => {
 const localUpload = ref(false);
 const importMediaMenuActive = ref(false);
 const datePickerActive = ref(false);
+
+onMounted(() => {
+  document.title = 'Meeting Media Manager';
+});
 </script>

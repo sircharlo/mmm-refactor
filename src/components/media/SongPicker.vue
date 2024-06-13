@@ -2,10 +2,11 @@
   <q-dialog persistent v-model="localValue">
     <q-card class="non-selectable" style="min-width: 500px">
       <q-card-section>
-        <div class="text-h6">Choose a song {{ selectedSong }}</div>
+        <div class="text-h6">{{ $t('choose-a-song') }}</div>
       </q-card-section>
       <q-card-section class="q-pt-none">
         <q-select
+          :label="$t('song')"
           :options="
             songOptions.map((song) => {
               return { value: song.track, label: song.title };
@@ -16,19 +17,19 @@
           fill-input
           hide-selected
           input-debounce="10"
-          label="Song"
           map-options
+          spellcheck="false"
           use-input
           v-model="selectedSong"
         />
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn @click="dismissPopup" color="negative" flat label="Cancel" />
+        <q-btn :label="$t('cancel')" @click="dismissPopup" color="negative" flat />
         <q-btn
+          :label="$t('add-song')"
           @click="addSong(selectedSong)"
           color="primary"
           flat
-          label="Add song"
         />
       </q-card-actions>
     </q-card>

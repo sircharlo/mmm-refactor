@@ -1,9 +1,11 @@
 import { enable, initialize } from '@electron/remote/main';
 import { BrowserWindow, Menu, app, session } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import os from 'os';
 import path from 'path';
 
 initialize();
+autoUpdater.checkForUpdatesAndNotify();
 
 // needed in case process is undefined under Linux
 const platform = process.platform || os.platform();

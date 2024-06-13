@@ -25,6 +25,7 @@ const oldDate = new Date(0);
 export const useJwStore = defineStore('jw-store', {
   actions: {
     addToAdditionMediaMap(mediaArray: DynamicMediaObject[]) {
+      if (!mediaArray.length) return;
       const currentState = useCurrentStateStore();
       if (!this.additionalMediaMaps[currentState.currentCongregation])
         this.additionalMediaMaps[currentState.currentCongregation] = {};
@@ -47,6 +48,7 @@ export const useJwStore = defineStore('jw-store', {
     removeFromAdditionMediaMap(uniqueId: string) {
       const currentState = useCurrentStateStore();
       if (
+        uniqueId &&
         currentState.currentCongregation &&
         currentState.selectedDate &&
         this.additionalMediaMaps[currentState.currentCongregation] &&
@@ -157,21 +159,23 @@ export const useJwStore = defineStore('jw-store', {
       }
     },
     async updateYeartext(lang?: string) {
-      const currentState = useCurrentStateStore();
-      if (!(currentState.currentSettings?.lang || lang)) {
-        return;
-      }
-      const currentLang =
-        (currentState.currentSettings.lang as string) || (lang as string);
-      const currentYear = new Date().getFullYear();
-      if (!this.yeartexts[currentYear]) {
-        this.yeartexts[currentYear] = {};
-      }
-      if (currentLang && !this.yeartexts[currentYear][currentLang]) {
-        const yeartextRequest = await getYeartext(currentLang, currentYear);
-        if (yeartextRequest?.content) {
-          this.yeartexts[currentYear][currentLang] = yeartextRequest.content;
+      try {
+        const currentState = useCurrentStateStore();
+        const currentLang =
+          (currentState.currentSettings.lang as string) || (lang as string);
+        if (!currentLang) return;
+        const currentYear = new Date().getFullYear();
+        if (!this.yeartexts[currentYear]) {
+          this.yeartexts[currentYear] = {};
         }
+        if (currentLang && !this.yeartexts[currentYear][currentLang]) {
+          const yeartextRequest = await getYeartext(currentLang, currentYear);
+          if (yeartextRequest?.content) {
+            this.yeartexts[currentYear][currentLang] = yeartextRequest.content;
+          }
+        }
+      } catch (error) {
+        console.error(error);
       }
     },
   },

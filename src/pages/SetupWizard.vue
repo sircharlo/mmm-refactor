@@ -569,7 +569,7 @@
               color="primary"
             />
             <q-btn
-              :label="$t('settings')"
+              :label="$t('titles.settings')"
               @click="goToPage('/settings')"
               class="q-ml-sm"
               outlined
@@ -626,31 +626,30 @@ const jwStore = useJwStore();
 const { updateYeartext } = jwStore;
 const router = useRouter();
 
-watch(usingAtKh, () => {
-  enableExternalDisplayAndMusic();
-});
-
-watch(companionToJwl, () => {
-  enableExternalDisplayAndMusic();
-});
-
-watch (obsIntegrate, () => {
-  if (obsIntegrate.value && obsUsed.value) {
+watch(
+  () => [usingAtKh.value, companionToJwl.value],
+  ([newUsingAtKh, newCompanionToJwl]) => {
+    currentSettings.value.enableMediaDisplayButton = newUsingAtKh;
+    if (newUsingAtKh) {
+      currentSettings.value.jwlCompanionMode = newCompanionToJwl;
+      currentSettings.value.autoStartMusic = !newCompanionToJwl;
+      currentSettings.value.enableMusicFadeOut = !newCompanionToJwl;
+      currentSettings.value.jwlCompanionMode = newCompanionToJwl;
+    }
+  },
+);
+watch(obsIntegrate, (newObsIntegrate) => {
+  if (newObsIntegrate && obsUsed.value) {
     currentSettings.value.obsEnable = true;
   }
 });
 
-async function enableExternalDisplayAndMusic() {
-  await updateYeartext(currentSettings.value.lang as string);
-  currentSettings.value.enableMediaDisplayButton = usingAtKh.value;
-  currentSettings.value.jwlCompanionMode = companionToJwl.value;
-
-  if (usingAtKh.value) {
-    currentSettings.value.autoStartMusic = !companionToJwl.value;
-    currentSettings.value.enableMusicFadeOut = !companionToJwl.value;
-    currentSettings.value.jwlCompanionMode = companionToJwl.value;
-  }
-}
+watch(
+  () => currentSettings.value?.lang,
+  (newLang) => {
+    if (newLang) updateYeartext();
+  },
+);
 
 const goToPage = (path: string) => {
   router.push({ path });
