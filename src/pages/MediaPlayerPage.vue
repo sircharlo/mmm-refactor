@@ -1,5 +1,5 @@
 <template>
-  {{ mediaPlayer }}
+  <!-- {{ mediaPlayer }} -->
   <q-page-container
     class="q-electron-drag vertical-middle overflow-hidden"
     padding
@@ -31,6 +31,12 @@
         v-else-if="isVideo(mediaPlayer.url)"
       >
         <source :src="mediaPlayer.url" ref="mediaElementSource" />
+        <track
+          :src="mediaPlayer.subtitlesUrl"
+          default
+          kind="subtitles"
+          v-if="mediaPlayer.subtitlesUrl && mediaPlayer.subtitlesVisible"
+        />
       </video>
       <div v-else>
         <audio
@@ -133,16 +139,26 @@ watch(
   },
 );
 
+watch(
+  () => mediaPlayer.value?.seekTo,
+  (newPosition) => {
+    console.log('newPosition', newPosition);
+    if (!mediaElement.value) return;
+    mediaElement.value.currentTime = newPosition;
+  },
+);
+
 const playMedia = () => {
   if (!mediaElement.value) {
     return;
   }
 
   // mediaElement.value.onpause = () => {
-  //   mediaPlayer.value.currentPosition = mediaElement.value?.currentTime || 0;
+  //   mediaPlayer.value.seekTo = mediaElement.value?.currentTime || 0;
   // };
   mediaElement.value.onended = () => {
     mediaPlayer.value.currentPosition = 0;
+    mediaPlayer.value.seekTo = 0;
     mediaPlayer.value.url = '';
     mediaPlayer.value.uniqueId = '';
     mediaPlayer.value.action =
@@ -152,7 +168,9 @@ const playMedia = () => {
   };
 
   mediaElement.value.ontimeupdate = () => {
-    mediaPlayer.value.currentPosition = mediaElement.value?.currentTime || 0;
+    const currentTime = mediaElement.value?.currentTime || 0;
+    mediaPlayer.value.currentPosition = currentTime;
+    // mediaPlayer.value.seekTo = currentTime;
     if (
       customDurations.value[currentCongregation.value][selectedDate.value][
         mediaPlayer.value.uniqueId
@@ -162,10 +180,7 @@ const playMedia = () => {
         customDurations.value[currentCongregation.value][selectedDate.value][
           mediaPlayer.value.uniqueId
         ];
-      if (
-        mediaElement.value?.currentTime &&
-        mediaElement.value?.currentTime >= customStartStop.max
-      ) {
+      if (currentTime >= customStartStop.max) {
         // updateMediaPlayer('currentPosition', customStartStop.min);
         mediaPlayer.value.url = '';
       }

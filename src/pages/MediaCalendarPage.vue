@@ -386,7 +386,10 @@
                     v-if="mediaPlayer.action === 'pause'"
                   />
                   <q-btn
-                    @click="mediaPlayer.action = 'pause'"
+                    @click="
+                      mediaPlayer.action = 'pause';
+                      mediaPlayer.seekTo = mediaPlayer.currentPosition;
+                    "
                     color="warning"
                     icon="mdi-pause"
                     round
@@ -449,10 +452,18 @@
           >
             <q-item-section>
               <q-slider
-                :disable="mediaPlayer.action !== 'pause'"
                 :max="media.duration"
                 :min="0"
                 :step="0"
+                v-if="mediaPlayer.action === 'pause'"
+                v-model="mediaPlayer.seekTo"
+              />
+              <q-slider
+                :max="media.duration"
+                :min="0"
+                :step="0"
+                disabled
+                v-else
                 v-model="mediaPlayer.currentPosition"
               />
             </q-item-section>
