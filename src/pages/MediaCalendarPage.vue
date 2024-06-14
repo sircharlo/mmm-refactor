@@ -568,7 +568,6 @@ import { electronApi } from 'src/helpers/electron-api';
 import {
   getDurationFromMediaPath,
   getFileUrl,
-  // getSubtitlesUrl,
   getTempDirectory,
   getThumbnailUrl,
 } from 'src/helpers/fs';
@@ -910,7 +909,6 @@ const copyToDatedAdditionalMedia = async (files: string[]) => {
           isImage: isImage(datedAdditionalMediaPath),
           isVideo: isVideoFile,
           section: 'additional',
-          // subtitlesUrl: await getSubtitlesUrl(datedAdditionalMediaPath),
           thumbnailUrl: await getThumbnailUrl(datedAdditionalMediaPath),
           title: path.basename(datedAdditionalMediaPath),
           uniqueId: sanitizeId(

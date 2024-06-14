@@ -225,6 +225,9 @@ contextBridge.exposeInMainWorld('electronApi', {
     return url.fileURLToPath(fileurl);
   },
   fs,
+  getAppDataPath: () => {
+    return app.getPath('appData');
+  },
   getUserDataPath: () => {
     return app.getPath('userData');
   },

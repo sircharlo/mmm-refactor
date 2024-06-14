@@ -190,7 +190,7 @@
       v-model="drawer"
     >
       <q-item
-        :disable="!currentSettings || invalidSettings()"
+        :disable="!currentSettings || invalidSettings() || mediaPlaying"
         :to="{ path: '/media-calendar', exact: true }"
         @click="
           selectedDate = '';
@@ -265,6 +265,7 @@ import ScenePicker from 'src/components/media/ScenePicker.vue';
 import SongPicker from 'src/components/media/SongPicker.vue';
 import SubtitlesButton from 'src/components/media/SubtitlesButton.vue';
 import { getLookupPeriod } from 'src/helpers/date';
+import { createTemporaryNotification } from 'src/helpers/notifications';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -272,11 +273,21 @@ import { useRoute, useRouter } from 'vue-router';
 import MediaDisplayButton from '../components/media/MediaDisplayButton.vue';
 import { electronApi } from '../helpers/electron-api';
 import { downloadBackgroundMusic } from '../helpers/jw-media';
+import { useAppSettingsStore } from '../stores/app-settings';
 import { useCongregationSettingsStore } from '../stores/congregation-settings';
 import { useCurrentStateStore } from '../stores/current-state';
 import { useJwStore } from '../stores/jw';
 
 // Store and router initializations
+
+const appSettings = useAppSettingsStore();
+const { migrations } = storeToRefs(appSettings);
+const { runMigration } = appSettings;
+
+appSettings.$subscribe((_, state) => {
+  LocalStorage.set('migrations', state.migrations);
+});
+
 const currentState = useCurrentStateStore();
 const { invalidSettings } = currentState;
 const {
@@ -311,7 +322,7 @@ const chooseSong = ref(false);
 const mediaSortForDay = ref(true);
 const { toggleMediaWindow } = electronApi;
 
-const { locale } = useI18n({ useScope: 'global' });
+const { locale, t } = useI18n({ useScope: 'global' });
 const drawer = ref(true);
 updateJwLanguages();
 
@@ -428,6 +439,19 @@ const getEventDates = () => {
 const localUpload = ref(false);
 const importMediaMenuActive = ref(false);
 const datePickerActive = ref(false);
+
+if (!migrations.value.includes('firstRun')) {
+  const migrationResult = runMigration('firstRun');
+  if (migrationResult) {
+    createTemporaryNotification({
+      caption: t('successfully-migrated-from-the-previous-version'),
+      icon: 'mdi-check-circle',
+      message: t('welcome-to-mmm'),
+      timeout: 10000,
+      type: 'positive',
+    })
+  }
+}
 
 onMounted(() => {
   document.title = 'Meeting Media Manager';

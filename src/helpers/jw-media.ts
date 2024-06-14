@@ -13,6 +13,8 @@ import {
 } from 'src/types/media';
 import {
   MediaImages,
+  MediaItemsMediator,
+  MediaItemsMediatorFile,
   MediaLink,
   Publication,
   PublicationFetcher,
@@ -127,9 +129,12 @@ const downloadFile = async ({ dir, filename, url }: FileDownloader) => {
   };
 };
 const fetchMedia = async () => {
-  const { lookupPeriod } = storeToRefs(useCurrentStateStore());
+  const { currentCongregation, lookupPeriod } = storeToRefs(
+    useCurrentStateStore(),
+  );
   const fetchErrors = {} as Record<string, boolean>;
   for (const day of lookupPeriod.value.filter((day) => day.meeting)) {
+    if (!currentCongregation.value) break;
     const dayDate = day.date;
     day.loading = true;
     let fetchResult = null;
@@ -546,7 +551,7 @@ const dynamicMediaMapper = async (
         paragraph: m.TargetParagraphNumberLabel,
         section, // if is we: wt; else, if >= middle song: LAC; >= (middle song - 8???): AYFM; else: TGW
         song: mediaIsSong,
-        subtitlesUrl: await getSubtitlesUrl(m),
+        subtitlesUrl: await getSubtitlesUrl(m, duration),
         thumbnailUrl,
         title: mediaIsSong ? m.Label.replace(/^\d+\.\s*/, '') : m.Label,
         uniqueId: sanitizeId(
@@ -981,7 +986,9 @@ const getPubMediaLinks = async (publication: PublicationFetcher) => {
   return response;
 };
 
-export function findBestResolution(mediaLinks: MediaLink[]) {
+export function findBestResolution(
+  mediaLinks: (MediaItemsMediatorFile | MediaLink)[],
+) {
   const currentState = useCurrentStateStore();
   const { getSettingValue } = currentState;
   let bestItem = null;
@@ -990,7 +997,7 @@ export function findBestResolution(mediaLinks: MediaLink[]) {
     (getSettingValue('maxRes') as string).replace(/\D/g, ''),
   );
   if (mediaLinks.some((m) => !m.subtitled))
-    mediaLinks = mediaLinks.filter((m) => !m.subtitled);
+    mediaLinks = mediaLinks.filter((m) => !m.subtitled) as MediaLink[];
   for (const mediaLink of mediaLinks) {
     if (
       mediaLink.frameHeight <= maxRes &&
@@ -1043,7 +1050,7 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
     )[0];
   const mediaItemLinks: MediaLink[] =
     responseObject.files[publication.langwritten][publication.fileformat];
-  const bestItem = findBestResolution(mediaItemLinks);
+  const bestItem = findBestResolution(mediaItemLinks) as MediaLink;
   if (!bestItem) {
     return '';
   }
@@ -1107,12 +1114,17 @@ const getJwMediaInfo = async (publication: PublicationFetcher) => {
     if (publication.fileformat?.toLowerCase().includes('mp4')) url += '_VIDEO';
     else if (publication.fileformat?.toLowerCase().includes('mp3'))
       url += '_AUDIO';
-    const responseObject = await get(url);
+    const responseObject: MediaItemsMediator = await get(url);
     if (!responseObject.media || responseObject.media.length === 0)
       throw new Error('No thumbnail found:' + url);
     return {
+      duration: responseObject.media[0].duration ?? undefined,
       subtitles:
-        findBestResolution(responseObject.media[0].files)?.subtitles?.url ?? '',
+        (
+          findBestResolution(
+            responseObject.media[0].files,
+          ) as MediaItemsMediatorFile
+        )?.subtitles?.url ?? '',
       thumbnail: getBestImageUrl(responseObject.media[0].images),
       title: responseObject.media[0].title,
     };
@@ -1156,7 +1168,7 @@ const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
     if (!filteredMediaItemLinks.some((m) => m.track === currentTrack)) {
       const bestItem = findBestResolution(
         mediaLinks.filter((m) => m.track === currentTrack),
-      );
+      ) as MediaLink;
       if (bestItem) filteredMediaItemLinks.push(bestItem);
     }
   }

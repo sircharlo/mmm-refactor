@@ -165,5 +165,7 @@
   "zoom-out": "Zoom out",
   "download-status": "Download status",
   "please-wait-downloading-media-for-this-day": "Please wait, downloading media for this day...",
-  "noDateSelected": "No date is currently selected. Please select a date before continuing."
+  "noDateSelected": "No date is currently selected. Please select a date before continuing.",
+  "welcome-to-mmm": "Welcome to M³!",
+  "successfully-migrated-from-the-previous-version": "Successfully migrated from the previous version"
 }

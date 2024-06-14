@@ -81,3 +81,96 @@ export interface SettingsGroup {
   name: string;
   order?: number;
 }
+
+export type OldAppConfig = {
+  __internal__: {
+    migrations: {
+      version: string;
+    };
+  };
+  app: {
+    autoOpenFolderWhenDone: boolean;
+    autoQuitWhenDone: boolean;
+    autoRunAtBoot: boolean;
+    autoStartSync: boolean;
+    betaUpdates: boolean;
+    congregationName: string;
+    customCachePath: null | string;
+    disableAutoUpdate: boolean;
+    disableHardwareAcceleration: boolean;
+    localAppLang: string;
+    localOutputPath: string;
+    obs: {
+      cameraScene: null | string;
+      enable: boolean;
+      imageScene: null | string;
+      mediaScene: null | string;
+      password: null | string;
+      port: null | number;
+      useV4: boolean;
+      zoomScene: null | string;
+    };
+    offline: boolean;
+    outputFolderDateFormat: string;
+    theme: string;
+    zoom: {
+      autoRename: string[];
+      autoStartMeeting: boolean;
+      autoStartTime: number;
+      enable: boolean;
+      hideComponent: boolean;
+      id: null | string;
+      name: null | string;
+      password: null | string;
+      spotlight: boolean;
+    };
+  };
+  cong: {
+    dir: null | string;
+    password: null | string;
+    port: null | number;
+    server: null | string;
+    user: null | string;
+  };
+  media: {
+    autoPlayFirst: boolean;
+    autoPlayFirstTime: number;
+    enableMediaDisplayButton: boolean;
+    enableMp4Conversion: boolean;
+    enablePp: boolean;
+    enableSubtitles: boolean;
+    enableVlcPlaylistCreation: boolean;
+    excludeFootnotes: boolean;
+    excludeLffImages: boolean;
+    excludeTh: boolean;
+    hideMediaLogo: boolean;
+    hideWinAfterMedia: boolean;
+    includePrinted: boolean;
+    keepOriginalsAfterConversion: boolean;
+    lang: string;
+    langFallback: null | string;
+    langSubs: null | string;
+    langUpdatedLast: string;
+    maxRes: string;
+    mediaWinShortcut: string;
+    ppBackward: null | string;
+    ppForward: null | string;
+    preferredOutput: string;
+    presentShortcut: string;
+  };
+  meeting: {
+    autoStartMusic: boolean;
+    coWeek: null | string;
+    enableMusicButton: boolean;
+    enableMusicFadeOut: boolean;
+    musicFadeOutTime: number;
+    musicFadeOutType: string;
+    musicVolume: number;
+    mwDay: number;
+    mwStartTime: string;
+    shuffleShortcut: string;
+    specialCong: boolean;
+    weDay: number;
+    weStartTime: string;
+  };
+};

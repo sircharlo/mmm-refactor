@@ -145,7 +145,7 @@ export const useJwStore = defineStore('jw-store', {
             if (!filteredMediaItemLinks.some((m) => m.track === currentTrack)) {
               const bestItem = findBestResolution(
                 mediaItemLinks.filter((m) => m.track === currentTrack),
-              );
+              ) as MediaLink;
               if (bestItem) filteredMediaItemLinks.push(bestItem);
             }
           }

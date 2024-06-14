@@ -11,6 +11,7 @@ export interface ElectronApi {
   executeQuery: (dbPath: string, query: string) => QueryResponseItem[];
   fileUrlToPath: (url: string) => string;
   fs: typeof import('fs-extra');
+  getAppDataPath: () => string;
   getUserDataPath: () => string;
   klawSync: typeof import('klaw-sync');
   openFolderDialog: () => string[];

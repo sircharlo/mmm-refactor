@@ -1,10 +1,10 @@
 import { Item } from 'klaw-sync';
-import { electronApi } from 'src/helpers/electron-api';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { PublicationFetcher } from 'src/types/publications';
 import { MultimediaItem } from 'src/types/sqlite';
 
 import { FULL_HD } from './converters';
+import { electronApi } from './electron-api';
 import { downloadFileIfNeeded, getJwMediaInfo } from './jw-media';
 import { isImage, isVideo } from './mediaPlayback';
 
@@ -153,7 +153,10 @@ const getThumbnailUrl = async (filepath: string) => {
   return thumbnailUrl;
 };
 
-const getSubtitlesUrl = async (multimediaItem: MultimediaItem) => {
+const getSubtitlesUrl = async (
+  multimediaItem: MultimediaItem,
+  comparisonDuration: number,
+) => {
   const currentState = useCurrentStateStore();
   const { getSettingValue } = currentState;
   if (!getSettingValue('enableSubtitles')) return '';
@@ -172,8 +175,10 @@ const getSubtitlesUrl = async (multimediaItem: MultimediaItem) => {
       pub: multimediaItem.KeySymbol,
       track: multimediaItem.Track,
     };
-    const { subtitles } = await getJwMediaInfo(subtitleFetcher);
+    const { duration, subtitles } = await getJwMediaInfo(subtitleFetcher);
     if (!subtitles) return '';
+    console.log('DURATION DEBUG', duration, comparisonDuration);
+    if (duration && Math.abs(duration - comparisonDuration) > 10) return '';
     const subtitlesFilename = path.basename(subtitles);
     const subDirectory = getPublicationDirectory(subtitleFetcher);
     await downloadFileIfNeeded({
