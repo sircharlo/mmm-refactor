@@ -2,14 +2,7 @@ import { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
   {
-    children: [
-      {
-        component: () => import('pages/CongregationSelectorPage.vue'),
-        path: '',
-      },
-    ],
-    component: () => import('layouts/MainLayout.vue'),
-    meta: { title: 'titles.profileSelection' },
+    component: () => import('layouts/RouteHelper.vue'),
     path: '/',
   },
 

@@ -40,17 +40,15 @@ function createMediaWindow() {
 
   window.setAspectRatio(16 / 9);
   if (platform !== 'darwin') {
-    // window.setAlwaysOnTop(true, 'screen-saver');
     window.setMenuBarVisibility(false);
   }
-  window.loadURL('/media');
   if (process.env.DEBUGGING) {
     window.webContents.openDevTools();
-  } else {
+    // } else {
     // window.webContents.on('devtools-opened', () => {
     //   mainWindow?.webContents.closeDevTools();
     // });
-    window.webContents.openDevTools();
+    // window.webContents.openDevTools();
   }
 
   return window;
@@ -122,15 +120,14 @@ function createWindow() {
   mainWindow.webContents.setUserAgent(
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
   );
-  mainWindow.loadURL(process.env.APP_URL);
 
   if (process.env.DEBUGGING) {
     mainWindow.webContents.openDevTools();
-  } else {
+    // } else {
     // mainWindow.webContents.on('devtools-opened', () => {
     //   mainWindow?.webContents.closeDevTools();
     // });
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
   }
 
   mainWindow.on('closed', () => {
@@ -144,20 +141,16 @@ function createWindow() {
     mediaWindow?.close();
   });
 
-  if (mediaWindow) {
-  } else {
+  if (!mediaWindow) {
     mediaWindow = createMediaWindow();
     mediaWindow.on('close', (/* e */) => {
       // if (!authorizedCloseMediaWin) e.preventDefault();
       // e.preventDefault();
     });
-    const mediaUrl = new URL(
-      path.posix.join(process.env.APP_URL, '#', 'media-player'),
-    );
     enable(mediaWindow.webContents);
-    mediaWindow.loadURL(mediaUrl.toString());
-    mainWindow?.webContents.send('mediaWindowShown');
   }
+  mainWindow.loadURL(process.env.APP_URL + '?page=congregation-selector');
+  mediaWindow.loadURL(process.env.APP_URL + '?page=media-player');
 }
 
 app.whenReady().then(createWindow);
