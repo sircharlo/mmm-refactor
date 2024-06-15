@@ -6,7 +6,7 @@
   "areYouSure": "Êtes-vous sûr ?",
   "automatic": "Automatique",
   "autoPlayFirst": "Lecture automatique du premier média",
-  "autoRunAtBoot": "Lancer l'appli automatiquement au démarrage de l'ordinateur",
+  "autoStartAtLogin": "Démarrez M³ automatiquement après l'ouverture de session",
   "autoStartMusic": "Jouer automatiquement la musique de fond avant les réunions",
   "autoStartSync": "Lancer la synchronisation automatiquement",
   "back": "Retour",
@@ -41,8 +41,8 @@
   "doing-so-will-greatly-simplify-and-facilitate-sharing-media-during-hybrid-meetings": "Cela simplifiera et facilitera grandement le partage de médias lors de réunions hybrides.",
   "dontForgetToGetMedia": "N'oubliez pas de rafraîchir les dossiers multimédias sur l'ordinateur utilisé pour présenter les médias lors des réunions de l'assemblée locale !",
   "downloadShuffleMusic": "Télécharger tous les cantiques pour la musique de fond",
-  "enableMediaDisplayButton": "Présenter les médias sur un écran externe ou dans une fenêtre séparée",
-  "enableMusicButton": "Activer le bouton pour jouer de la musique de fond",
+  "enableMediaDisplayButton": "Activer la fonction de lecture des médias",
+  "enableMusicButton": "Activer la fonction de musique de fond",
   "enableObs": "Activer le mode de compatibilité avec OBS Studio <em>(nécessite obs-websocket)</em>",
   "enablePp": "Activer les raccourcis clavier pendant la lecture des médias (à utiliser avec une télécommande USB, par exemple)",
   "enableSubtitles": "Activer les sous-titres pour les vidéos",
@@ -328,5 +328,6 @@
   "please-wait-downloading-media-for-this-day": "Veuillez patienter, téléchargement des médias pour cette journée en cours...",
   "noDateSelected": "Aucune date n'est actuellement sélectionnée. Veuillez sélectionner une date avant de continuer.",
   "welcome-to-mmm": "Bienvenue à M³ !",
-  "successfully-migrated-from-the-previous-version": "Migré avec succès depuis la version précédente"
+  "successfully-migrated-from-the-previous-version": "Migré avec succès depuis la version précédente",
+  "depends-on": "Relié à :"
 }

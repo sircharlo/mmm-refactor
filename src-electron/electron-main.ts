@@ -149,7 +149,9 @@ function createWindow() {
     });
     enable(mediaWindow.webContents);
   }
-  mainWindow.loadURL(process.env.APP_URL + '?page=congregation-selector');
+  mainWindow.loadURL(
+    process.env.APP_URL + '?page=initial-congregation-selector',
+  );
   mediaWindow.loadURL(process.env.APP_URL + '?page=media-player');
 }
 

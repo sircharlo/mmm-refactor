@@ -38,16 +38,35 @@
             <q-item
               :class="{
               'q-py-lg': invalidSettings.includes(settingId as keyof SettingsItems),
-              'bg-grey-8': item.depends && $q.dark.isActive,
-              'bg-grey-3': item.depends && !$q.dark.isActive
+              // 'bg-grey-8': item.depends && $q.dark.isActive,
+              // 'bg-grey-3': item.depends && !$q.dark.isActive,
+              'q-mx-xl': true
             }"
               v-if="(!item.depends || currentSettings[item.depends as keyof SettingsItems]) && (!onlyShowInvalid || !invalidSettingsLength || invalidSettings.includes(settingId as keyof SettingsItems))"
             >
-              <q-item-section class="col-4">
+              <q-item-section>
                 {{ $t(settingId) }}
               </q-item-section>
-              <q-item-section>
-                <!-- <pre>{{ item }}</pre> -->
+              <q-item-section side>
+                <q-icon
+                  color="info"
+                  name="mdi-link-variant"
+                  size="sm"
+                  v-if="item.depends"
+                >
+                  <q-tooltip>
+                    {{ $t('depends-on') }}
+                    <strong>{{ $t(item.depends) }}</strong>
+                  </q-tooltip>
+                </q-icon>
+                <q-icon
+                  :name="item.icon"
+                  color="info"
+                  size="sm"
+                  v-else-if="item.icon"
+                />
+              </q-item-section>
+              <q-item-section style="align-items: end">
                 <ToggleInput
                   :actions="item.actions"
                   v-if="item.type === 'toggle'"

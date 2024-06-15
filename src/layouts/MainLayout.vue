@@ -277,6 +277,7 @@ import { useAppSettingsStore } from '../stores/app-settings';
 import { useCongregationSettingsStore } from '../stores/congregation-settings';
 import { useCurrentStateStore } from '../stores/current-state';
 import { useJwStore } from '../stores/jw';
+//electronapi
 
 // Store and router initializations
 
@@ -320,7 +321,7 @@ jwStore.$subscribe((_, state) => {
 // Ref and reactive initializations
 const chooseSong = ref(false);
 const mediaSortForDay = ref(true);
-const { toggleMediaWindow } = electronApi;
+const { setautoStartAtLogin, toggleMediaWindow } = electronApi;
 
 const { locale, t } = useI18n({ useScope: 'global' });
 const drawer = ref(true);
@@ -351,14 +352,15 @@ watch(route, (newVal) => {
   );
 });
 
+const navigateToCongregationSelector = () => {
+  if (route.fullPath !== '/congregation-selector') {
+      router.push({ path: '/congregation-selector' });
+    }
+};
+
 watch(currentSettings, (newSettings) => {
   console.log('currentSettings changed', newSettings);
-  if (!newSettings) {
-    if (route.fullPath !== '/congregation-selector') {
-      router.push({ path: '/congregation-selector' });
-      return;
-    }
-  }
+  if (!newSettings) navigateToCongregationSelector();
 });
 
 watch(
@@ -400,6 +402,13 @@ watch(
       mediaPlayer.value.windowVisible = newMediaDisplayEnabled;
       toggleMediaWindow(newMediaDisplayEnabled ? 'show' : 'hide');
     }
+  },
+);
+
+watch(
+  () => currentSettings.value?.autoStartAtLogin,
+  (newautoStartAtLogin) => {
+    setautoStartAtLogin(!!newautoStartAtLogin);
   },
 );
 
@@ -455,5 +464,7 @@ if (!migrations.value.includes('firstRun')) {
 
 onMounted(() => {
   document.title = 'Meeting Media Manager';
+  console.log(currentSettings.value)
+  if (!currentSettings.value) navigateToCongregationSelector();
 });
 </script>

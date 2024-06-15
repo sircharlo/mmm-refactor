@@ -16,6 +16,7 @@ export interface ElectronApi {
   klawSync: typeof import('klaw-sync');
   openFolderDialog: () => string[];
   path: typeof import('path');
+  setautoStartAtLogin: (value: boolean) => void;
   toggleMediaWindow: (action: string) => void;
 }
 

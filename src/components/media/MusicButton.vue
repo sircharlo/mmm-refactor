@@ -72,7 +72,7 @@ import { storeToRefs } from 'pinia';
 import { date } from 'quasar';
 import { getFileUrl, getPublicationDirectoryContents } from 'src/helpers/fs';
 import { formatTime } from 'src/helpers/mediaPlayback';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { useCurrentStateStore } from '../../stores/current-state';
@@ -129,7 +129,8 @@ const getNextSongUrl = () => {
 
 function playMusic() {
   if (!musicPlayer.value || !musicPlayerSource.value) return;
-  musicPlayer.value.volume = 1;
+  musicPlayer.value.volume =
+    (getSettingValue('musicVolume') as number) / 100 ?? 1;
   musicPlayerSource.value.src = getNextSongUrl();
   musicPlayer.value.load();
   musicPlayer.value.play().then(() => {
@@ -158,16 +159,24 @@ function playMusic() {
   };
 }
 
+const meetingDay = ref(false);
+
+onMounted(() => {
+  meetingDay.value = !!selectedDateObject.value?.meeting;
+  if (currentSettings.value?.autoStartMusic && meetingDay.value) {
+    playMusic();
+  }
+});
+
 /**
  * Calculates the remaining time before the meeting starts based on the selected meeting day and start time settings.
  *
  * @return {string|null} The remaining time in hours and minutes, optionally formatted, or null if there is no meeting day selected.
  */
 const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
-  const meetingDay = selectedDateObject.value.meeting;
-  if (meetingDay) {
+  if (meetingDay.value) {
     const now = new Date();
-    const weMeeting = meetingDay === 'we';
+    const weMeeting = selectedDateObject.value?.meeting === 'we';
     const meetingStartTime = weMeeting
       ? (getSettingValue('weStartTime') as string)
       : (getSettingValue('mwStartTime') as string);
@@ -192,10 +201,7 @@ const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
 const musicRemainingTime = computed(() => {
   if (!musicPlayer.value) return '..:..';
   if (musicStopping.value) return ref(t('music.stopping')).value;
-  if (
-    selectedDateObject.value.meeting &&
-    timeRemainingBeforeMusicStop.value > 0
-  )
+  if (meetingDay.value && timeRemainingBeforeMusicStop.value > 0)
     return formatTime(timeRemainingBeforeMusicStop.value);
   return currentSongRemainingTime.value;
 });

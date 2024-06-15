@@ -196,5 +196,16 @@ contextBridge.exposeInMainWorld('electronApi', {
     });
   },
   path,
+  setMediaWindowPosition: (x: number, y: number) => {
+    const mediaWindow = getMediaWindow();
+    if (mediaWindow) {
+      mediaWindow.setPosition(x, y);
+    }
+  },
+  setautoStartAtLogin: (value: boolean) => {
+    app.setLoginItemSettings({
+      openAtLogin: value,
+    });
+  },
   toggleMediaWindow,
 });

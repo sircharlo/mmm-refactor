@@ -5,8 +5,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/RouteHelper.vue'),
     path: '/',
   },
-
   {
+    alias: ['/initial-congregation-selector'],
     children: [
       {
         component: () => import('pages/CongregationSelectorPage.vue'),
@@ -17,7 +17,6 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'titles.profileSelection' },
     path: '/congregation-selector',
   },
-
   {
     children: [
       { component: () => import('pages/MediaCalendarPage.vue'), path: '' },
@@ -26,7 +25,6 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'titles.mediaCalendar' },
     path: '/media-calendar',
   },
-
   {
     children: [
       { component: () => import('pages/MediaPlayerPage.vue'), path: '' },
@@ -38,7 +36,7 @@ const routes: RouteRecordRaw[] = [
   {
     children: [{ component: () => import('pages/SetupWizard.vue'), path: '' }],
     component: () => import('layouts/MainLayout.vue'),
-    meta: { title: 'Setup Wizard' },
+    meta: { title: 'setup-wizard' },
     path: '/setup-wizard',
   },
   {

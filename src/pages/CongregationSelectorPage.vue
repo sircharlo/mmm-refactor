@@ -98,7 +98,7 @@ function chooseCongregation(
 }
 
 const isHomePage = computed(() => {
-  return route.path === '/';
+  return route.path === '/initial-congregation-selector';
 });
 
 function createNewCongregation() {

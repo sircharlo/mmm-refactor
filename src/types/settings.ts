@@ -3,7 +3,7 @@ export interface SettingsValues {
   // autoPlayFirst: boolean;
   // autoPlayFirstTime: number;
   // autoQuitWhenDone: boolean;
-  autoRunAtBoot: boolean;
+  autoStartAtLogin: boolean;
   autoStartMusic: boolean;
   // autoStartSync: boolean;
   coWeek: string;
@@ -47,7 +47,7 @@ export interface SettingsValues {
   obsMediaScene: string;
   obsPassword: string;
   obsPort: string;
-  preferredOutput: string;
+  // preferredOutput: string;
   // [key: string]: unknown;
   weDay: string;
   weStartTime: string;
@@ -57,6 +57,7 @@ export interface SettingsItem {
   actions?: string[];
   depends?: string;
   group: string;
+  icon?: string;
   list?: string;
   max?: number;
   min?: number;

@@ -11,8 +11,8 @@
   "are-you-using-this-app-at-a-kingdom-hall-if-so-well-configure-a-few-things-for-you-right-off-the-bat": "Are you using this app at a Kingdom Hall? If so, we'll configure a few things for you right off the bat.",
   "areYouSure": "Are you sure?",
   "automatic": "Automatic",
-  "autoRunAtBoot": "Run app at system start-up",
-  "autoStartMusic": "Play background music automatically before meetings",
+  "autoStartAtLogin": "Start M³ automatically after logging in",
+  "autoStartMusic": "Start background music before meetings automatically",
   "back": "Back",
   "betaUpdates": "Enable beta updates for testing purposes <em>(Note: Do not enable this setting on the computer used to present media at the Kingdom Hall.)</em>",
   "cancel": "Cancel",
@@ -39,8 +39,8 @@
   "does-your-kingdom-hall-use-a-program-called-obs-studio": "Does your Kingdom Hall use a program called OBS Studio?",
   "doing-so-will-greatly-simplify-and-facilitate-sharing-media-during-hybrid-meetings": "Doing so will greatly simplify and facilitate sharing media during hybrid meetings.",
   "drop-multimedia-files-here-to-add-them-to-the-list-for-this-day": "Drop multimedia files here to add them to the list for this day.",
-  "enableMediaDisplayButton": "Present media on an external monitor or in a separate window",
-  "enableMusicButton": "Enable button to play background music",
+  "enableMediaDisplayButton": "Enable media playback",
+  "enableMusicButton": "Enable background music playback",
   "enter-the-port-and-password-configured-in-obs-studios-websocket-plugin": "Enter the port and password configured in OBS Studio's Websocket plugin.",
   "entireFile": "Play from start to finish",
   "error": "Error",
@@ -167,5 +167,7 @@
   "please-wait-downloading-media-for-this-day": "Please wait, downloading media for this day...",
   "noDateSelected": "No date is currently selected. Please select a date before continuing.",
   "welcome-to-mmm": "Welcome to M³!",
-  "successfully-migrated-from-the-previous-version": "Successfully migrated from the previous version"
+  "successfully-migrated-from-the-previous-version": "Successfully migrated from the previous version",
+  "depends-on": "Linked to:",
+  "setup-wizard": "Setup Wizard"
 }

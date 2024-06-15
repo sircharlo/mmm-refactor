@@ -90,5 +90,8 @@
     "&\n              currentSettings.congregationName) ||\n            $t('titles.profileSelection')\n          }}\n        ",
     "&\n              currentSettings ",
     "Meeting Media Manager"
-  ]
+  ],
+  "[xml]": {
+    "editor.defaultFormatter": "redhat.vscode-xml"
+  }
 }

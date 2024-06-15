@@ -29,7 +29,7 @@ const parsePrefsFile = (path: string) => {
 
 const buildNewPrefsObject = (oldPrefs: OldAppConfig) => {
   const newPrefsObject: SettingsValues = {
-    autoRunAtBoot: oldPrefs.app.autoRunAtBoot || false,
+    autoStartAtLogin: oldPrefs.app.autoRunAtBoot || false,
     autoStartMusic: oldPrefs.meeting.autoStartMusic || true,
     coWeek: oldPrefs.meeting.coWeek || '',
     congregationName: oldPrefs.app.congregationName || '',
@@ -57,7 +57,7 @@ const buildNewPrefsObject = (oldPrefs: OldAppConfig) => {
     obsMediaScene: oldPrefs.app.obs.mediaScene || '',
     obsPassword: oldPrefs.app.obs.password || '',
     obsPort: oldPrefs.app.obs.port?.toString() || '',
-    preferredOutput: oldPrefs.media.preferredOutput || '',
+    // preferredOutput: oldPrefs.media.preferredOutput || '',
     weDay: oldPrefs.meeting.weDay?.toString() || '',
     weStartTime: oldPrefs.meeting.weStartTime?.toString() || '',
   };

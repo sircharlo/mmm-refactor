@@ -28,6 +28,7 @@ import {
   TableItem,
   VideoMarker,
 } from 'src/types/sqlite';
+import { useRoute } from 'vue-router';
 
 import { useCurrentStateStore } from '../stores/current-state';
 import { MAX_SONGS } from '../stores/jw';
@@ -132,9 +133,14 @@ const fetchMedia = async () => {
   const { currentCongregation, lookupPeriod } = storeToRefs(
     useCurrentStateStore(),
   );
+  const route = useRoute();
   const fetchErrors = {} as Record<string, boolean>;
   for (const day of lookupPeriod.value.filter((day) => day.meeting)) {
-    if (!currentCongregation.value) break;
+    if (
+      !currentCongregation.value ||
+      !['/media-calendar', '/setup-wizard'].includes(route.fullPath)
+    )
+      break;
     const dayDate = day.date;
     day.loading = true;
     let fetchResult = null;
