@@ -54,6 +54,7 @@ export interface JwPlaylistItem {
 export interface MultimediaItem {
   AlternativeLanguage?: string;
   BeginParagraphOrdinal: number;
+  BeginPosition?: number;
   Caption: string;
   CaptionContent?: null | string;
   CaptionRich?: null | string;

@@ -135,6 +135,9 @@ const fetchMedia = async () => {
   );
   const route = useRoute();
   const fetchErrors = {} as Record<string, boolean>;
+  lookupPeriod.value.forEach((day) => {
+    day.loading = true;
+  });
   for (const day of lookupPeriod.value.filter((day) => day.meeting)) {
     if (
       !currentCongregation.value ||
@@ -142,7 +145,7 @@ const fetchMedia = async () => {
     )
       break;
     const dayDate = day.date;
-    day.loading = true;
+    // day.loading = true;
     let fetchResult = null;
     if (day.meeting === 'we') {
       fetchResult = await getWeMedia(dayDate);
@@ -294,9 +297,11 @@ const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
   // let select = 'SELECT Multimedia.DocumentId, Multimedia.MultimediaId, ';
   const select = 'SELECT * ';
   let from = 'FROM Multimedia ';
-  if (mmTable === 'DocumentMultimedia')
+  if (mmTable === 'DocumentMultimedia') {
     from +=
       'INNER JOIN DocumentMultimedia ON DocumentMultimedia.MultimediaId = Multimedia.MultimediaId ';
+    from += `INNER JOIN DocumentParagraph ON ${mmTable}.BeginParagraphOrdinal = DocumentParagraph.ParagraphIndex `;
+  }
   from += `INNER JOIN Document ON ${mmTable}.DocumentId = Document.DocumentId `;
 
   let where = ` WHERE ${
@@ -324,7 +329,7 @@ const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
   }
 
   const groupAndSort = ParagraphColumnsExist
-    ? ` GROUP BY Multimedia.MultimediaId ORDER BY ${mmTable}.BeginParagraphOrdinal`
+    ? ' GROUP BY Multimedia.MultimediaId ORDER BY DocumentParagraph.BeginPosition'
     : '';
 
   if (targetParNrExists && ParagraphColumnsExist) {
@@ -601,16 +606,19 @@ const getWeMedia = async (lookupDate: Date) => {
     }
     const videos = executeQuery(
       db,
-      `SELECT DocumentMultimedia.MultimediaId, DocumentMultimedia.DocumentId, MepsDocumentId, CategoryType, KeySymbol, Track, IssueTagNumber, MimeType, BeginParagraphOrdinal, TargetParagraphNumberLabel
+      `SELECT *
          FROM DocumentMultimedia
          INNER JOIN Multimedia
            ON DocumentMultimedia.MultimediaId = Multimedia.MultimediaId
+         INNER JOIN DocumentParagraph
+           ON DocumentMultimedia.BeginParagraphOrdinal = DocumentParagraph.ParagraphIndex
          LEFT JOIN Question
            ON Question.DocumentId = DocumentMultimedia.DocumentId
            AND Question.TargetParagraphOrdinal = DocumentMultimedia.BeginParagraphOrdinal
          WHERE DocumentMultimedia.DocumentId = ${docId}
            AND CategoryType = -1
-         GROUP BY DocumentMultimedia.MultimediaId`,
+         GROUP BY DocumentMultimedia.MultimediaId
+         ORDER BY DocumentParagraph.BeginPosition`,
     ) as MultimediaItem[];
     const videosInParagraphs = videos.filter(
       (video) => !!video.TargetParagraphNumberLabel,
@@ -622,10 +630,12 @@ const getWeMedia = async (lookupDate: Date) => {
     const media = (
       executeQuery(
         db,
-        `SELECT DocumentMultimedia.MultimediaId, DocumentMultimedia.DocumentId, *
+        `SELECT *
        FROM DocumentMultimedia
          INNER JOIN Multimedia
            ON DocumentMultimedia.MultimediaId = Multimedia.MultimediaId
+         INNER JOIN DocumentParagraph
+           ON DocumentMultimedia.BeginParagraphOrdinal = DocumentParagraph.ParagraphIndex
          LEFT JOIN Question
            ON Question.DocumentId = DocumentMultimedia.DocumentId
            AND Question.TargetParagraphOrdinal = DocumentMultimedia.BeginParagraphOrdinal
@@ -634,7 +644,7 @@ const getWeMedia = async (lookupDate: Date) => {
            AND CategoryType <> -1
            AND (KeySymbol != '${currentSongbook.value.pub}' OR KeySymbol IS NULL)
          GROUP BY DocumentMultimedia.MultimediaId
-         ORDER BY BeginParagraphOrdinal`, // pictures
+         ORDER BY DocumentParagraph.BeginPosition`, // pictures
       ) as MultimediaItem[]
     )
       .map((multimediaItem) =>
@@ -717,14 +727,20 @@ const getWeMedia = async (lookupDate: Date) => {
       console.error(e);
       songLangs = songs.map(() => getSettingValue('lang') as string);
     }
-    const mergedSongs = songs.map((song, index) => ({
-      ...song,
-      ...(songLangs[index] ? { LangOverride: songLangs[index] } : {}),
-    }));
-
-    const allMedia = finalMedia
-      .concat(mergedSongs)
-      .sort((a, b) => a.BeginParagraphOrdinal - b.BeginParagraphOrdinal);
+    const mergedSongs = songs
+      .map((song, index) => ({
+        ...song,
+        ...(songLangs[index] ? { LangOverride: songLangs[index] } : {}),
+      }))
+      .sort(
+        (a, b) =>
+          (a.BeginParagraphOrdinal ?? 0) - (b.BeginParagraphOrdinal ?? 0),
+      );
+    const allMedia = finalMedia;
+    if (mergedSongs.length > 0) {
+      allMedia.unshift(mergedSongs[0]);
+      if (mergedSongs.length > 1) allMedia.push(mergedSongs[1]);
+    }
 
     const multimediaMepsLangs = getMultimediaMepsLangs({ db, docId });
     for (const media of allMedia) {
@@ -1067,7 +1083,11 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
   })) as DownloadedFile;
 
   const jwMediaInfo = await getJwMediaInfo(publication);
-  for (const itemUrl of [jwMediaInfo.subtitles, jwMediaInfo.thumbnail]) {
+  const { currentSettings } = storeToRefs(useCurrentStateStore());
+  for (const itemUrl of [
+    currentSettings.value.enableSubtitles ? jwMediaInfo.subtitles : undefined,
+    jwMediaInfo.thumbnail,
+  ].filter(Boolean)) {
     if (!itemUrl) continue;
     const itemFilename =
       path.basename(bestItem.file.url).split('.')[0] + path.extname(itemUrl);

@@ -113,6 +113,11 @@ export const useCurrentStateStore = defineStore('current-state', {
         dateString,
       );
     },
+    mediaPaused(state) {
+      return (
+        state.mediaPlayer.url !== '' && state.mediaPlayer.action === 'pause'
+      );
+    },
     mediaPlaying(state) {
       return state.mediaPlayer.url !== '';
     },

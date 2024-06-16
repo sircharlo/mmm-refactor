@@ -28,7 +28,6 @@
         </template>
         {{ $t('noMedia') }}
       </q-banner>
-
       <template
         :key="media.uniqueId"
         v-else
@@ -394,7 +393,8 @@
                     icon="mdi-pause"
                     round
                     v-else-if="
-                      mediaPlayer.action === 'play' || !mediaPlayer.action
+                      media.isVideo &&
+                      (mediaPlayer.action === 'play' || !mediaPlayer.action)
                     "
                   />
                   <!-- </transition> -->
@@ -633,6 +633,7 @@ const {
   currentSettings,
   getDatedAdditionalMediaDirectory,
   lookupPeriod,
+  mediaPaused,
   mediaPlayer,
   mediaPlaying,
   selectedDate,
@@ -796,10 +797,13 @@ dragAndDrop({
   values: sortableMediaItems,
 });
 
-watch(mediaPlaying, (newValue) => {
-  setObsScene(!newValue ? 'camera' : 'media');
-  updateConfig(mediaList.value, { disabled: !!newValue });
-});
+watch(
+  () => [mediaPlaying.value, mediaPaused.value],
+  ([newMediaPlaying, newMediaPaused]) => {
+    setObsScene(!newMediaPlaying || newMediaPaused ? 'camera' : 'media');
+    updateConfig(mediaList.value, { disabled: !!newMediaPlaying });
+  },
+);
 
 const fetchMediaFromCalendar = async () => {
   const fetchResult = await fetchMedia();
