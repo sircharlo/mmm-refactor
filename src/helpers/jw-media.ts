@@ -135,7 +135,7 @@ const fetchMedia = async () => {
   );
   const route = useRoute();
   const fetchErrors = {} as Record<string, boolean>;
-  lookupPeriod.value.forEach((day) => {
+  lookupPeriod.value.filter((day) => day.meeting).forEach((day) => {
     day.loading = true;
   });
   for (const day of lookupPeriod.value.filter((day) => day.meeting)) {
