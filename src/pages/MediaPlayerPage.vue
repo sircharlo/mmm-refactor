@@ -74,12 +74,11 @@
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { storeToRefs } from 'pinia';
 import { useQuasar } from 'quasar';
+import { electronApi } from 'src/helpers/electron-api';
 import { isAudio, isImage, isVideo } from 'src/helpers/mediaPlayback';
+import { useCurrentStateStore } from 'src/stores/current-state';
+import { useJwStore } from 'src/stores/jw';
 import { Ref, ref, watch } from 'vue';
-
-import { electronApi } from '../helpers/electron-api';
-import { useCurrentStateStore } from '../stores/current-state';
-import { useJwStore } from '../stores/jw';
 
 const currentState = useCurrentStateStore();
 const { currentCongregation, currentSettings, mediaPlayer, selectedDate } =

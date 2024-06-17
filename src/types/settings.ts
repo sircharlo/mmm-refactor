@@ -76,6 +76,11 @@ export interface SettingsGroups {
   [id: string]: SettingsGroup;
 }
 
+export interface ScreenPreferences {
+  preferWindowed: boolean;
+  preferredScreenNumber: number;
+}
+
 export interface SettingsGroup {
   description: string;
   hidden?: boolean;

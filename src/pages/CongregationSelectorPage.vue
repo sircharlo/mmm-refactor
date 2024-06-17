@@ -56,12 +56,11 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { Dark } from 'quasar';
+import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
+import { useCurrentStateStore } from 'src/stores/current-state';
+import { useJwStore } from 'src/stores/jw';
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-
-import { useCongregationSettingsStore } from '../stores/congregation-settings';
-import { useCurrentStateStore } from '../stores/current-state';
-import { useJwStore } from '../stores/jw';
 
 const congregationSettings = useCongregationSettingsStore();
 const currentState = useCurrentStateStore();

@@ -54,9 +54,8 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { setObsSceneByUuid } from 'src/helpers/obs';
+import { useObsStateStore } from 'src/stores/obs-state';
 import { ref } from 'vue';
-
-import { useObsStateStore } from '../../stores/obs-state';
 
 const obsState = useObsStateStore();
 const { currentSceneUuid, mediaScene, nonMediaScenes, obsConnectionState } =

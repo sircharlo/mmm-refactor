@@ -1,4 +1,4 @@
-import { DynamicMediaObject } from './media';
+import { DynamicMediaObject } from 'src/types/media';
 
 export interface DateInfo {
   date: Date;

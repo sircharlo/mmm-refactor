@@ -1,11 +1,35 @@
 import axios from 'axios';
 import { Buffer } from 'buffer';
+import PQueue from 'p-queue';
 import { storeToRefs } from 'pinia';
 import { LocalStorage, date } from 'quasar';
 import sanitize from 'sanitize-filename';
 import { get, urlWithParamsToString } from 'src/boot/axios';
 import mepslangs from 'src/defaults/mepslangs';
+import {
+  dateFromString,
+  getSpecificWeekday,
+  isCoWeek,
+  isMwMeetingDay,
+} from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
+import {
+  getDurationFromMediaPath,
+  getFileUrl,
+  getPublicationDirectory,
+  getSubtitlesUrl,
+  getThumbnailUrl,
+} from 'src/helpers/fs';
+import {
+  decompressJwpub,
+  findDb,
+  isAudio,
+  isImage,
+  isSong,
+  isVideo,
+} from 'src/helpers/mediaPlayback';
+import { useCurrentStateStore } from 'src/stores/current-state';
+import { MAX_SONGS } from 'src/stores/jw';
 import {
   DownloadedFile,
   DynamicMediaObject,
@@ -29,30 +53,6 @@ import {
   VideoMarker,
 } from 'src/types/sqlite';
 import { useRoute } from 'vue-router';
-
-import { useCurrentStateStore } from '../stores/current-state';
-import { MAX_SONGS } from '../stores/jw';
-import {
-  dateFromString,
-  getSpecificWeekday,
-  isCoWeek,
-  isMwMeetingDay,
-} from './date';
-import {
-  getDurationFromMediaPath,
-  getFileUrl,
-  getPublicationDirectory,
-  getSubtitlesUrl,
-  getThumbnailUrl,
-} from './fs';
-import {
-  decompressJwpub,
-  findDb,
-  isAudio,
-  isImage,
-  isSong,
-  isVideo,
-} from './mediaPlayback';
 
 const { executeQuery, fs, klawSync, path } = electronApi;
 const FEB_2023 = 20230200;
@@ -1216,37 +1216,25 @@ const downloadBackgroundMusic = () => {
   });
 };
 
-async function addToDownloadsWithLimit(
-  mediaLinks: MediaLink[],
-  dir: string,
-  limit = 3,
-) {
-  const queue = [];
-  const results = [];
+async function addToDownloadsWithLimit(mediaLinks: MediaLink[], dir: string) {
+  console.log('11. Adding to download queue');
+  const queue = new PQueue({ concurrency: 2 });
 
   for (const mediaLink of mediaLinks) {
-    const downloadPromise = downloadFileIfNeeded({
-      dir,
-      size: mediaLink.filesize,
-      url: mediaLink.file.url,
-    }) as Promise<DownloadedFile>;
-    if (!(downloadPromise instanceof Promise)) continue;
-
-    queue.push(downloadPromise);
-    // When the queue is at the limit, wait for one to finish
-    if (queue.length >= limit) {
-      const finishedPromise: Promise<DownloadedFile> = Promise.race(
-        queue,
-      ) as Promise<DownloadedFile>;
-      results.push(await finishedPromise);
-      // Remove the finished promise from the queue
-      queue.splice(queue.indexOf(finishedPromise), 1);
-    }
+    queue.add(() =>
+      downloadFileIfNeeded({
+        dir,
+        size: mediaLink.filesize,
+        url: mediaLink.file.url,
+      }),
+    );
   }
-  // Wait for the remaining promises in the queue
-  results.push(...(await Promise.all(queue)));
-
-  return results;
+  // queue.on('active', () => {
+  //   console.log(
+  //     `Working on new queue item.  Size: ${queue.size}  Pending: ${queue.pending}`,
+  //   );
+  // });
+  // await queue.onIdle();
 }
 
 const downloadJwpub = async (

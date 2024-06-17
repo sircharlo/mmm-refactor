@@ -1,13 +1,12 @@
 import { OBSWebSocketError } from 'obs-websocket-js';
 import { storeToRefs } from 'pinia';
 import { obsWebSocket } from 'src/boot/obs';
+import { isImage } from 'src/helpers/mediaPlayback';
+import { useCurrentStateStore } from 'src/stores/current-state';
+import { useObsStateStore } from 'src/stores/obs-state';
 import { JsonObject } from 'type-fest';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-
-import { useCurrentStateStore } from '../stores/current-state';
-import { useObsStateStore } from '../stores/obs-state';
-import { isImage } from './mediaPlayback';
 
 const currentState = useCurrentStateStore();
 const { getSettingValue } = currentState;

@@ -11,12 +11,15 @@ export interface ElectronApi {
   executeQuery: (dbPath: string, query: string) => QueryResponseItem[];
   fileUrlToPath: (url: string) => string;
   fs: typeof import('fs-extra');
+  getAllScreens: (
+    type?: string,
+  ) => ({ mainWindow?: boolean } & Electron.Display)[];
   getAppDataPath: () => string;
   getUserDataPath: () => string;
   klawSync: typeof import('klaw-sync');
   openFolderDialog: () => string[];
   path: typeof import('path');
-  setautoStartAtLogin: (value: boolean) => void;
+  setAutoStartAtLogin: (value: boolean) => void;
   toggleMediaWindow: (action: string) => void;
 }
 

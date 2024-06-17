@@ -1,14 +1,13 @@
 import { defineStore } from 'pinia';
 import { LocalStorage, uid } from 'quasar';
-import { OldAppConfig } from 'src/types/settings';
-
 import {
   buildNewPrefsObject,
   getOldPrefsPaths,
   getOldVersionPath,
   parsePrefsFile,
-} from '../helpers/migrations';
-import { useCongregationSettingsStore } from '../stores/congregation-settings';
+} from 'src/helpers/migrations';
+import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
+import { OldAppConfig, ScreenPreferences } from 'src/types/settings';
 
 export const useAppSettingsStore = defineStore('app-settings', {
   actions: {
@@ -43,6 +42,8 @@ export const useAppSettingsStore = defineStore('app-settings', {
   state: () => {
     return {
       migrations: (LocalStorage.getItem('migrations') || []) as string[],
+      screenPreferences: (LocalStorage.getItem('screenPreferences') ||
+        {}) as ScreenPreferences,
     };
   },
 });

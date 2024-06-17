@@ -1,12 +1,11 @@
 import { Item } from 'klaw-sync';
+import { FULL_HD } from 'src/helpers/converters';
+import { electronApi } from 'src/helpers/electron-api';
+import { downloadFileIfNeeded, getJwMediaInfo } from 'src/helpers/jw-media';
+import { isImage, isVideo } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { PublicationFetcher } from 'src/types/publications';
 import { MultimediaItem } from 'src/types/sqlite';
-
-import { FULL_HD } from './converters';
-import { electronApi } from './electron-api';
-import { downloadFileIfNeeded, getJwMediaInfo } from './jw-media';
-import { isImage, isVideo } from './mediaPlayback';
 
 const { fs, getUserDataPath, klawSync, path } = electronApi;
 

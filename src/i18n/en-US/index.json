@@ -169,5 +169,7 @@
   "welcome-to-mmm": "Welcome to M³!",
   "successfully-migrated-from-the-previous-version": "Successfully migrated from the previous version",
   "depends-on": "Linked to:",
-  "setup-wizard": "Setup Wizard"
+  "setup-wizard": "Setup Wizard",
+  "footnote": "Footnote",
+  "windowed": "Windowed"
 }

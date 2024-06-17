@@ -1,9 +1,8 @@
 import { storeToRefs } from 'pinia';
 import { date } from 'quasar';
+import { useCurrentStateStore } from 'src/stores/current-state';
 import { DateInfo } from 'src/types/dates';
 import { DynamicMediaObject } from 'src/types/media';
-
-import { useCurrentStateStore } from '../stores/current-state';
 // const currentState = useCurrentStateStore();
 // const { getSettingValue } = currentState
 // const { selectedDateObject } = storeToRefs(currentState);

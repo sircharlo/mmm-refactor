@@ -607,11 +607,10 @@ import TimeInput from 'src/components/form-inputs/TimeInput.vue';
 import MediaDisplayButton from 'src/components/media/MediaDisplayButton.vue';
 import MusicButton from 'src/components/media/MusicButton.vue';
 import { downloadBackgroundMusic, fetchMedia } from 'src/helpers/jw-media';
+import { useCurrentStateStore } from 'src/stores/current-state';
+import { useJwStore } from 'src/stores/jw';
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-
-import { useCurrentStateStore } from '../stores/current-state';
-import { useJwStore } from '../stores/jw';
 
 const currentState = useCurrentStateStore();
 const { currentSettings } = storeToRefs(currentState);

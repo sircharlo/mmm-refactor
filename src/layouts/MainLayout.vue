@@ -4,7 +4,7 @@
       <q-toolbar class="q-pl-none">
         <q-toolbar-title>
           <q-avatar class="q-px-sm q-mr-md">
-            <img src="../assets/master-icon.png" />
+            <img src="src/assets/master-icon.png" />
           </q-avatar>
           {{ $t(route.meta.title as string) }}
         </q-toolbar-title>
@@ -157,11 +157,11 @@
     >
       <q-toolbar class="bg-blue-9 text-white" style="min-height: initial">
         <DownloadStatus />
-        <ObsStatus />
         <q-space />
-        <ScenePicker />
+        <!-- <ScenePicker /> -->
         <MusicButton />
         <SubtitlesButton />
+        <ObsStatus />
         <!-- <q-separator
           inset
           v-if="
@@ -259,25 +259,23 @@
 import { storeToRefs } from 'pinia';
 import { Dark, LocalStorage, date } from 'quasar';
 import DownloadStatus from 'src/components/media/DownloadStatus.vue';
+import MediaDisplayButton from 'src/components/media/MediaDisplayButton.vue';
 import MusicButton from 'src/components/media/MusicButton.vue';
 import ObsStatus from 'src/components/media/ObsStatus.vue';
-import ScenePicker from 'src/components/media/ScenePicker.vue';
+// import ScenePicker from 'src/components/media/ScenePicker.vue';
 import SongPicker from 'src/components/media/SongPicker.vue';
 import SubtitlesButton from 'src/components/media/SubtitlesButton.vue';
 import { getLookupPeriod } from 'src/helpers/date';
+import { electronApi } from 'src/helpers/electron-api';
+import { downloadBackgroundMusic } from 'src/helpers/jw-media';
 import { createTemporaryNotification } from 'src/helpers/notifications';
+import { useAppSettingsStore } from 'src/stores/app-settings';
+import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
+import { useCurrentStateStore } from 'src/stores/current-state';
+import { useJwStore } from 'src/stores/jw';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-
-import MediaDisplayButton from '../components/media/MediaDisplayButton.vue';
-import { electronApi } from '../helpers/electron-api';
-import { downloadBackgroundMusic } from '../helpers/jw-media';
-import { useAppSettingsStore } from '../stores/app-settings';
-import { useCongregationSettingsStore } from '../stores/congregation-settings';
-import { useCurrentStateStore } from '../stores/current-state';
-import { useJwStore } from '../stores/jw';
-//electronapi
 
 // Store and router initializations
 
@@ -287,6 +285,7 @@ const { runMigration } = appSettings;
 
 appSettings.$subscribe((_, state) => {
   LocalStorage.set('migrations', state.migrations);
+  LocalStorage.set('screenPreferences', state.screenPreferences);
 });
 
 const currentState = useCurrentStateStore();
@@ -321,7 +320,7 @@ jwStore.$subscribe((_, state) => {
 // Ref and reactive initializations
 const chooseSong = ref(false);
 const mediaSortForDay = ref(true);
-const { setautoStartAtLogin, toggleMediaWindow } = electronApi;
+const { setAutoStartAtLogin, toggleMediaWindow } = electronApi;
 
 const { locale, t } = useI18n({ useScope: 'global' });
 const drawer = ref(true);
@@ -408,7 +407,7 @@ watch(
 watch(
   () => currentSettings.value?.autoStartAtLogin,
   (newautoStartAtLogin) => {
-    setautoStartAtLogin(!!newautoStartAtLogin);
+    setAutoStartAtLogin(!!newautoStartAtLogin);
   },
 );
 

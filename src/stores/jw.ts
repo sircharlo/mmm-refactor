@@ -3,11 +3,10 @@ import { defineStore } from 'pinia';
 import { LocalStorage } from 'quasar';
 import { date } from 'quasar';
 import { findBestResolution, getPubMediaLinks } from 'src/helpers/jw-media';
+import { useCurrentStateStore } from 'src/stores/current-state';
+import { jwLanguage } from 'src/types/languages';
 import { DynamicMediaObject } from 'src/types/media';
 import { MediaLink, PublicationFetcher } from 'src/types/publications';
-
-import { useCurrentStateStore } from '../stores/current-state';
-import { jwLanguage } from '../types/languages';
 
 export const MAX_SONGS = 500;
 

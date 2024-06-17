@@ -1,16 +1,14 @@
 import { defineStore, storeToRefs } from 'pinia';
 import { date } from 'quasar';
-
-import { settingsDefinitions } from '../defaults/settings';
-import { electronApi } from '../helpers/electron-api';
-import { useCongregationSettingsStore } from '../stores/congregation-settings';
-const { getUserDataPath, path } = electronApi;
-
+import { settingsDefinitions } from 'src/defaults/settings';
+import { electronApi } from 'src/helpers/electron-api';
+import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
+import { useJwStore } from 'src/stores/jw';
 import { DateInfo } from 'src/types/dates';
 import { DownloadProgressItems, DownloadedFile } from 'src/types/media';
 import { SettingsValues } from 'src/types/settings';
 
-import { useJwStore } from '../stores/jw';
+const { getUserDataPath, path } = electronApi;
 
 export const useCurrentStateStore = defineStore('current-state', {
   actions: {

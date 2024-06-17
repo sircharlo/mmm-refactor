@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
+import { useCurrentStateStore } from 'src/stores/current-state';
 import { JsonObject } from 'type-fest';
-
-import { useCurrentStateStore } from '../stores/current-state';
 
 export const useObsStateStore = defineStore('obs-state', {
   getters: {

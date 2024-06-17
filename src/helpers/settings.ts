@@ -1,13 +1,12 @@
 import { storeToRefs } from 'pinia';
 import { ValidationRule, date } from 'quasar';
+import { useJwStore } from 'src/stores/jw';
 import { ref } from 'vue';
-
-import { useJwStore } from '../stores/jw';
 const jwStore = useJwStore();
 const { jwLanguages } = storeToRefs(jwStore);
 const filteredJwLanguages = ref(jwLanguages.value.list);
 
-import { useObsStateStore } from '../stores/obs-state';
+import { useObsStateStore } from 'src/stores/obs-state';
 const obsState = useObsStateStore();
 const { nonMediaScenes, nonStageScenes, scenes } = storeToRefs(obsState);
 

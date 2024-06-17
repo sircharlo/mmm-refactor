@@ -99,9 +99,8 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { electronApi } from 'src/helpers/electron-api';
+import { useCurrentStateStore } from 'src/stores/current-state';
 import { DownloadProgressItems } from 'src/types/media';
-
-import { useCurrentStateStore } from '../../stores/current-state';
 
 // Initialize store and destructure reactive properties
 const currentState = useCurrentStateStore();

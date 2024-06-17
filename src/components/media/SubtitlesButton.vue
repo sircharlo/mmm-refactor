@@ -19,10 +19,8 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
+import { useCurrentStateStore } from 'src/stores/current-state';
 
-import { useCurrentStateStore } from '../../stores/current-state';
-
-// Initialize store and destructure reactive properties
 const currentState = useCurrentStateStore();
 const { currentSettings, mediaPlayer } = storeToRefs(currentState);
 </script>

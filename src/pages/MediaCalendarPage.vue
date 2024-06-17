@@ -31,13 +31,25 @@
       <template
         :key="media.uniqueId"
         v-else
-        v-for="media in sortableMediaItems"
+        v-for="(media, index) in sortableMediaItems"
       >
         <q-item
-          :class="'meeting-section meeting-section-' + media.section"
+          :class="
+            'meeting-section meeting-section-' +
+            media.section +
+            ' ' +
+            (index === 0 ||
+            media.section !== sortableMediaItems[index - 1]?.section
+              ? 'meeting-section-begin meeting-section-begin-' + media.section
+              : '') +
+            ' ' +
+            (index !== sortableMediaItems.length &&
+            media.section !== sortableMediaItems[index + 1]?.section
+              ? 'meeting-section-end meeting-section-end-' + media.section
+              : '')
+          "
           draggable="false"
         >
-          <!-- <q-item-section horizontal class="q-pa-none"> -->
           <q-item-section class="q-pr-none" side>
             <div
               class="rounded-borders bg-grey-9 text-white flex flex-center"
@@ -251,6 +263,14 @@
               :label="media.paragraph"
               icon="fas fa-paragraph"
               square
+              v-if="media.paragraph !== 9999"
+            />
+            <q-chip
+              :clickable="false"
+              :label="$t('footnote')"
+              icon="mdi-asterisk-circle-outline"
+              square
+              v-else
             />
           </q-item-section>
           <q-item-section class="q-px-sm" side v-else-if="media.song">
@@ -602,14 +622,13 @@ import {
 } from 'src/helpers/mediaPlayback';
 import { createTemporaryNotification } from 'src/helpers/notifications';
 import { setObsScene } from 'src/helpers/obs';
+import { useCurrentStateStore } from 'src/stores/current-state';
+import { useJwStore } from 'src/stores/jw';
+import { useObsStateStore } from 'src/stores/obs-state';
 import { DynamicMediaObject } from 'src/types/media';
 import { DocumentItem, TableItem } from 'src/types/sqlite';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-
-import { useCurrentStateStore } from '../stores/current-state';
-import { useJwStore } from '../stores/jw';
-import { useObsStateStore } from '../stores/obs-state';
 
 const dragging = ref(false);
 const jwpubImportDb = ref('');
@@ -1132,23 +1151,76 @@ const imageLoadingError = (media: DynamicMediaObject) => {
   border-left: 10px solid;
 }
 
+.meeting-section-begin {
+  margin-top: 1em;
+}
+
+.meeting-section-end {
+  margin-bottom: 1em;
+}
+
 .meeting-section-tgw {
   border-color: rgb(60, 127, 139);
+  background-color: rgb(60, 127, 139, 0.1);
 }
+/*
+.meeting-section-begin-tgw {
+  border-top: 5px solid rgb(60, 127, 139, 0.25);
+}
+
+.meeting-section-end-tgw {
+  border-bottom: 5px solid rgb(60, 127, 139, 0.25);
+} */
 
 .meeting-section-ayfm {
   border-color: rgb(214, 143, 0);
+  background-color: rgb(214, 143, 0, 0.1);
 }
+
+/* .meeting-section-begin-ayfm {
+  border-top: 5px solid rgb(214, 143, 0, 0.25);
+}
+
+.meeting-section-end-ayfm {
+  border-bottom: 5px solid rgb(214, 143, 0, 0.25);
+} */
 
 .meeting-section-lac {
   border-color: rgb(191, 47, 19);
+  background-color: rgb(191, 47, 19, 0.1);
 }
+
+/* .meeting-section-begin-lac {
+  border-top: 5px solid rgb(191, 47, 19, 0.25);
+}
+
+.meeting-section-end-lac {
+  border-bottom: 5px solid rgb(191, 47, 19, 0.25);
+} */
 
 .meeting-section-wt {
   border-color: rgb(214, 143, 0);
+  background-color: rgb(214, 143, 0, 0.1);
 }
+
+/* .meeting-section-begin-wt {
+  border-top: 5px solid rgb(214, 143, 0, 0.25);
+}
+
+.meeting-section-end-wt {
+  border-bottom: 5px solid rgb(214, 143, 0, 0.25);
+} */
 
 .meeting-section-additional {
   border-color: rgb(91, 60, 136);
+  background-color: rgb(91, 60, 136, 0.1);
 }
+/*
+.meeting-section-begin-additional {
+  border-top: 5px solid rgb(91, 60, 136, 0.25);
+}
+
+.meeting-section-end-additional {
+  border-bottom: 5px solid rgb(91, 60, 136, 0.25);
+} */
 </style>

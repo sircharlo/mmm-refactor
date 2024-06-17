@@ -42,11 +42,10 @@ import {
   dynamicMediaMapper,
   processMissingMediaInfo,
 } from 'src/helpers/jw-media';
+import { useCurrentStateStore } from 'src/stores/current-state';
+import { useJwStore } from 'src/stores/jw';
 import { MultimediaItem } from 'src/types/sqlite';
 import { ref, watch } from 'vue';
-
-import { useCurrentStateStore } from '../../stores/current-state';
-import { useJwStore } from '../../stores/jw';
 
 // Define props and emits
 const props = defineProps<{

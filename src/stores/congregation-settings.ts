@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia';
 import { LocalStorage, uid } from 'quasar';
-
-import { defaultSettings } from '../defaults/settings';
-import { SettingsValues } from '../types/settings';
+import { defaultSettings } from 'src/defaults/settings';
+import { SettingsValues } from 'src/types/settings';
 
 export const useCongregationSettingsStore = defineStore(
   'congregation-settings',

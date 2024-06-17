@@ -131,12 +131,11 @@ import SliderInput from 'src/components/form-inputs/SliderInput.vue';
 import TextInput from 'src/components/form-inputs/TextInput.vue';
 import TimeInput from 'src/components/form-inputs/TimeInput.vue';
 import ToggleInput from 'src/components/form-inputs/ToggleInput.vue';
+import { settingsDefinitions, settingsGroups } from 'src/defaults/settings';
+import { useCurrentStateStore } from 'src/stores/current-state';
+import { useJwStore } from 'src/stores/jw';
 import { SettingsItems } from 'src/types/settings';
 import { computed, onMounted, ref, watch } from 'vue';
-
-import { settingsDefinitions, settingsGroups } from '../defaults/settings';
-import { useCurrentStateStore } from '../stores/current-state';
-import { useJwStore } from '../stores/jw';
 
 // Store initializations
 const currentState = useCurrentStateStore();

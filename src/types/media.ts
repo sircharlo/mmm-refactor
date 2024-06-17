@@ -1,4 +1,4 @@
-import { VideoMarker } from './sqlite';
+import { VideoMarker } from 'src/types/sqlite';
 
 export interface DynamicMediaObject {
   customDuration?: { max: number; min: number };

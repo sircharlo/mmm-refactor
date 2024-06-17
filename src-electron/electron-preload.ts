@@ -35,6 +35,8 @@ import { Point, contextBridge } from 'electron';
 import fs from 'fs-extra';
 import convert from 'heic-convert';
 import klawSync from 'klaw-sync';
+import { LocalStorage } from 'quasar';
+import { ScreenPreferences } from 'src/types/settings';
 import path from 'upath';
 
 const getMainWindow = () =>
@@ -46,8 +48,13 @@ const getMediaWindow = () =>
     w.webContents.getURL().includes('media-player'),
   );
 
-function getOtherScreens() {
-  let displays: Electron.Display[] = [];
+const getScreens = () =>
+  screen
+    .getAllDisplays()
+    .sort((a, b) => a.bounds.x + a.bounds.y - (b.bounds.x + b.bounds.y));
+
+const getAllScreens = (type?: string) => {
+  let displays = getScreens();
   const winMidpoints: { main?: Point; media?: Point } = {};
   const mainWindow = getMainWindow();
   const mediaWindow = getMediaWindow();
@@ -65,39 +72,50 @@ function getOtherScreens() {
           y: posSize[1] + posSize[3] / 2,
         };
       }
-      displays = screen.getAllDisplays().map((display, i) => {
-        return {
-          ...display,
-          humanFriendlyNumber: i + 1,
-        };
-      });
+      if (type === 'other') {
+        displays = displays.filter(
+          (display) =>
+            display.id !==
+            screen.getDisplayNearestPoint(winMidpoints.main as Point).id,
+        );
+      } else {
+        const mainWindowScreen = displays.find(
+          (display) =>
+            display.id ===
+            screen.getDisplayNearestPoint(winMidpoints.media as Point).id,
+        ) as { mainWindow?: boolean } & Electron.Display;
+        if (mainWindowScreen) mainWindowScreen.mainWindow = true;
+      }
     } catch (err) {
       console.error(err);
     }
   }
-  return displays.filter(
-    (display) =>
-      display.id !==
-      screen.getDisplayNearestPoint(winMidpoints.main as Point).id,
-  );
-}
-
+  return displays;
+};
 
 const moveMediaWindow = () => {
-  const otherScreens = getOtherScreens();
+  const otherScreens = getAllScreens('other');
   const mediaWindow = getMediaWindow();
   if (otherScreens.length > 0) {
-    if (!mediaWindow?.isFullScreen()) {
-      mediaWindow?.setPosition(
-        otherScreens[0].workArea.x,
-        otherScreens[0].workArea.y,
-      );
-      mediaWindow?.setFullScreen(true);
+    // One or more other screens found
+    const { preferWindowed, preferredScreenNumber } = (LocalStorage.getItem(
+      'screenPreferences',
+    ) || {}) as ScreenPreferences;
+    let targetScreen = 0;
+    if (otherScreens.length > 1) {
+      // More than one other screen found, so get user preferences for screen selection
+      targetScreen = preferredScreenNumber ?? 0;
     }
-    if (!mediaWindow?.isAlwaysOnTop()) mediaWindow?.setAlwaysOnTop(true);
+    mediaWindow?.setPosition(
+      otherScreens[targetScreen].workArea.x + 50,
+      otherScreens[targetScreen].workArea.y + 50,
+    );
+    mediaWindow?.setFullScreen(!preferWindowed);
+    mediaWindow?.setAlwaysOnTop(!preferWindowed);
   } else {
-    if (mediaWindow?.isFullScreen()) mediaWindow?.setFullScreen(false);
-    if (mediaWindow?.isAlwaysOnTop()) mediaWindow?.setAlwaysOnTop(false);
+    // Only one screen found, so media window is windowed and not always on top
+    mediaWindow?.setFullScreen(false);
+    mediaWindow?.setAlwaysOnTop(false);
   }
 };
 
@@ -183,6 +201,7 @@ contextBridge.exposeInMainWorld('electronApi', {
     return url.fileURLToPath(fileurl);
   },
   fs,
+  getAllScreens,
   getAppDataPath: () => {
     return app.getPath('appData');
   },
@@ -196,16 +215,16 @@ contextBridge.exposeInMainWorld('electronApi', {
     });
   },
   path,
+  setAutoStartAtLogin: (value: boolean) => {
+    app.setLoginItemSettings({
+      openAtLogin: value,
+    });
+  },
   setMediaWindowPosition: (x: number, y: number) => {
     const mediaWindow = getMediaWindow();
     if (mediaWindow) {
       mediaWindow.setPosition(x, y);
     }
-  },
-  setautoStartAtLogin: (value: boolean) => {
-    app.setLoginItemSettings({
-      openAtLogin: value,
-    });
   },
   toggleMediaWindow,
 });

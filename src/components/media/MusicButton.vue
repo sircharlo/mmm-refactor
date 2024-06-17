@@ -72,10 +72,9 @@ import { storeToRefs } from 'pinia';
 import { date } from 'quasar';
 import { getFileUrl, getPublicationDirectoryContents } from 'src/helpers/fs';
 import { formatTime } from 'src/helpers/mediaPlayback';
+import { useCurrentStateStore } from 'src/stores/current-state';
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-
-import { useCurrentStateStore } from '../../stores/current-state';
 const { t } = useI18n();
 
 defineProps<{

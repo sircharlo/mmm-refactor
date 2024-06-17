@@ -4,7 +4,7 @@ import {
   SettingsGroups,
   SettingsItems,
   SettingsValues,
-} from '../types/settings';
+} from 'src/types/settings';
 
 export const settingsGroups: SettingsGroups = {
   app: {
