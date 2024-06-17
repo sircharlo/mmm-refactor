@@ -4,7 +4,6 @@ import { obsWebSocket } from 'src/boot/obs';
 import { isImage } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useObsStateStore } from 'src/stores/obs-state';
-import { JsonObject } from 'type-fest';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -49,7 +48,7 @@ obsWebSocket.on('ConnectionError', obsErrorHandler);
 obsWebSocket.on('CurrentProgramSceneChanged', (data: { sceneUuid: string }) => {
   currentSceneUuid.value = data.sceneUuid;
 });
-obsWebSocket.on('SceneListChanged', (data: { scenes: JsonObject[] }) => {
+obsWebSocket.on('SceneListChanged', (data) => {
   scenes.value = data.scenes;
 });
 

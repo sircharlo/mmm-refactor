@@ -7,7 +7,7 @@
 
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
-
+const { sentryVitePlugin } = require('@sentry/vite-plugin');
 const { configure } = require('quasar/wrappers');
 const path = require('path');
 // const inject  = require('@rollup/plugin-inject')
@@ -31,7 +31,7 @@ module.exports = configure(function (/* ctx */) {
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ['i18n', 'axios', 'obs'],
+    boot: ['sentry', 'i18n', 'axios', 'obs'],
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
@@ -50,7 +50,17 @@ module.exports = configure(function (/* ctx */) {
         if (!viteConf.optimizeDeps.esbuildOptions.define)
           viteConf.optimizeDeps.esbuildOptions.define = {};
         viteConf.optimizeDeps.esbuildOptions.define.global = 'window';
+        if (!viteConf.build) viteConf.build = {};
+        viteConf.build.sourcemap = true;
+        if (!viteConf.build.plugins) viteConf.build.plugins = [];
+        viteConf.build.plugins.push(
+          sentryVitePlugin({
+            org: 'jw-projects',
+            project: 'mmm-v2',
+          }),
+        );
       },
+
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,

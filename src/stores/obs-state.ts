@@ -1,6 +1,6 @@
+import { JsonObject } from 'obs-websocket-js/node_modules/type-fest';
 import { defineStore } from 'pinia';
 import { useCurrentStateStore } from 'src/stores/current-state';
-import { JsonObject } from 'type-fest';
 
 export const useObsStateStore = defineStore('obs-state', {
   getters: {
@@ -9,7 +9,7 @@ export const useObsStateStore = defineStore('obs-state', {
       return state.scenes.find(
         (scene) =>
           scene.sceneUuid === currentState.currentSettings?.obsMediaScene,
-      ) as JsonObject;
+      );
     },
     nonMediaScenes: (state) => {
       const currentState = useCurrentStateStore();
