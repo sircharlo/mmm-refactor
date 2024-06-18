@@ -136,6 +136,9 @@ export const useCurrentStateStore = defineStore('current-state', {
       downloads: {} as {
         [key: string]: DownloadedFile | Promise<DownloadedFile>;
       },
+      extractedFiles: {} as {
+        [key: string]: Promise<string>;
+      },
       lookupPeriod: [] as DateInfo[],
       mediaPlayer: {
         action: '',

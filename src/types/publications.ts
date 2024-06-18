@@ -115,50 +115,6 @@ export interface MediaItemsMediator {
   }[];
 }
 
-/**
-   * // 20240614125438
-// https://b.jw-cdn.org/apis/mediator/v1/media-items/U/pub-lmdv_6_VIDEO
-
-{
-  "media": [
-    {
-
-      "images": {
-        "pnr": {
-          "lg": "https://cms-imgp.jw-cdn.org/img/p/1102023306/univ/art/1102023306_univ_pnr_lg.jpg"
-        },
-        "wss": {
-          "lg": "https://cms-imgp.jw-cdn.org/img/p/1102023306/univ/art/1102023306_univ_wss_lg.jpg",
-          "sm": "https://cms-imgp.jw-cdn.org/img/p/1102023306/univ/art/1102023306_univ_wss_sm.jpg"
-        },
-        "lsr": {
-          "xl": "https://cms-imgp.jw-cdn.org/img/p/1102023306/univ/art/1102023306_univ_lsr_xl.jpg"
-        },
-        "sqr": {
-          "md": "https://cms-imgp.jw-cdn.org/img/p/1102023306/univ/art/1102023306_univ_sqr_md.jpg"
-        }
-      },
-      "availableLanguages": [
-        "A",
-        "AA",
-
-      ],
-      "printReferences": [
-        "lmdv-6.v",
-        "lmdv-6"
-      ]
-    }
-  ],
-  "language": {
-    "languageCode": "U",
-    "locale": "ru",
-    "script": "CYRILLIC",
-    "direction": "ltr",
-    "isSignLanguage": false
-  }
-}
-   */
-
 export interface Publication {
   booknum: null | number;
   fileformat: string[];

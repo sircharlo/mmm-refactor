@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer';
+import { storeToRefs } from 'pinia';
 import { format } from 'quasar';
 import { FULL_HD } from 'src/helpers/converters';
 import { electronApi } from 'src/helpers/electron-api';
@@ -7,6 +8,7 @@ import {
   dynamicMediaMapper,
   processMissingMediaInfo,
 } from 'src/helpers/jw-media';
+import { useCurrentStateStore } from 'src/stores/current-state';
 import {
   JwPlaylistItem,
   MultimediaItem,
@@ -116,13 +118,20 @@ const isImageString = (url: string) => {
   return url.startsWith('data:image');
 };
 
-const decompressJwpub = async (jwpubPath: string, outputPath?: string) => {
-  if (!isJwpub(jwpubPath)) return jwpubPath;
-  if (!outputPath)
-    outputPath = path.join(getTempDirectory(), path.basename(jwpubPath));
+const jwpubDecompressor = async (jwpubPath: string, outputPath: string) => {
   await decompress(jwpubPath, outputPath);
   await decompress(path.join(outputPath, 'contents'), outputPath);
   return outputPath;
+};
+
+const decompressJwpub = async (jwpubPath: string, outputPath?: string) => {
+  const { extractedFiles } = storeToRefs(useCurrentStateStore());
+  if (!isJwpub(jwpubPath)) return jwpubPath;
+  if (!outputPath)
+    outputPath = path.join(getTempDirectory(), path.basename(jwpubPath));
+  if (!extractedFiles.value[outputPath])
+    extractedFiles.value[outputPath] = jwpubDecompressor(jwpubPath, outputPath);
+  return extractedFiles.value[outputPath];
 };
 
 const getMediaFromJwPlaylist = async (

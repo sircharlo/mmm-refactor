@@ -28,6 +28,32 @@
         </template>
         {{ $t('noMedia') }}
       </q-banner>
+      <template v-else-if="selectedDateObject.loading">
+        <template :key="i" v-for="i in 5">
+          <q-item class="meeting-section meeting-section-skeleton">
+            <q-item-section avatar class="q-pr-none">
+              <q-skeleton style="width: 150px; height: 84px" />
+            </q-item-section>
+            <q-item-section class="q-px-sm" side v-if="i % 2 !== 0">
+              <q-skeleton style="width: 70px" type="QChip" />
+            </q-item-section>
+            <q-item-section class="q-pl-md">
+              <q-item-label>
+                <q-skeleton type="text" />
+              </q-item-label>
+              <q-item-label caption>
+                <q-skeleton type="text" />
+              </q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-skeleton type="circle" />
+            </q-item-section>
+          </q-item>
+        </template>
+        <q-inner-loading
+          :label="$t('please-wait-downloading-media-for-this-day')"
+        />
+      </template>
       <template
         :key="media.uniqueId"
         v-else
@@ -490,10 +516,10 @@
           </q-item>
         </transition>
       </template>
-      <q-inner-loading
+      <!-- <q-inner-loading
         :label="$t('please-wait-downloading-media-for-this-day')"
         :showing="!selectedDateObject || selectedDateObject?.loading"
-      />
+      /> -->
     </q-list>
     <q-dialog persistent v-model="mediaStopPending">
       <q-card>
@@ -1149,6 +1175,10 @@ const imageLoadingError = (media: DynamicMediaObject) => {
 <style scoped>
 .meeting-section {
   border-left: 10px solid;
+}
+
+.meeting-section-skeleton {
+  border-color: rgba(0, 0, 0, 0.12);
 }
 
 .meeting-section-begin {
