@@ -30,32 +30,72 @@
             {{ $t('projecting') }}
           </div>
           <div class="text-h5 text-negative" v-else>{{ $t('inactive') }}</div>
-          <div class="text-caption text-grey">{{  $t((screenList.length < 2 || screenPreferences.preferWindowed) ? 'windowed' : 'external-screen') }}</div>
+          <div class="text-caption text-grey">
+            {{
+              $t(
+                screenList.length < 2 || screenPreferences.preferWindowed
+                  ? 'windowed'
+                  : 'external-screen',
+              )
+            }}
+          </div>
         </q-card-section>
         <q-separator />
         <q-card-section class="q-pb-none">
           <template :key="screen.id" v-for="(screen, index) in screenList">
             <q-btn
-            :color="screenPreferences.preferredScreenNumber === index ? 'primary' : ''"
+              :color="
+                screenList.length < 2 ||
+                screenPreferences.preferredScreenNumber === index
+                  ? 'primary'
+                  : ''
+              "
               :disable="screenList.length < 2 || screen.mainWindow"
-              :icon="screen.mainWindow ? 'mdi-monitor-dashboard' : (screenPreferences.preferredScreenNumber === index ? 'mdi-monitor-shimmer' : 'mdi-monitor')"
-              :text-color="screenPreferences.preferredScreenNumber === index ? '' : 'primary'"
+              :icon="
+                screen.mainWindow
+                  ? 'mdi-monitor-dashboard'
+                  : screenPreferences.preferredScreenNumber === index
+                  ? 'mdi-monitor-shimmer'
+                  : 'mdi-monitor'
+              "
+              :text-color="
+                screenList.length < 2 ||
+                screenPreferences.preferredScreenNumber === index
+                  ? ''
+                  : 'primary'
+              "
               @click="screenPreferences.preferredScreenNumber = index"
             />
           </template>
         </q-card-section>
         <q-card-section>
           <q-btn
-            :color="screenList.length < 2 || screenPreferences.preferWindowed ? 'primary' : ''"
+            :color="
+              screenList.length < 2 || screenPreferences.preferWindowed
+                ? 'primary'
+                : ''
+            "
             :disable="screenList.length < 2"
-            :text-color="screenList.length < 2 || screenPreferences.preferWindowed ? '' : 'primary'"
+            :text-color="
+              screenList.length < 2 || screenPreferences.preferWindowed
+                ? ''
+                : 'primary'
+            "
             @click="screenPreferences.preferWindowed = true"
             icon="mdi-window-restore"
           />
           <q-btn
-            :color="screenList.length >= 2 && !screenPreferences.preferWindowed ? 'primary' : ''"
+            :color="
+              screenList.length >= 2 && !screenPreferences.preferWindowed
+                ? 'primary'
+                : ''
+            "
             :disable="screenList.length < 2"
-            :text-color="screenList.length >= 2 && !screenPreferences.preferWindowed ? '' : 'primary'"
+            :text-color="
+              screenList.length >= 2 && !screenPreferences.preferWindowed
+                ? ''
+                : 'primary'
+            "
             @click="screenPreferences.preferWindowed = false"
             icon="mdi-overscan"
           />
@@ -88,7 +128,10 @@ import { storeToRefs } from 'pinia';
 import { electronApi } from 'src/helpers/electron-api';
 import { useAppSettingsStore } from 'src/stores/app-settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
-import { ref, } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
+
+const { getAllScreens, moveMediaWindow, toggleMediaWindow } =
+  electronApi;
 
 defineProps<{
   disabled?: boolean;
@@ -101,10 +144,56 @@ const mediaDisplayPopup = ref();
 
 const showMediaWindow = (state: boolean) => {
   mediaPlayer.value.windowVisible = state;
-  electronApi.toggleMediaWindow(state ? 'show' : 'hide');
+  toggleMediaWindow(state ? 'show' : 'hide');
 };
 
 const appSettings = useAppSettingsStore();
 const { screenPreferences } = storeToRefs(appSettings);
-const screenList = ref(electronApi.getAllScreens());
+const screenList = ref(getAllScreens());
+
+watch(
+  () => [
+    currentSettings.value?.enableMediaDisplayButton,
+    currentSettings.value?.jwlCompanionMode,
+  ],
+  ([newMediaDisplayEnabled, newJwlCompanionMode]) => {
+    if (newMediaDisplayEnabled && !newJwlCompanionMode) {
+      showMediaWindow(newMediaDisplayEnabled);
+    }
+  },
+  { immediate: true },
+);
+
+watch(
+  () => screenPreferences.value,
+  (newScreenPreferences) => {
+    console.log('newScreenPreferences', newScreenPreferences);
+    moveMediaWindow({
+      noEvent: true,
+      targetScreen: newScreenPreferences.preferredScreenNumber,
+      windowedMode: newScreenPreferences.preferWindowed,
+    });
+  },
+  { deep: true, immediate: true },
+);
+
+const targetScreenListener = (event: CustomEventInit) => {
+  console.log('targetScreen-update', event.detail);
+  screenPreferences.value.preferredScreenNumber = event.detail;
+};
+
+const windowedModeListener = (event: CustomEventInit) => {
+  console.log('windowedMode-update', event.detail);
+  screenPreferences.value.preferWindowed = event.detail;
+};
+
+onMounted(() => {
+  window.addEventListener('targetScreen-update', targetScreenListener);
+  window.addEventListener('windowedMode-update', windowedModeListener);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('targetScreen-update', targetScreenListener);
+  window.removeEventListener('windowedMode-update', windowedModeListener);
+});
 </script>

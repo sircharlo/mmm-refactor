@@ -17,6 +17,15 @@ export interface ElectronApi {
   getAppDataPath: () => string;
   getUserDataPath: () => string;
   klawSync: typeof import('klaw-sync');
+  moveMediaWindow: ({
+    targetScreen,
+    windowedMode,
+  }: {
+    noEvent: boolean;
+    targetScreen?: number;
+    windowedMode?: boolean;
+  }) => void;
+  openFileDialog: () => string[];
   openFolderDialog: () => string[];
   path: typeof import('path');
   setAutoStartAtLogin: (value: boolean) => void;

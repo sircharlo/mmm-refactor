@@ -111,6 +111,12 @@ watch(
 );
 
 watch(
+  () => currentCongregation.value,
+  (newCongregation) => {
+    if (!newCongregation) toggleMediaWindow('hide');
+  },)
+
+watch(
   () => [mediaPlayer.value?.scale, mediaPlayer.value?.x, mediaPlayer.value?.y],
   ([newScale, newX, newY]) => {
     if (!mediaElement.value) {

@@ -115,14 +115,24 @@
                     text-color="white"
                 /></q-card-section>
                 <q-card-section>
-                  <span>{{
-                    $t(
-                      'to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window',
-                    )
-                  }}</span></q-card-section
+                  <p>
+                    {{
+                      $t(
+                        'to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window',
+                      )
+                    }}
+                  </p>
+                  <p>
+                    {{
+                      $t(
+                        'you-can-also-use-the-button-below-to-browse-for-files',
+                      )
+                    }}
+                  </p></q-card-section
                 >
               </q-card-section>
               <q-card-actions align="right">
+                <q-btn @click="localUpload = false" label="Browse" />
                 <q-btn
                   :label="$t('got-it')"
                   color="primary"
@@ -285,7 +295,9 @@ const { runMigration } = appSettings;
 
 appSettings.$subscribe((_, state) => {
   LocalStorage.set('migrations', state.migrations);
-  LocalStorage.set('screenPreferences', state.screenPreferences);
+
+  // Use native localStorage for screen preferences, since Electron preload can't use quasar's LocalStorage
+  localStorage.set('screenPreferences', state.screenPreferences);
 });
 
 const currentState = useCurrentStateStore();
@@ -295,7 +307,6 @@ const {
   currentSettings,
   downloadProgress,
   lookupPeriod,
-  mediaPlayer,
   mediaPlaying,
   onlyShowInvalid,
   selectedDate,
@@ -320,7 +331,7 @@ jwStore.$subscribe((_, state) => {
 // Ref and reactive initializations
 const chooseSong = ref(false);
 const mediaSortForDay = ref(true);
-const { setAutoStartAtLogin, toggleMediaWindow } = electronApi;
+const { setAutoStartAtLogin } = electronApi;
 
 const { locale, t } = useI18n({ useScope: 'global' });
 const drawer = ref(true);
@@ -353,8 +364,8 @@ watch(route, (newVal) => {
 
 const navigateToCongregationSelector = () => {
   if (route.fullPath !== '/congregation-selector') {
-      router.push({ path: '/congregation-selector' });
-    }
+    router.push({ path: '/congregation-selector' });
+  }
 };
 
 watch(currentSettings, (newSettings) => {
@@ -388,19 +399,6 @@ watch(
   ],
   () => {
     lookupPeriod.value = getLookupPeriod();
-  },
-);
-
-watch(
-  () => [
-    currentSettings.value?.enableMediaDisplayButton,
-    currentSettings.value?.jwlCompanionMode,
-  ],
-  ([newMediaDisplayEnabled, newJwlCompanionMode]) => {
-    if (newMediaDisplayEnabled && !newJwlCompanionMode) {
-      mediaPlayer.value.windowVisible = newMediaDisplayEnabled;
-      toggleMediaWindow(newMediaDisplayEnabled ? 'show' : 'hide');
-    }
   },
 );
 
@@ -457,13 +455,13 @@ if (!migrations.value.includes('firstRun')) {
       message: t('welcome-to-mmm'),
       timeout: 10000,
       type: 'positive',
-    })
+    });
   }
 }
 
 onMounted(() => {
   document.title = 'Meeting Media Manager';
-  console.log(currentSettings.value)
+  console.log(currentSettings.value);
   if (!currentSettings.value) navigateToCongregationSelector();
 });
 </script>

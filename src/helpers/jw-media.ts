@@ -135,30 +135,37 @@ const fetchMedia = async () => {
   );
   const route = useRoute();
   const fetchErrors = {} as Record<string, boolean>;
-  lookupPeriod.value.filter((day) => day.meeting).forEach((day) => {
-    day.loading = true;
-  });
+  lookupPeriod.value
+    .filter((day) => day.meeting)
+    .forEach((day) => {
+      day.loading = true;
+    });
+  const queue = new PQueue({ concurrency: 3 });
   for (const day of lookupPeriod.value.filter((day) => day.meeting)) {
-    if (
-      !currentCongregation.value ||
-      !['/media-calendar', '/setup-wizard'].includes(route.fullPath)
-    )
-      break;
-    const dayDate = day.date;
-    // day.loading = true;
-    let fetchResult = null;
-    if (day.meeting === 'we') {
-      fetchResult = await getWeMedia(dayDate);
-    } else if (day.meeting === 'mw') {
-      fetchResult = await getMwMedia(dayDate);
-    }
-    if (fetchResult) {
-      day.dynamicMedia = fetchResult.media;
-      if (fetchResult.error)
-        fetchErrors[date.formatDate(dayDate, 'YYYY/MM/DD')] = fetchResult.error;
-    }
-    day.loading = false;
+    queue.add(async () => {
+      if (
+        !currentCongregation.value ||
+        !['/media-calendar', '/setup-wizard'].includes(route.fullPath)
+      )
+        return;
+      const dayDate = day.date;
+      // day.loading = true;
+      let fetchResult = null;
+      if (day.meeting === 'we') {
+        fetchResult = await getWeMedia(dayDate);
+      } else if (day.meeting === 'mw') {
+        fetchResult = await getMwMedia(dayDate);
+      }
+      if (fetchResult) {
+        day.dynamicMedia = fetchResult.media;
+        if (fetchResult.error)
+          fetchErrors[date.formatDate(dayDate, 'YYYY/MM/DD')] =
+            fetchResult.error;
+      }
+      day.loading = false;
+    });
   }
+  await queue.onIdle();
   return fetchErrors;
 };
 
@@ -1217,9 +1224,7 @@ const downloadBackgroundMusic = () => {
 };
 
 async function addToDownloadsWithLimit(mediaLinks: MediaLink[], dir: string) {
-  console.log('11. Adding to download queue');
-  const queue = new PQueue({ concurrency: 2 });
-
+  const queue = new PQueue({ concurrency: 3 });
   for (const mediaLink of mediaLinks) {
     queue.add(() =>
       downloadFileIfNeeded({
@@ -1229,12 +1234,6 @@ async function addToDownloadsWithLimit(mediaLinks: MediaLink[], dir: string) {
       }),
     );
   }
-  // queue.on('active', () => {
-  //   console.log(
-  //     `Working on new queue item.  Size: ${queue.size}  Pending: ${queue.pending}`,
-  //   );
-  // });
-  // await queue.onIdle();
 }
 
 const downloadJwpub = async (
