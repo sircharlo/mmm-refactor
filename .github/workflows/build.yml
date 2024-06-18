@@ -33,11 +33,19 @@ jobs:
       - run: pip install setuptools
       - run: yarn install && yarn global add @quasar/cli
 
-      - run: yarn quasar build -m electron -P always
+      - name: Build and publish Electron app
+        if: "!startsWith(github.head_ref, 'dependabot/')"
+        run: yarn quasar build -m electron -P always
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-
+ 
+      - name: Build Electron app
+        if: "startsWith(github.head_ref, 'dependabot/')"
+        run: yarn quasar build -m electron
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
    #   - name: Build/release Electron app
   #    uses: samuelmeuli/action-electron-builder@v1
