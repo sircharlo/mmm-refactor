@@ -1,6 +1,10 @@
 name: Build/release
 
-on: push
+on:
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+  pull_request:
 
 jobs:
   release:
