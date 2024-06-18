@@ -30,7 +30,7 @@ jobs:
         with:
           python-version: '3.9'
 
-      - run: pip install setuptools
+      - run: pip install setuptools pangocairo
       - run: yarn install && yarn global add @quasar/cli
 
       - name: Build and publish Electron app
