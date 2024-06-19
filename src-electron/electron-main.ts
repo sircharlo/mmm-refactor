@@ -12,6 +12,27 @@ const platform = process.platform || os.platform();
 let mainWindow: BrowserWindow | null | undefined;
 let mediaWindow: BrowserWindow | null | undefined;
 
+const allowedHostnames = [
+  'jw.org',
+  'jw-cdn.org',
+  'akamaihd.net',
+  'cloudfront.net',
+];
+
+const isValidHostname = (hostname: string) => {
+  // Check if the hostname is exactly one of the allowed hostnames
+  if (allowedHostnames.includes(hostname)) {
+    return true;
+  }
+
+  // Check for subdomain matches
+  return allowedHostnames.some((allowedHostname) => {
+    return (
+      hostname === allowedHostname || hostname.endsWith(`.${allowedHostname}`)
+    );
+  });
+};
+
 function createMediaWindow() {
   const window = new BrowserWindow({
     alwaysOnTop: true,
@@ -57,12 +78,7 @@ function createMediaWindow() {
 function createWindow() {
   session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
     const parsedUrl = new URL(details.url);
-    if (
-      parsedUrl.hostname.includes('jw.org') ||
-      parsedUrl.hostname.includes('jw-cdn.org') ||
-      parsedUrl.hostname.includes('akamaihd') ||
-      parsedUrl.hostname.includes('cloudfront.net')
-    ) {
+    if (isValidHostname(parsedUrl.hostname)) {
       if (details.requestHeaders) {
         const baseUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}/`;
         details.requestHeaders.Referer = baseUrl;
@@ -76,12 +92,7 @@ function createWindow() {
   });
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     const parsedUrl = new URL(details.url);
-    if (
-      parsedUrl.hostname.includes('jw.org') ||
-      parsedUrl.hostname.includes('jw-cdn.org') ||
-      parsedUrl.hostname.includes('akamaihd') ||
-      parsedUrl.hostname.includes('cloudfront.net')
-    ) {
+    if (isValidHostname(parsedUrl.hostname)) {
       if (details.responseHeaders) {
         if (
           !details.responseHeaders['access-control-allow-origin'] ||
