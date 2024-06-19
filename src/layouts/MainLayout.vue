@@ -32,7 +32,11 @@
                   </q-item-section>
                   <q-item-section>{{ $t('song') }}</q-item-section>
                 </q-item>
-                <q-item @click="localUpload = true" clickable v-close-popup>
+                <q-item
+                  @click="localUploadPopup = true"
+                  clickable
+                  v-close-popup
+                >
                   <q-item-section avatar>
                     <q-icon color="primary" name="mdi-movie-open-play" />
                   </q-item-section>
@@ -49,7 +53,11 @@
                     ['mdi-playlist-play', 'JW Playlist'],
                   ]"
                 >
-                  <q-item @click="localUpload = true" clickable v-close-popup>
+                  <q-item
+                    @click="localUploadPopup = true"
+                    clickable
+                    v-close-popup
+                  >
                     <q-item-section avatar>
                       <q-icon :name="icon" color="primary" />
                     </q-item-section>
@@ -104,7 +112,10 @@
               </q-date>
             </q-popup-proxy>
           </q-btn>
-          <q-dialog @dragenter="localUpload = false" v-model="localUpload">
+          <q-dialog
+            @dragenter="localUploadPopup = false"
+            v-model="localUploadPopup"
+          >
             <q-card>
               <q-card-section horizontal>
                 <q-card-section>
@@ -115,30 +126,29 @@
                     text-color="white"
                 /></q-card-section>
                 <q-card-section>
+                  <div class="text-h6">{{ $t('add-media-files') }}</div>
                   <p>
                     {{
                       $t(
                         'to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window',
                       )
                     }}
-                  </p>
-                  <p>
                     {{
                       $t(
                         'you-can-also-use-the-button-below-to-browse-for-files',
                       )
                     }}
-                  </p></q-card-section
-                >
+                  </p>
+                </q-card-section>
               </q-card-section>
               <q-card-actions align="right">
-                <q-btn @click="localUpload = false" label="Browse" />
                 <q-btn
-                  :label="$t('got-it')"
+                  :label="$t('browse')"
+                  @click="getLocalFiles()"
                   color="primary"
                   flat
-                  v-close-popup
                 />
+                <q-btn :label="$t('got-it')" color="primary" v-close-popup />
               </q-card-actions>
             </q-card>
           </q-dialog>
@@ -331,7 +341,7 @@ jwStore.$subscribe((_, state) => {
 // Ref and reactive initializations
 const chooseSong = ref(false);
 const mediaSortForDay = ref(true);
-const { setAutoStartAtLogin } = electronApi;
+const { openFileDialog, setAutoStartAtLogin } = electronApi;
 
 const { locale, t } = useI18n({ useScope: 'global' });
 const drawer = ref(true);
@@ -404,8 +414,8 @@ watch(
 
 watch(
   () => currentSettings.value?.autoStartAtLogin,
-  (newautoStartAtLogin) => {
-    setAutoStartAtLogin(!!newautoStartAtLogin);
+  (newAutoStartAtLogin) => {
+    setAutoStartAtLogin(!!newAutoStartAtLogin);
   },
 );
 
@@ -442,7 +452,7 @@ const getEventDates = () => {
 };
 
 // Ref for UI states
-const localUpload = ref(false);
+const localUploadPopup = ref(false);
 const importMediaMenuActive = ref(false);
 const datePickerActive = ref(false);
 
@@ -458,6 +468,23 @@ if (!migrations.value.includes('firstRun')) {
     });
   }
 }
+
+const getLocalFiles = async () => {
+  openFileDialog().then((result) => {
+    if (result.filePaths.length > 0) {
+      window.dispatchEvent(
+        new CustomEvent('localFiles-browsed', {
+          detail: result.filePaths.map((path) => {
+            return {
+              path,
+            };
+          }),
+        }),
+      );
+    }
+    localUploadPopup.value = false;
+  });
+};
 
 onMounted(() => {
   document.title = 'Meeting Media Manager';

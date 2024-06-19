@@ -32,6 +32,7 @@ import { BrowserWindow, app, dialog, screen } from '@electron/remote';
 import * as sqlite3 from 'better-sqlite3';
 import decompress from 'decompress';
 import { contextBridge } from 'electron';
+import { PathLike } from 'fs';
 import fs from 'fs-extra';
 import convert from 'heic-convert';
 import klawSync from 'klaw-sync';
@@ -227,7 +228,7 @@ contextBridge.exposeInMainWorld('electronApi', {
       return {};
     }
   },
-  fileUrlToPath: (fileurl: string) => {
+  fileUrlToPath: (fileurl: PathLike) => {
     const url = require('node:url');
     return url.fileURLToPath(fileurl);
   },
@@ -241,8 +242,8 @@ contextBridge.exposeInMainWorld('electronApi', {
   },
   klawSync,
   moveMediaWindow,
-  openFileDialog: () => {
-    return dialog.showOpenDialogSync({
+  openFileDialog: async () => {
+    return await dialog.showOpenDialog({
       properties: ['openFile', 'multiSelections'],
     });
   },

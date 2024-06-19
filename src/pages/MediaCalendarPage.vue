@@ -17,6 +17,24 @@
       ref="mediaList"
       v-else-if="selectedDate && currentCongregation"
     >
+      <template v-if="additionalLoading">
+        <q-item class="meeting-section meeting-section-skeleton">
+          <q-item-section avatar class="q-pr-none">
+            <q-skeleton style="width: 150px; height: 84px" />
+          </q-item-section>
+          <q-item-section class="q-pl-md">
+            <q-item-label>
+              <q-skeleton type="text" />
+            </q-item-label>
+            <q-item-label caption>
+              <q-skeleton type="text" />
+            </q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-skeleton type="circle" />
+          </q-item-section>
+        </q-item>
+      </template>
       <q-banner
         class="bg-orange-9 text-white"
         inline-actions
@@ -574,20 +592,31 @@
       </q-card>
     </template>
   </q-dialog>
-  <q-dialog @drop="dropIgnore" v-model="dragging">
-    <q-card @drop="dropEnd" style="width: 300px; height: 300px">
-      <q-card-section>
-        <div class="text-h6">{{ $t('add-media-files') }}</div>
+  <q-dialog @drop="dropEnd" v-model="dragging">
+    <q-card @drop="dropEnd">
+      <q-card-section horizontal>
+        <q-card-section>
+          <q-icon
+            color="primary"
+            name="mdi-cursor-default"
+            size="lg"
+            text-color="white"
+        /></q-card-section>
+        <q-card-section>
+          <div class="text-h6">{{ $t('add-media-files') }}</div>
+          <p>
+            {{
+              $t(
+                'to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window',
+              )
+            }}
+            {{ $t('you-can-also-use-the-button-below-to-browse-for-files') }}
+          </p>
+        </q-card-section>
       </q-card-section>
-
-      <q-card-section class="q-pt-none">
-        {{
-          $t('drop-multimedia-files-here-to-add-them-to-the-list-for-this-day')
-        }}
-      </q-card-section>
-
       <q-card-actions align="right">
         <q-btn :label="$t('cancel')" color="negative" flat v-close-popup />
+        <q-btn :label="$t('browse')" @click="getLocalFiles()" color="primary" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -607,6 +636,8 @@ import {
 import { dragAndDrop } from '@formkit/drag-and-drop/vue';
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { Buffer } from 'buffer';
+import DOMPurify from 'dompurify';
+import { PathLike } from 'fs';
 import mime from 'mime';
 import { storeToRefs } from 'pinia';
 import { date, uid } from 'quasar';
@@ -657,6 +688,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const dragging = ref(false);
+const additionalLoading = ref(false);
 const jwpubImportDb = ref('');
 const jwpubImportInProgress = computed(() => !!jwpubImportDb.value);
 const jwpubImportLoading = ref(false);
@@ -692,7 +724,8 @@ const mediaStopPending = computed(() => !!mediaToStop.value);
 
 const mediaToDelete = ref('');
 const mediaDeletePending = computed(() => !!mediaToDelete.value);
-const { decompress, executeQuery, fs, path } = electronApi;
+const { decompress, executeQuery, fileUrlToPath, fs, openFileDialog, path } =
+  electronApi;
 
 const zoomReset = (elemId: string, forced = false) => {
   if (panzooms[elemId]?.getScale() <= 1.25 || forced) panzooms[elemId]?.reset();
@@ -768,8 +801,19 @@ const mapOrder =
     return sortOrder.indexOf(a[key]) > sortOrder.indexOf(b[key]) ? 1 : -1;
   };
 
+const fileUrlIsValid = (fileUrl: PathLike) => {
+  console.log(fileUrlToPath(fileUrl));
+  if (!fileUrl) {
+    return false;
+  } else if (!fs.existsSync(fileUrlToPath(fileUrl))) return false;
+  else {
+    return true;
+  }
+};
+
 const mediaItems = computed(() => {
   return datedAdditionalMediaMap.value
+    .filter((mediaItem) => fileUrlIsValid(mediaItem?.fileUrl))
     .concat(selectedDateObject.value?.dynamicMedia)
     .filter((mediaItem) => mediaItem?.fileUrl) as DynamicMediaObject[];
 });
@@ -908,6 +952,7 @@ function inferExtension(filename: string, filetype?: string) {
 }
 
 const addJwpubDocumentMediaToFiles = async (document: DocumentItem) => {
+  additionalLoading.value = true;
   jwpubImportDocuments.value = [];
   jwpubImportLoading.value = true;
   const publication = getPublicationInfoFromDb(jwpubImportDb.value);
@@ -921,25 +966,55 @@ const addJwpubDocumentMediaToFiles = async (document: DocumentItem) => {
   const dynamicMediaItems = await dynamicMediaMapper(
     multimediaItems,
     selectedDateObject.value?.date,
+    true
   );
   addToAdditionMediaMap(dynamicMediaItems);
   jwpubImportDb.value = '';
   jwpubImportLoading.value = false;
+  additionalLoading.value = false;
 };
 
 const copyToDatedAdditionalMedia = async (files: string[]) => {
   const datedAdditionalMediaDir = getDatedAdditionalMediaDirectory.value;
   fs.ensureDirSync(datedAdditionalMediaDir);
 
-  for (const filepath of files) {
-    const datedAdditionalMediaPath = path.join(
+  for (const filepathToCopy of files) {
+    let datedAdditionalMediaPath = path.join(
       datedAdditionalMediaDir,
-      path.basename(filepath),
+      path.basename(filepathToCopy),
     );
+    const trimFilepathAsNeeded = (filepath: string) => {
+      let filepathSize = new Blob([filepath]).size;
+      console.log(filepathSize);
+      while (filepathSize > 230) {
+        console.log(filepathSize);
+        const overBy = filepathSize - 230;
+        const baseName = path
+          .basename(filepath)
+          .slice(0, -path.extname(filepath).length);
+        const newBaseName = baseName.slice(0, -overBy);
+        filepath = path.join(
+          datedAdditionalMediaDir,
+          newBaseName + path.extname(filepath),
+        );
+        filepathSize = new Blob([filepath]).size;
+        console.log(filepathSize, filepath);
+      }
+      console.log(filepath);
+      return filepath;
+    };
+    datedAdditionalMediaPath = trimFilepathAsNeeded(datedAdditionalMediaPath);
     try {
-      if (fs.existsSync(datedAdditionalMediaPath))
+      const uniqueId = sanitizeId(
+        date.formatDate(selectedDate.value, 'YYYYMMDD') +
+          '-' +
+          getFileUrl(datedAdditionalMediaPath),
+      );
+      if (fs.existsSync(datedAdditionalMediaPath)) {
         fs.removeSync(datedAdditionalMediaPath);
-      fs.copySync(filepath, datedAdditionalMediaPath);
+        removeFromAdditionMediaMap(uniqueId);
+      }
+      fs.copySync(filepathToCopy, datedAdditionalMediaPath);
 
       const isVideoFile = isVideo(datedAdditionalMediaPath);
       const isAudioFile = isAudio(datedAdditionalMediaPath);
@@ -958,17 +1033,13 @@ const copyToDatedAdditionalMedia = async (files: string[]) => {
           isImage: isImage(datedAdditionalMediaPath),
           isVideo: isVideoFile,
           section: 'additional',
-          thumbnailUrl: await getThumbnailUrl(datedAdditionalMediaPath),
+          thumbnailUrl: await getThumbnailUrl(datedAdditionalMediaPath, true),
           title: path.basename(datedAdditionalMediaPath),
-          uniqueId: sanitizeId(
-            date.formatDate(selectedDate.value, 'YYYYMMDD') +
-              '-' +
-              getFileUrl(datedAdditionalMediaPath),
-          ),
+          uniqueId,
         },
       ]);
     } catch (error) {
-      console.error(error, filepath, datedAdditionalMediaPath);
+      console.error(error, filepathToCopy, datedAdditionalMediaPath);
     }
   }
 };
@@ -977,7 +1048,7 @@ const addToFiles = async (
   files: { filetype?: string; path: string }[] | FileList,
 ) => {
   if (!files) return;
-
+  additionalLoading.value = true;
   for (let i = 0; i < files.length; i++) {
     let filepath = files[i].path;
     try {
@@ -1028,7 +1099,6 @@ const addToFiles = async (
         const db = findDb(unzipDir);
         if (!db) return;
         jwpubImportDb.value = db;
-
         if (executeQuery(db, 'SELECT * FROM Multimedia;').length === 0) {
           createTemporaryNotification({
             caption: path.basename(filepath),
@@ -1055,27 +1125,28 @@ const addToFiles = async (
         }
         jwpubImportLoading.value = false;
       } else if (isJwPlaylist(filepath)) {
-        const additionalMedia = await getMediaFromJwPlaylist(
+        getMediaFromJwPlaylist(
           filepath,
           selectedDateObject.value?.date,
           getDatedAdditionalMediaDirectory.value,
-        );
-        addToAdditionMediaMap(additionalMedia);
+        ).then((additionalMedia) => {
+          addToAdditionMediaMap(additionalMedia);
+        });
       } else if (isArchive(filepath)) {
         const unzipDirectory = path.join(
           getTempDirectory(),
           path.basename(filepath),
         );
         if (fs.existsSync(unzipDirectory)) fs.removeSync(unzipDirectory);
-        await decompress(filepath, unzipDirectory);
-        await addToFiles(
-          fs.readdirSync(unzipDirectory).map((file) => {
-            return {
-              path: path.join(unzipDirectory, file),
-            };
-          }),
-        );
-        fs.removeSync(unzipDirectory);
+        decompress(filepath, unzipDirectory).then(() => {
+          addToFiles(
+            fs.readdirSync(unzipDirectory).map((file) => {
+              return {
+                path: path.join(unzipDirectory, file),
+              };
+            }),
+          ).then(() => fs.removeSync(unzipDirectory));
+        });
       } else {
         createTemporaryNotification({
           caption: path.basename(filepath),
@@ -1115,22 +1186,25 @@ const dropEnd = (event: DragEvent) => {
     if (noLocalDroppedFiles && droppedStuff.length > 0) {
       // maybe its a drag and drop from a web browser?
       let html = event.dataTransfer.getData('text/html');
+      let sanitizedHtml = DOMPurify.sanitize(html);
       let src = new DOMParser()
-        .parseFromString(html, 'text/html')
+        .parseFromString(sanitizedHtml, 'text/html')
         .querySelector('img')?.src;
       const filetype = Array.from(event.dataTransfer.items).find(
         (item) => item.kind === 'file',
       )?.type;
       if (src) droppedStuff[0] = { filetype, path: src };
     }
-    addToFiles(droppedStuff);
+    addToFiles(droppedStuff).then(() => {
+      additionalLoading.value = false;
+    });
   }
   dragging.value = false;
 };
-const dropIgnore = (event: DragEvent) => {
-  event.preventDefault();
-  event.stopPropagation();
-};
+// const dropIgnore = (event: DragEvent) => {
+//   event.preventDefault();
+//   event.stopPropagation();
+// };
 
 const mediaDurationPopups = ref({} as { [key: string]: boolean });
 
@@ -1170,6 +1244,37 @@ const imageLoadingError = (media: DynamicMediaObject) => {
   media.thumbnailUrl = '';
   media.thumbnailUrl = thumbnailUrl ?? getThumbnailUrl(media.fileUrl);
 };
+
+const localFilesBrowsedListener = (event: CustomEventInit) => {
+  addToFiles(event.detail).then(() => {
+    additionalLoading.value = false;
+  });
+};
+
+const getLocalFiles = async () => {
+  openFileDialog().then((result) => {
+    if (result.filePaths.length > 0) {
+      addToFiles(
+        result.filePaths.map((path) => {
+          return {
+            path,
+          };
+        }),
+      ).then(() => {
+        additionalLoading.value = false;
+      });
+    }
+    dragging.value = false;
+  });
+};
+
+onMounted(() => {
+  window.addEventListener('localFiles-browsed', localFilesBrowsedListener);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('localFiles-browsed', localFilesBrowsedListener);
+});
 </script>
 
 <style scoped>

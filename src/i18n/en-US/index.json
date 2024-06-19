@@ -172,5 +172,6 @@
   "setup-wizard": "Setup Wizard",
   "footnote": "Footnote",
   "windowed": "Windowed",
-  "you-can-also-use-the-button-below-to-browse-for-files": "You can also use the button below to browse for files."
+  "you-can-also-use-the-button-below-to-browse-for-files": "You can also browse for files manually if you prefer.",
+  "browse": "Browse"
 }

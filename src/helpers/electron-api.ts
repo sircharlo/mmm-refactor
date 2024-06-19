@@ -1,3 +1,4 @@
+import { PathLike } from 'fs';
 import { QueryResponseItem } from 'src/types/sqlite';
 
 export interface ElectronFileFilter {
@@ -9,7 +10,7 @@ export interface ElectronApi {
   convert: typeof import('heic-convert');
   decompress: typeof import('decompress');
   executeQuery: (dbPath: string, query: string) => QueryResponseItem[];
-  fileUrlToPath: (url: string) => string;
+  fileUrlToPath: (url: PathLike) => string;
   fs: typeof import('fs-extra');
   getAllScreens: (
     type?: string,
@@ -25,7 +26,7 @@ export interface ElectronApi {
     targetScreen?: number;
     windowedMode?: boolean;
   }) => void;
-  openFileDialog: () => string[];
+  openFileDialog: () => Promise<Electron.OpenDialogReturnValue>;
   openFolderDialog: () => string[];
   path: typeof import('path');
   setAutoStartAtLogin: (value: boolean) => void;

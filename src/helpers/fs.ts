@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import { Item } from 'klaw-sync';
 import { FULL_HD } from 'src/helpers/converters';
 import { electronApi } from 'src/helpers/electron-api';
@@ -79,9 +80,10 @@ const getDurationFromMediaPath: (mediaPath: string) => Promise<number> = (
   });
 };
 
-const getThumbnailFromVideoPath: (videoPath: string) => Promise<string> = (
+const getThumbnailFromVideoPath: (
   videoPath: string,
-) => {
+  thumbnailPath: string,
+) => Promise<string> = (videoPath: string, thumbnailPath: string) => {
   return new Promise((resolve, reject) => {
     if (!videoPath) {
       reject(new Error('No video path provided'));
@@ -109,12 +111,17 @@ const getThumbnailFromVideoPath: (videoPath: string) => Promise<string> = (
           if (ctx) {
             ctx.drawImage(videoRef, 0, 0, canvas.width, canvas.height);
             const imageUrl = canvas.toDataURL('image/jpeg');
+            // save to file
+            fs.writeFileSync(
+              thumbnailPath,
+              Buffer.from(imageUrl.split(',')[1], 'base64'),
+            );
 
             // Cleanup
             canvas.remove();
             videoRef.remove();
 
-            resolve(imageUrl);
+            resolve(thumbnailPath);
           } else {
             // Cleanup in case of error
             canvas.remove();
@@ -137,7 +144,7 @@ const getThumbnailFromVideoPath: (videoPath: string) => Promise<string> = (
   });
 };
 
-const getThumbnailUrl = async (filepath: string) => {
+const getThumbnailUrl = async (filepath: string, forceRefresh?: boolean) => {
   let thumbnailUrl = '';
   if (isImage(filepath)) {
     thumbnailUrl = getFileUrl(filepath);
@@ -146,10 +153,10 @@ const getThumbnailUrl = async (filepath: string) => {
     if (fs.existsSync(thumbnailPath)) {
       thumbnailUrl = getFileUrl(thumbnailPath);
     } else {
-      thumbnailUrl = await getThumbnailFromVideoPath(filepath);
+      thumbnailUrl = await getThumbnailFromVideoPath(filepath, thumbnailPath);
     }
   }
-  return thumbnailUrl;
+  return thumbnailUrl + (forceRefresh ? '?timestamp=' + Date.now() : '');
 };
 
 const getSubtitlesUrl = async (
