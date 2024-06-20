@@ -53,12 +53,12 @@
     "@types/heic-convert": "^1.2.3",
     "@types/klaw-sync": "^6.0.5",
     "@types/node": "^20.14.6",
-    "@typescript-eslint/eslint-plugin": "^5.10.0",
-    "@typescript-eslint/parser": "^5.10.0",
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/parser": "^7.13.1",
     "autoprefixer": "^10.4.2",
     "electron": "^30.0.1",
     "electron-builder": "^24.3.0",
-    "eslint": "^8.11.0",
+    "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-perfectionist": "^2.10.0",
     "eslint-plugin-vue": "^9.0.0",
@@ -70,7 +70,7 @@
     "vue-tsc": "^1.8.22"
   },
   "engines": {
-    "node": "^20 || ^18 || ^16",
+    "node": "^22 || ^20 || ^18 || ^16",
     "npm": ">= 6.13.4",
     "yarn": ">= 1.21.1"
   }

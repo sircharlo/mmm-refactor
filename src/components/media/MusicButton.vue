@@ -161,7 +161,8 @@ function playMusic() {
 const meetingDay = ref(false);
 
 onMounted(() => {
-  meetingDay.value = selectedDateObject.value?.today && !!selectedDateObject.value?.meeting;
+  meetingDay.value =
+    selectedDateObject.value?.today && !!selectedDateObject.value?.meeting;
   if (currentSettings.value?.autoStartMusic && meetingDay.value) {
     playMusic();
   }
