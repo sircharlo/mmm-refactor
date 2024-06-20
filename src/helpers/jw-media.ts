@@ -36,7 +36,8 @@ import {
   FileDownloader,
 } from 'src/types/media';
 import {
-  MediaImages,
+  ImageSizes,
+  ImageTypeSizes,
   MediaItemsMediator,
   MediaItemsMediatorFile,
   MediaLink,
@@ -1113,20 +1114,22 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
   return downloadedFile?.path;
 };
 
-function getBestImageUrl(images: MediaImages) {
-  const preferredOrder = ['wss', 'lsr', 'sqr', 'pnr'];
+function getBestImageUrl(images: ImageTypeSizes, size?: keyof ImageSizes) {
+  const preferredOrder: (keyof ImageTypeSizes)[] = ['wss', 'lsr', 'sqr', 'pnr'];
   for (const key of preferredOrder) {
     if (images.hasOwnProperty(key)) {
-      const sizes = ['sm', 'md', 'lg', 'xl'];
+      const sizes: (keyof ImageSizes)[] = size
+        ? [size]
+        : ['sm', 'md', 'lg', 'xl'];
       for (const size of sizes) {
         if (images[key].hasOwnProperty(size)) {
           return images[key][size];
         }
       }
       // If none of the preferred sizes are found, return any other size
-      const otherSizes = Object.keys(images[key]).filter(
-        (size) => !sizes.includes(size),
-      );
+      const otherSizes = (
+        Object.keys(images[key]) as (keyof ImageSizes)[]
+      ).filter((size) => !sizes.includes(size));
       if (otherSizes.length > 0) {
         return images[key][otherSizes[0]];
       }
@@ -1289,6 +1292,7 @@ export {
   downloadPubMediaFiles,
   dynamicMediaMapper,
   fetchMedia,
+  getBestImageUrl,
   getDocumentMultimediaItems,
   getJwMediaInfo,
   getMwMedia,

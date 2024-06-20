@@ -26,7 +26,16 @@
           :label="$t(name)"
           expand-separator
           icon="mdi-home-account"
-          v-if="!invalidSettingsLength || !onlyShowInvalid || Object.entries(settingsDefinitions).filter(([settingId, item]) => item.group === groupId).map(([settingId, _]) => settingId).some(settingId => invalidSettings.includes(settingId as keyof SettingsItems))"
+          v-if="
+            !invalidSettingsLength ||
+            !onlyShowInvalid ||
+            Object.entries(settingsDefinitions)
+              .filter(([settingId, item]) => item.group === groupId)
+              .map(([settingId, _]) => settingId)
+              .some((settingId) =>
+                invalidSettings.includes(settingId as keyof SettingsItems),
+              )
+          "
           v-model="expansionState[groupId as keyof SettingsItems]"
         >
           <template
@@ -37,12 +46,21 @@
           >
             <q-item
               :class="{
-              'q-py-lg': invalidSettings.includes(settingId as keyof SettingsItems),
-              // 'bg-grey-8': item.depends && $q.dark.isActive,
-              // 'bg-grey-3': item.depends && !$q.dark.isActive,
-              'q-mx-xl': true
-            }"
-              v-if="(!item.depends || currentSettings[item.depends as keyof SettingsItems]) && (!onlyShowInvalid || !invalidSettingsLength || invalidSettings.includes(settingId as keyof SettingsItems))"
+                'q-py-lg': invalidSettings.includes(
+                  settingId as keyof SettingsItems,
+                ),
+                // 'bg-grey-8': item.depends && $q.dark.isActive,
+                // 'bg-grey-3': item.depends && !$q.dark.isActive,
+                'q-mx-xl': true,
+              }"
+              tag="label"
+              v-if="
+                (!item.depends ||
+                  currentSettings[item.depends as keyof SettingsItems]) &&
+                (!onlyShowInvalid ||
+                  !invalidSettingsLength ||
+                  invalidSettings.includes(settingId as keyof SettingsItems))
+              "
             >
               <q-item-section>
                 {{ $t(settingId) }}
@@ -70,36 +88,48 @@
                 <ToggleInput
                   :actions="item.actions"
                   v-if="item.type === 'toggle'"
-                  v-model="currentSettings[settingId as keyof SettingsItems] as boolean"
+                  v-model="
+                    currentSettings[settingId as keyof SettingsItems] as boolean
+                  "
                 />
                 <TextInput
                   :actions="item.actions"
                   :rules="item.rules"
                   v-else-if="item.type === 'text'"
-                  v-model="currentSettings[settingId as keyof SettingsItems] as string"
+                  v-model="
+                    currentSettings[settingId as keyof SettingsItems] as string
+                  "
                 />
                 <SliderInput
                   :max="item.max"
                   :min="item.min"
                   :step="item.step"
                   v-else-if="item.type === 'slider'"
-                  v-model="currentSettings[settingId as keyof SettingsItems] as number"
+                  v-model="
+                    currentSettings[settingId as keyof SettingsItems] as number
+                  "
                 />
                 <DateInput
                   :options="item.options"
                   :rules="item.rules"
                   v-else-if="item.type === 'date'"
-                  v-model="currentSettings[settingId as keyof SettingsItems] as string"
+                  v-model="
+                    currentSettings[settingId as keyof SettingsItems] as string
+                  "
                 />
                 <TimeInput
                   :options="item.options"
                   :rules="item.rules"
                   v-else-if="item.type === 'time'"
-                  v-model="currentSettings[settingId as keyof SettingsItems] as string"
+                  v-model="
+                    currentSettings[settingId as keyof SettingsItems] as string
+                  "
                 />
                 <PathInput
                   v-else-if="item.type === 'path'"
-                  v-model="currentSettings[settingId as keyof SettingsItems] as string"
+                  v-model="
+                    currentSettings[settingId as keyof SettingsItems] as string
+                  "
                 />
                 <SelectInput
                   :options="item.list"
@@ -109,7 +139,9 @@
                     settingId === 'langSubtitles'
                   "
                   v-else-if="item.type === 'list'"
-                  v-model="currentSettings[settingId as keyof SettingsItems] as string"
+                  v-model="
+                    currentSettings[settingId as keyof SettingsItems] as string
+                  "
                 />
                 <pre v-else>{{ item }}</pre>
               </q-item-section>

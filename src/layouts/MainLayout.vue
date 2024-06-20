@@ -33,7 +33,10 @@
                   <q-item-section>{{ $t('song') }}</q-item-section>
                 </q-item>
                 <q-item
-                  @click="localUploadPopup = true"
+                  @click="
+                    remoteVideoPopup = true;
+                    getJwVideos();
+                  "
                   clickable
                   v-close-popup
                 >
@@ -141,6 +144,90 @@
                   </p>
                 </q-card-section>
               </q-card-section>
+              <q-card-actions align="right">
+                <q-btn
+                  :label="$t('browse')"
+                  @click="getLocalFiles()"
+                  color="primary"
+                  flat
+                />
+                <q-btn :label="$t('got-it')" color="primary" v-close-popup />
+              </q-card-actions>
+            </q-card>
+          </q-dialog>
+          <q-dialog v-model="remoteVideoPopup">
+            <q-card
+              class="non-selectable"
+              style="width: 80vw; max-width: 80vw; min-width: 3"
+            >
+              <q-toolbar>
+                <q-avatar>
+                  <q-icon
+                    color="primary"
+                    name="mdi-cursor-default"
+                    size="lg"
+                    text-color="white"
+                  />
+                </q-avatar>
+
+                <q-toolbar-title>{{ $t('add-media-files') }}</q-toolbar-title>
+
+                <q-btn dense flat icon="close" round v-close-popup />
+              </q-toolbar>
+
+              <!-- <q-card-section horizontal> -->
+              <!-- <q-card-section> </q-card-section> -->
+              <div class="row q-px-sm">
+                <div class="col-grow">
+                  <q-input :label="$t('filter')" dense v-model="remoteVideoFilter" />
+                </div>
+                <q-toggle
+                  :label="$t('include-audio-description')"
+                  left-label
+                  v-model="remoteVideosIncludeAudioDescription"
+                />
+              </div>
+              <q-separator />
+              <q-card-section>
+                <div class="row q-col-gutter-lg">
+                  <template
+                    :key="video.guid"
+                    v-for="video in remoteVideosFiltered"
+                  >
+                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                      <q-card
+                        @click="console.log(video)"
+                        class="text-white cursor-pointer"
+                        style="
+                          background-color: rgb(91, 60, 136);
+                          border-radius: 0.75em;
+                        "
+                        v-ripple
+                      >
+                        <q-img :src="getBestImageUrl(video.images, 'md')">
+                          <!-- <div class="absolute-bottom">
+                            <div class="text-subtitle2">{{ video.title }}</div>
+                            <div class="text-caption">
+                              {{ video.naturalKey }}
+                            </div>
+                          </div> -->
+                        </q-img>
+                        <q-card-section>
+                          <div class="text-subtitle1 q-mb-xs">
+                            {{ video.title }}
+                          </div>
+                          <div>
+                            <span class="text-caption text-grey-2">{{
+                              video.naturalKey
+                            }}</span>
+                          </div>
+                        </q-card-section>
+                      </q-card>
+                    </div>
+                  </template>
+                </div>
+              </q-card-section>
+              <!-- </q-card-section> -->
               <q-card-actions align="right">
                 <q-btn
                   :label="$t('browse')"
@@ -278,6 +365,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { Dark, LocalStorage, date } from 'quasar';
+import { get } from 'src/boot/axios';
 import DownloadStatus from 'src/components/media/DownloadStatus.vue';
 import MediaDisplayButton from 'src/components/media/MediaDisplayButton.vue';
 import MusicButton from 'src/components/media/MusicButton.vue';
@@ -287,13 +375,17 @@ import SongPicker from 'src/components/media/SongPicker.vue';
 import SubtitlesButton from 'src/components/media/SubtitlesButton.vue';
 import { getLookupPeriod } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
-import { downloadBackgroundMusic } from 'src/helpers/jw-media';
+import { downloadBackgroundMusic, getBestImageUrl } from 'src/helpers/jw-media';
 import { createTemporaryNotification } from 'src/helpers/notifications';
 import { useAppSettingsStore } from 'src/stores/app-settings';
 import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
-import { onMounted, ref, watch } from 'vue';
+import {
+  JwVideoCategory,
+  MediaItemsMediatorItem,
+} from 'src/types/publications';
+import { Ref, computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -307,7 +399,7 @@ appSettings.$subscribe((_, state) => {
   LocalStorage.set('migrations', state.migrations);
 
   // Use native localStorage for screen preferences, since Electron preload can't use quasar's LocalStorage
-  localStorage.set('screenPreferences', state.screenPreferences);
+  LocalStorage.set('screenPreferences', state.screenPreferences);
 });
 
 const currentState = useCurrentStateStore();
@@ -455,6 +547,13 @@ const getEventDates = () => {
 const localUploadPopup = ref(false);
 const importMediaMenuActive = ref(false);
 const datePickerActive = ref(false);
+const remoteVideoPopup = ref(false);
+const remoteVideos: Ref<MediaItemsMediatorItem[]> = ref([]);
+// const remoteVideosByCategory: Ref<{
+//   [key: string]: MediaItemsMediatorItem[];
+// }> = ref({});
+const remoteVideoFilter = ref('');
+const remoteVideosIncludeAudioDescription = ref(false);
 
 if (!migrations.value.includes('firstRun')) {
   const migrationResult = runMigration('firstRun');
@@ -485,6 +584,79 @@ const getLocalFiles = async () => {
     localUploadPopup.value = false;
   });
 };
+
+const getJwVideos = async () => {
+  const currentState = useCurrentStateStore();
+  const { getSettingValue } = currentState;
+  const getSubcategories = async (category: string) => {
+    return (await get(
+      `https://b.jw-cdn.org/apis/mediator/v1/categories/${
+        getSettingValue('lang') as string
+      }/${category}?detailed=1&mediaLimit=0&clientType=www`,
+    )) as JwVideoCategory;
+  };
+  const subcategories: {
+    key: string;
+    parentCategory: string;
+  }[] = [{ key: 'LatestVideos', parentCategory: '' }];
+  const subcategoriesRequest = await getSubcategories('VideoOnDemand');
+  console.log('subcategoriesRequest', subcategoriesRequest);
+  const subcategoriesFirstLevel =
+    subcategoriesRequest.category.subcategories.map((s) => s.key);
+  for (const subcategoryFirstLevel of subcategoriesFirstLevel) {
+    subcategories.push(
+      ...(
+        await getSubcategories(subcategoryFirstLevel)
+      ).category.subcategories.map((s) => {
+        return { key: s.key, parentCategory: subcategoryFirstLevel };
+      }),
+    );
+  }
+  console.log('subcategories', subcategories);
+  for (const category of subcategories) {
+    const request = (await get(
+      `https://b.jw-cdn.org/apis/mediator/v1/categories/${
+        getSettingValue('lang') as string
+      }/${category.key}?detailed=0&clientType=www`,
+    )) as JwVideoCategory;
+    // remoteVideosByCategory.value[category.parentCategory ?? category.key] =
+    //   request.category.media;
+    remoteVideos.value = remoteVideos.value
+      .concat(request.category.media)
+      .reduce((accumulator: MediaItemsMediatorItem[], current) => {
+        const guids = new Set(accumulator.map((item) => item.guid));
+        if (!guids.has(current.guid)) {
+          accumulator.push(current);
+        }
+        return accumulator;
+      }, [])
+      .sort((a, b) => {
+        return (
+          new Date(b.firstPublished).getTime() -
+          new Date(a.firstPublished).getTime()
+        );
+      });
+  }
+  // make sure values are unique, based on guid
+};
+
+const remoteVideosFiltered = computed(() => {
+  return (
+    remoteVideoFilter.value?.length > 2
+      ? remoteVideos.value.filter((video) =>
+          video.title
+            .toLowerCase()
+            .includes(remoteVideoFilter.value.toLowerCase()),
+        )
+      : remoteVideos.value
+  )
+    .filter(
+      (v) =>
+        remoteVideosIncludeAudioDescription.value ||
+        !v.primaryCategory.endsWith('AD'),
+    )
+    .slice(0, 100);
+});
 
 onMounted(() => {
   document.title = 'Meeting Media Manager';

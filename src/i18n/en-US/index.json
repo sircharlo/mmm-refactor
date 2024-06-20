@@ -173,5 +173,7 @@
   "footnote": "Footnote",
   "windowed": "Windowed",
   "you-can-also-use-the-button-below-to-browse-for-files": "You can also browse for files manually if you prefer.",
-  "browse": "Browse"
+  "browse": "Browse",
+  "include-audio-description": "Include videos with audio descriptions",
+  "filter": "Filter"
 }

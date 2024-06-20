@@ -73,7 +73,7 @@ import { date } from 'quasar';
 import { getFileUrl, getPublicationDirectoryContents } from 'src/helpers/fs';
 import { formatTime } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
@@ -207,4 +207,12 @@ const musicRemainingTime = computed(() => {
 });
 
 const musicPopup = ref(false);
+
+watch(
+  () => currentSettings.value?.enableMusicButton,
+  (newMusicButtonEnabled) => {
+    console.log('newMusicButtonEnabled', newMusicButtonEnabled);
+    if (!newMusicButtonEnabled) stopMusic();
+  },
+);
 </script>

@@ -90,6 +90,7 @@ const moveMediaWindow = ({
     const screenPreferences = JSON.parse(
       localStorage.getItem('screenPreferences') ?? '{}',
     ) as ScreenPreferences;
+    // todo: fix this, not reading right values
     console.log('screenPreferences', screenPreferences);
     targetScreen = screenPreferences.preferredScreenNumber;
     windowedMode = screenPreferences.preferWindowed;
