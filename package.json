@@ -53,7 +53,7 @@
     "@types/heic-convert": "^1.2.3",
     "@types/klaw-sync": "^6.0.5",
     "@types/lodash": "^4.17.1",
-    "@types/node": "^12.20.21",
+    "@types/node": "^20.14.6",
     "@types/pdfjs-dist": "^2.10.378",
     "@types/sql.js": "^1.4.9",
     "@types/sqlite3": "^3.1.11",
