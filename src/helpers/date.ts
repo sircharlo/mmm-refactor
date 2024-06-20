@@ -129,8 +129,9 @@ function getLookupPeriod() {
       meeting: isMwMeetingDay(dayDate)
         ? 'mw'
         : isWeMeetingDay(dayDate)
-        ? 'we'
-        : false,
+          ? 'we'
+          : false,
+      today: datesAreSame(dayDate, new Date()),
     };
   }) as DateInfo[];
 }
