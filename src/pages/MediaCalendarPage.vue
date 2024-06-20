@@ -637,7 +637,6 @@ import { dragAndDrop } from '@formkit/drag-and-drop/vue';
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { Buffer } from 'buffer';
 import DOMPurify from 'dompurify';
-import { PathLike } from 'fs';
 import mime from 'mime';
 import { storeToRefs } from 'pinia';
 import { date, uid } from 'quasar';
@@ -682,7 +681,7 @@ import { setObsScene } from 'src/helpers/obs';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { useObsStateStore } from 'src/stores/obs-state';
-import { DynamicMediaObject } from 'src/types/media';
+import { DownloadedFile, DynamicMediaObject } from 'src/types/media';
 import { DocumentItem, TableItem } from 'src/types/sqlite';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -724,7 +723,7 @@ const mediaStopPending = computed(() => !!mediaToStop.value);
 
 const mediaToDelete = ref('');
 const mediaDeletePending = computed(() => !!mediaToDelete.value);
-const { decompress, executeQuery, fileUrlToPath, fs, openFileDialog, path } =
+const { decompress, executeQuery, fs, openFileDialog, path } =
   electronApi;
 
 const zoomReset = (elemId: string, forced = false) => {
@@ -801,19 +800,19 @@ const mapOrder =
     return sortOrder.indexOf(a[key]) > sortOrder.indexOf(b[key]) ? 1 : -1;
   };
 
-const fileUrlIsValid = (fileUrl: PathLike) => {
-  console.log(fileUrlToPath(fileUrl));
-  if (!fileUrl) {
-    return false;
-  } else if (!fs.existsSync(fileUrlToPath(fileUrl))) return false;
-  else {
-    return true;
-  }
-};
+// const fileUrlIsValid = (fileUrl: PathLike) => {
+//   if (!fileUrl) {
+//     return false;
+//   } else if (!fs.existsSync(fileUrlToPath(fileUrl))) return false;
+//   else {
+//     return true;
+//   }
+// };
 
+// todo: watch length instead? less heavy?
 const mediaItems = computed(() => {
   return datedAdditionalMediaMap.value
-    .filter((mediaItem) => fileUrlIsValid(mediaItem?.fileUrl))
+    // .filter((mediaItem) => fileUrlIsValid(mediaItem?.fileUrl))
     .concat(selectedDateObject.value?.dynamicMedia)
     .filter((mediaItem) => mediaItem?.fileUrl) as DynamicMediaObject[];
 });
@@ -966,7 +965,7 @@ const addJwpubDocumentMediaToFiles = async (document: DocumentItem) => {
   const dynamicMediaItems = await dynamicMediaMapper(
     multimediaItems,
     selectedDateObject.value?.date,
-    true
+    true,
   );
   addToAdditionMediaMap(dynamicMediaItems);
   jwpubImportDb.value = '';
@@ -1011,37 +1010,53 @@ const copyToDatedAdditionalMedia = async (files: string[]) => {
           getFileUrl(datedAdditionalMediaPath),
       );
       if (fs.existsSync(datedAdditionalMediaPath)) {
-        fs.removeSync(datedAdditionalMediaPath);
+        if (filepathToCopy !== datedAdditionalMediaPath)
+          fs.removeSync(datedAdditionalMediaPath);
         removeFromAdditionMediaMap(uniqueId);
       }
-      fs.copySync(filepathToCopy, datedAdditionalMediaPath);
+      if (filepathToCopy !== datedAdditionalMediaPath)
+        fs.copySync(filepathToCopy, datedAdditionalMediaPath);
 
-      const isVideoFile = isVideo(datedAdditionalMediaPath);
-      const isAudioFile = isAudio(datedAdditionalMediaPath);
-      let duration = 0;
-
-      if (isVideoFile || isAudioFile) {
-        duration = await getDurationFromMediaPath(datedAdditionalMediaPath);
-      }
-
-      addToAdditionMediaMap([
-        {
-          duration,
-          fileUrl: getFileUrl(datedAdditionalMediaPath),
-          isAdditional: true,
-          isAudio: isAudioFile,
-          isImage: isImage(datedAdditionalMediaPath),
-          isVideo: isVideoFile,
-          section: 'additional',
-          thumbnailUrl: await getThumbnailUrl(datedAdditionalMediaPath, true),
-          title: path.basename(datedAdditionalMediaPath),
-          uniqueId,
-        },
-      ]);
+      await addToAdditionMediaMapFromPath(datedAdditionalMediaPath, uniqueId);
     } catch (error) {
       console.error(error, filepathToCopy, datedAdditionalMediaPath);
     }
   }
+};
+
+const addToAdditionMediaMapFromPath = async (
+  additionalFilePath: string,
+  uniqueId?: string,
+) => {
+  const isVideoFile = isVideo(additionalFilePath);
+  const isAudioFile = isAudio(additionalFilePath);
+  let duration = 0;
+
+  if (isVideoFile || isAudioFile) {
+    duration = await getDurationFromMediaPath(additionalFilePath);
+  }
+
+  if (!uniqueId) {
+    uniqueId = sanitizeId(
+      date.formatDate(selectedDate.value, 'YYYYMMDD') +
+        '-' +
+        getFileUrl(additionalFilePath),
+    );
+  }
+  addToAdditionMediaMap([
+    {
+      duration,
+      fileUrl: getFileUrl(additionalFilePath),
+      isAdditional: true,
+      isAudio: isAudioFile,
+      isImage: isImage(additionalFilePath),
+      isVideo: isVideoFile,
+      section: 'additional',
+      thumbnailUrl: await getThumbnailUrl(additionalFilePath, true),
+      title: path.basename(additionalFilePath),
+      uniqueId,
+    },
+  ]);
 };
 
 const addToFiles = async (
@@ -1268,12 +1283,25 @@ const getLocalFiles = async () => {
   });
 };
 
+const remoteVideoLoading = () => {
+  additionalLoading.value = true;
+};
+
+const remoteVideoLoaded = (event: CustomEventInit) => {
+  addToAdditionMediaMapFromPath((event.detail as DownloadedFile).path);
+  additionalLoading.value = false;
+};
+
 onMounted(() => {
   window.addEventListener('localFiles-browsed', localFilesBrowsedListener);
+  window.addEventListener('remoteVideo-loading', remoteVideoLoading);
+  window.addEventListener('remoteVideo-loaded', remoteVideoLoaded);
 });
 
 onUnmounted(() => {
   window.removeEventListener('localFiles-browsed', localFilesBrowsedListener);
+  window.removeEventListener('remoteVideo-loading', remoteVideoLoading);
+  window.removeEventListener('remoteVideo-loaded', remoteVideoLoaded);
 });
 </script>
 

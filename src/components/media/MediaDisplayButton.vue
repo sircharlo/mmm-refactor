@@ -55,8 +55,8 @@
                 screen.mainWindow
                   ? 'mdi-monitor-dashboard'
                   : screenPreferences.preferredScreenNumber === index
-                  ? 'mdi-monitor-shimmer'
-                  : 'mdi-monitor'
+                    ? 'mdi-monitor-shimmer'
+                    : 'mdi-monitor'
               "
               :text-color="
                 screenList.length < 2 ||
@@ -130,8 +130,7 @@ import { useAppSettingsStore } from 'src/stores/app-settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 
-const { getAllScreens, moveMediaWindow, toggleMediaWindow } =
-  electronApi;
+const { getAllScreens, moveMediaWindow, toggleMediaWindow } = electronApi;
 
 defineProps<{
   disabled?: boolean;
@@ -178,13 +177,21 @@ watch(
 );
 
 const targetScreenListener = (event: CustomEventInit) => {
-  console.log('targetScreen-update', event.detail);
-  screenPreferences.value.preferredScreenNumber = event.detail;
+  try {
+    console.log('targetScreen-update', event.detail);
+    screenPreferences.value.preferredScreenNumber = event.detail;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const windowedModeListener = (event: CustomEventInit) => {
-  console.log('windowedMode-update', event.detail);
-  screenPreferences.value.preferWindowed = event.detail;
+  try {
+    console.log('windowedMode-update', event.detail);
+    screenPreferences.value.preferWindowed = event.detail;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 onMounted(() => {

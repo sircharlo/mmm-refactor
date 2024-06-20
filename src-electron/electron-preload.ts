@@ -87,13 +87,17 @@ const moveMediaWindow = ({
   const mediaWindow = getMediaWindow();
   if (!mediaWindow || !mainWindow) return;
   if (targetScreen === undefined || windowedMode === undefined) {
-    const screenPreferences = JSON.parse(
-      localStorage.getItem('screenPreferences') ?? '{}',
-    ) as ScreenPreferences;
-    // todo: fix this, not reading right values
-    console.log('screenPreferences', screenPreferences);
-    targetScreen = screenPreferences.preferredScreenNumber;
-    windowedMode = screenPreferences.preferWindowed;
+    try {
+      const screenPreferences = JSON.parse(
+        localStorage.getItem('screenPreferences') ?? '{}',
+      ) as ScreenPreferences;
+      // todo: fix this, not reading right values
+      console.log('screenPreferences', screenPreferences);
+      targetScreen = screenPreferences.preferredScreenNumber;
+      windowedMode = screenPreferences.preferWindowed;
+    } catch (err) {
+      console.error(err);
+    }
   }
   const getWindowScreen = (window: Electron.BrowserWindow) => {
     const windowDisplay = screen.getDisplayMatching(window.getBounds());

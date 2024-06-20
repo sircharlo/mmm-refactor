@@ -1017,7 +1017,7 @@ const getPubMediaLinks = async (publication: PublicationFetcher) => {
 };
 
 export function findBestResolution(
-  mediaLinks: (MediaItemsMediatorFile | MediaLink)[],
+  mediaLinks: MediaItemsMediatorFile[] | MediaLink[],
 ) {
   const currentState = useCurrentStateStore();
   const { getSettingValue } = currentState;
@@ -1033,7 +1033,9 @@ export function findBestResolution(
       mediaLink.frameHeight <= maxRes &&
       mediaLink.frameHeight >= bestHeight
     ) {
-      bestItem = mediaLink;
+      bestItem = Object.hasOwn(mediaLink, 'progressiveDownloadURL')
+        ? (mediaLink as MediaItemsMediatorFile)
+        : (mediaLink as MediaLink);
       bestHeight = mediaLink.frameHeight;
     }
   }
@@ -1112,6 +1114,32 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
     }
   }
   return downloadedFile?.path;
+};
+
+const downloadAdditionalRemoteVideo = async (
+  mediaItemLinks: MediaItemsMediatorFile[],
+) => {
+  window.dispatchEvent(
+    new CustomEvent('remoteVideo-loading', {
+      detail: true,
+    }),
+  );
+  const currentState = useCurrentStateStore();
+  const { getDatedAdditionalMediaDirectory } = storeToRefs(currentState);
+  const bestItem = findBestResolution(mediaItemLinks) as MediaItemsMediatorFile;
+  let downloadedFile: DownloadedFile = { path: '' };
+  if (bestItem) {
+    downloadedFile = (await downloadFileIfNeeded({
+      dir: getDatedAdditionalMediaDirectory.value,
+      size: bestItem.filesize,
+      url: bestItem.progressiveDownloadURL,
+    })) as DownloadedFile;
+  }
+  window.dispatchEvent(
+    new CustomEvent('remoteVideo-loaded', {
+      detail: downloadedFile,
+    }),
+  );
 };
 
 function getBestImageUrl(images: ImageTypeSizes, size?: keyof ImageSizes) {
@@ -1287,6 +1315,7 @@ const downloadJwpub = async (
 
 export {
   addFullFilePathToMultimediaItem,
+  downloadAdditionalRemoteVideo,
   downloadBackgroundMusic,
   downloadFileIfNeeded,
   downloadPubMediaFiles,

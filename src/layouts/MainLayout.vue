@@ -169,17 +169,20 @@
                     text-color="white"
                   />
                 </q-avatar>
-
                 <q-toolbar-title>{{ $t('add-media-files') }}</q-toolbar-title>
-
                 <q-btn dense flat icon="close" round v-close-popup />
               </q-toolbar>
-
-              <!-- <q-card-section horizontal> -->
-              <!-- <q-card-section> </q-card-section> -->
+              <q-linear-progress
+                :value="remoteVideosLoadingProgress"
+                class="q-mt-md"
+              />
               <div class="row q-px-sm">
                 <div class="col-grow">
-                  <q-input :label="$t('filter')" dense v-model="remoteVideoFilter" />
+                  <q-input
+                    :label="$t('filter')"
+                    dense
+                    v-model="remoteVideoFilter"
+                  />
                 </div>
                 <q-toggle
                   :label="$t('include-audio-description')"
@@ -196,7 +199,7 @@
                   >
                     <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
                       <q-card
-                        @click="console.log(video)"
+                        @click="downloadAdditionalRemoteVideo(video.files); remoteVideoPopup = false"
                         class="text-white cursor-pointer"
                         style="
                           background-color: rgb(91, 60, 136);
@@ -227,16 +230,6 @@
                   </template>
                 </div>
               </q-card-section>
-              <!-- </q-card-section> -->
-              <q-card-actions align="right">
-                <q-btn
-                  :label="$t('browse')"
-                  @click="getLocalFiles()"
-                  color="primary"
-                  flat
-                />
-                <q-btn :label="$t('got-it')" color="primary" v-close-popup />
-              </q-card-actions>
             </q-card>
           </q-dialog>
         </template>
@@ -375,7 +368,11 @@ import SongPicker from 'src/components/media/SongPicker.vue';
 import SubtitlesButton from 'src/components/media/SubtitlesButton.vue';
 import { getLookupPeriod } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
-import { downloadBackgroundMusic, getBestImageUrl } from 'src/helpers/jw-media';
+import {
+  downloadAdditionalRemoteVideo,
+  downloadBackgroundMusic,
+  getBestImageUrl,
+} from 'src/helpers/jw-media';
 import { createTemporaryNotification } from 'src/helpers/notifications';
 import { useAppSettingsStore } from 'src/stores/app-settings';
 import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
@@ -548,6 +545,7 @@ const localUploadPopup = ref(false);
 const importMediaMenuActive = ref(false);
 const datePickerActive = ref(false);
 const remoteVideoPopup = ref(false);
+const remoteVideosLoadingProgress = ref(0);
 const remoteVideos: Ref<MediaItemsMediatorItem[]> = ref([]);
 // const remoteVideosByCategory: Ref<{
 //   [key: string]: MediaItemsMediatorItem[];
@@ -586,81 +584,85 @@ const getLocalFiles = async () => {
 };
 
 const getJwVideos = async () => {
-  const currentState = useCurrentStateStore();
-  const { getSettingValue } = currentState;
-  const getSubcategories = async (category: string) => {
-    return (await get(
-      `https://b.jw-cdn.org/apis/mediator/v1/categories/${
-        getSettingValue('lang') as string
-      }/${category}?detailed=1&mediaLimit=0&clientType=www`,
-    )) as JwVideoCategory;
-  };
-  const subcategories: {
-    key: string;
-    parentCategory: string;
-  }[] = [{ key: 'LatestVideos', parentCategory: '' }];
-  const subcategoriesRequest = await getSubcategories('VideoOnDemand');
-  console.log('subcategoriesRequest', subcategoriesRequest);
-  const subcategoriesFirstLevel =
-    subcategoriesRequest.category.subcategories.map((s) => s.key);
-  for (const subcategoryFirstLevel of subcategoriesFirstLevel) {
-    subcategories.push(
-      ...(
-        await getSubcategories(subcategoryFirstLevel)
-      ).category.subcategories.map((s) => {
-        return { key: s.key, parentCategory: subcategoryFirstLevel };
-      }),
-    );
-  }
-  console.log('subcategories', subcategories);
-  for (const category of subcategories) {
-    const request = (await get(
-      `https://b.jw-cdn.org/apis/mediator/v1/categories/${
-        getSettingValue('lang') as string
-      }/${category.key}?detailed=0&clientType=www`,
-    )) as JwVideoCategory;
-    // remoteVideosByCategory.value[category.parentCategory ?? category.key] =
-    //   request.category.media;
-    remoteVideos.value = remoteVideos.value
-      .concat(request.category.media)
-      .reduce((accumulator: MediaItemsMediatorItem[], current) => {
-        const guids = new Set(accumulator.map((item) => item.guid));
-        if (!guids.has(current.guid)) {
-          accumulator.push(current);
-        }
-        return accumulator;
-      }, [])
-      .sort((a, b) => {
-        return (
-          new Date(b.firstPublished).getTime() -
-          new Date(a.firstPublished).getTime()
+  try {
+    if (remoteVideosLoadingProgress.value < 1) {
+      const currentState = useCurrentStateStore();
+      const { getSettingValue } = currentState;
+      const getSubcategories = async (category: string) => {
+        return (await get(
+          `https://b.jw-cdn.org/apis/mediator/v1/categories/${
+            getSettingValue('lang') as string
+          }/${category}?detailed=1&mediaLimit=0&clientType=www`,
+        )) as JwVideoCategory;
+      };
+      const subcategories: {
+        key: string;
+        parentCategory: string;
+      }[] = [{ key: 'LatestVideos', parentCategory: '' }];
+      const subcategoriesRequest = await getSubcategories('VideoOnDemand');
+      console.log('subcategoriesRequest', subcategoriesRequest);
+      const subcategoriesFirstLevel =
+        subcategoriesRequest.category.subcategories.map((s) => s.key);
+      for (const subcategoryFirstLevel of subcategoriesFirstLevel) {
+        subcategories.push(
+          ...(
+            await getSubcategories(subcategoryFirstLevel)
+          ).category.subcategories.map((s) => {
+            return { key: s.key, parentCategory: subcategoryFirstLevel };
+          }),
         );
-      });
+      }
+      console.log('subcategories', subcategories);
+      let index = 0;
+      for (const category of subcategories) {
+        const request = (await get(
+          `https://b.jw-cdn.org/apis/mediator/v1/categories/${
+            getSettingValue('lang') as string
+          }/${category.key}?detailed=0&clientType=www`,
+        )) as JwVideoCategory;
+        // remoteVideosByCategory.value[category.parentCategory ?? category.key] =
+        //   request.category.media;
+        remoteVideos.value = remoteVideos.value
+          .concat(request.category.media)
+          .reduce((accumulator: MediaItemsMediatorItem[], current) => {
+            const guids = new Set(accumulator.map((item) => item.guid));
+            if (!guids.has(current.guid)) {
+              accumulator.push(current);
+            }
+            return accumulator;
+          }, [])
+          .sort((a, b) => {
+            return (
+              new Date(b.firstPublished).getTime() -
+              new Date(a.firstPublished).getTime()
+            );
+          });
+        index++;
+        remoteVideosLoadingProgress.value = index / subcategories.length;
+      }
+    }
+  } catch (error) {
+    console.error(error);
   }
-  // make sure values are unique, based on guid
 };
 
 const remoteVideosFiltered = computed(() => {
-  return (
-    remoteVideoFilter.value?.length > 2
-      ? remoteVideos.value.filter((video) =>
-          video.title
-            .toLowerCase()
-            .includes(remoteVideoFilter.value.toLowerCase()),
-        )
-      : remoteVideos.value
-  )
-    .filter(
+  const useableVideos = ref(
+    remoteVideos.value.filter(
       (v) =>
         remoteVideosIncludeAudioDescription.value ||
         !v.primaryCategory.endsWith('AD'),
-    )
-    .slice(0, 100);
+    ),
+  );
+  if (remoteVideoFilter.value?.length > 2)
+    useableVideos.value = useableVideos.value.filter((video) =>
+      video.title.toLowerCase().includes(remoteVideoFilter.value.toLowerCase()),
+    );
+  return useableVideos.value.slice(0, 50);
 });
 
 onMounted(() => {
   document.title = 'Meeting Media Manager';
-  console.log(currentSettings.value);
   if (!currentSettings.value) navigateToCongregationSelector();
 });
 </script>
