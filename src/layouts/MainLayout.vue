@@ -199,7 +199,10 @@
                   >
                     <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
                       <q-card
-                        @click="downloadAdditionalRemoteVideo(video.files); remoteVideoPopup = false"
+                        @click="
+                          downloadAdditionalRemoteVideo(video.files);
+                          remoteVideoPopup = false;
+                        "
                         class="text-white cursor-pointer"
                         style="
                           background-color: rgb(91, 60, 136);
@@ -373,6 +376,12 @@ import {
   downloadBackgroundMusic,
   getBestImageUrl,
 } from 'src/helpers/jw-media';
+import {
+  registerAllCustomShortcuts,
+  registerCustomShortcut,
+  unregisterAllCustomShortcuts,
+  unregisterShortcut,
+} from 'src/helpers/keyboardShortcuts';
 import { createTemporaryNotification } from 'src/helpers/notifications';
 import { useAppSettingsStore } from 'src/stores/app-settings';
 import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
@@ -382,6 +391,7 @@ import {
   JwVideoCategory,
   MediaItemsMediatorItem,
 } from 'src/types/publications';
+import { SettingsValues } from 'src/types/settings';
 import { Ref, computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -394,8 +404,6 @@ const { runMigration } = appSettings;
 
 appSettings.$subscribe((_, state) => {
   LocalStorage.set('migrations', state.migrations);
-
-  // Use native localStorage for screen preferences, since Electron preload can't use quasar's LocalStorage
   LocalStorage.set('screenPreferences', state.screenPreferences);
 });
 
@@ -450,6 +458,7 @@ watch(currentCongregation, (newCongregation) => {
   } else {
     downloadProgress.value = {};
     lookupPeriod.value = getLookupPeriod();
+    registerAllCustomShortcuts();
     downloadBackgroundMusic();
   }
 });
@@ -505,6 +514,36 @@ watch(
   () => currentSettings.value?.autoStartAtLogin,
   (newAutoStartAtLogin) => {
     setAutoStartAtLogin(!!newAutoStartAtLogin);
+  },
+);
+
+watch(
+  () => currentSettings.value?.enableKeyboardShortcuts,
+  (newEnableKeyboardShortcuts) => {
+    if (newEnableKeyboardShortcuts) {
+      registerAllCustomShortcuts();
+    } else {
+      unregisterAllCustomShortcuts();
+    }
+  },
+)
+
+watch(
+  () => ({
+    shortcutMediaNext: currentSettings.value?.shortcutMediaNext,
+    shortcutMediaPrevious: currentSettings.value?.shortcutMediaPrevious,
+    shortcutMediaWindow: currentSettings.value?.shortcutMediaWindow,
+    shortcutMusic: currentSettings.value?.shortcutMusic,
+  }),
+  (newShortcuts, oldShortcuts) => {
+    Object.entries(oldShortcuts).forEach(([, oldShortcut]) => {
+      if (oldShortcut) unregisterShortcut(oldShortcut);
+    });
+    Object.entries(newShortcuts).forEach(
+      ([shortcutName, newShortcut]) => {
+        if (newShortcut) registerCustomShortcut(shortcutName as keyof SettingsValues, newShortcut);
+      },
+    );
   },
 );
 

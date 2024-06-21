@@ -630,7 +630,7 @@ watch(
     currentSettings.value.enableMediaDisplayButton = newUsingAtKh;
     if (newUsingAtKh) {
       currentSettings.value.autoStartMusic = !newCompanionToJwl;
-      currentSettings.value.enableMusicFadeOut = !newCompanionToJwl;
+      // currentSettings.value.enableMusicFadeOut = !newCompanionToJwl;
       currentSettings.value.jwlCompanionMode = newCompanionToJwl;
     }
   },

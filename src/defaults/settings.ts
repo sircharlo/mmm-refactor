@@ -158,6 +158,30 @@ export const settingsDefinitions: SettingsItems = {
   //   list: 'screens',
   //   type: 'list',
   // },
+  enableKeyboardShortcuts: {
+    group: 'advanced',
+    type: 'toggle',
+  },
+  shortcutMediaWindow: {
+    depends: 'enableKeyboardShortcuts',
+    group: 'advanced',
+    type: 'key',
+  },
+  shortcutMediaPrevious: {
+    depends: 'enableKeyboardShortcuts',
+    group: 'advanced',
+    type: 'key',
+  },
+  shortcutMediaNext: {
+    depends: 'enableKeyboardShortcuts',
+    group: 'advanced',
+    type: 'key',
+  },
+  shortcutMusic: {
+    depends: 'enableKeyboardShortcuts',
+    group: 'advanced',
+    type: 'key',
+  },
   maxRes: {
     depends: 'enableMediaDisplayButton',
     group: 'advanced',
@@ -209,12 +233,11 @@ export const settingsDefinitions: SettingsItems = {
     step: 1,
     type: 'slider',
   },
-  // todo: implement enableMusicFadeOut toggle
-  enableMusicFadeOut: {
-    depends: 'enableMusicButton',
-    group: 'advanced',
-    type: 'toggle',
-  },
+  // enableMusicFadeOut: {
+  //   depends: 'enableMusicButton',
+  //   group: 'advanced',
+  //   type: 'toggle',
+  // },
   // enableMp4Conversion: {
   //   type: 'toggle',
   //   depends: 'advanced',
@@ -364,11 +387,12 @@ export const defaultSettings: SettingsValues = {
   congregationName: '',
   // disableAutoUpdate: false,
   darkMode: 'auto',
+  enableKeyboardShortcuts: false,
   // disableHardwareAcceleration: false,
   enableMediaDisplayButton: false,
   // enableMp4Conversion: false,
   enableMusicButton: true,
-  enableMusicFadeOut: true,
+  // enableMusicFadeOut: true,
   // enablePp: false,
   enableSubtitles: false,
   // enableVlcPlaylistCreation: false,
@@ -378,6 +402,10 @@ export const defaultSettings: SettingsValues = {
   hideMediaLogo: false,
   includePrinted: true,
   jwlCompanionMode: false,
+  shortcutMediaNext: '',
+  shortcutMediaPrevious: '',
+  shortcutMediaWindow: '',
+  shortcutMusic: '',
   // keepOriginalsAfterConversion: false,
   lang: 'E',
   langFallback: '',
