@@ -369,6 +369,7 @@ import ObsStatus from 'src/components/media/ObsStatus.vue';
 // import ScenePicker from 'src/components/media/ScenePicker.vue';
 import SongPicker from 'src/components/media/SongPicker.vue';
 import SubtitlesButton from 'src/components/media/SubtitlesButton.vue';
+import { cleanAdditionalMediaFolder, cleanLocalStorage } from 'src/helpers/cleanup';
 import { getLookupPeriod } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import {
@@ -604,6 +605,9 @@ if (!migrations.value.includes('firstRun')) {
     });
   }
 }
+
+cleanLocalStorage()
+cleanAdditionalMediaFolder()
 
 const getLocalFiles = async () => {
   openFileDialog().then((result) => {
