@@ -165,22 +165,22 @@ export const settingsDefinitions: SettingsItems = {
   shortcutMediaWindow: {
     depends: 'enableKeyboardShortcuts',
     group: 'advanced',
-    type: 'key',
+    type: 'shortcut',
   },
   shortcutMediaPrevious: {
     depends: 'enableKeyboardShortcuts',
     group: 'advanced',
-    type: 'key',
+    type: 'shortcut',
   },
   shortcutMediaNext: {
     depends: 'enableKeyboardShortcuts',
     group: 'advanced',
-    type: 'key',
+    type: 'shortcut',
   },
   shortcutMusic: {
     depends: 'enableKeyboardShortcuts',
     group: 'advanced',
-    type: 'key',
+    type: 'shortcut',
   },
   maxRes: {
     depends: 'enableMediaDisplayButton',

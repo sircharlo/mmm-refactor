@@ -175,5 +175,8 @@
   "you-can-also-use-the-button-below-to-browse-for-files": "You can also browse for files manually if you prefer.",
   "browse": "Browse",
   "include-audio-description": "Include videos with audio descriptions",
-  "filter": "Filter"
+  "filter": "Filter",
+  "clear": "Clear",
+  "no-key-combination": "Enter a key combination now using your keyboard.",
+  "enter-key-combination": "Choose a shortcut"
 }

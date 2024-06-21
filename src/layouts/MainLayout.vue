@@ -369,7 +369,10 @@ import ObsStatus from 'src/components/media/ObsStatus.vue';
 // import ScenePicker from 'src/components/media/ScenePicker.vue';
 import SongPicker from 'src/components/media/SongPicker.vue';
 import SubtitlesButton from 'src/components/media/SubtitlesButton.vue';
-import { cleanAdditionalMediaFolder, cleanLocalStorage } from 'src/helpers/cleanup';
+import {
+  cleanAdditionalMediaFolder,
+  cleanLocalStorage,
+} from 'src/helpers/cleanup';
 import { getLookupPeriod } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import {
@@ -379,9 +382,7 @@ import {
 } from 'src/helpers/jw-media';
 import {
   registerAllCustomShortcuts,
-  registerCustomShortcut,
   unregisterAllCustomShortcuts,
-  unregisterShortcut,
 } from 'src/helpers/keyboardShortcuts';
 import { createTemporaryNotification } from 'src/helpers/notifications';
 import { useAppSettingsStore } from 'src/stores/app-settings';
@@ -392,7 +393,6 @@ import {
   JwVideoCategory,
   MediaItemsMediatorItem,
 } from 'src/types/publications';
-import { SettingsValues } from 'src/types/settings';
 import { Ref, computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -527,26 +527,8 @@ watch(
       unregisterAllCustomShortcuts();
     }
   },
-)
-
-watch(
-  () => ({
-    shortcutMediaNext: currentSettings.value?.shortcutMediaNext,
-    shortcutMediaPrevious: currentSettings.value?.shortcutMediaPrevious,
-    shortcutMediaWindow: currentSettings.value?.shortcutMediaWindow,
-    shortcutMusic: currentSettings.value?.shortcutMusic,
-  }),
-  (newShortcuts, oldShortcuts) => {
-    Object.entries(oldShortcuts).forEach(([, oldShortcut]) => {
-      if (oldShortcut) unregisterShortcut(oldShortcut);
-    });
-    Object.entries(newShortcuts).forEach(
-      ([shortcutName, newShortcut]) => {
-        if (newShortcut) registerCustomShortcut(shortcutName as keyof SettingsValues, newShortcut);
-      },
-    );
-  },
 );
+
 
 const dateOptions = (lookupDate: string) => {
   const dateArray: Date[] = lookupPeriod.value.map((day) => day.date);
@@ -606,8 +588,8 @@ if (!migrations.value.includes('firstRun')) {
   }
 }
 
-cleanLocalStorage()
-cleanAdditionalMediaFolder()
+cleanLocalStorage();
+cleanAdditionalMediaFolder();
 
 const getLocalFiles = async () => {
   openFileDialog().then((result) => {

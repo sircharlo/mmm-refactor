@@ -143,6 +143,13 @@
                     currentSettings[settingId as keyof SettingsItems] as string
                   "
                 />
+                <ShortcutInput
+                  :shortcutName="settingId as keyof SettingsItems"
+                  v-else-if="item.type === 'shortcut'"
+                  v-model="
+                    currentSettings[settingId as keyof SettingsItems] as string
+                  "
+                />
                 <pre v-else>{{ item }}</pre>
               </q-item-section>
             </q-item>
@@ -159,6 +166,7 @@ import { storeToRefs } from 'pinia';
 import DateInput from 'src/components/form-inputs/DateInput.vue';
 import PathInput from 'src/components/form-inputs/PathInput.vue';
 import SelectInput from 'src/components/form-inputs/SelectInput.vue';
+import ShortcutInput from 'src/components/form-inputs/ShortcutInput.vue';
 import SliderInput from 'src/components/form-inputs/SliderInput.vue';
 import TextInput from 'src/components/form-inputs/TextInput.vue';
 import TimeInput from 'src/components/form-inputs/TimeInput.vue';

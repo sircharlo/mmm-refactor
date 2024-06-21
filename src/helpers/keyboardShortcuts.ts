@@ -6,11 +6,32 @@ import { SettingsValues } from 'src/types/settings';
 const { registerShortcut, unregisterShortcut } = electronApi;
 
 const shortcutCallbacks: Partial<Record<keyof SettingsValues, () => void>> = {
+  shortcutMediaNext: () => {
+    console.log('shortcutMediaNext');
+  },
+  shortcutMediaPrevious: () => {
+    console.log('shortcutMediaPrevious');
+  },
   shortcutMediaWindow: () => {
     const currentState = useCurrentStateStore();
     const { mediaPlayer } = storeToRefs(currentState);
     showMediaWindow(!mediaPlayer.value.windowVisible);
   },
+  shortcutMusic: () => {
+    window.dispatchEvent(new CustomEvent('toggleMusic'));
+  },
+};
+
+const getCurrentShortcuts = () => {
+  const currentState = useCurrentStateStore();
+  const { currentSettings } = storeToRefs(currentState);
+  const shortcuts = [];
+  for (const shortcutName of Object.keys(shortcutCallbacks)) {
+    const shortcutVal =
+      currentSettings.value[shortcutName as keyof SettingsValues];
+    if (shortcutVal) shortcuts.push(shortcutVal);
+  }
+  return shortcuts;
 };
 
 const registerCustomShortcut = (
@@ -58,6 +79,7 @@ const unregisterAllCustomShortcuts = () => {
 };
 
 export {
+  getCurrentShortcuts,
   registerAllCustomShortcuts,
   registerCustomShortcut,
   unregisterAllCustomShortcuts,
