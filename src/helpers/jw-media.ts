@@ -21,11 +21,13 @@ import {
   getThumbnailUrl,
 } from 'src/helpers/fs';
 import {
+  convertSvgToJpg,
   decompressJwpub,
   findDb,
   isAudio,
   isImage,
   isSong,
+  isSvg,
   isVideo,
 } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
@@ -172,6 +174,14 @@ const fetchMedia = async () => {
 
 const getDbFromJWPUB = async (publication: PublicationFetcher) => {
   try {
+    if (
+      publication.pub === 'w' &&
+      publication.issue &&
+      parseInt(publication.issue.toString()) >= 20080101 &&
+      publication.issue.toString().slice(-2) === '01'
+    ) {
+      publication.pub = 'wp';
+    }
     const jwpub = await downloadJwpub(publication);
     if (jwpub.error) throw new Error('JWPUB download error: ' + publication);
     const publicationDirectory = getPublicationDirectory(publication);
@@ -534,6 +544,7 @@ const dynamicMediaMapper = async (
   const mediaPromises = allMedia
     .filter((m) => m.FilePath)
     .map(async (m) => {
+      if (isSvg(m.FilePath)) m.FilePath = await convertSvgToJpg(m.FilePath);
       const mediaIsSong = isSong(m);
       const thumbnailUrl = await getThumbnailUrl(
         m.ThumbnailFilePath || m.FilePath,
@@ -1243,7 +1254,12 @@ const downloadBackgroundMusic = () => {
   const { currentSettings, currentSongbook } = storeToRefs(
     useCurrentStateStore(),
   );
-  if (!currentSongbook.value || !currentSettings.value?.lang) return;
+  if (
+    !currentSongbook.value ||
+    !currentSettings.value?.lang ||
+    !currentSettings.value.enableMusicButton
+  )
+    return;
   downloadPubMediaFiles({
     fileformat: currentSongbook.value.fileformat,
     langwritten: currentSongbook.value.signLanguage

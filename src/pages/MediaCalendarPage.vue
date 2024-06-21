@@ -1,6 +1,5 @@
 <template>
   <q-page @dragenter="dropActive" @dragover="dropActive" padding>
-    <canvas ref="canvas" style="display: none"></canvas>
     <q-banner
       class="bg-orange-9 text-white"
       inline-actions
@@ -692,7 +691,6 @@ const jwpubImportDb = ref('');
 const jwpubImportInProgress = computed(() => !!jwpubImportDb.value);
 const jwpubImportLoading = ref(false);
 const jwpubImportDocuments = ref([] as DocumentItem[]);
-const canvas = ref();
 
 const { t } = useI18n();
 
@@ -1096,7 +1094,7 @@ const addToFiles = async (
       if (isHeic(filepath)) {
         filepath = await convertHeicToJpg(filepath);
       } else if (isSvg(filepath)) {
-        filepath = await convertSvgToJpg(filepath, canvas);
+        filepath = await convertSvgToJpg(filepath);
       }
 
       if (isImage(filepath) || isVideo(filepath) || isAudio(filepath)) {

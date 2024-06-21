@@ -126,11 +126,12 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { electronApi } from 'src/helpers/electron-api';
+import { showMediaWindow } from 'src/helpers/mediaPlayback';
 import { useAppSettingsStore } from 'src/stores/app-settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 
-const { getAllScreens, moveMediaWindow, toggleMediaWindow } = electronApi;
+const { getAllScreens, moveMediaWindow } = electronApi;
 
 defineProps<{
   disabled?: boolean;
@@ -138,14 +139,7 @@ defineProps<{
 
 const currentState = useCurrentStateStore();
 const { currentSettings, mediaPlayer } = storeToRefs(currentState);
-
-const mediaDisplayPopup = ref();
-
-const showMediaWindow = (state: boolean) => {
-  mediaPlayer.value.windowVisible = state;
-  toggleMediaWindow(state ? 'show' : 'hide');
-};
-
+const mediaDisplayPopup = ref()
 const appSettings = useAppSettingsStore();
 const { screenPreferences } = storeToRefs(appSettings);
 const screenList = ref(getAllScreens());

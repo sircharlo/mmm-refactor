@@ -74,8 +74,7 @@
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { storeToRefs } from 'pinia';
 import { useQuasar } from 'quasar';
-import { electronApi } from 'src/helpers/electron-api';
-import { isAudio, isImage, isVideo } from 'src/helpers/mediaPlayback';
+import { isAudio, isImage, isVideo, showMediaWindow } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { Ref, ref, watch } from 'vue';
@@ -86,8 +85,6 @@ const { currentCongregation, currentSettings, mediaPlayer, selectedDate } =
 
 const jwStore = useJwStore();
 const { customDurations, yeartexts } = storeToRefs(jwStore);
-
-const { toggleMediaWindow } = electronApi;
 
 const panzoom: Ref<PanzoomObject | undefined> = ref();
 
@@ -106,14 +103,14 @@ watch(
   () => mediaPlayer.value?.url,
   (newUrl) => {
     if (currentSettings.value?.jwlCompanionMode)
-      toggleMediaWindow(newUrl ? 'show' : 'hide');
+    showMediaWindow(!!newUrl);
   },
 );
 
 watch(
   () => currentCongregation.value,
   (newCongregation) => {
-    if (!newCongregation) toggleMediaWindow('hide');
+    if (!newCongregation) showMediaWindow(false);
   },)
 
 watch(

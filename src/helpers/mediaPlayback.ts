@@ -14,9 +14,9 @@ import {
   MultimediaItem,
   PlaylistTagItem,
 } from 'src/types/sqlite';
-import { Ref } from 'vue';
 
-const { convert, decompress, executeQuery, fs, path } = electronApi;
+const { convert, decompress, executeQuery, fs, path, toggleMediaWindow } =
+  electronApi;
 const { pad } = format;
 
 const formatTime = (time: number) => {
@@ -239,15 +239,13 @@ const convertHeicToJpg = async (filepath: string) => {
   return newPath;
 };
 
-const convertSvgToJpg = async (
-  filepath: string,
-  canvas: Ref<HTMLCanvasElement>,
-): Promise<string> => {
-  if (!isSvg(filepath) || !canvas.value) return filepath;
+const convertSvgToJpg = async (filepath: string): Promise<string> => {
+  if (!isSvg(filepath)) return filepath;
 
-  canvas.value.width = FULL_HD.width * 2;
-  canvas.value.height = FULL_HD.height * 2;
-  const ctx = canvas.value.getContext('2d');
+  const canvas = document.createElement('canvas');
+  canvas.width = FULL_HD.width * 2;
+  canvas.height = FULL_HD.height * 2;
+  const ctx = canvas.getContext('2d');
   if (!ctx) return filepath;
 
   const img = new Image();
@@ -255,23 +253,23 @@ const convertSvgToJpg = async (
 
   return new Promise((resolve, reject) => {
     img.onload = function () {
-      const canvasW = canvas.value.width,
-        canvasH = canvas.value.height;
+      const canvasW = canvas.width,
+        canvasH = canvas.height;
       const imgW = img.naturalWidth || canvasW,
         imgH = img.naturalHeight || canvasH;
       const wRatio = canvasW / imgW,
         hRatio = canvasH / imgH;
       if (wRatio < hRatio) {
-        canvas.value.height = canvasW * (imgH / imgW);
+        canvas.height = canvasW * (imgH / imgW);
       } else {
-        canvas.value.width = canvasH * (imgW / imgH);
+        canvas.width = canvasH * (imgW / imgH);
       }
       const ratio = Math.min(wRatio, hRatio);
       ctx.drawImage(img, 0, 0, imgW * ratio, imgH * ratio);
       ctx.globalCompositeOperation = 'destination-over';
       ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, canvas.value.width, canvas.value.height);
-      const outputImg = canvas.value.toDataURL('image/png');
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const outputImg = canvas.toDataURL('image/png');
       const existingPath = path.parse(filepath);
       const newPath = `${existingPath.dir}/${existingPath.name}.jpg`;
       try {
@@ -289,6 +287,13 @@ const convertSvgToJpg = async (
       reject(error);
     };
   });
+};
+
+const showMediaWindow = (state: boolean) => {
+  const currentState = useCurrentStateStore();
+  const { mediaPlayer } = storeToRefs(currentState);
+  mediaPlayer.value.windowVisible = state;
+  toggleMediaWindow(state ? 'show' : 'hide');
 };
 
 export {
@@ -310,4 +315,5 @@ export {
   isSong,
   isSvg,
   isVideo,
+  showMediaWindow,
 };
