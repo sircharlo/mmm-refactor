@@ -21,11 +21,13 @@ import {
   getThumbnailUrl,
 } from 'src/helpers/fs';
 import {
+  convertSvgToJpg,
   decompressJwpub,
   findDb,
   isAudio,
   isImage,
   isSong,
+  isSvg,
   isVideo,
 } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
@@ -36,7 +38,8 @@ import {
   FileDownloader,
 } from 'src/types/media';
 import {
-  MediaImages,
+  ImageSizes,
+  ImageTypeSizes,
   MediaItemsMediator,
   MediaItemsMediatorFile,
   MediaLink,
@@ -171,6 +174,14 @@ const fetchMedia = async () => {
 
 const getDbFromJWPUB = async (publication: PublicationFetcher) => {
   try {
+    if (
+      publication.pub === 'w' &&
+      publication.issue &&
+      parseInt(publication.issue.toString()) >= 20080101 &&
+      publication.issue.toString().slice(-2) === '01'
+    ) {
+      publication.pub = 'wp';
+    }
     const jwpub = await downloadJwpub(publication);
     if (jwpub.error) throw new Error('JWPUB download error: ' + publication);
     const publicationDirectory = getPublicationDirectory(publication);
@@ -533,6 +544,7 @@ const dynamicMediaMapper = async (
   const mediaPromises = allMedia
     .filter((m) => m.FilePath)
     .map(async (m) => {
+      if (isSvg(m.FilePath)) m.FilePath = await convertSvgToJpg(m.FilePath);
       const mediaIsSong = isSong(m);
       const thumbnailUrl = await getThumbnailUrl(
         m.ThumbnailFilePath || m.FilePath,
@@ -1016,7 +1028,7 @@ const getPubMediaLinks = async (publication: PublicationFetcher) => {
 };
 
 export function findBestResolution(
-  mediaLinks: (MediaItemsMediatorFile | MediaLink)[],
+  mediaLinks: MediaItemsMediatorFile[] | MediaLink[],
 ) {
   const currentState = useCurrentStateStore();
   const { getSettingValue } = currentState;
@@ -1032,7 +1044,9 @@ export function findBestResolution(
       mediaLink.frameHeight <= maxRes &&
       mediaLink.frameHeight >= bestHeight
     ) {
-      bestItem = mediaLink;
+      bestItem = Object.hasOwn(mediaLink, 'progressiveDownloadURL')
+        ? (mediaLink as MediaItemsMediatorFile)
+        : (mediaLink as MediaLink);
       bestHeight = mediaLink.frameHeight;
     }
   }
@@ -1113,20 +1127,48 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
   return downloadedFile?.path;
 };
 
-function getBestImageUrl(images: MediaImages) {
-  const preferredOrder = ['wss', 'lsr', 'sqr', 'pnr'];
+const downloadAdditionalRemoteVideo = async (
+  mediaItemLinks: MediaItemsMediatorFile[],
+) => {
+  window.dispatchEvent(
+    new CustomEvent('remoteVideo-loading', {
+      detail: true,
+    }),
+  );
+  const currentState = useCurrentStateStore();
+  const { getDatedAdditionalMediaDirectory } = storeToRefs(currentState);
+  const bestItem = findBestResolution(mediaItemLinks) as MediaItemsMediatorFile;
+  let downloadedFile: DownloadedFile = { path: '' };
+  if (bestItem) {
+    downloadedFile = (await downloadFileIfNeeded({
+      dir: getDatedAdditionalMediaDirectory.value,
+      size: bestItem.filesize,
+      url: bestItem.progressiveDownloadURL,
+    })) as DownloadedFile;
+  }
+  window.dispatchEvent(
+    new CustomEvent('remoteVideo-loaded', {
+      detail: downloadedFile,
+    }),
+  );
+};
+
+function getBestImageUrl(images: ImageTypeSizes, size?: keyof ImageSizes) {
+  const preferredOrder: (keyof ImageTypeSizes)[] = ['wss', 'lsr', 'sqr', 'pnr'];
   for (const key of preferredOrder) {
     if (images.hasOwnProperty(key)) {
-      const sizes = ['sm', 'md', 'lg', 'xl'];
+      const sizes: (keyof ImageSizes)[] = size
+        ? [size]
+        : ['sm', 'md', 'lg', 'xl'];
       for (const size of sizes) {
         if (images[key].hasOwnProperty(size)) {
           return images[key][size];
         }
       }
       // If none of the preferred sizes are found, return any other size
-      const otherSizes = Object.keys(images[key]).filter(
-        (size) => !sizes.includes(size),
-      );
+      const otherSizes = (
+        Object.keys(images[key]) as (keyof ImageSizes)[]
+      ).filter((size) => !sizes.includes(size));
       if (otherSizes.length > 0) {
         return images[key][otherSizes[0]];
       }
@@ -1212,7 +1254,12 @@ const downloadBackgroundMusic = () => {
   const { currentSettings, currentSongbook } = storeToRefs(
     useCurrentStateStore(),
   );
-  if (!currentSongbook.value || !currentSettings.value?.lang) return;
+  if (
+    !currentSongbook.value ||
+    !currentSettings.value?.lang ||
+    !currentSettings.value.enableMusicButton
+  )
+    return;
   downloadPubMediaFiles({
     fileformat: currentSongbook.value.fileformat,
     langwritten: currentSongbook.value.signLanguage
@@ -1284,11 +1331,13 @@ const downloadJwpub = async (
 
 export {
   addFullFilePathToMultimediaItem,
+  downloadAdditionalRemoteVideo,
   downloadBackgroundMusic,
   downloadFileIfNeeded,
   downloadPubMediaFiles,
   dynamicMediaMapper,
   fetchMedia,
+  getBestImageUrl,
   getDocumentMultimediaItems,
   getJwMediaInfo,
   getMwMedia,

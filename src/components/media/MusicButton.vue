@@ -73,7 +73,7 @@ import { date } from 'quasar';
 import { getFileUrl, getPublicationDirectoryContents } from 'src/helpers/fs';
 import { formatTime } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
@@ -127,7 +127,12 @@ const getNextSongUrl = () => {
 };
 
 function playMusic() {
-  if (!musicPlayer.value || !musicPlayerSource.value) return;
+  if (
+    !musicPlayer.value ||
+    !musicPlayerSource.value ||
+    !currentSettings.value?.enableMusicButton
+  )
+    return;
   musicPlayer.value.volume =
     (getSettingValue('musicVolume') as number) / 100 ?? 1;
   musicPlayerSource.value.src = getNextSongUrl();
@@ -163,7 +168,11 @@ const meetingDay = ref(false);
 onMounted(() => {
   meetingDay.value =
     selectedDateObject.value?.today && !!selectedDateObject.value?.meeting;
-  if (currentSettings.value?.autoStartMusic && meetingDay.value) {
+  if (
+    currentSettings.value?.enableMusicButton &&
+    currentSettings.value?.autoStartMusic &&
+    meetingDay.value
+  ) {
     playMusic();
   }
 });
@@ -207,4 +216,34 @@ const musicRemainingTime = computed(() => {
 });
 
 const musicPopup = ref(false);
+
+watch(
+  () => currentSettings.value?.enableMusicButton,
+  (newMusicButtonEnabled) => {
+    console.log('newMusicButtonEnabled', newMusicButtonEnabled);
+    if (!newMusicButtonEnabled) stopMusic();
+  },
+);
+
+const toggleMusicListener = (event: CustomEventInit) => {
+  try {
+    console.log('toggleMusic-update', event.detail);
+    if (!currentSettings.value?.enableMusicButton) return;
+    if (musicPlaying.value) {
+      stopMusic();
+    } else {
+      playMusic();
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('toggleMusic', toggleMusicListener);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('toggleMusic', toggleMusicListener);
+});
 </script>

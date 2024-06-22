@@ -69,50 +69,28 @@ export interface MediaItemsMediatorFile {
   };
 }
 
+export interface MediaItemsMediatorItem {
+  availableLanguages: string[];
+  description: string;
+  duration: number;
+  durationFormattedHHMM: string;
+  durationFormattedMinSec: string;
+  files: MediaItemsMediatorFile[];
+  firstPublished: string;
+  guid: string;
+  images: ImageTypeSizes;
+  key: string;
+  languageAgnosticNaturalKey: string;
+  name: string;
+  naturalKey: string;
+  primaryCategory: string;
+  printReferences: string[];
+  tags: string[];
+  title: string;
+  type: string;
+}
 export interface MediaItemsMediator {
-  media: {
-    availableLanguages: string[];
-    description: string;
-    duration: number;
-    durationFormattedHHMM: string;
-    durationFormattedMinSec: string;
-    files: MediaItemsMediatorFile[];
-    firstPublished: string;
-    guid: string;
-    images: {
-      lsr: {
-        lg: string;
-        md: string;
-        sm: string;
-        xl: string;
-      };
-      pnr: {
-        lg: string;
-        md: string;
-        sm: string;
-        xl: string;
-      };
-      sqr: {
-        lg: string;
-        md: string;
-        sm: string;
-        xl: string;
-      };
-      wss: {
-        lg: string;
-        md: string;
-        sm: string;
-        xl: string;
-      };
-    };
-    languageAgnosticNaturalKey: string;
-    naturalKey: string;
-    primaryCategory: string;
-    printReferences: string[];
-    tags: string[];
-    title: string;
-    type: string;
-  }[];
+  media: MediaItemsMediatorItem[];
 }
 
 export interface Publication {
@@ -155,9 +133,35 @@ export interface PublicationFetcher {
 }
 
 export interface ImageSizes {
-  [key: string]: string;
+  lg: string;
+  md: string;
+  sm: string;
+  xl: string;
 }
 
-export interface MediaImages {
-  [key: string]: ImageSizes;
+export interface ImageTypeSizes {
+  lsr: ImageSizes;
+  pnr: ImageSizes;
+  sqr: ImageSizes;
+  wss: ImageSizes;
+}
+
+export interface JwVideoCategoryListings {
+  categories: JwVideoCategoryListing[];
+}
+
+export interface JwVideoCategoryListing {
+  description: string;
+  images: ImageTypeSizes;
+  key: string;
+  media: MediaItemsMediatorItem[];
+  name: string;
+  parentCategory: JwVideoCategoryListing;
+  subcategories: JwVideoCategoryListing[];
+  tags: string[];
+  type: string;
+}
+
+export interface JwVideoCategory {
+  category: JwVideoCategoryListing;
 }

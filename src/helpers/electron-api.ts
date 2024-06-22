@@ -29,8 +29,10 @@ export interface ElectronApi {
   openFileDialog: () => Promise<Electron.OpenDialogReturnValue>;
   openFolderDialog: () => string[];
   path: typeof import('path');
+  registerShortcut: (shortcut: string, callback: () => void) => void;
   setAutoStartAtLogin: (value: boolean) => void;
   toggleMediaWindow: (action: string) => void;
+  unregisterShortcut: (shortcut: string) => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment

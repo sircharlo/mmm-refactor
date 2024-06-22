@@ -356,5 +356,10 @@
   "congregationMeetings": "Réunions de l'assemblée locale",
   "applicationConfigurationDescription": "Personnaliser le comportement et l'apparence de cette application",
   "applicationConfiguration": "Configuration de l'application",
-  "you-can-also-use-the-button-below-to-browse-for-files": "Vous pouvez également parcourir et sélectionner des fichiers manuellement, si vous le désirez."
+  "you-can-also-use-the-button-below-to-browse-for-files": "Vous pouvez également parcourir et sélectionner des fichiers manuellement, si vous le désirez.",
+  "include-audio-description": "Inclure les vidéos avec des descriptions audio",
+  "filter": "Filtre",
+  "clear": "Supprimer",
+  "no-key-combination": "Entrez une combinaison de touches à l'aide de votre clavier maintenant.",
+  "enter-key-combination": "Choisir un raccourci"
 }

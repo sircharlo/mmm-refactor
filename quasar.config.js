@@ -93,7 +93,7 @@ module.exports = configure(function (/* ctx */) {
       target: {
         // browser: ['esnext', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
         browser: ['esnext'],
-        node: 'node20',
+        node: 'node22',
       },
       vitePlugins: [
         [
