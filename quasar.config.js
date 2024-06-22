@@ -57,6 +57,7 @@ module.exports = configure(function (/* ctx */) {
           sentryVitePlugin({
             org: 'jw-projects',
             project: 'mmm-v2',
+            authToken: process.env.SENTRY_AUTH_TOKEN,
           }),
         );
       },
