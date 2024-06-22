@@ -55,9 +55,9 @@ module.exports = configure(function (/* ctx */) {
         if (!viteConf.build.plugins) viteConf.build.plugins = [];
         viteConf.build.plugins.push(
           sentryVitePlugin({
+            authToken: process.env.SENTRY_AUTH_TOKEN,
             org: 'jw-projects',
             project: 'mmm-v2',
-            authToken: process.env.SENTRY_AUTH_TOKEN,
           }),
         );
       },
