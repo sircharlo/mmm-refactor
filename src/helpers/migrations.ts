@@ -34,9 +34,17 @@ const buildNewPrefsObject = (oldPrefs: OldAppConfig) => {
     coWeek: oldPrefs.meeting.coWeek || '',
     congregationName: oldPrefs.app.congregationName || '',
     darkMode: 'auto',
+    enableKeyboardShortcuts:
+      oldPrefs.media.mediaWinShortcut ||
+      oldPrefs.media.ppBackward ||
+      oldPrefs.media.ppForward ||
+      // oldPrefs.media.presentShortcut ||
+      oldPrefs.meeting.shuffleShortcut
+        ? true
+        : false,
     enableMediaDisplayButton: oldPrefs.media.enableMediaDisplayButton || true,
     enableMusicButton: oldPrefs.meeting.enableMusicButton || true,
-    enableMusicFadeOut: oldPrefs.meeting.enableMusicFadeOut || true,
+    // enableMusicFadeOut: oldPrefs.meeting.enableMusicFadeOut || true,
     enableSubtitles: oldPrefs.media.enableSubtitles || false,
     excludeFootnotes: oldPrefs.media.excludeFootnotes || false,
     excludeTh: oldPrefs.media.excludeTh || true,
@@ -57,6 +65,10 @@ const buildNewPrefsObject = (oldPrefs: OldAppConfig) => {
     obsMediaScene: oldPrefs.app.obs.mediaScene || '',
     obsPassword: oldPrefs.app.obs.password || '',
     obsPort: oldPrefs.app.obs.port?.toString() || '',
+    shortcutMediaNext: oldPrefs.media.ppForward || '',
+    shortcutMediaPrevious: oldPrefs.media.ppBackward || '',
+    shortcutMediaWindow: oldPrefs.media.mediaWinShortcut || '',
+    shortcutMusic: oldPrefs.meeting.shuffleShortcut || '',
     // preferredOutput: oldPrefs.media.preferredOutput || '',
     weDay: oldPrefs.meeting.weDay?.toString() || '',
     weStartTime: oldPrefs.meeting.weStartTime?.toString() || '',

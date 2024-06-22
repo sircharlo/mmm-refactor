@@ -2,8 +2,6 @@ name: Build/release
 
 on:
   push:
-    branches-ignore:
-      - 'dependabot/**'
   pull_request:
 
 jobs:
@@ -32,14 +30,14 @@ jobs:
       - run: yarn install && yarn global add @quasar/cli
 
       - name: Build and publish Electron app
-        if: "!startsWith(github.head_ref, 'dependabot/')"
+        if: "!startsWith(github.ref, 'refs/tags/v')"
         run: yarn quasar build -m electron -P always
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+           GITHUB_TOKEN: ${{ github.token }}
+           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Build Electron app
-        if: "startsWith(github.head_ref, 'dependabot/')"
+        if: "startsWith(github.ref, 'refs/tags/v')"
         run: yarn quasar build -m electron
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -50,3 +48,4 @@ jobs:
   #    with:
   #      github_token: ${{ secrets.github_token }}
   #      release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+

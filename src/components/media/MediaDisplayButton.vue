@@ -55,8 +55,8 @@
                 screen.mainWindow
                   ? 'mdi-monitor-dashboard'
                   : screenPreferences.preferredScreenNumber === index
-                  ? 'mdi-monitor-shimmer'
-                  : 'mdi-monitor'
+                    ? 'mdi-monitor-shimmer'
+                    : 'mdi-monitor'
               "
               :text-color="
                 screenList.length < 2 ||
@@ -126,12 +126,12 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { electronApi } from 'src/helpers/electron-api';
+import { showMediaWindow } from 'src/helpers/mediaPlayback';
 import { useAppSettingsStore } from 'src/stores/app-settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 
-const { getAllScreens, moveMediaWindow, toggleMediaWindow } =
-  electronApi;
+const { getAllScreens, moveMediaWindow } = electronApi;
 
 defineProps<{
   disabled?: boolean;
@@ -139,14 +139,7 @@ defineProps<{
 
 const currentState = useCurrentStateStore();
 const { currentSettings, mediaPlayer } = storeToRefs(currentState);
-
-const mediaDisplayPopup = ref();
-
-const showMediaWindow = (state: boolean) => {
-  mediaPlayer.value.windowVisible = state;
-  toggleMediaWindow(state ? 'show' : 'hide');
-};
-
+const mediaDisplayPopup = ref()
 const appSettings = useAppSettingsStore();
 const { screenPreferences } = storeToRefs(appSettings);
 const screenList = ref(getAllScreens());
@@ -178,13 +171,21 @@ watch(
 );
 
 const targetScreenListener = (event: CustomEventInit) => {
-  console.log('targetScreen-update', event.detail);
-  screenPreferences.value.preferredScreenNumber = event.detail;
+  try {
+    console.log('targetScreen-update', event.detail);
+    screenPreferences.value.preferredScreenNumber = event.detail;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const windowedModeListener = (event: CustomEventInit) => {
-  console.log('windowedMode-update', event.detail);
-  screenPreferences.value.preferWindowed = event.detail;
+  try {
+    console.log('windowedMode-update', event.detail);
+    screenPreferences.value.preferWindowed = event.detail;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 onMounted(() => {

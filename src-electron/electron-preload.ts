@@ -28,7 +28,13 @@
  * }
  */
 
-import { BrowserWindow, app, dialog, screen } from '@electron/remote';
+import {
+  BrowserWindow,
+  app,
+  dialog,
+  globalShortcut,
+  screen,
+} from '@electron/remote';
 import * as sqlite3 from 'better-sqlite3';
 import decompress from 'decompress';
 import { contextBridge } from 'electron';
@@ -87,12 +93,18 @@ const moveMediaWindow = ({
   const mediaWindow = getMediaWindow();
   if (!mediaWindow || !mainWindow) return;
   if (targetScreen === undefined || windowedMode === undefined) {
-    const screenPreferences = JSON.parse(
-      localStorage.getItem('screenPreferences') ?? '{}',
-    ) as ScreenPreferences;
-    console.log('screenPreferences', screenPreferences);
-    targetScreen = screenPreferences.preferredScreenNumber;
-    windowedMode = screenPreferences.preferWindowed;
+    try {
+      const screenPreferences = JSON.parse(
+        window.localStorage
+          .getItem('screenPreferences')
+          ?.replace('__q_objt|', '') ?? '{}', // This is a hack, we need to replace the string __q_objt| with an empty string due to Quasar's implementation of LocalStorage
+      ) as ScreenPreferences;
+      console.log('screenPreferences', screenPreferences);
+      targetScreen = screenPreferences.preferredScreenNumber;
+      windowedMode = screenPreferences.preferWindowed;
+    } catch (err) {
+      console.error(err);
+    }
   }
   const getWindowScreen = (window: Electron.BrowserWindow) => {
     const windowDisplay = screen.getDisplayMatching(window.getBounds());
@@ -204,6 +216,23 @@ const toggleMediaWindow = (action: string) => {
   }
 };
 
+const registerShortcut = (keySequence: string, callback: () => void) => {
+  if (!keySequence) return;
+  console.log('registering shortcut', keySequence, callback);
+  const ret = globalShortcut.register(keySequence, callback);
+  if (!ret) {
+    console.log('registration failed');
+  }
+  console.log(globalShortcut.isRegistered(keySequence));
+};
+
+const unregisterShortcut = (keySequence: string) => {
+  if (!keySequence) return;
+  console.log('unregistering shortcut', keySequence);
+  if (globalShortcut.isRegistered(keySequence))
+    globalShortcut.unregister(keySequence);
+};
+
 contextBridge.exposeInMainWorld('electronApi', {
   convert,
   decompress,
@@ -253,6 +282,7 @@ contextBridge.exposeInMainWorld('electronApi', {
     });
   },
   path,
+  registerShortcut,
   setAutoStartAtLogin: (value: boolean) => {
     app.setLoginItemSettings({
       openAtLogin: value,
@@ -265,4 +295,5 @@ contextBridge.exposeInMainWorld('electronApi', {
     }
   },
   toggleMediaWindow,
+  unregisterShortcut,
 });
