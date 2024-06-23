@@ -18,16 +18,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Create Sentry release
-        if: matrix.os == 'ubuntu-latest'
-        uses: getsentry/action-release@v1
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: 'jw-projects'
-          SENTRY_PROJECT: 'mmm-v2'
-        with:
-          environment: production
-
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v4
         with:
@@ -46,3 +36,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      - name: Create Sentry release
+        if: matrix.os == 'ubuntu-latest'
+        uses: getsentry/action-release@v1.7.0
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: 'jw-projects'
+          SENTRY_PROJECT: 'mmm-v2'
+        with:
+          dist: ${{ github.sha }}
+          environment: production
+          sourcemaps: "./"
