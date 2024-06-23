@@ -60,6 +60,11 @@ module.exports = configure(function (/* ctx */) {
           }),
         );
       },
+      // afterBuild: async () => {
+      //   const SentryCli = require('@sentry/cli');
+      //   const cli = new SentryCli();
+      //   await cli.releases.new(release);
+      // },
 
       // },
       extendWebpack(cfg, {}) {
