@@ -15,7 +15,7 @@ const { mergeConfig } = require('vite');
 const { configure } = require('quasar/wrappers');
 const path = require('path');
 // const inject  = require('@rollup/plugin-inject')
-import { version } from 'package.json';
+const { version } = require('package.json');
 
 
 module.exports = configure(function (/* ctx */) {
