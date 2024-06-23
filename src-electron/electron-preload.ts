@@ -67,7 +67,7 @@ const getAllScreens = () => {
     try {
       const mainWindowScreen = displays.find(
         (display) =>
-          display.id === screen.getDisplayMatching(mainWindow?.getBounds()).id,
+          display.id === screen.getDisplayMatching(mainWindow.getBounds()).id,
       ) as { mainWindow?: boolean } & Electron.Display;
       if (mainWindowScreen) mainWindowScreen.mainWindow = true;
     } catch (err) {
@@ -75,6 +75,82 @@ const getAllScreens = () => {
     }
   }
   return displays as ({ mainWindow?: boolean } & Electron.Display)[];
+};
+
+const getWindowScreen = (window: Electron.BrowserWindow) => {
+  const allScreens = getAllScreens();
+  const windowDisplay = screen.getDisplayMatching(window.getBounds());
+  return allScreens.findIndex((display) => display.id === windowDisplay.id);
+};
+
+const setWindowPosition = (
+  targetWindow: Electron.BrowserWindow,
+  targetScreenNumber: number | undefined,
+  windowedMode = false,
+  noEvent?: boolean,
+) => {
+  if (!targetWindow) return;
+  const allScreens = getAllScreens();
+  console.log('allScreens', allScreens);
+  const currentMediaScreenNumber = getWindowScreen(targetWindow);
+  console.log(
+    'targetScreen, currentMediaScreenNumber',
+    targetScreenNumber,
+    currentMediaScreenNumber,
+  );
+  const targetScreen = allScreens[targetScreenNumber ?? 0];
+  console.log('targetScreen', targetScreen);
+  if (!targetScreen) return;
+  const targetScreenBounds = targetScreen.bounds;
+  console.log('targetScreenBounds', targetScreenBounds);
+  if (!targetScreenBounds) return;
+  if (windowedMode) {
+    if (targetWindow.isAlwaysOnTop()) targetWindow.setAlwaysOnTop(false);
+    if (targetWindow.isFullScreen()) targetWindow.setFullScreen(false);
+    const newBounds = {
+      height: 720,
+      width: 1280,
+      x: targetScreenBounds.x + 50,
+      y: targetScreenBounds.y + 50,
+    };
+    const currentBounds = targetWindow.getBounds();
+    console.log(
+      'currentBounds, newBounds',
+      currentBounds.height,
+      newBounds.height,
+      currentBounds.width,
+      newBounds.width,
+      currentBounds.x,
+      newBounds.x,
+      currentBounds.y,
+      newBounds.y,
+      currentBounds.height !== newBounds.height,
+      currentBounds.width !== newBounds.width,
+      currentBounds.x !== newBounds.x,
+      currentBounds.y !== newBounds.y,
+    );
+    if (
+      currentBounds.height !== newBounds.height ||
+      currentBounds.width !== newBounds.width ||
+      currentBounds.x !== newBounds.x ||
+      currentBounds.y !== newBounds.y
+    ) {
+      targetWindow.setBounds(newBounds);
+    }
+  } else {
+    targetWindow.setPosition(
+      targetScreenBounds.x + 50,
+      targetScreenBounds.y + 50,
+    );
+    if (!targetWindow.isAlwaysOnTop()) targetWindow.setAlwaysOnTop(true);
+    if (!targetWindow.isFullScreen()) targetWindow.setFullScreen(true);
+  }
+  if (!noEvent)
+    window.dispatchEvent(
+      new CustomEvent('windowScreen-update', {
+        detail: { targetScreen, windowedMode },
+      }),
+    );
 };
 
 const moveMediaWindow = ({
@@ -99,52 +175,16 @@ const moveMediaWindow = ({
           .getItem('screenPreferences')
           ?.replace('__q_objt|', '') ?? '{}', // This is a hack, we need to replace the string __q_objt| with an empty string due to Quasar's implementation of LocalStorage
       ) as ScreenPreferences;
-      console.log('screenPreferences', screenPreferences);
+      console.log('screenPreferences from LocalStorage', screenPreferences);
       targetScreen = screenPreferences.preferredScreenNumber;
       windowedMode = screenPreferences.preferWindowed;
     } catch (err) {
       console.error(err);
     }
   }
-  const getWindowScreen = (window: Electron.BrowserWindow) => {
-    const windowDisplay = screen.getDisplayMatching(window.getBounds());
-    return allScreens.findIndex((display) => display.id === windowDisplay.id);
-  };
-  const setPosition = (targetScreen = 0) => {
-    const currentMediaScreenNumber = getWindowScreen(mediaWindow);
-    if (targetScreen !== currentMediaScreenNumber) {
-      mediaWindow?.setPosition(
-        allScreens[targetScreen].workArea.x + 50,
-        allScreens[targetScreen].workArea.y + 50,
-      );
-    }
-    if (!mediaWindow?.isFullScreen()) mediaWindow?.setSize(1280, 720, true);
-    if (!noEvent)
-      window.dispatchEvent(
-        new CustomEvent('targetScreen-update', {
-          detail: targetScreen,
-        }),
-      );
-  };
-  const setFullScreen = (enabled: boolean) => {
-    if (enabled) {
-      // Make media window fullscreen if it's not already
-      if (!mediaWindow?.isFullScreen()) mediaWindow?.setFullScreen(true);
-      if (!mediaWindow?.isAlwaysOnTop()) mediaWindow?.setAlwaysOnTop(true);
-    } else {
-      // Make media window windowed if it's not already
-      if (mediaWindow?.isFullScreen()) mediaWindow?.setFullScreen(false);
-      if (mediaWindow?.isAlwaysOnTop()) mediaWindow?.setAlwaysOnTop(false);
-    }
-    if (!noEvent)
-      window.dispatchEvent(
-        new CustomEvent('windowedMode-update', {
-          detail: !enabled,
-        }),
-      );
-  };
   if (otherScreens.length > 0) {
-    if (windowedMode === undefined) windowedMode = !mediaWindow?.isFullScreen();
+    console.log('otherScreens.length > 0', otherScreens.length);
+    if (windowedMode === undefined) windowedMode = !mediaWindow.isFullScreen();
     if (targetScreen === undefined) {
       targetScreen = allScreens.findIndex((s) => !s.mainWindow);
       if (otherScreens.length > 1) {
@@ -155,11 +195,11 @@ const moveMediaWindow = ({
             : currentMediaScreenNumber;
       }
     }
-    setFullScreen(!windowedMode);
   } else {
-    setFullScreen(false);
+    targetScreen = 0;
+    windowedMode = true;
   }
-  setPosition(targetScreen);
+  setWindowPosition(mediaWindow, targetScreen, windowedMode, noEvent);
 };
 
 const moveMediaWindowDebounced = debounce(moveMediaWindow, 100);
@@ -206,13 +246,14 @@ function sleepSync(ms: number) {
 
 const toggleMediaWindow = (action: string) => {
   const mediaWindow = getMediaWindow();
+  if (!mediaWindow) return;
   if (action === 'show') {
     moveMediaWindow({});
-    if (!mediaWindow?.isVisible()) {
-      mediaWindow?.show();
+    if (!mediaWindow.isVisible()) {
+      mediaWindow.show();
     }
   } else if (action === 'hide') {
-    mediaWindow?.hide();
+    mediaWindow.hide();
   }
 };
 
@@ -221,7 +262,7 @@ const registerShortcut = (keySequence: string, callback: () => void) => {
   console.log('registering shortcut', keySequence, callback);
   const ret = globalShortcut.register(keySequence, callback);
   if (!ret) {
-    console.log('registration failed');
+    console.error('registration failed');
   }
   console.log(globalShortcut.isRegistered(keySequence));
 };

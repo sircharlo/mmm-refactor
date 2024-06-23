@@ -19,6 +19,7 @@ export interface ElectronApi {
   getUserDataPath: () => string;
   klawSync: typeof import('klaw-sync');
   moveMediaWindow: ({
+    noEvent,
     targetScreen,
     windowedMode,
   }: {

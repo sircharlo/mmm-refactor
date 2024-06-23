@@ -170,31 +170,21 @@ watch(
   { deep: true, immediate: true },
 );
 
-const targetScreenListener = (event: CustomEventInit) => {
+const windowScreenListener = (event: CustomEventInit) => {
   try {
-    console.log('targetScreen-update', event.detail);
-    screenPreferences.value.preferredScreenNumber = event.detail;
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const windowedModeListener = (event: CustomEventInit) => {
-  try {
-    console.log('windowedMode-update', event.detail);
-    screenPreferences.value.preferWindowed = event.detail;
+    console.log('windowScreen-update', event.detail);
+    screenPreferences.value.preferredScreenNumber = event.detail.targetScreen;
+    screenPreferences.value.preferWindowed = event.detail.windowedMode;
   } catch (error) {
     console.error(error);
   }
 };
 
 onMounted(() => {
-  window.addEventListener('targetScreen-update', targetScreenListener);
-  window.addEventListener('windowedMode-update', windowedModeListener);
+  window.addEventListener('windowScreen-update', windowScreenListener);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('targetScreen-update', targetScreenListener);
-  window.removeEventListener('windowedMode-update', windowedModeListener);
+  window.removeEventListener('windowScreen-update', windowScreenListener);
 });
 </script>
