@@ -41,18 +41,21 @@ jobs:
         id: package-version
         uses: martinbeentjes/npm-get-version-action@v1.3.1
 
-      - name: Create Sentry release
-        if: matrix.os == 'ubuntu-latest'
-        uses: getsentry/action-release@v1.7.0
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: 'jw-projects'
-          SENTRY_PROJECT: 'mmm-v2'
-        with:
-          dist: ${{ steps.package-version.outputs.current-version}}
-          environment: production
-          # sourcemaps: './dist/electron/UnPackaged/assets'
-          sourcemaps: './'
+      # - name: Create Sentry release
+      #   if: matrix.os == 'ubuntu-latest'
+      #   uses: getsentry/action-release@v1.7.0
+      #   env:
+      #     SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      #     SENTRY_ORG: 'jw-projects'
+      #     SENTRY_PROJECT: 'mmm-v2'
+      #   with:
+      #     dist: ${{ steps.package-version.outputs.current-version}}
+      #     environment: production
+      #     # sourcemaps: './dist/electron/UnPackaged/assets'
+      #     sourcemaps: './'
 
-      # - run: yarn install && yarn global add @sentry/cli
-      # - run: sentry-cli sourcemaps upload --project mmm-v2 --release ${{ github.sha }}
+      - run: yarn install && yarn global add @sentry/cli
+        name: Install Sentry CLI
+
+      - run: SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}; SENTRY_ORG='jw-projects'; SENTRY_PROJECT='mmm-v2'; sentry-cli sourcemaps upload --dist ${{ steps.package-version.outputs.current-version}}-${{ matrix.os }} --release ${{ github.sha }}
+        name: Upload sourcemaps
