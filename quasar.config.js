@@ -56,17 +56,17 @@ module.exports = configure(function (/* ctx */) {
             },
           },
         });
-        viteConf.build = mergeConfig(viteConf.build, {
-          plugins: [
-            sentryVitePlugin({
-              authToken: process.env.SENTRY_AUTH_TOKEN,
-              org: 'jw-projects',
-              project: 'mmm-v2',
-              release: version,
-            }),
-          ],
-          sourcemap: true,
-        });
+        // viteConf.build = mergeConfig(viteConf.build, {
+        //   plugins: [
+        //     sentryVitePlugin({
+        //       authToken: process.env.SENTRY_AUTH_TOKEN,
+        //       org: 'jw-projects',
+        //       project: 'mmm-v2',
+        //       release: version,
+        //     }),
+        //   ],
+        //   sourcemap: true,
+        // });
         // if (!viteConf.optimizeDeps.esbuildOptions)
         //   viteConf.optimizeDeps.esbuildOptions = {};
         // if (!viteConf.optimizeDeps.esbuildOptions.define)
