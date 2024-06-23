@@ -12,7 +12,9 @@ export default boot(({ app }) => {
       Sentry.rewriteFramesIntegration({
         // @ts-expect-error Frame typing
         iteratee: (frame) => {
-          frame.filename = path.basename(frame.filename) ?? frame.filename;
+          frame.filename = frame.filename
+            ? path.basename(frame.filename)
+            : frame.filename;
         },
         prefix: '~/',
       }),
