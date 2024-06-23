@@ -37,9 +37,9 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
-      - name: get-npm-version
+      - name: Read package version package.json
+        uses: xile611/read-package-version-action@v2.1
         id: package-version
-        uses: martinbeentjes/npm-get-version-action@v1.3.1
 
       # - name: Create Sentry release
       #   if: matrix.os == 'ubuntu-latest'
@@ -57,5 +57,8 @@ jobs:
       - run: yarn install && yarn global add @sentry/cli
         name: Install Sentry CLI
 
-      - run: sentry-cli --auth-token ${{ secrets.SENTRY_AUTH_TOKEN }} sourcemaps upload --org 'jw-projects' --project 'mmm-v2' --dist ${{ matrix.os }} --release ${{ steps.package-version.outputs.current-version}} ./
+      - run: sentry-cli sourcemaps inject ./dist/
+        name: Inject Debug IDs Into Artifacts
+
+      - run: sentry-cli --auth-token ${{ secrets.SENTRY_AUTH_TOKEN }} sourcemaps upload --org 'jw-projects' --project 'mmm-v2' --dist ${{ matrix.os }} --release ${{ steps.package-version.outputs.version}} ./
         name: Upload sourcemaps
