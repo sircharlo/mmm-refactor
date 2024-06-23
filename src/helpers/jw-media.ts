@@ -164,6 +164,7 @@ const fetchMedia = async () => {
           )
             return;
           const dayDate = day.date;
+          console.log(dayDate);
           // day.loading = true;
           let fetchResult = null;
           if (day.meeting === 'we') {

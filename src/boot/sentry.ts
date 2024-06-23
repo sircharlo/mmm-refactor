@@ -11,7 +11,7 @@ function getBasenameFromFileUrl(fileUrl: string | undefined) {
   try {
     const parsedUrl = new URL(fileUrl);
     const pathname = decodeURIComponent(parsedUrl.pathname);
-    return path.basename(pathname);
+    return path.join('~', path.basename(pathname));
   } catch (e) {
     console.error(e);
     return '';
