@@ -7,7 +7,9 @@
 
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
-const { sentryVitePlugin } = require('@sentry/vite-plugin');
+// const { sentryVitePlugin } = require('@sentry/vite-plugin');
+const { sentryEsbuildPlugin } = require('@sentry/esbuild-plugin');
+
 const { configure } = require('quasar/wrappers');
 const path = require('path');
 // const inject  = require('@rollup/plugin-inject')
@@ -49,16 +51,16 @@ module.exports = configure(function (/* ctx */) {
         if (!viteConf.optimizeDeps.esbuildOptions.define)
           viteConf.optimizeDeps.esbuildOptions.define = {};
         viteConf.optimizeDeps.esbuildOptions.define.global = 'window';
-        if (!viteConf.build) viteConf.build = {};
-        viteConf.build.sourcemap = true;
-        if (!viteConf.build.plugins) viteConf.build.plugins = [];
-        viteConf.build.plugins.push(
-          sentryVitePlugin({
-            authToken: process.env.SENTRY_AUTH_TOKEN,
-            org: 'jw-projects',
-            project: 'mmm-v2',
-          }),
-        );
+        // if (!viteConf.build) viteConf.build = {};
+        // viteConf.build.sourcemap = true;
+        // if (!viteConf.build.plugins) viteConf.build.plugins = [];
+        // viteConf.build.plugins.push(
+        //   sentryVitePlugin({
+        //     authToken: process.env.SENTRY_AUTH_TOKEN,
+        //     org: 'jw-projects',
+        //     project: 'mmm-v2',
+        //   }),
+        // );
       },
       // afterBuild: async () => {
       //   const SentryCli = require('@sentry/cli');
@@ -179,8 +181,30 @@ module.exports = configure(function (/* ctx */) {
 
       bundler: 'builder', // 'packager' or 'builder'
 
-      inspectPort: 5858,
+      extendElectronMainConf: (esbuildConf) => {
+        esbuildConf.sourcemap = true;
+        if (!esbuildConf.plugins) esbuildConf.plugins = [];
+        esbuildConf.plugins.push(
+          sentryEsbuildPlugin({
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            org: 'jw-projects',
+            project: 'mmm-v2',
+          }),
+        );
+      },
 
+      // if (!viteConf.build) viteConf.build = {};
+      // viteConf.build.sourcemap = true;
+      // if (!viteConf.build.plugins) viteConf.build.plugins = [];
+      // viteConf.build.plugins.push(
+      //   sentryVitePlugin({
+      //     authToken: process.env.SENTRY_AUTH_TOKEN,
+      //     org: 'jw-projects',
+      //     project: 'mmm-v2',
+      //   }),
+      // );
+
+      inspectPort: 5858,
       packager: {
         // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
         // OS X / Mac App Store

@@ -19,6 +19,7 @@
     "@panzoom/panzoom": "^4.5.1",
     "@quasar/cli": "^2.4.0",
     "@quasar/extras": "^1.16.4",
+    "@sentry/esbuild-plugin": "^2.19.0",
     "@sentry/vite-plugin": "^2.19.0",
     "@sentry/vue": "^8.9.2",
     "axios": "^1.6.8",

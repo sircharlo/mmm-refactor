@@ -32,8 +32,8 @@ export default boot(({ app, router }) => {
       if (stacktrace && stacktrace.frames) {
         stacktrace.frames.forEach(function (frame) {
           console.log('before', frame.filename);
-          frame.filename = getBasenameFromFileUrl(frame.filename);
-          console.log('after', frame.filename);
+          // frame.filename = getBasenameFromFileUrl(frame.filename);
+          console.log('after', getBasenameFromFileUrl(frame.filename));
         });
       }
       return event;
