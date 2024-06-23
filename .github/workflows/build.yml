@@ -39,30 +39,17 @@ jobs:
       - run: pip install setuptools
       - run: yarn install && yarn global add @quasar/cli
 
-      - name: Build and publish Electron app
+      - name: Build and Publish Electron App
         run: yarn quasar build -m electron
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
-      # - name: Create Sentry release
-      #   if: matrix.os == 'ubuntu-latest'
-      #   uses: getsentry/action-release@v1.7.0
-      #   env:
-      #     SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      #     SENTRY_ORG: 'jw-projects'
-      #     SENTRY_PROJECT: 'mmm-v2'
-      #   with:
-      #     dist: ${{ steps.package-version.outputs.current-version}}
-      #     environment: production
-      #     # sourcemaps: './dist/electron/UnPackaged/assets'
-      #     sourcemaps: './'
-
       - run: yarn install && yarn global add @sentry/cli
         name: Install Sentry CLI
 
-      - run: sentry-cli sourcemaps inject ./dist/
-        name: Inject Debug IDs Into Artifacts
+      - run: yarn sentry-cli sourcemaps inject -i node_modules ./dist/
+        name: Inject Debug IDs into Artifacts
 
-      - run: sentry-cli --auth-token ${{ secrets.SENTRY_AUTH_TOKEN }} sourcemaps upload --org 'jw-projects' --project 'mmm-v2' --dist ${{ matrix.os }} --release ${{ steps.package-version.outputs.version}} ./
-        name: Upload sourcemaps
+      - run: yarn sentry-cli --auth-token ${{ secrets.SENTRY_AUTH_TOKEN }} sourcemaps upload --org 'jw-projects' --project 'mmm-v2' --dist ${{ matrix.os }} --release ${{ steps.package-version.outputs.version}}  -i node_modules ./dist/
+        name: Upload Source Maps to Sentry
