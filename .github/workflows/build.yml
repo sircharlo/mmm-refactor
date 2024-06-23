@@ -57,5 +57,5 @@ jobs:
       - run: yarn install && yarn global add @sentry/cli
         name: Install Sentry CLI
 
-      - run: SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}; SENTRY_ORG='jw-projects'; SENTRY_PROJECT='mmm-v2'; sentry-cli sourcemaps upload --dist ${{ steps.package-version.outputs.current-version}}-${{ matrix.os }} --release ${{ github.sha }}
+      - run: SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}; SENTRY_ORG='jw-projects'; SENTRY_PROJECT='mmm-v2'; sentry-cli sourcemaps upload --dist ${{ matrix.os }} --release ${{ steps.package-version.outputs.current-version}}
         name: Upload sourcemaps
