@@ -7,7 +7,7 @@
 
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
-// const { sentryVitePlugin } = require('@sentry/vite-plugin');
+const { sentryVitePlugin } = require('@sentry/vite-plugin');
 const { sentryEsbuildPlugin } = require('@sentry/esbuild-plugin');
 // use mergeConfig helper to avoid overwriting the default config
 const { mergeConfig } = require('vite');
@@ -16,7 +16,6 @@ const { configure } = require('quasar/wrappers');
 const path = require('path');
 // const inject  = require('@rollup/plugin-inject')
 const { version } = require('./package.json');
-
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -59,7 +58,7 @@ module.exports = configure(function (/* ctx */) {
         });
         viteConf.build = mergeConfig(viteConf.build, {
           plugins: [
-            sentryEsbuildPlugin({
+            sentryVitePlugin({
               authToken: process.env.SENTRY_AUTH_TOKEN,
               org: 'jw-projects',
               project: 'mmm-v2',
@@ -227,6 +226,19 @@ module.exports = configure(function (/* ctx */) {
             release: version,
           }),
         );
+      },
+      extendViteConf(viteConf) {
+        viteConf.build = mergeConfig(viteConf.build, {
+          plugins: [
+            sentryVitePlugin({
+              authToken: process.env.SENTRY_AUTH_TOKEN,
+              org: 'jw-projects',
+              project: 'mmm-v2',
+              release: version,
+            }),
+          ],
+          sourcemap: true,
+        });
       },
 
       // if (!viteConf.build) viteConf.build = {};
