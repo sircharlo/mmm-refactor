@@ -16,7 +16,7 @@ export default boot(({ app }) => {
             ? path.basename(frame.filename)
             : frame.filename;
         },
-        prefix: '~/',
+        prefix: '',
       }),
       Sentry.vueIntegration(),
       Sentry.browserTracingIntegration(),
