@@ -66,7 +66,9 @@ module.exports = configure(function (/* ctx */) {
             authToken: process.env.SENTRY_AUTH_TOKEN,
             org: 'jw-projects',
             project: 'mmm-v2',
-            release: version,
+            release: {
+              name: version,
+            },
           }),
         );
       },
@@ -190,7 +192,9 @@ module.exports = configure(function (/* ctx */) {
             authToken: process.env.SENTRY_AUTH_TOKEN,
             org: 'jw-projects',
             project: 'mmm-v2',
-            release: version,
+            release: {
+              name: version,
+            },
           }),
         );
       },
@@ -203,7 +207,9 @@ module.exports = configure(function (/* ctx */) {
             authToken: process.env.SENTRY_AUTH_TOKEN,
             org: 'jw-projects',
             project: 'mmm-v2',
-            release: version,
+            release: {
+              name: version,
+            },
           }),
         );
       },

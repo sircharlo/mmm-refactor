@@ -50,6 +50,7 @@ export default boot(({ app, router }) => {
       //   },
       //   prefix: '',
       // }),
+      Sentry.vueIntegration({ app }),
       Sentry.browserTracingIntegration({ router }),
       Sentry.replayIntegration(),
     ],
