@@ -18,6 +18,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Read package version package.json
+        uses: xile611/read-package-version-action@v2.1
+        id: package-version
+
+      - name: Version check
+        run: |
+          echo "Current version: ${{ steps.package-version.outputs.version }}"
+
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v4
         with:
@@ -36,10 +44,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-
-      - name: Read package version package.json
-        uses: xile611/read-package-version-action@v2.1
-        id: package-version
 
       # - name: Create Sentry release
       #   if: matrix.os == 'ubuntu-latest'
