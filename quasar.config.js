@@ -39,7 +39,6 @@ module.exports = configure(function (/* ctx */) {
         const nodePolyfillWebpackPlugin = require('node-polyfill-webpack-plugin');
         chain.plugin('node-polyfill').use(nodePolyfillWebpackPlugin);
       },
-
       extendViteConf(viteConf) {
         if (!viteConf.optimizeDeps) viteConf.optimizeDeps = {};
         // if (!viteConf.optimizeDeps.exclude) viteConf.optimizeDeps.exclude = [
@@ -62,35 +61,11 @@ module.exports = configure(function (/* ctx */) {
         );
       },
 
-      // vueRouterBase,
-      // vueDevtools,
-      // vueOptionsAPI: false,
-
-      // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
-
-      // publicPath: '/',
-      // analyze: true,
-      // env: {},
-      // rawDefine: {}
-      // ignorePublicFolder: true,
-      // minify: false,
-      // polyfillModulePreload: true,
-      // distDir
-
-      // extendViteConf(viteConf) {
-      //   // do something with viteConf... change it in-place
-      //   viteConf.resolve = {
-      //     alias: {
-      //       ...viteConf.resolve.alias, // that's important we want to keep the alias set by quasar team
-      //       fs: require.resolve('fs'),
-      //       // child_process: require.resolve('rollup-plugin-node-builtins'),
-      //     },
-      //   };
       // },
       extendWebpack(cfg, {}) {
         cfg.externals = ['better-sqlite3'];
       },
-
+      sourcemap: true,
       target: {
         // browser: ['esnext', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
         browser: ['esnext'],
