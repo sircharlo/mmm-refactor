@@ -56,6 +56,33 @@ module.exports = configure(function (/* ctx */) {
             },
           },
         });
+
+        viteConf.build = mergeConfig(viteConf.build, {
+          sourcemap: true,
+        });
+
+        viteConf.plugins = mergeConfig(viteConf.plugins, [
+          sentryVitePlugin({
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            org: 'jw-projects',
+            project: 'mmm-v2',
+            release: version,
+          }),
+        ]);
+
+        // extendElectronMainConf: (esbuildConf) => {
+        //   esbuildConf.sourcemap = true;
+        //   if (!esbuildConf.plugins) esbuildConf.plugins = [];
+        //   esbuildConf.plugins.push(
+        //     sentryEsbuildPlugin({
+        //       authToken: process.env.SENTRY_AUTH_TOKEN,
+        //       org: 'jw-projects',
+        //       project: 'mmm-v2',
+        //       release: version,
+        //     }),
+        //   );
+        // },
+
         // viteConf.build = mergeConfig(viteConf.build, {
         //   plugins: [
         //     sentryVitePlugin({
@@ -83,16 +110,16 @@ module.exports = configure(function (/* ctx */) {
         //   }),
         // );
       },
+      // },
+      extendWebpack(cfg, {}) {
+        cfg.externals = ['better-sqlite3'];
+      },
       // afterBuild: async () => {
       //   const SentryCli = require('@sentry/cli');
       //   const cli = new SentryCli();
       //   await cli.releases.new(release);
       // },
 
-      // },
-      extendWebpack(cfg, {}) {
-        cfg.externals = ['better-sqlite3'];
-      },
       sourcemap: true,
       target: {
         // browser: ['esnext', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
@@ -226,19 +253,6 @@ module.exports = configure(function (/* ctx */) {
             release: version,
           }),
         );
-      },
-      extendViteConf(viteConf) {
-        viteConf.build = mergeConfig(viteConf.build, {
-          plugins: [
-            sentryVitePlugin({
-              authToken: process.env.SENTRY_AUTH_TOKEN,
-              org: 'jw-projects',
-              project: 'mmm-v2',
-              release: version,
-            }),
-          ],
-          sourcemap: true,
-        });
       },
 
       // if (!viteConf.build) viteConf.build = {};
