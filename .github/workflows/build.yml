@@ -18,8 +18,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Read package version package.json
-        uses: xile611/read-package-version-action@v2.1
+      - name: Read package version
+        uses: ZvonimirSun/read-package-version-actions@v2
         id: package-version
 
       - name: Version check
