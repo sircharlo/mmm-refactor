@@ -12,6 +12,9 @@ const { fs, getUserDataPath, klawSync, path } = electronApi;
 
 const getPublicationsPath = () => path.join(getUserDataPath(), 'Publications');
 
+const getAdditionalMediaPath = () =>
+  path.join(getUserDataPath(), 'Additional Media');
+
 const getTempDirectory = () => {
   return path.join(getUserDataPath(), 'Temp');
 };
@@ -38,7 +41,7 @@ const getPublicationDirectoryContents = (
   if (!fs.existsSync(dir)) return [];
   const files = klawSync(dir, {
     filter: (file) => {
-      if (!filter) return true;
+      if (!filter || !file.path) return true;
       return path
         .basename(file.path.toLowerCase())
         .includes(filter.toLowerCase());
@@ -205,6 +208,7 @@ const getSubtitlesUrl = async (
 };
 
 export {
+  getAdditionalMediaPath,
   getDurationFromMediaPath,
   getFileUrl,
   getPublicationDirectory,

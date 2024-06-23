@@ -8,8 +8,12 @@ const getOldVersionPath = () => {
 };
 
 const oldPrefsFilterFn = (item: { path: string }) => {
-  const basename = path.basename(item.path);
-  return basename.startsWith('prefs') && basename.endsWith('.json');
+  if (!item?.path) return false;
+  const oldPrefsFilterFnBasename = path.basename(item.path);
+  return (
+    oldPrefsFilterFnBasename.startsWith('prefs') &&
+    oldPrefsFilterFnBasename.endsWith('.json')
+  );
 };
 
 const getOldPrefsPaths = (oldPath: string) => {

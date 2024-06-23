@@ -67,6 +67,11 @@ const downloadFileIfNeeded = async ({
   size,
   url,
 }: FileDownloader) => {
+  if (!url)
+    return {
+      new: false,
+      path: '',
+    };
   fs.ensureDirSync(dir);
   if (!filename) filename = path.basename(url);
   filename = sanitize(filename);
@@ -93,6 +98,12 @@ const downloadFileIfNeeded = async ({
 };
 
 const downloadFile = async ({ dir, filename, url }: FileDownloader) => {
+  if (!url) {
+    return {
+      error: true,
+      path: '',
+    };
+  }
   if (!filename) filename = path.basename(url);
   filename = sanitize(filename);
   const { downloadProgress } = storeToRefs(useCurrentStateStore());
@@ -1074,7 +1085,8 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
           .filter((i) => i !== undefined)
           .map((i) => i?.toString()) as string[];
         for (const test of params) {
-          if (!path.basename(file.path).includes(test)) match = false;
+          if (!file.path || !path.basename(file.path).includes(test))
+            match = false;
         }
         if (
           !publication.fileformat ||
@@ -1103,7 +1115,7 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
   const mediaItemLinks: MediaLink[] =
     responseObject.files[publication.langwritten][publication.fileformat];
   const bestItem = findBestResolution(mediaItemLinks) as MediaLink;
-  if (!bestItem) {
+  if (!bestItem?.file?.url) {
     return '';
   }
   const downloadedFile = (await downloadFileIfNeeded({

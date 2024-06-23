@@ -679,5 +679,6 @@ const remoteVideosFiltered = computed(() => {
 onMounted(() => {
   document.title = 'Meeting Media Manager';
   if (!currentSettings.value) navigateToCongregationSelector();
+  throw new Error('Test');
 });
 </script>

@@ -327,7 +327,10 @@
           </q-item-section>
           <q-item-section class="q-px-sm">
             <div class="ellipsis-3-lines">
-              {{ media.title || path.basename(media.fileUrl || '') }}
+              {{
+                media.title ||
+                (media.fileUrl ? path.basename(media.fileUrl) : '')
+              }}
             </div>
           </q-item-section>
           <q-item-section side v-if="media.isAdditional">
@@ -971,6 +974,7 @@ const copyToDatedAdditionalMedia = async (files: string[]) => {
   fs.ensureDirSync(datedAdditionalMediaDir);
 
   for (const filepathToCopy of files) {
+    if (!filepathToCopy || !fs.existsSync(filepathToCopy)) continue;
     let datedAdditionalMediaPath = path.join(
       datedAdditionalMediaDir,
       path.basename(filepathToCopy),
@@ -1021,35 +1025,40 @@ const addToAdditionMediaMapFromPath = async (
   additionalFilePath: string,
   uniqueId?: string,
 ) => {
-  const isVideoFile = isVideo(additionalFilePath);
-  const isAudioFile = isAudio(additionalFilePath);
-  let duration = 0;
+  try {
+    if (!additionalFilePath) return;
+    const isVideoFile = isVideo(additionalFilePath);
+    const isAudioFile = isAudio(additionalFilePath);
+    let duration = 0;
 
-  if (isVideoFile || isAudioFile) {
-    duration = await getDurationFromMediaPath(additionalFilePath);
-  }
+    if (isVideoFile || isAudioFile) {
+      duration = await getDurationFromMediaPath(additionalFilePath);
+    }
 
-  if (!uniqueId) {
-    uniqueId = sanitizeId(
-      date.formatDate(selectedDate.value, 'YYYYMMDD') +
-        '-' +
-        getFileUrl(additionalFilePath),
-    );
+    if (!uniqueId) {
+      uniqueId = sanitizeId(
+        date.formatDate(selectedDate.value, 'YYYYMMDD') +
+          '-' +
+          getFileUrl(additionalFilePath),
+      );
+    }
+    addToAdditionMediaMap([
+      {
+        duration,
+        fileUrl: getFileUrl(additionalFilePath),
+        isAdditional: true,
+        isAudio: isAudioFile,
+        isImage: isImage(additionalFilePath),
+        isVideo: isVideoFile,
+        section: 'additional',
+        thumbnailUrl: await getThumbnailUrl(additionalFilePath, true),
+        title: path.basename(additionalFilePath),
+        uniqueId,
+      },
+    ]);
+  } catch (error) {
+    console.error(error, additionalFilePath);
   }
-  addToAdditionMediaMap([
-    {
-      duration,
-      fileUrl: getFileUrl(additionalFilePath),
-      isAdditional: true,
-      isAudio: isAudioFile,
-      isImage: isImage(additionalFilePath),
-      isVideo: isVideoFile,
-      section: 'additional',
-      thumbnailUrl: await getThumbnailUrl(additionalFilePath, true),
-      title: path.basename(additionalFilePath),
-      uniqueId,
-    },
-  ]);
 };
 
 const addToFiles = async (
@@ -1058,10 +1067,10 @@ const addToFiles = async (
   if (!files) return;
   additionalLoading.value = true;
   for (let i = 0; i < files.length; i++) {
-    let filepath = files[i].path;
+    let filepath = files[i]?.path;
     try {
-      console.log('file', files[i]);
-
+      console.log('file', files[i], filepath);
+      if (!filepath) continue;
       // Check if file is remote URL; if so, download it
       if (isRemoteUrl(filepath)) {
         const baseFileName = path.basename(new URL(filepath).pathname);
@@ -1157,7 +1166,7 @@ const addToFiles = async (
         });
       } else {
         createTemporaryNotification({
-          caption: path.basename(filepath),
+          caption: filepath ? path.basename(filepath) : filepath,
           icon: 'mdi-file',
           message: t('filetypeNotSupported'),
           type: 'error',
@@ -1165,7 +1174,7 @@ const addToFiles = async (
       }
     } catch (error) {
       createTemporaryNotification({
-        caption: path.basename(filepath),
+        caption: filepath ? path.basename(filepath) : filepath,
         icon: 'mdi-file',
         message: t('fileProcessError'),
         type: 'error',

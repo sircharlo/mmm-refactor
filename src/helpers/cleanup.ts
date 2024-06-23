@@ -4,7 +4,9 @@ import { isInPast } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import { DynamicMediaObject } from 'src/types/media';
 
-const { fileUrlToPath, fs, getUserDataPath, klawSync, path } = electronApi;
+import { getAdditionalMediaPath } from './fs';
+
+const { fileUrlToPath, fs, klawSync, path } = electronApi;
 
 const cleanLocalStorage = () => {
   try {
@@ -82,10 +84,11 @@ function removeEmptyDirs(rootDir: string) {
 
 const cleanAdditionalMediaFolder = () => {
   try {
-    const additionalMediaPath = path.join(
-      getUserDataPath(),
-      'Additional Media',
-    );
+    const additionalMediaPath = getAdditionalMediaPath();
+    if (!fs.existsSync(additionalMediaPath)) {
+      LocalStorage.removeItem('additionalMediaMaps');
+      return;
+    }
     const additionalMediaMaps = LocalStorage.getItem(
       'additionalMediaMaps',
     ) as Record<string, Record<string, DynamicMediaObject[]>>;
