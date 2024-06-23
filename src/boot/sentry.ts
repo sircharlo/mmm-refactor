@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/vue';
-// import path from 'path';
+import path from 'path';
 import { boot } from 'quasar/wrappers';
 
 import packageInfo from '../../package.json';
@@ -7,6 +7,22 @@ import packageInfo from '../../package.json';
 export default boot(({ app, router }) => {
   Sentry.init({
     app,
+    beforeSend: function (event, hint) {
+      console.error(hint.originalException || hint.syntheticException);
+      const stacktrace =
+        event.exception &&
+        event.exception.values &&
+        event.exception.values.length > 0 &&
+        event.exception.values[0].stacktrace;
+      if (stacktrace && stacktrace.frames) {
+        stacktrace.frames.forEach(function (frame) {
+          frame.filename = frame.filename
+            ? path.basename(frame.filename)
+            : frame.filename;
+        });
+      }
+      return event;
+    },
     dsn: 'https://0f2ab1c7ddfb118d25704c85957b8188@o1401005.ingest.us.sentry.io/4507449197920256',
     integrations: [
       // Sentry.rewriteFramesIntegration({
