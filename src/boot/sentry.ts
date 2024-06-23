@@ -31,13 +31,11 @@ export default boot(({ app, router }) => {
         event.exception.values[0].stacktrace;
       if (stacktrace && stacktrace.frames) {
         stacktrace.frames.forEach(function (frame) {
+          console.log('before', frame.filename);
           frame.filename = getBasenameFromFileUrl(frame.filename);
+          console.log('after', frame.filename);
         });
       }
-      return event;
-    },
-    beforeSendTransaction(event, hint) {
-      console.log('beforeSendTransaction', event, hint);
       return event;
     },
     debug: true,

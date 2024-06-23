@@ -112,7 +112,7 @@ function createWindow() {
    */
   mainWindow = new BrowserWindow({
     height: 600,
-    icon: path.resolve(__dirname, 'icons/icon.png'), // tray icon
+    // icon: path.resolve(__dirname, 'icons/icon.png'), // tray icon
     // backgroundColor: 'black',
     useContentSize: true,
     webPreferences: {
