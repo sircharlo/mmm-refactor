@@ -48,8 +48,8 @@ jobs:
       - run: yarn install && yarn global add @sentry/cli
         name: Install Sentry CLI
 
-      - run: yarn sentry-cli sourcemaps inject -i node_modules ./dist/
+      - run: yarn sentry-cli sourcemaps inject ./dist/electron/UnPackaged/assets
         name: Inject Debug IDs into Artifacts
 
-      - run: yarn sentry-cli --auth-token ${{ secrets.SENTRY_AUTH_TOKEN }} sourcemaps upload --org 'jw-projects' --project 'mmm-v2' --dist ${{ matrix.os }} --release ${{ steps.package-version.outputs.version}}  -i node_modules ./dist/
+      - run: yarn sentry-cli --auth-token ${{ secrets.SENTRY_AUTH_TOKEN }} sourcemaps upload --org 'jw-projects' --project 'mmm-v2' --dist ${{ matrix.os }} --release ${{ steps.package-version.outputs.version}}  ./dist/electron/UnPackaged/assets
         name: Upload Source Maps to Sentry
