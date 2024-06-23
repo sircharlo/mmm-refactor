@@ -261,18 +261,9 @@
       <q-toolbar class="bg-blue-9 text-white" style="min-height: initial">
         <DownloadStatus />
         <q-space />
-        <!-- <ScenePicker /> -->
         <MusicButton />
         <SubtitlesButton />
         <ObsStatus />
-        <!-- <q-separator
-          inset
-          v-if="
-            currentSettings?.enableMediaDisplayButton &&
-            currentSettings?.enableMusicButton
-          "
-          vertical
-        /> -->
         <MediaDisplayButton />
       </q-toolbar>
     </q-footer>
@@ -366,7 +357,6 @@ import DownloadStatus from 'src/components/media/DownloadStatus.vue';
 import MediaDisplayButton from 'src/components/media/MediaDisplayButton.vue';
 import MusicButton from 'src/components/media/MusicButton.vue';
 import ObsStatus from 'src/components/media/ObsStatus.vue';
-// import ScenePicker from 'src/components/media/ScenePicker.vue';
 import SongPicker from 'src/components/media/SongPicker.vue';
 import SubtitlesButton from 'src/components/media/SubtitlesButton.vue';
 import {

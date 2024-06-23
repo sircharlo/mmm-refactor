@@ -272,7 +272,7 @@
               </div> -->
               <div class="col" v-if="obsConnectionState === 'connected'">
                 <q-btn
-                  @click="setObsScene('camera')"
+                  @click="sendObsSceneEvent('camera')"
                   color="negative"
                   flat
                   icon="mdi-grid-off"
@@ -285,7 +285,7 @@
                   }}</q-tooltip>
                 </q-btn>
                 <q-btn
-                  @click="setObsScene('media')"
+                  @click="sendObsSceneEvent('media')"
                   color="positive"
                   flat
                   icon="mdi-grid"
@@ -676,7 +676,6 @@ import {
   isVideo,
 } from 'src/helpers/mediaPlayback';
 import { createTemporaryNotification } from 'src/helpers/notifications';
-import { setObsScene } from 'src/helpers/obs';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { useObsStateStore } from 'src/stores/obs-state';
@@ -721,8 +720,7 @@ const mediaStopPending = computed(() => !!mediaToStop.value);
 
 const mediaToDelete = ref('');
 const mediaDeletePending = computed(() => !!mediaToDelete.value);
-const { decompress, executeQuery, fs, openFileDialog, path } =
-  electronApi;
+const { decompress, executeQuery, fs, openFileDialog, path } = electronApi;
 
 const zoomReset = (elemId: string, forced = false) => {
   if (panzooms[elemId]?.getScale() <= 1.25 || forced) panzooms[elemId]?.reset();
@@ -810,7 +808,6 @@ const mapOrder =
 // todo: watch length instead? less heavy?
 const mediaItems = computed(() => {
   return datedAdditionalMediaMap.value
-    // .filter((mediaItem) => fileUrlIsValid(mediaItem?.fileUrl))
     .concat(selectedDateObject.value?.dynamicMedia)
     .filter((mediaItem) => mediaItem?.fileUrl) as DynamicMediaObject[];
 });
@@ -886,7 +883,7 @@ dragAndDrop({
 watch(
   () => [mediaPlaying.value, mediaPaused.value],
   ([newMediaPlaying, newMediaPaused]) => {
-    setObsScene(!newMediaPlaying || newMediaPaused ? 'camera' : 'media');
+    sendObsSceneEvent(!newMediaPlaying || newMediaPaused ? 'camera' : 'media');
     updateConfig(mediaList.value, { disabled: !!newMediaPlaying });
   },
 );
@@ -910,6 +907,10 @@ const fetchMediaFromCalendar = async () => {
 };
 
 onMounted(async () => {
+  window.addEventListener('localFiles-browsed', localFilesBrowsedListener);
+  window.addEventListener('remoteVideo-loading', remoteVideoLoading);
+  window.addEventListener('remoteVideo-loaded', remoteVideoLoaded);
+
   watch(selectedDate, (newVal) => {
     if (!currentCongregation.value || !newVal) return;
     const durations = (customDurations.value[currentCongregation.value] ||= {});
@@ -922,14 +923,8 @@ onMounted(async () => {
       .map((day) => day.date)[0],
     'YYYY/MM/DD',
   );
-  setObsScene('camera');
+  sendObsSceneEvent('camera');
   fetchMediaFromCalendar();
-});
-
-onUnmounted(() => {
-  Object.keys(panzooms).forEach((key) => {
-    panzooms[key].destroy();
-  });
 });
 
 function inferExtension(filename: string, filetype?: string) {
@@ -1290,16 +1285,25 @@ const remoteVideoLoaded = (event: CustomEventInit) => {
   additionalLoading.value = false;
 };
 
-onMounted(() => {
-  window.addEventListener('localFiles-browsed', localFilesBrowsedListener);
-  window.addEventListener('remoteVideo-loading', remoteVideoLoading);
-  window.addEventListener('remoteVideo-loaded', remoteVideoLoaded);
-});
+const sendObsSceneEvent = (scene: string) => {
+  if (!scene) return;
+  window.dispatchEvent(
+    new CustomEvent('obsSceneEvent', {
+      detail: {
+        scene,
+      },
+    }),
+  );
+};
 
 onUnmounted(() => {
   window.removeEventListener('localFiles-browsed', localFilesBrowsedListener);
   window.removeEventListener('remoteVideo-loading', remoteVideoLoading);
   window.removeEventListener('remoteVideo-loaded', remoteVideoLoaded);
+
+  Object.keys(panzooms).forEach((key) => {
+    panzooms[key].destroy();
+  });
 });
 </script>
 
