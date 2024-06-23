@@ -60,15 +60,15 @@ module.exports = configure(function (/* ctx */) {
         viteConf.build = mergeConfig(viteConf.build, {
           sourcemap: true,
         });
-
-        viteConf.plugins = mergeConfig(viteConf.plugins, [
+        if (!viteConf.plugins) viteConf.plugins = [];
+        viteConf.plugins.push(
           sentryVitePlugin({
             authToken: process.env.SENTRY_AUTH_TOKEN,
             org: 'jw-projects',
             project: 'mmm-v2',
             release: version,
           }),
-        ]);
+        );
 
         // extendElectronMainConf: (esbuildConf) => {
         //   esbuildConf.sourcemap = true;
