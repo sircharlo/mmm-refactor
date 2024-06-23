@@ -45,12 +45,12 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
-      - run: yarn install && yarn global add @sentry/cli
-        name: Install Sentry CLI
+      # - run: yarn install && yarn global add @sentry/cli
+      #   name: Install Sentry CLI
 
       # TODO: Eventually switch over to Debug IDs instead of Source Maps by hooking into the Electron build before it's published
       # - run: yarn sentry-cli sourcemaps inject ./dist/electron/UnPackaged/assets
       #   name: Inject Debug IDs into Artifacts
 
-      - run: yarn sentry-cli --auth-token ${{ secrets.SENTRY_AUTH_TOKEN }} sourcemaps upload --org 'jw-projects' --project 'mmm-v2' --release ${{ steps.package-version.outputs.version}}  .
-        name: Upload Source Maps to Sentry
+      # - run: yarn sentry-cli --auth-token ${{ secrets.SENTRY_AUTH_TOKEN }} sourcemaps upload --org 'jw-projects' --project 'mmm-v2' --release ${{ steps.package-version.outputs.version}}  .
+      #   name: Upload Source Maps to Sentry

@@ -9,10 +9,14 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 // const { sentryVitePlugin } = require('@sentry/vite-plugin');
 const { sentryEsbuildPlugin } = require('@sentry/esbuild-plugin');
+// use mergeConfig helper to avoid overwriting the default config
+const { mergeConfig } = require('vite');
 
 const { configure } = require('quasar/wrappers');
 const path = require('path');
 // const inject  = require('@rollup/plugin-inject')
+import { version } from 'package.json';
+
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -42,15 +46,30 @@ module.exports = configure(function (/* ctx */) {
         chain.plugin('node-polyfill').use(nodePolyfillWebpackPlugin);
       },
       extendViteConf(viteConf) {
-        if (!viteConf.optimizeDeps) viteConf.optimizeDeps = {};
+        // if (!viteConf.optimizeDeps) viteConf.optimizeDeps = {};
         // if (!viteConf.optimizeDeps.exclude) viteConf.optimizeDeps.exclude = [
         //   'pdfjs-dist',
         // ];
-        if (!viteConf.optimizeDeps.esbuildOptions)
-          viteConf.optimizeDeps.esbuildOptions = {};
-        if (!viteConf.optimizeDeps.esbuildOptions.define)
-          viteConf.optimizeDeps.esbuildOptions.define = {};
-        viteConf.optimizeDeps.esbuildOptions.define.global = 'window';
+        viteConf.optimizeDeps = mergeConfig(viteConf, {
+          esbuildOptions: {
+            define: {
+              global: 'window',
+            },
+          },
+        });
+        viteConf.plugins = mergeConfig(viteConf.plugins, [
+          sentryEsbuildPlugin({
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            org: 'jw-projects',
+            project: 'mmm-v2',
+            release: version,
+          }),
+        ]);
+        // if (!viteConf.optimizeDeps.esbuildOptions)
+        //   viteConf.optimizeDeps.esbuildOptions = {};
+        // if (!viteConf.optimizeDeps.esbuildOptions.define)
+        //   viteConf.optimizeDeps.esbuildOptions.define = {};
+        // viteConf.optimizeDeps.esbuildOptions.define.global = 'window';
         // if (!viteConf.build) viteConf.build = {};
         // viteConf.build.sourcemap = true;
         // if (!viteConf.build.plugins) viteConf.build.plugins = [];
@@ -189,6 +208,20 @@ module.exports = configure(function (/* ctx */) {
             authToken: process.env.SENTRY_AUTH_TOKEN,
             org: 'jw-projects',
             project: 'mmm-v2',
+            release: version,
+          }),
+        );
+      },
+
+      extendElectronPreloadConf: (esbuildConf) => {
+        esbuildConf.sourcemap = true;
+        if (!esbuildConf.plugins) esbuildConf.plugins = [];
+        esbuildConf.plugins.push(
+          sentryEsbuildPlugin({
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            org: 'jw-projects',
+            project: 'mmm-v2',
+            release: version,
           }),
         );
       },
