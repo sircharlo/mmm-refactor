@@ -133,42 +133,51 @@ const downloadFile = async ({ dir, filename, url }: FileDownloader) => {
   };
 };
 const fetchMedia = async () => {
-  const { currentCongregation, lookupPeriod } = storeToRefs(
-    useCurrentStateStore(),
-  );
-  const route = useRoute();
   const fetchErrors = {} as Record<string, boolean>;
-  lookupPeriod.value
-    .filter((day) => day.meeting)
-    .forEach((day) => {
+  try {
+    const { currentCongregation, lookupPeriod } = storeToRefs(
+      useCurrentStateStore(),
+    );
+    const meetingDays = lookupPeriod.value.filter((day) => day.meeting);
+    meetingDays.forEach((day) => {
       day.loading = true;
     });
-  const queue = new PQueue({ concurrency: 3 });
-  for (const day of lookupPeriod.value.filter((day) => day.meeting)) {
-    queue.add(async () => {
-      if (
-        !currentCongregation.value ||
-        !['/media-calendar', '/setup-wizard'].includes(route.fullPath)
-      )
-        return;
-      const dayDate = day.date;
-      // day.loading = true;
-      let fetchResult = null;
-      if (day.meeting === 'we') {
-        fetchResult = await getWeMedia(dayDate);
-      } else if (day.meeting === 'mw') {
-        fetchResult = await getMwMedia(dayDate);
+    const queue = new PQueue({ concurrency: 3 });
+    for (const day of meetingDays) {
+      try {
+        const route = useRoute();
+        queue.add(async () => {
+          if (
+            !currentCongregation.value ||
+            !['/media-calendar', '/setup-wizard'].includes(route.fullPath)
+          )
+            return;
+          const dayDate = day.date;
+          // day.loading = true;
+          let fetchResult = null;
+          if (day.meeting === 'we') {
+            fetchResult = await getWeMedia(dayDate);
+          } else if (day.meeting === 'mw') {
+            fetchResult = await getMwMedia(dayDate);
+          }
+          if (fetchResult) {
+            day.dynamicMedia = fetchResult.media;
+            if (fetchResult.error)
+              fetchErrors[date.formatDate(dayDate, 'YYYY/MM/DD')] =
+                fetchResult.error;
+          }
+          day.loading = false;
+        });
+      } catch (error) {
+        console.error(error);
+        fetchErrors[date.formatDate(day.date, 'YYYY/MM/DD')] = true;
+        day.loading = false;
       }
-      if (fetchResult) {
-        day.dynamicMedia = fetchResult.media;
-        if (fetchResult.error)
-          fetchErrors[date.formatDate(dayDate, 'YYYY/MM/DD')] =
-            fetchResult.error;
-      }
-      day.loading = false;
-    });
+    }
+    await queue.onIdle();
+  } catch (error) {
+    console.error(error);
   }
-  await queue.onIdle();
   return fetchErrors;
 };
 
