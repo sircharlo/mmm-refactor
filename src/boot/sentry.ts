@@ -21,23 +21,23 @@ function getBasenameFromFileUrl(fileUrl: string | undefined) {
 export default boot(({ app, router }) => {
   Sentry.init({
     app,
-    beforeSend: function (event, hint) {
-      console.log('beforeSend', event, hint);
-      console.error(hint.originalException || hint.syntheticException);
-      const stacktrace =
-        event.exception &&
-        event.exception.values &&
-        event.exception.values.length > 0 &&
-        event.exception.values[0].stacktrace;
-      if (stacktrace && stacktrace.frames) {
-        stacktrace.frames.forEach(function (frame) {
-          console.log('before', frame.filename);
-          frame.filename = getBasenameFromFileUrl(frame.filename);
-          console.log('after', getBasenameFromFileUrl(frame.filename));
-        });
-      }
-      return event;
-    },
+    // beforeSend: function (event, hint) {
+    //   console.log('beforeSend', event, hint);
+    //   console.error(hint.originalException || hint.syntheticException);
+    //   const stacktrace =
+    //     event.exception &&
+    //     event.exception.values &&
+    //     event.exception.values.length > 0 &&
+    //     event.exception.values[0].stacktrace;
+    //   if (stacktrace && stacktrace.frames) {
+    //     stacktrace.frames.forEach(function (frame) {
+    //       console.log('before', frame.filename);
+    //       frame.filename = getBasenameFromFileUrl(frame.filename);
+    //       console.log('after', getBasenameFromFileUrl(frame.filename));
+    //     });
+    //   }
+    //   return event;
+    // },
     debug: true,
     dsn: 'https://0f2ab1c7ddfb118d25704c85957b8188@o1401005.ingest.us.sentry.io/4507449197920256',
     integrations: [
