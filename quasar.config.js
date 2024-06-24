@@ -135,29 +135,21 @@ module.exports = configure(function (/* ctx */) {
       // https: true
       open: true, // opens browser window automatically
     },
-
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/configuring-electron
     electron: {
-      // extendElectronMainConf (esbuildConf)
-      // extendElectronPreloadConf (esbuildConf)
-
       builder: {
-        // https://www.electron.build/configuration/configuration
-
         appId: 'sircharlo.meeting-media-manager-v2',
         artifactName: 'meeting-media-manager-${version}.${ext}',
         buildDependenciesFromSource: true,
         generateUpdatesFilesForAllChannels: true,
         linux: {
           category: 'Utility',
-          // icon: 'icons/',
+          icon: 'icon.png',
           publish: ['github'],
           target: 'AppImage',
         },
-        // directories: {
-        //   output: 'build',
         mac: {
-          // icon: 'icons/icon.icns',
+          icon: 'icon.icns',
           publish: ['github'],
           target: {
             arch: ['universal'],
@@ -169,9 +161,8 @@ module.exports = configure(function (/* ctx */) {
           oneClick: false,
         },
         productName: 'Meeting Media Manager',
-        // },
         win: {
-          // icon: 'icons/icon.ico',
+          icon: 'icon.ico',
           publish: ['github'],
           target: [
             {
@@ -214,31 +205,11 @@ module.exports = configure(function (/* ctx */) {
         );
       },
       inspectPort: 5858,
-      packager: {
-        // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
-        // OS X / Mac App Store
-        // appBundleId: '',
-        // appCategoryType: '',
-        // osxSign: '',
-        // protocol: 'myapp://path',
-        // Windows only
-        // win32metadata: { ... }
-      },
+      packager: {},
     },
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
-    extras: [
-      'fontawesome-v6',
-      'material-icons', // optional, you are not bound to it
-      'mdi-v7',
-      // 'ionicons-v4',
-      // 'bootstrap-icons',
-      // 'eva-icons',
-      // 'themify',
-      // 'line-awesome',
-      // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
-      // 'roboto-font', // optional, you are not bound to it
-    ],
+    extras: ['fontawesome-v6', 'material-icons', 'mdi-v7'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
