@@ -2,13 +2,14 @@ import { defineStore, storeToRefs } from 'pinia';
 import { date } from 'quasar';
 import { settingsDefinitions } from 'src/defaults/settings';
 import { electronApi } from 'src/helpers/electron-api';
+import { getAdditionalMediaPath } from 'src/helpers/fs';
 import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
 import { useJwStore } from 'src/stores/jw';
 import { DateInfo } from 'src/types/dates';
 import { DownloadProgressItems, DownloadedFile } from 'src/types/media';
 import { SettingsValues } from 'src/types/settings';
 
-const { getUserDataPath, path } = electronApi;
+const { fs, path } = electronApi;
 
 export const useCurrentStateStore = defineStore('current-state', {
   actions: {
@@ -100,16 +101,18 @@ export const useCurrentStateStore = defineStore('current-state', {
     },
     getDatedAdditionalMediaDirectory(state) {
       if (!state.selectedDate) return '';
+      const additionalMediaPath = getAdditionalMediaPath();
       const dateString = date.formatDate(
         new Date(state.selectedDate),
         'YYYYMMDD',
       );
-      return path.join(
-        getUserDataPath(),
-        'Additional Media',
+      const datedAdditionalMediaDirectory = path.join(
+        additionalMediaPath,
         state.currentCongregation,
         dateString,
       );
+      fs.ensureDirSync(datedAdditionalMediaDirectory);
+      return datedAdditionalMediaDirectory;
     },
     mediaPaused(state) {
       return (

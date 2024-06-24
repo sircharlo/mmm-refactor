@@ -114,9 +114,7 @@
             >
               <q-badge
                 :color="
-                  customDurations[currentCongregation] &&
-                  customDurations[currentCongregation][selectedDate] &&
-                  customDurations[currentCongregation][selectedDate][
+                  customDurations[currentCongregation]?.[selectedDate]?.[
                     media.uniqueId
                   ] &&
                   (customDurations[currentCongregation][selectedDate][
@@ -134,31 +132,27 @@
               >
                 <q-icon class="q-mr-xs" color="white" name="mdi-play" />
                 {{
-                  ((customDurations[currentCongregation] &&
-                    customDurations[currentCongregation][selectedDate] &&
+                  customDurations[currentCongregation]?.[selectedDate]?.[
+                    media.uniqueId
+                  ] &&
+                  (customDurations[currentCongregation][selectedDate][
+                    media.uniqueId
+                  ].min > 0 ||
                     customDurations[currentCongregation][selectedDate][
                       media.uniqueId
-                    ] &&
-                    (customDurations[currentCongregation][selectedDate][
-                      media.uniqueId
-                    ].min > 0 ||
-                      customDurations[currentCongregation][selectedDate][
-                        media.uniqueId
-                      ].max < media.duration) &&
-                    formatTime(
-                      customDurations[currentCongregation][selectedDate][
-                        media.uniqueId
-                      ].min,
-                    ) + ' - ') ||
-                    '') +
+                    ].max < media.duration)
+                    ? formatTime(
+                        customDurations[currentCongregation][selectedDate][
+                          media.uniqueId
+                        ].min,
+                      ) + ' - '
+                    : ''
+                }}
+                {{
                   formatTime(
-                    (customDurations[currentCongregation][selectedDate][
+                    customDurations[currentCongregation]?.[selectedDate]?.[
                       media.uniqueId
-                    ] &&
-                      customDurations[currentCongregation][selectedDate][
-                        media.uniqueId
-                      ].max) ||
-                      media.duration,
+                    ]?.max ?? media.duration,
                   )
                 }}
               </q-badge>
@@ -187,18 +181,18 @@
                       <q-range
                         :left-label-value="
                           formatTime(
-                            customDurations[currentCongregation][selectedDate][
-                              media.uniqueId
-                            ].min,
+                            customDurations[currentCongregation]?.[
+                              selectedDate
+                            ]?.[media.uniqueId]?.min,
                           )
                         "
                         :max="media.duration"
                         :min="0"
                         :right-label-value="
                           formatTime(
-                            customDurations[currentCongregation][selectedDate][
-                              media.uniqueId
-                            ].max,
+                            customDurations[currentCongregation]?.[
+                              selectedDate
+                            ]?.[media.uniqueId]?.max,
                           )
                         "
                         :step="0"
@@ -272,7 +266,7 @@
               </div> -->
               <div class="col" v-if="obsConnectionState === 'connected'">
                 <q-btn
-                  @click="setObsScene('camera')"
+                  @click="sendObsSceneEvent('camera')"
                   color="negative"
                   flat
                   icon="mdi-grid-off"
@@ -285,7 +279,7 @@
                   }}</q-tooltip>
                 </q-btn>
                 <q-btn
-                  @click="setObsScene('media')"
+                  @click="sendObsSceneEvent('media')"
                   color="positive"
                   flat
                   icon="mdi-grid"
@@ -327,7 +321,10 @@
           </q-item-section>
           <q-item-section class="q-px-sm">
             <div class="ellipsis-3-lines">
-              {{ media.title || path.basename(media.fileUrl || '') }}
+              {{
+                media.title ||
+                (media.fileUrl ? path.basename(media.fileUrl) : '')
+              }}
             </div>
           </q-item-section>
           <q-item-section side v-if="media.isAdditional">
@@ -371,6 +368,10 @@
                       <q-list style="min-width: 100px">
                         <q-item
                           @click="
+                            customDurations[currentCongregation] ??= {};
+                            customDurations[currentCongregation][
+                              selectedDate
+                            ] ??= {};
                             customDurations[currentCongregation][selectedDate][
                               media.uniqueId
                             ] = {
@@ -392,25 +393,10 @@
                         <q-item
                           :key="marker.VideoMarkerId"
                           @click="
-                            if (
-                              !customDurations[currentCongregation][
-                                selectedDate
-                              ]
-                            )
-                              customDurations[currentCongregation][
-                                selectedDate
-                              ] = {};
-                            if (
-                              !customDurations[currentCongregation][
-                                selectedDate
-                              ][media.uniqueId]
-                            )
-                              customDurations[currentCongregation][
-                                selectedDate
-                              ][media.uniqueId] = {
-                                min: 0,
-                                max: media.duration,
-                              };
+                            customDurations[currentCongregation] ??= {};
+                            customDurations[currentCongregation][
+                              selectedDate
+                            ] ??= {};
                             customDurations[currentCongregation][selectedDate][
                               media.uniqueId
                             ].min = marker.StartTimeTicks / 10000 / 1000;
@@ -676,7 +662,6 @@ import {
   isVideo,
 } from 'src/helpers/mediaPlayback';
 import { createTemporaryNotification } from 'src/helpers/notifications';
-import { setObsScene } from 'src/helpers/obs';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { useObsStateStore } from 'src/stores/obs-state';
@@ -721,8 +706,7 @@ const mediaStopPending = computed(() => !!mediaToStop.value);
 
 const mediaToDelete = ref('');
 const mediaDeletePending = computed(() => !!mediaToDelete.value);
-const { decompress, executeQuery, fs, openFileDialog, path } =
-  electronApi;
+const { decompress, executeQuery, fs, openFileDialog, path } = electronApi;
 
 const zoomReset = (elemId: string, forced = false) => {
   if (panzooms[elemId]?.getScale() <= 1.25 || forced) panzooms[elemId]?.reset();
@@ -810,7 +794,6 @@ const mapOrder =
 // todo: watch length instead? less heavy?
 const mediaItems = computed(() => {
   return datedAdditionalMediaMap.value
-    // .filter((mediaItem) => fileUrlIsValid(mediaItem?.fileUrl))
     .concat(selectedDateObject.value?.dynamicMedia)
     .filter((mediaItem) => mediaItem?.fileUrl) as DynamicMediaObject[];
 });
@@ -886,7 +869,7 @@ dragAndDrop({
 watch(
   () => [mediaPlaying.value, mediaPaused.value],
   ([newMediaPlaying, newMediaPaused]) => {
-    setObsScene(!newMediaPlaying || newMediaPaused ? 'camera' : 'media');
+    sendObsSceneEvent(!newMediaPlaying || newMediaPaused ? 'camera' : 'media');
     updateConfig(mediaList.value, { disabled: !!newMediaPlaying });
   },
 );
@@ -910,6 +893,10 @@ const fetchMediaFromCalendar = async () => {
 };
 
 onMounted(async () => {
+  window.addEventListener('localFiles-browsed', localFilesBrowsedListener);
+  window.addEventListener('remoteVideo-loading', remoteVideoLoading);
+  window.addEventListener('remoteVideo-loaded', remoteVideoLoaded);
+
   watch(selectedDate, (newVal) => {
     if (!currentCongregation.value || !newVal) return;
     const durations = (customDurations.value[currentCongregation.value] ||= {});
@@ -922,14 +909,8 @@ onMounted(async () => {
       .map((day) => day.date)[0],
     'YYYY/MM/DD',
   );
-  setObsScene('camera');
+  sendObsSceneEvent('camera');
   fetchMediaFromCalendar();
-});
-
-onUnmounted(() => {
-  Object.keys(panzooms).forEach((key) => {
-    panzooms[key].destroy();
-  });
 });
 
 function inferExtension(filename: string, filetype?: string) {
@@ -976,6 +957,7 @@ const copyToDatedAdditionalMedia = async (files: string[]) => {
   fs.ensureDirSync(datedAdditionalMediaDir);
 
   for (const filepathToCopy of files) {
+    if (!filepathToCopy || !fs.existsSync(filepathToCopy)) continue;
     let datedAdditionalMediaPath = path.join(
       datedAdditionalMediaDir,
       path.basename(filepathToCopy),
@@ -1026,35 +1008,40 @@ const addToAdditionMediaMapFromPath = async (
   additionalFilePath: string,
   uniqueId?: string,
 ) => {
-  const isVideoFile = isVideo(additionalFilePath);
-  const isAudioFile = isAudio(additionalFilePath);
-  let duration = 0;
+  try {
+    if (!additionalFilePath) return;
+    const isVideoFile = isVideo(additionalFilePath);
+    const isAudioFile = isAudio(additionalFilePath);
+    let duration = 0;
 
-  if (isVideoFile || isAudioFile) {
-    duration = await getDurationFromMediaPath(additionalFilePath);
-  }
+    if (isVideoFile || isAudioFile) {
+      duration = await getDurationFromMediaPath(additionalFilePath);
+    }
 
-  if (!uniqueId) {
-    uniqueId = sanitizeId(
-      date.formatDate(selectedDate.value, 'YYYYMMDD') +
-        '-' +
-        getFileUrl(additionalFilePath),
-    );
+    if (!uniqueId) {
+      uniqueId = sanitizeId(
+        date.formatDate(selectedDate.value, 'YYYYMMDD') +
+          '-' +
+          getFileUrl(additionalFilePath),
+      );
+    }
+    addToAdditionMediaMap([
+      {
+        duration,
+        fileUrl: getFileUrl(additionalFilePath),
+        isAdditional: true,
+        isAudio: isAudioFile,
+        isImage: isImage(additionalFilePath),
+        isVideo: isVideoFile,
+        section: 'additional',
+        thumbnailUrl: await getThumbnailUrl(additionalFilePath, true),
+        title: path.basename(additionalFilePath),
+        uniqueId,
+      },
+    ]);
+  } catch (error) {
+    console.error(error, additionalFilePath);
   }
-  addToAdditionMediaMap([
-    {
-      duration,
-      fileUrl: getFileUrl(additionalFilePath),
-      isAdditional: true,
-      isAudio: isAudioFile,
-      isImage: isImage(additionalFilePath),
-      isVideo: isVideoFile,
-      section: 'additional',
-      thumbnailUrl: await getThumbnailUrl(additionalFilePath, true),
-      title: path.basename(additionalFilePath),
-      uniqueId,
-    },
-  ]);
 };
 
 const addToFiles = async (
@@ -1063,10 +1050,10 @@ const addToFiles = async (
   if (!files) return;
   additionalLoading.value = true;
   for (let i = 0; i < files.length; i++) {
-    let filepath = files[i].path;
+    let filepath = files[i]?.path;
     try {
-      console.log('file', files[i]);
-
+      console.log('file', files[i], filepath);
+      if (!filepath) continue;
       // Check if file is remote URL; if so, download it
       if (isRemoteUrl(filepath)) {
         const baseFileName = path.basename(new URL(filepath).pathname);
@@ -1162,7 +1149,7 @@ const addToFiles = async (
         });
       } else {
         createTemporaryNotification({
-          caption: path.basename(filepath),
+          caption: filepath ? path.basename(filepath) : filepath,
           icon: 'mdi-file',
           message: t('filetypeNotSupported'),
           type: 'error',
@@ -1170,7 +1157,7 @@ const addToFiles = async (
       }
     } catch (error) {
       createTemporaryNotification({
-        caption: path.basename(filepath),
+        caption: filepath ? path.basename(filepath) : filepath,
         icon: 'mdi-file',
         message: t('fileProcessError'),
         type: 'error',
@@ -1223,26 +1210,20 @@ const mediaDurationPopups = ref({} as { [key: string]: boolean });
 
 const showMediaDurationPopup = (media: DynamicMediaObject) => {
   if (!currentCongregation.value) return;
-  if (!customDurations.value[currentCongregation.value])
-    customDurations.value[currentCongregation.value] = {};
-  if (!customDurations.value[currentCongregation.value][selectedDate.value])
-    customDurations.value[currentCongregation.value][selectedDate.value] = {};
-  if (
-    !customDurations.value[currentCongregation.value][selectedDate.value][
-      media.uniqueId
-    ]
-  ) {
-    customDurations.value[currentCongregation.value][selectedDate.value][
-      media.uniqueId
-    ] = {
-      max: media.duration,
-      min: 0,
-    };
-  }
+  customDurations.value[currentCongregation.value] ??= {};
+  customDurations.value[currentCongregation.value][selectedDate.value] ??= {};
+  customDurations.value[currentCongregation.value][selectedDate.value][
+    media.uniqueId
+  ] ??= {
+    max: media.duration,
+    min: 0,
+  };
   mediaDurationPopups.value[media.uniqueId] = true;
 };
 
 const resetMediaDuration = (media: DynamicMediaObject) => {
+  customDurations.value[currentCongregation.value] ??= {};
+  customDurations.value[currentCongregation.value][selectedDate.value] ??= {};
   customDurations.value[currentCongregation.value][selectedDate.value][
     media.uniqueId
   ] = {
@@ -1290,16 +1271,31 @@ const remoteVideoLoaded = (event: CustomEventInit) => {
   additionalLoading.value = false;
 };
 
-onMounted(() => {
-  window.addEventListener('localFiles-browsed', localFilesBrowsedListener);
-  window.addEventListener('remoteVideo-loading', remoteVideoLoading);
-  window.addEventListener('remoteVideo-loaded', remoteVideoLoaded);
-});
+const sendObsSceneEvent = (scene: string) => {
+  if (!scene) return;
+  window.dispatchEvent(
+    new CustomEvent('obsSceneEvent', {
+      detail: {
+        scene,
+      },
+    }),
+  );
+};
 
 onUnmounted(() => {
   window.removeEventListener('localFiles-browsed', localFilesBrowsedListener);
   window.removeEventListener('remoteVideo-loading', remoteVideoLoading);
   window.removeEventListener('remoteVideo-loaded', remoteVideoLoaded);
+
+  Object.keys(panzooms).forEach((key) => {
+    try {
+      if (!panzooms[key]) return;
+      panzooms[key].destroy();
+      delete panzooms[key];
+    } catch (e) {
+      console.error(e);
+    }
+  });
 });
 </script>
 

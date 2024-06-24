@@ -139,6 +139,7 @@ const getMediaFromJwPlaylist = async (
   selectedDateValue: Date,
   destPath: string,
 ) => {
+  if (!jwPlaylistPath) return [];
   const outputPath = path.join(destPath, path.basename(jwPlaylistPath));
   await decompress(jwPlaylistPath, outputPath);
   const dbFile = findDb(outputPath);

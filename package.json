@@ -1,6 +1,6 @@
 {
   "name": "mmm-v2",
-  "version": "24.6.3",
+  "version": "24.6.4",
   "description": "A cross platform app to download and present media (pictures and videos) for congregation meetings of Jehovah’s Witnesses in any language. Features include recurring and custom media management, congregation sync, and media presentation tools for hybrid, in-person or fully remote Zoom meetings.",
   "productName": "Meeting Media Manager v2",
   "author": "Olivier Savignac",
@@ -19,7 +19,6 @@
     "@panzoom/panzoom": "^4.5.1",
     "@quasar/cli": "^2.4.0",
     "@quasar/extras": "^1.16.4",
-    "@sentry/vite-plugin": "^2.18.0",
     "@sentry/vue": "^8.9.2",
     "axios": "^1.6.8",
     "better-sqlite3": "^11.0.0",
@@ -46,6 +45,8 @@
     "@intlify/vite-plugin-vue-i18n": "^3.3.1",
     "@quasar/app-vite": "^1.8.0",
     "@rollup/plugin-inject": "^5.0.5",
+    "@sentry/esbuild-plugin": "^2.19.0",
+    "@sentry/vite-plugin": "^2.19.0",
     "@types/better-sqlite3": "^7.6.10",
     "@types/decompress": "^4.2.7",
     "@types/dompurify": "^3.0.5",
@@ -65,7 +66,7 @@
     "node-polyfill-webpack-plugin": "^3.0.0",
     "prettier": "^3.3.2",
     "process": "^0.11.10",
-    "typescript": "^5.4.5",
+    "typescript": "~5.4.5",
     "vite-plugin-checker": "^0.6.4",
     "vue-tsc": "^2.0.21"
   },
