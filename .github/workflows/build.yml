@@ -26,6 +26,37 @@ jobs:
         run: |
           echo "Current version: ${{ steps.package-version.outputs.version }}"
 
+      - name: Get Current GitHub Release
+        id: get_current_release
+        uses: joutvhu/get-release@v1
+        with:
+          debug: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compare versions and increment if needed
+        id: compare-versions
+        run: |
+          PACKAGE_VERSION="${{ steps.package-version.outputs.version }}"
+          GITHUB_RELEASE_VERSION="${{ steps.get_current_release.outputs.tag_name }}"
+
+          # Strip leading 'v' if present
+          GITHUB_RELEASE_VERSION="${GITHUB_RELEASE_VERSION#v}"
+
+          echo "Package version: $PACKAGE_VERSION"
+          echo "GitHub release version: $GITHUB_RELEASE_VERSION"
+
+          if [ "$PACKAGE_VERSION" = "$GITHUB_RELEASE_VERSION" ]; then
+            NEW_VERSION=true
+            echo "New version: $NEW_VERSION"
+            echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
+            exit 0
+          fi
+
+      - name: Stop rest of actions since package.json version is the same
+        if: steps.compare-versions.outputs.NEW_VERSION
+        run: exit 1
+
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v4
         with:
