@@ -9,7 +9,7 @@ import { DateInfo } from 'src/types/dates';
 import { DownloadProgressItems, DownloadedFile } from 'src/types/media';
 import { SettingsValues } from 'src/types/settings';
 
-const { path } = electronApi;
+const { fs, path } = electronApi;
 
 export const useCurrentStateStore = defineStore('current-state', {
   actions: {
@@ -106,11 +106,13 @@ export const useCurrentStateStore = defineStore('current-state', {
         new Date(state.selectedDate),
         'YYYYMMDD',
       );
-      return path.join(
+      const datedAdditionalMediaDirectory = path.join(
         additionalMediaPath,
         state.currentCongregation,
         dateString,
       );
+      fs.ensureDirSync(datedAdditionalMediaDirectory);
+      return datedAdditionalMediaDirectory;
     },
     mediaPaused(state) {
       return (

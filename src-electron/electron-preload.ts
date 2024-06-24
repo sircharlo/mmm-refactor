@@ -153,11 +153,17 @@ const setWindowPosition = (
     );
 };
 
-const moveMediaWindow = (
-  noEvent?: boolean,
-  targetScreen?: number,
-  windowedMode?: boolean,
-) => {
+const moveMediaWindow = (jsonString?: string) => {
+  let targetScreen: number | undefined;
+  let windowedMode = false;
+  let noEvent = false;
+  if (jsonString) {
+    try {
+      [noEvent, targetScreen, windowedMode] = JSON.parse(jsonString);
+    } catch (err) {
+      console.error(err);
+    }
+  }
   console.log('moveMediaWindow', targetScreen, windowedMode);
   const allScreens = getAllScreens();
   const otherScreens = allScreens.filter((screen) => !screen.mainWindow);

@@ -162,9 +162,11 @@ watch(
   (newScreenPreferences) => {
     console.log('newScreenPreferences', newScreenPreferences);
     moveMediaWindow(
-      true,
-      newScreenPreferences.preferredScreenNumber,
-      newScreenPreferences.preferWindowed,
+      JSON.stringify([
+        true,
+        newScreenPreferences.preferredScreenNumber,
+        newScreenPreferences.preferWindowed,
+      ]),
     );
   },
   { deep: true, immediate: true },

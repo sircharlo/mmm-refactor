@@ -1258,7 +1258,7 @@ const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
       !publication.maxTrack || mediaLink.track < publication.maxTrack,
   );
 
-  const dir = getPublicationDirectory(publication, true);
+  const dir = getPublicationDirectory(publication);
   const filteredMediaItemLinks = [] as MediaLink[];
   for (const mediaItemLink of mediaLinks) {
     const currentTrack = mediaItemLink.track;

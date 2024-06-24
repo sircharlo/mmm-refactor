@@ -1311,7 +1311,13 @@ onUnmounted(() => {
   window.removeEventListener('remoteVideo-loaded', remoteVideoLoaded);
 
   Object.keys(panzooms).forEach((key) => {
-    panzooms[key]?.destroy();
+    try {
+      if (!panzooms[key]) return;
+      panzooms[key].destroy();
+      delete panzooms[key];
+    } catch (e) {
+      console.error(e);
+    }
   });
 });
 </script>

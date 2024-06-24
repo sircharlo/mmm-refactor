@@ -16,13 +16,12 @@ const getAdditionalMediaPath = () =>
   path.join(getUserDataPath(), 'Additional Media');
 
 const getTempDirectory = () => {
-  return path.join(getUserDataPath(), 'Temp');
+  const tempDirectory = path.join(getUserDataPath(), 'Temp');
+  fs.ensureDirSync(tempDirectory);
+  return tempDirectory;
 };
 
-const getPublicationDirectory = (
-  publication: PublicationFetcher,
-  create?: boolean,
-) => {
+const getPublicationDirectory = (publication: PublicationFetcher) => {
   const dir = path.join(
     getPublicationsPath(),
     publication.pub +
@@ -30,7 +29,7 @@ const getPublicationDirectory = (
       publication.langwritten +
       (publication.issue ? '_' + publication.issue.toString() : ''),
   );
-  if (create) fs.ensureDirSync(dir);
+  fs.ensureDirSync(dir);
   return dir;
 };
 const getPublicationDirectoryContents = (
