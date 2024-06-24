@@ -74,7 +74,12 @@
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { storeToRefs } from 'pinia';
 import { useQuasar } from 'quasar';
-import { isAudio, isImage, isVideo, showMediaWindow } from 'src/helpers/mediaPlayback';
+import {
+  isAudio,
+  isImage,
+  isVideo,
+  showMediaWindow,
+} from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { Ref, ref, watch } from 'vue';
@@ -102,8 +107,7 @@ const panzoomOptions = { animate: true, duration: 1000 };
 watch(
   () => mediaPlayer.value?.url,
   (newUrl) => {
-    if (currentSettings.value?.jwlCompanionMode)
-    showMediaWindow(!!newUrl);
+    if (currentSettings.value?.jwlCompanionMode) showMediaWindow(!!newUrl);
   },
 );
 
@@ -111,7 +115,8 @@ watch(
   () => currentCongregation.value,
   (newCongregation) => {
     if (!newCongregation) showMediaWindow(false);
-  },)
+  },
+);
 
 watch(
   () => [mediaPlayer.value?.scale, mediaPlayer.value?.x, mediaPlayer.value?.y],
@@ -173,14 +178,13 @@ const playMedia = () => {
     mediaPlayer.value.currentPosition = currentTime;
     // mediaPlayer.value.seekTo = currentTime;
     if (
-      customDurations.value[currentCongregation.value][selectedDate.value][
-        mediaPlayer.value.uniqueId
-      ]
+      customDurations?.value?.[currentCongregation.value]?.[
+        selectedDate.value
+      ]?.[mediaPlayer.value.uniqueId]
     ) {
-      const customStartStop =
-        customDurations.value[currentCongregation.value][selectedDate.value][
-          mediaPlayer.value.uniqueId
-        ];
+      const customStartStop = customDurations?.value?.[
+        currentCongregation.value
+      ]?.[selectedDate.value]?.[mediaPlayer.value.uniqueId] ?? { max: 0 };
       if (currentTime >= customStartStop.max) {
         // updateMediaPlayer('currentPosition', customStartStop.min);
         mediaPlayer.value.url = '';
@@ -189,14 +193,13 @@ const playMedia = () => {
   };
   let customStartStop = { max: 0, min: 0 };
   if (
-    customDurations.value[currentCongregation.value][selectedDate.value][
+    customDurations?.value?.[currentCongregation.value]?.[selectedDate.value]?.[
       mediaPlayer.value.uniqueId
     ]
   ) {
-    customStartStop =
-      customDurations.value[currentCongregation.value][selectedDate.value][
-        mediaPlayer.value.uniqueId
-      ];
+    customStartStop = customDurations?.value?.[currentCongregation.value]?.[
+      selectedDate.value
+    ]?.[mediaPlayer.value.uniqueId] ?? { min: 0 };
   }
   mediaElement.value.currentTime = customStartStop.min;
   mediaElement.value.play();
