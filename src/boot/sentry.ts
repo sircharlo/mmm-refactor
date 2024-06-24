@@ -1,22 +1,22 @@
 import * as Sentry from '@sentry/vue';
 import { boot } from 'quasar/wrappers';
-import { electronApi } from 'src/helpers/electron-api';
+// import { electronApi } from 'src/helpers/electron-api';
 
 import packageInfo from '../../package.json';
 
-const { path } = electronApi;
+// const { path } = electronApi;
 
-function getBasenameFromFileUrl(fileUrl: string | undefined) {
-  if (!fileUrl) return '';
-  try {
-    const parsedUrl = new URL(fileUrl);
-    const pathname = decodeURIComponent(parsedUrl.pathname);
-    return path.join(path.basename(pathname));
-  } catch (e) {
-    console.error(e);
-    return '';
-  }
-}
+// function getBasenameFromFileUrl(fileUrl: string | undefined) {
+//   if (!fileUrl) return '';
+//   try {
+//     const parsedUrl = new URL(fileUrl);
+//     const pathname = decodeURIComponent(parsedUrl.pathname);
+//     return path.join(path.basename(pathname));
+//   } catch (e) {
+//     console.error(e);
+//     return '';
+//   }
+// }
 
 export default boot(({ app, router }) => {
   Sentry.init({
