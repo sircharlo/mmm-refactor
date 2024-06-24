@@ -237,7 +237,6 @@
           </q-dialog>
         </template>
         <template v-else-if="route.fullPath === '/settings'">
-          <!-- <q-btn color="negative" v-if="invalidSettings()"> -->
           <q-toggle
             :label="$t('only-show-settings-that-are-not-valid')"
             color="red"
@@ -247,7 +246,6 @@
             v-model="onlyShowInvalid"
           >
           </q-toggle>
-          <!-- </q-badge> -->
         </template>
       </q-toolbar>
     </q-header>

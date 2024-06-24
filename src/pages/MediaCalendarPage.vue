@@ -114,9 +114,7 @@
             >
               <q-badge
                 :color="
-                  customDurations[currentCongregation] &&
-                  customDurations[currentCongregation][selectedDate] &&
-                  customDurations[currentCongregation][selectedDate][
+                  customDurations[currentCongregation]?.[selectedDate]?.[
                     media.uniqueId
                   ] &&
                   (customDurations[currentCongregation][selectedDate][
@@ -134,31 +132,27 @@
               >
                 <q-icon class="q-mr-xs" color="white" name="mdi-play" />
                 {{
-                  ((customDurations[currentCongregation] &&
-                    customDurations[currentCongregation][selectedDate] &&
+                  customDurations[currentCongregation]?.[selectedDate]?.[
+                    media.uniqueId
+                  ] &&
+                  (customDurations[currentCongregation][selectedDate][
+                    media.uniqueId
+                  ].min > 0 ||
                     customDurations[currentCongregation][selectedDate][
                       media.uniqueId
-                    ] &&
-                    (customDurations[currentCongregation][selectedDate][
-                      media.uniqueId
-                    ].min > 0 ||
-                      customDurations[currentCongregation][selectedDate][
-                        media.uniqueId
-                      ].max < media.duration) &&
-                    formatTime(
-                      customDurations[currentCongregation][selectedDate][
-                        media.uniqueId
-                      ].min,
-                    ) + ' - ') ||
-                    '') +
+                    ].max < media.duration)
+                    ? formatTime(
+                        customDurations[currentCongregation][selectedDate][
+                          media.uniqueId
+                        ].min,
+                      ) + ' - '
+                    : ''
+                }}
+                {{
                   formatTime(
-                    (customDurations[currentCongregation][selectedDate][
+                    customDurations[currentCongregation]?.[selectedDate]?.[
                       media.uniqueId
-                    ] &&
-                      customDurations[currentCongregation][selectedDate][
-                        media.uniqueId
-                      ].max) ||
-                      media.duration,
+                    ]?.max ?? media.duration,
                   )
                 }}
               </q-badge>
@@ -187,18 +181,18 @@
                       <q-range
                         :left-label-value="
                           formatTime(
-                            customDurations[currentCongregation][selectedDate][
-                              media.uniqueId
-                            ].min,
+                            customDurations[currentCongregation]?.[
+                              selectedDate
+                            ]?.[media.uniqueId]?.min,
                           )
                         "
                         :max="media.duration"
                         :min="0"
                         :right-label-value="
                           formatTime(
-                            customDurations[currentCongregation][selectedDate][
-                              media.uniqueId
-                            ].max,
+                            customDurations[currentCongregation]?.[
+                              selectedDate
+                            ]?.[media.uniqueId]?.max,
                           )
                         "
                         :step="0"
@@ -374,6 +368,10 @@
                       <q-list style="min-width: 100px">
                         <q-item
                           @click="
+                            customDurations[currentCongregation] ??= {};
+                            customDurations[currentCongregation][
+                              selectedDate
+                            ] ??= {};
                             customDurations[currentCongregation][selectedDate][
                               media.uniqueId
                             ] = {
@@ -395,25 +393,10 @@
                         <q-item
                           :key="marker.VideoMarkerId"
                           @click="
-                            if (
-                              !customDurations[currentCongregation][
-                                selectedDate
-                              ]
-                            )
-                              customDurations[currentCongregation][
-                                selectedDate
-                              ] = {};
-                            if (
-                              !customDurations[currentCongregation][
-                                selectedDate
-                              ][media.uniqueId]
-                            )
-                              customDurations[currentCongregation][
-                                selectedDate
-                              ][media.uniqueId] = {
-                                min: 0,
-                                max: media.duration,
-                              };
+                            customDurations[currentCongregation] ??= {};
+                            customDurations[currentCongregation][
+                              selectedDate
+                            ] ??= {};
                             customDurations[currentCongregation][selectedDate][
                               media.uniqueId
                             ].min = marker.StartTimeTicks / 10000 / 1000;
@@ -1227,26 +1210,20 @@ const mediaDurationPopups = ref({} as { [key: string]: boolean });
 
 const showMediaDurationPopup = (media: DynamicMediaObject) => {
   if (!currentCongregation.value) return;
-  if (!customDurations.value[currentCongregation.value])
-    customDurations.value[currentCongregation.value] = {};
-  if (!customDurations.value[currentCongregation.value][selectedDate.value])
-    customDurations.value[currentCongregation.value][selectedDate.value] = {};
-  if (
-    !customDurations.value[currentCongregation.value][selectedDate.value][
-      media.uniqueId
-    ]
-  ) {
-    customDurations.value[currentCongregation.value][selectedDate.value][
-      media.uniqueId
-    ] = {
-      max: media.duration,
-      min: 0,
-    };
-  }
+  customDurations.value[currentCongregation.value] ??= {};
+  customDurations.value[currentCongregation.value][selectedDate.value] ??= {};
+  customDurations.value[currentCongregation.value][selectedDate.value][
+    media.uniqueId
+  ] ??= {
+    max: media.duration,
+    min: 0,
+  };
   mediaDurationPopups.value[media.uniqueId] = true;
 };
 
 const resetMediaDuration = (media: DynamicMediaObject) => {
+  customDurations.value[currentCongregation.value] ??= {};
+  customDurations.value[currentCongregation.value][selectedDate.value] ??= {};
   customDurations.value[currentCongregation.value][selectedDate.value][
     media.uniqueId
   ] = {

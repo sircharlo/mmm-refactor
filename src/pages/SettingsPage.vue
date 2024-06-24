@@ -7,14 +7,6 @@
       ref="settingsFormDynamic"
       v-if="currentSettings"
     >
-      <!-- <q-badge color="negative" v-if="invalidSettingsLength">
-        <q-toggle
-          :label="$t('only-show-settings-that-are-not-valid')"
-          color="white"
-          v-model="onlyShowInvalid"
-        >
-        </q-toggle>
-      </q-badge> -->
       <template
         :key="groupId"
         v-for="[groupId, { name, description }] in Object.entries(
