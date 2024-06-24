@@ -137,14 +137,21 @@ function playMusic() {
     (getSettingValue('musicVolume') as number) / 100 ?? 1;
   musicPlayerSource.value.src = getNextSongUrl();
   musicPlayer.value.load();
-  musicPlayer.value.play().then(() => {
-    musicPlaying.value = true;
-  });
+  musicPlayer.value
+    .play()
+    .then(() => {
+      musicPlaying.value = true;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
   musicPlayer.value.onended = () => {
     if (!musicPlayer.value || !musicPlayerSource.value) return;
     musicPlayerSource.value.src = getNextSongUrl();
     musicPlayer.value.load();
-    musicPlayer.value.play();
+    musicPlayer.value.play().catch((error) => {
+      console.error(error);
+    });
   };
   musicPlayer.value.ontimeupdate = () => {
     if (!musicPlayer.value) return;

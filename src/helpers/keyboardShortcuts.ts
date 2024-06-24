@@ -52,6 +52,7 @@ const registerCustomShortcut = (
 };
 
 const registerAllCustomShortcuts = () => {
+  unregisterAllCustomShortcuts();
   for (const shortcutName of Object.keys(shortcutCallbacks)) {
     registerCustomShortcut(shortcutName as keyof SettingsValues);
   }
@@ -63,8 +64,8 @@ const unregisterAllCustomShortcuts = () => {
   for (const shortcutName of Object.keys(
     shortcutCallbacks,
   ) as (keyof SettingsValues)[]) {
-    if (shortcutName || !currentSettings.value[shortcutName]) continue;
-    unregisterShortcut(shortcutName);
+    if (!shortcutName || !currentSettings.value[shortcutName]) continue;
+    unregisterShortcut(currentSettings.value[shortcutName] as string);
   }
 };
 

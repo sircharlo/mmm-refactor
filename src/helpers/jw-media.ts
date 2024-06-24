@@ -167,10 +167,13 @@ const fetchMedia = async () => {
     meetingsToFetch.forEach((day) => {
       day.loading = true;
     });
-    if (!queues.meetings[currentCongregation.value])
+    if (!queues.meetings[currentCongregation.value]) {
       queues.meetings[currentCongregation.value] = new PQueue({
         concurrency: 2,
       });
+    } else {
+      queues.meetings[currentCongregation.value].start();
+    }
     const queue = queues.meetings[currentCongregation.value];
     for (const day of meetingsToFetch) {
       try {
@@ -634,7 +637,6 @@ const getWeMedia = async (lookupDate: Date) => {
   const currentState = useCurrentStateStore();
   const { currentSongbook } = storeToRefs(currentState);
   const { getSettingValue } = currentState;
-  console.log('getWeMedia', lookupDate);
   lookupDate = dateFromString(lookupDate);
   try {
     const monday = getSpecificWeekday(lookupDate, 0);

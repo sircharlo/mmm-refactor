@@ -156,7 +156,7 @@ const setObsScene = async (scene: string) => {
 };
 
 const setObsSceneByUuid = async (sceneUuid: string) => {
-  if (obsConnectionState.value !== 'connected') await obsConnect(false);
+  if (obsConnectionState.value !== 'connected') await obsConnect();
   if (sceneUuid) {
     obsWebSocket?.call('SetCurrentProgramScene', { sceneUuid });
   }
@@ -171,6 +171,7 @@ const setObsSceneListener = (event: CustomEventInit) => {
 };
 
 onMounted(() => {
+  window.addEventListener('obsConnectFromSettings', () => obsConnect(true));
   window.addEventListener('obsSceneEvent', setObsSceneListener);
 
   obsWebSocket.on('ConnectionClosed', obsErrorHandler);

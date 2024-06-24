@@ -51,7 +51,7 @@ const getActions = (actions: string[] | undefined) => {
   actions
     ?.map(async (action) => {
       return action == 'obsConnect'
-        ? window.dispatchEvent(new CustomEvent('obsConnect'))
+        ? window.dispatchEvent(new CustomEvent('obsConnectFromSettings'))
         : undefined;
     })
     .filter(Boolean);

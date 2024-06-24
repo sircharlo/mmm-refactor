@@ -140,7 +140,9 @@ watch(
       mediaElement.value.pause();
       // mediaElement.value.currentTime = mediaPlayer.value.currentPosition;
     } else if (newAction.toLowerCase().includes('play')) {
-      mediaElement.value.play();
+      mediaElement.value.play().catch((error) => {
+        console.error(error);
+      });
     }
   },
 );
@@ -202,7 +204,9 @@ const playMedia = () => {
     ]?.[mediaPlayer.value.uniqueId] ?? { min: 0 };
   }
   mediaElement.value.currentTime = customStartStop.min;
-  mediaElement.value.play();
+  mediaElement.value.play().catch((error) => {
+    console.error(error);
+  });
 };
 
 function onResize(size: { height: number; width: number }) {

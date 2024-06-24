@@ -239,12 +239,10 @@ const toggleMediaWindow = (action: string) => {
 
 const registerShortcut = (keySequence: string, callback: () => void) => {
   if (!keySequence) return;
-  console.log('registering shortcut', keySequence, callback);
   const ret = globalShortcut.register(keySequence, callback);
   if (!ret) {
     console.error('registration failed');
   }
-  console.log(globalShortcut.isRegistered(keySequence));
 };
 
 const unregisterShortcut = (keySequence: string) => {

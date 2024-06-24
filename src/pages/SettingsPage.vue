@@ -20,7 +20,7 @@
           icon="mdi-home-account"
           v-if="
             !invalidSettingsLength ||
-            !onlyShowInvalid ||
+            !onlyShowInvalidSettings ||
             Object.entries(settingsDefinitions)
               .filter(([settingId, item]) => item.group === groupId)
               .map(([settingId, _]) => settingId)
@@ -49,7 +49,7 @@
               v-if="
                 (!item.depends ||
                   currentSettings[item.depends as keyof SettingsItems]) &&
-                (!onlyShowInvalid ||
+                (!onlyShowInvalidSettings ||
                   !invalidSettingsLength ||
                   invalidSettings.includes(settingId as keyof SettingsItems))
               "
@@ -171,7 +171,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 
 // Store initializations
 const currentState = useCurrentStateStore();
-const { currentSettings, onlyShowInvalid } = storeToRefs(currentState);
+const { currentSettings, onlyShowInvalidSettings } = storeToRefs(currentState);
 const { getInvalidSettings } = currentState;
 
 const jwStore = useJwStore();

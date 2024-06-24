@@ -26,13 +26,19 @@
             >
               <q-list style="min-width: 100px">
                 <q-item-label header>{{ $t('from-jw-org') }}</q-item-label>
-                <q-item @click="chooseSong = true" clickable v-close-popup>
+                <q-item
+                  :disable="!online"
+                  @click="chooseSong = true"
+                  clickable
+                  v-close-popup
+                >
                   <q-item-section avatar>
                     <q-icon color="primary" name="mdi-music-clef-treble" />
                   </q-item-section>
                   <q-item-section>{{ $t('song') }}</q-item-section>
                 </q-item>
                 <q-item
+                  :disable="!online"
                   @click="
                     remoteVideoPopup = true;
                     getJwVideos();
@@ -243,7 +249,7 @@
             icon="clear"
             left-label
             v-if="invalidSettings()"
-            v-model="onlyShowInvalid"
+            v-model="onlyShowInvalidSettings"
           >
           </q-toggle>
         </template>
@@ -351,6 +357,7 @@
 import { storeToRefs } from 'pinia';
 import { Dark, LocalStorage, date } from 'quasar';
 import { get } from 'src/boot/axios';
+import { queues } from 'src/boot/globals';
 import DownloadStatus from 'src/components/media/DownloadStatus.vue';
 import MediaDisplayButton from 'src/components/media/MediaDisplayButton.vue';
 import MusicButton from 'src/components/media/MusicButton.vue';
@@ -403,7 +410,8 @@ const {
   currentSettings,
   downloadProgress,
   mediaPlaying,
-  onlyShowInvalid,
+  online,
+  onlyShowInvalidSettings,
   selectedDate,
 } = storeToRefs(currentState);
 
@@ -438,7 +446,10 @@ const route = useRoute();
 const router = useRouter();
 const miniState = ref(true);
 
-watch(currentCongregation, (newCongregation) => {
+watch(currentCongregation, (newCongregation, oldCongregation) => {
+  if (oldCongregation && queues.meetings[oldCongregation]) {
+    queues.meetings[oldCongregation].pause();
+  }
   if (!newCongregation) {
     if (route.fullPath !== '/congregation-selector') {
       router.push({ path: '/congregation-selector' });
@@ -449,6 +460,30 @@ watch(currentCongregation, (newCongregation) => {
     updateLookupPeriod();
     registerAllCustomShortcuts();
     downloadBackgroundMusic();
+    if (queues.meetings[newCongregation]) {
+      queues.meetings[newCongregation].start();
+    }
+  }
+});
+
+watch(online, (isNowOnline) => {
+  try {
+    const congregation = currentCongregation.value;
+    if (!congregation) return;
+
+    const { downloads, meetings } = queues;
+    const downloadQueue = downloads[congregation];
+    const meetingQueue = meetings[congregation];
+
+    if (isNowOnline) {
+      downloadQueue.start();
+      meetingQueue.start();
+    } else {
+      downloadQueue.pause();
+      meetingQueue.pause();
+    }
+  } catch (error) {
+    console.error(error);
   }
 });
 
@@ -565,9 +600,6 @@ const datePickerActive = ref(false);
 const remoteVideoPopup = ref(false);
 const remoteVideosLoadingProgress = ref(0);
 const remoteVideos: Ref<MediaItemsMediatorItem[]> = ref([]);
-// const remoteVideosByCategory: Ref<{
-//   [key: string]: MediaItemsMediatorItem[];
-// }> = ref({});
 const remoteVideoFilter = ref('');
 const remoteVideosIncludeAudioDescription = ref(false);
 
@@ -639,8 +671,6 @@ const getJwVideos = async () => {
             getSettingValue('lang') as string
           }/${category.key}?detailed=0&clientType=www`,
         )) as JwVideoCategory;
-        // remoteVideosByCategory.value[category.parentCategory ?? category.key] =
-        //   request.category.media;
         remoteVideos.value = remoteVideos.value
           .concat(request.category.media)
           .reduce((accumulator: MediaItemsMediatorItem[], current) => {
@@ -681,7 +711,7 @@ const remoteVideosFiltered = computed(() => {
 });
 
 const getEventDayColor = (eventDate: string) => {
-  if(!lookupPeriod.value || !currentCongregation.value) return 'primary';
+  if (!lookupPeriod.value || !currentCongregation.value) return 'primary';
   const isLoaded =
     lookupPeriod.value[currentCongregation.value]?.find(
       (d) => date.getDateDiff(eventDate, d.date, 'days') === 0,

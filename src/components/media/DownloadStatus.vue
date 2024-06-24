@@ -1,4 +1,5 @@
 <template>
+  {{ online }}
   <q-btn
     :icon="
       Object.values(downloadProgress).filter((item) => item.error).length === 0
@@ -15,10 +16,7 @@
     <template v-slot:loading>
       <q-spinner-pie />
     </template>
-    <q-tooltip
-      anchor="bottom left"
-      self="top left"
-      >
+    <q-tooltip anchor="bottom left" self="top left">
       <!-- v-if="!disabled && !mediaDisplayPopup" -->
       {{ $t('download-status') }}
     </q-tooltip>
@@ -43,7 +41,11 @@
               {{ $t('noDownloadsInProgress') }}
             </q-item-section>
             <q-space />
-            <q-item-section avatar class="q-pt-md q-pl-md" style="align-items: end">
+            <q-item-section
+              avatar
+              class="q-pt-md q-pl-md"
+              style="align-items: end"
+            >
               <q-icon color="positive" name="mdi-check-circle" />
             </q-item-section>
           </q-item>
@@ -97,13 +99,15 @@
 </template>
 
 <script setup lang="ts">
+import isOnline from 'is-online';
 import { storeToRefs } from 'pinia';
 import { electronApi } from 'src/helpers/electron-api';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { DownloadProgressItems } from 'src/types/media';
+import { onMounted } from 'vue';
 
 const currentState = useCurrentStateStore();
-const { downloadProgress } = storeToRefs(currentState);
+const { downloadProgress, online } = storeToRefs(currentState);
 const { path } = electronApi;
 
 const filteredDownloads = (
@@ -137,4 +141,20 @@ const statusConfig = [
   { icon: 'mdi-alert-circle', label: 'errors', status: 'error' },
   { icon: 'mdi-check-circle', label: 'complete', status: 'complete' },
 ] as { icon: string; label: string; status: 'complete' | 'error' | 'loaded' }[];
+
+const updateOnline = async () => {
+  try {
+    online.value = await isOnline();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+setInterval(() => {
+  updateOnline();
+}, 10000);
+
+onMounted(async () => {
+  updateOnline();
+});
 </script>
