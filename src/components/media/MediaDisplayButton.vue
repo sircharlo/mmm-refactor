@@ -160,13 +160,10 @@ watch(
 watch(
   () => screenPreferences.value,
   (newScreenPreferences) => {
-    console.log('newScreenPreferences', newScreenPreferences);
     moveMediaWindow(
-      JSON.stringify([
-        true,
-        newScreenPreferences.preferredScreenNumber,
-        newScreenPreferences.preferWindowed,
-      ]),
+      newScreenPreferences.preferredScreenNumber,
+      newScreenPreferences.preferWindowed,
+      true,
     );
   },
   { deep: true, immediate: true },
@@ -174,8 +171,8 @@ watch(
 
 const windowScreenListener = (event: CustomEventInit) => {
   try {
-    console.log('windowScreen-update', event.detail);
-    screenPreferences.value.preferredScreenNumber = event.detail.targetScreen;
+    screenPreferences.value.preferredScreenNumber =
+      event.detail.targetScreenNumber;
     screenPreferences.value.preferWindowed = event.detail.windowedMode;
   } catch (error) {
     console.error(error);

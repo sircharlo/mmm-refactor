@@ -89,119 +89,97 @@ const setWindowPosition = (
   windowedMode = false,
   noEvent?: boolean,
 ) => {
-  if (!targetWindow) return;
-  const allScreens = getAllScreens();
-  console.log('allScreens', allScreens);
-  const currentMediaScreenNumber = getWindowScreen(targetWindow);
-  console.log(
-    'targetScreen, currentMediaScreenNumber',
-    targetScreenNumber,
-    currentMediaScreenNumber,
-  );
-  const targetScreen = allScreens[targetScreenNumber ?? 0];
-  console.log('targetScreen', targetScreen);
-  if (!targetScreen) return;
-  const targetScreenBounds = targetScreen.bounds;
-  console.log('targetScreenBounds', targetScreenBounds);
-  if (!targetScreenBounds) return;
-  if (windowedMode) {
-    if (targetWindow.isAlwaysOnTop()) targetWindow.setAlwaysOnTop(false);
-    if (targetWindow.isFullScreen()) targetWindow.setFullScreen(false);
-    const newBounds = {
-      height: 720,
-      width: 1280,
-      x: targetScreenBounds.x + 50,
-      y: targetScreenBounds.y + 50,
-    };
-    const currentBounds = targetWindow.getBounds();
-    console.log(
-      'currentBounds, newBounds',
-      currentBounds.height,
-      newBounds.height,
-      currentBounds.width,
-      newBounds.width,
-      currentBounds.x,
-      newBounds.x,
-      currentBounds.y,
-      newBounds.y,
-      currentBounds.height !== newBounds.height,
-      currentBounds.width !== newBounds.width,
-      currentBounds.x !== newBounds.x,
-      currentBounds.y !== newBounds.y,
-    );
-    if (
-      currentBounds.height !== newBounds.height ||
-      currentBounds.width !== newBounds.width ||
-      currentBounds.x !== newBounds.x ||
-      currentBounds.y !== newBounds.y
-    ) {
-      targetWindow.setBounds(newBounds);
+  try {
+    if (!targetWindow) return;
+    const allScreens = getAllScreens();
+    const currentMediaScreenNumber = getWindowScreen(targetWindow);
+    const targetScreen = allScreens[targetScreenNumber ?? 0];
+    if (!targetScreen) return;
+    const targetScreenBounds = targetScreen.bounds;
+    if (!targetScreenBounds) return;
+    if (windowedMode) {
+      if (targetWindow.isAlwaysOnTop()) targetWindow.setAlwaysOnTop(false);
+      if (targetWindow.isFullScreen()) targetWindow.setFullScreen(false);
+      if (targetScreenNumber === currentMediaScreenNumber) return;
+      const newBounds = {
+        height: 720,
+        width: 1280,
+        x: targetScreenBounds.x + 50,
+        y: targetScreenBounds.y + 50,
+      };
+      const currentBounds = targetWindow.getBounds();
+      if (
+        currentBounds.height !== newBounds.height ||
+        currentBounds.width !== newBounds.width ||
+        currentBounds.x !== newBounds.x ||
+        currentBounds.y !== newBounds.y
+      ) {
+        targetWindow.setBounds(newBounds);
+      }
+    } else {
+      targetWindow.setPosition(
+        targetScreenBounds.x + 50,
+        targetScreenBounds.y + 50,
+      );
+      if (!targetWindow.isAlwaysOnTop()) targetWindow.setAlwaysOnTop(true);
+      if (!targetWindow.isFullScreen()) targetWindow.setFullScreen(true);
     }
-  } else {
-    targetWindow.setPosition(
-      targetScreenBounds.x + 50,
-      targetScreenBounds.y + 50,
-    );
-    if (!targetWindow.isAlwaysOnTop()) targetWindow.setAlwaysOnTop(true);
-    if (!targetWindow.isFullScreen()) targetWindow.setFullScreen(true);
+    if (!noEvent)
+      window.dispatchEvent(
+        new CustomEvent('windowScreen-update', {
+          detail: { targetScreenNumber, windowedMode },
+        }),
+      );
+  } catch (err) {
+    console.error(err);
   }
-  if (!noEvent)
-    window.dispatchEvent(
-      new CustomEvent('windowScreen-update', {
-        detail: { targetScreen, windowedMode },
-      }),
-    );
 };
 
-const moveMediaWindow = (jsonString?: string) => {
-  let targetScreen: number | undefined;
-  let windowedMode = false;
-  let noEvent = false;
-  if (jsonString) {
-    try {
-      [noEvent, targetScreen, windowedMode] = JSON.parse(jsonString);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-  console.log('moveMediaWindow', targetScreen, windowedMode);
-  const allScreens = getAllScreens();
-  const otherScreens = allScreens.filter((screen) => !screen.mainWindow);
-  const mainWindow = getMainWindow();
-  const mediaWindow = getMediaWindow();
-  if (!mediaWindow || !mainWindow) return;
-  if (targetScreen === undefined || windowedMode === undefined) {
-    try {
-      const screenPreferences = JSON.parse(
-        window.localStorage
-          .getItem('screenPreferences')
-          ?.replace('__q_objt|', '') ?? '{}', // This is a hack, we need to replace the string __q_objt| with an empty string due to Quasar's implementation of LocalStorage
-      ) as ScreenPreferences;
-      console.log('screenPreferences from LocalStorage', screenPreferences);
-      targetScreen = screenPreferences.preferredScreenNumber;
-      windowedMode = screenPreferences.preferWindowed;
-    } catch (err) {
-      console.error(err);
-    }
-  }
-  if (otherScreens.length > 0) {
-    console.log('otherScreens.length > 0', otherScreens.length);
-    if (windowedMode === undefined) windowedMode = !mediaWindow.isFullScreen();
-    if (targetScreen === undefined) {
-      targetScreen = allScreens.findIndex((s) => !s.mainWindow);
-      if (otherScreens.length > 1) {
-        const currentMediaScreenNumber = getWindowScreen(mediaWindow);
-        targetScreen =
-          getWindowScreen(mainWindow) === currentMediaScreenNumber
-            ? 0
-            : currentMediaScreenNumber;
+const moveMediaWindow = (
+  targetScreenNumber = 0,
+  windowedMode = false,
+  noEvent = false,
+) => {
+  try {
+    const allScreens = getAllScreens();
+    const otherScreens = allScreens.filter((screen) => !screen.mainWindow);
+    const mainWindow = getMainWindow();
+    const mediaWindow = getMediaWindow();
+    if (!mediaWindow || !mainWindow) return;
+    if (targetScreenNumber === undefined || windowedMode === undefined) {
+      try {
+        const screenPreferences = JSON.parse(
+          window.localStorage
+            .getItem('screenPreferences')
+            ?.replace('__q_objt|', '') ?? '{}', // This is a hack, we need to replace the string __q_objt| with an empty string due to Quasar's implementation of LocalStorage
+        ) as ScreenPreferences;
+        targetScreenNumber = screenPreferences.preferredScreenNumber;
+        windowedMode = screenPreferences.preferWindowed;
+      } catch (err) {
+        console.error(err);
       }
     }
-  } else {
-    targetScreen = 0;
-    windowedMode = true;
+    if (otherScreens.length > 0) {
+      if (windowedMode === undefined)
+        windowedMode = !mediaWindow.isFullScreen();
+      if (targetScreenNumber === undefined) {
+        targetScreenNumber = allScreens.findIndex((s) => !s.mainWindow);
+        if (otherScreens.length > 1) {
+          const currentMediaScreenNumber = getWindowScreen(mediaWindow);
+          targetScreenNumber =
+            getWindowScreen(mainWindow) === currentMediaScreenNumber
+              ? 0
+              : currentMediaScreenNumber;
+        }
+      }
+    } else {
+      targetScreenNumber = 0;
+      windowedMode = true;
+    }
+    setWindowPosition(mediaWindow, targetScreenNumber, windowedMode, noEvent);
+  } catch (err) {
+    console.error(err);
   }
-  setWindowPosition(mediaWindow, targetScreen, windowedMode, noEvent);
 };
 
 const moveMediaWindowDebounced = debounce(moveMediaWindow, 100);
@@ -325,6 +303,11 @@ contextBridge.exposeInMainWorld('electronApi', {
     });
   },
   path,
+  pathToFileURL: (path: string) => {
+    const url: typeof import('url') = require('node:url');
+    console.log('pathToFileURL', path, url.pathToFileURL(path).href);
+    return url.pathToFileURL(path).href;
+  },
   registerShortcut,
   setAutoStartAtLogin: (value: boolean) => {
     app.setLoginItemSettings({

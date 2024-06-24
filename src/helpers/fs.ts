@@ -8,7 +8,7 @@ import { useCurrentStateStore } from 'src/stores/current-state';
 import { PublicationFetcher } from 'src/types/publications';
 import { MultimediaItem } from 'src/types/sqlite';
 
-const { fs, getUserDataPath, klawSync, path } = electronApi;
+const { fs, getUserDataPath, klawSync, path, pathToFileURL } = electronApi;
 
 const getPublicationsPath = () => path.join(getUserDataPath(), 'Publications');
 
@@ -52,7 +52,7 @@ const getPublicationDirectoryContents = (
 
 const getFileUrl = (path: string) => {
   if (!path || !fs.existsSync(path)) return '';
-  return new URL(path).href;
+  return pathToFileURL(path);
 };
 
 const getDurationFromMediaPath: (mediaPath: string) => Promise<number> = (
@@ -185,7 +185,6 @@ const getSubtitlesUrl = async (
     };
     const { duration, subtitles } = await getJwMediaInfo(subtitleFetcher);
     if (!subtitles) return '';
-    console.log('DURATION DEBUG', duration, comparisonDuration);
     if (duration && Math.abs(duration - comparisonDuration) > 10) return '';
     const subtitlesFilename = path.basename(subtitles);
     const subDirectory = getPublicationDirectory(subtitleFetcher);
