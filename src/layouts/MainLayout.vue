@@ -3,8 +3,8 @@
     <q-header bordered class="bg-primary text-white">
       <q-toolbar class="q-pl-none">
         <q-toolbar-title>
-          <q-avatar class="q-px-sm q-mr-md">
-            <img src="src/assets/master-icon.png" />
+          <q-avatar class="q-px-sm q-mr-md" rounded>
+            <img src="icon.png" />
           </q-avatar>
           {{ $t(route.meta.title as string) }}
         </q-toolbar-title>
