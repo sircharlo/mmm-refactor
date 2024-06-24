@@ -19,6 +19,10 @@ import packageInfo from '../../package.json';
 // }
 
 export default boot(({ app, router }) => {
+  // app.config.errorHandler = (err, info) => {
+  //   alert(info)
+  // }
+
   Sentry.init({
     app,
     // beforeSend: function (event, hint) {

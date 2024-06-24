@@ -144,12 +144,12 @@ module.exports = configure(function (/* ctx */) {
         generateUpdatesFilesForAllChannels: true,
         linux: {
           category: 'Utility',
-          icon: 'icon.png',
+          icon: 'icons/icon.png',
           publish: ['github'],
           target: 'AppImage',
         },
         mac: {
-          icon: 'icon.icns',
+          icon: 'icons/icon.icns',
           publish: ['github'],
           target: {
             arch: ['universal'],
@@ -162,7 +162,7 @@ module.exports = configure(function (/* ctx */) {
         },
         productName: 'Meeting Media Manager',
         win: {
-          icon: 'icon.ico',
+          icon: 'icons/icon.ico',
           publish: ['github'],
           target: [
             {
