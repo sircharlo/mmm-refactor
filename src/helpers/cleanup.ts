@@ -13,7 +13,7 @@ const cleanLocalStorage = () => {
     for (const storageElementName of [
       'additionalMediaMaps',
       'customDurations',
-      'dynamicMedia',
+      // 'dynamicMedia',
       'mediaSort',
     ]) {
       const storageElement = LocalStorage.getItem(storageElementName);

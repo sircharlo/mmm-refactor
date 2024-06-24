@@ -2,9 +2,10 @@ import axios from 'axios';
 import { Buffer } from 'buffer';
 import PQueue from 'p-queue';
 import { storeToRefs } from 'pinia';
-import { LocalStorage, date } from 'quasar';
+import { date } from 'quasar';
 import sanitize from 'sanitize-filename';
 import { get, urlWithParamsToString } from 'src/boot/axios';
+import { queues } from 'src/boot/globals';
 import mepslangs from 'src/defaults/mepslangs';
 import {
   dateFromString,
@@ -31,7 +32,7 @@ import {
   isVideo,
 } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
-import { MAX_SONGS } from 'src/stores/jw';
+import { MAX_SONGS, useJwStore } from 'src/stores/jw';
 import {
   DownloadedFile,
   DynamicMediaObject,
@@ -55,7 +56,6 @@ import {
   TableItem,
   VideoMarker,
 } from 'src/types/sqlite';
-import { useRoute } from 'vue-router';
 
 const { executeQuery, fs, klawSync, path } = electronApi;
 const FEB_2023 = 20230200;
@@ -64,37 +64,49 @@ const FOOTNOTE_TAR_PAR = 9999;
 const downloadFileIfNeeded = async ({
   dir,
   filename,
+  lowPriority = false,
   size,
   url,
-}: FileDownloader) => {
+}: FileDownloader): Promise<DownloadedFile> => {
   if (!url)
     return {
       new: false,
       path: '',
     };
-  fs.ensureDirSync(dir);
-  if (!filename) filename = path.basename(url);
-  filename = sanitize(filename);
-  const destinationPath = path.join(dir, filename);
-  const remoteSize: number =
-    size ||
-    (await axios({ method: 'HEAD', url }).then(
-      (response) => +response.headers['content-length'] || 0,
-    ));
-  if (fs.existsSync(destinationPath)) {
-    const stat = fs.statSync(destinationPath);
-    const localSize = stat.size;
-    if (localSize === remoteSize) {
-      return {
-        new: false,
-        path: destinationPath,
-      };
-    }
-  }
-  const { downloads } = storeToRefs(useCurrentStateStore());
-  if (!downloads.value[url])
-    downloads.value[url] = downloadFile({ dir, filename, size, url });
-  return downloads.value[url];
+  const { currentCongregation } = storeToRefs(useCurrentStateStore());
+  if (!queues.downloads[currentCongregation.value])
+    queues.downloads[currentCongregation.value] = new PQueue({
+      concurrency: 5,
+    });
+  const queue = queues.downloads[currentCongregation.value];
+  return queue.add(
+    async () => {
+      fs.ensureDirSync(dir);
+      if (!filename) filename = path.basename(url);
+      filename = sanitize(filename);
+      const destinationPath = path.join(dir, filename);
+      const remoteSize: number =
+        size ||
+        (await axios({ method: 'HEAD', url }).then(
+          (response) => +response.headers['content-length'] || 0,
+        ));
+      if (fs.existsSync(destinationPath)) {
+        const stat = fs.statSync(destinationPath);
+        const localSize = stat.size;
+        if (localSize === remoteSize) {
+          return {
+            new: false,
+            path: destinationPath,
+          };
+        }
+      }
+      const { downloadedFiles } = storeToRefs(useCurrentStateStore());
+      if (!downloadedFiles.value[url])
+        downloadedFiles.value[url] = downloadFile({ dir, filename, size, url });
+      return downloadedFiles.value[url];
+    },
+    { priority: lowPriority ? 10 : 100 },
+  ) as Promise<DownloadedFile>;
 };
 
 const downloadFile = async ({ dir, filename, url }: FileDownloader) => {
@@ -144,33 +156,32 @@ const downloadFile = async ({ dir, filename, url }: FileDownloader) => {
   };
 };
 const fetchMedia = async () => {
-  const fetchErrors = {} as Record<string, boolean>;
   try {
-    const { currentCongregation, lookupPeriod } = storeToRefs(
-      useCurrentStateStore(),
-    );
-    const meetingDays = lookupPeriod.value.filter((day) => day.meeting);
-    meetingDays.forEach((day) => {
+    const { currentCongregation } = storeToRefs(useCurrentStateStore());
+    if (!currentCongregation.value) return;
+    const { lookupPeriod } = storeToRefs(useJwStore());
+    const meetingsToFetch = lookupPeriod.value[
+      currentCongregation.value
+    ]?.filter((day) => day.meeting && !day.complete);
+    if (meetingsToFetch.length === 0) return;
+    meetingsToFetch.forEach((day) => {
       day.loading = true;
     });
-    const queue = new PQueue({ concurrency: 3 });
-    for (const day of meetingDays) {
+    if (!queues.meetings[currentCongregation.value])
+      queues.meetings[currentCongregation.value] = new PQueue({
+        concurrency: 2,
+      });
+    const queue = queues.meetings[currentCongregation.value];
+    for (const day of meetingsToFetch) {
       try {
-        const route = useRoute();
         queue.add(async () => {
-          if (
-            !currentCongregation.value ||
-            !['/media-calendar', '/setup-wizard'].includes(route.fullPath)
-          )
-            return;
           const dayDate = day.date;
-          console.log(dayDate);
           if (!dayDate) {
-            fetchErrors[date.formatDate(day.date, 'YYYY/MM/DD')] = true;
             day.loading = false;
+            day.complete = false;
+            day.error = true;
             return;
           }
-          // day.loading = true;
           let fetchResult = null;
           if (day.meeting === 'we') {
             fetchResult = await getWeMedia(dayDate);
@@ -179,23 +190,22 @@ const fetchMedia = async () => {
           }
           if (fetchResult) {
             day.dynamicMedia = fetchResult.media;
-            if (fetchResult.error)
-              fetchErrors[date.formatDate(dayDate, 'YYYY/MM/DD')] =
-                fetchResult.error;
+            day.error = fetchResult.error;
+            day.complete = !fetchResult.error;
           }
           day.loading = false;
         });
       } catch (error) {
         console.error(error);
-        fetchErrors[date.formatDate(day.date, 'YYYY/MM/DD')] = true;
         day.loading = false;
+        day.complete = false;
+        day.error = true;
       }
     }
     await queue.onIdle();
   } catch (error) {
     console.error(error);
   }
-  return fetchErrors;
 };
 
 const getDbFromJWPUB = async (publication: PublicationFetcher) => {
@@ -622,9 +632,10 @@ const dynamicMediaMapper = async (
 
 const getWeMedia = async (lookupDate: Date) => {
   const currentState = useCurrentStateStore();
-  const { currentCongregation, currentSongbook } = storeToRefs(currentState);
+  const { currentSongbook } = storeToRefs(currentState);
   const { getSettingValue } = currentState;
-  lookupDate = dateFromString(lookupDate.toISOString());
+  console.log('getWeMedia', lookupDate);
+  lookupDate = dateFromString(lookupDate);
   try {
     const monday = getSpecificWeekday(lookupDate, 0);
 
@@ -814,20 +825,20 @@ const getWeMedia = async (lookupDate: Date) => {
 
     const dynamicMediaForDay = await dynamicMediaMapper(allMedia, lookupDate);
 
-    const dynamicMedia: Record<
-      string,
-      Record<string, DynamicMediaObject[]>
-    > = LocalStorage.getItem('dynamicMedia') || {};
-    if (!dynamicMedia[currentCongregation.value])
-      dynamicMedia[currentCongregation.value] = {} as Record<
-        string,
-        DynamicMediaObject[]
-      >;
+    // const dynamicMedia: Record<
+    //   string,
+    //   Record<string, DynamicMediaObject[]>
+    // > = LocalStorage.getItem('dynamicMedia') || {};
+    // if (!dynamicMedia[currentCongregation.value])
+    //   dynamicMedia[currentCongregation.value] = {} as Record<
+    //     string,
+    //     DynamicMediaObject[]
+    //   >;
 
-    dynamicMedia[currentCongregation.value][
-      date.formatDate(lookupDate, 'YYYYMMDD')
-    ] = dynamicMediaForDay;
-    LocalStorage.set('dynamicMedia', dynamicMedia);
+    // dynamicMedia[currentCongregation.value][
+    //   date.formatDate(lookupDate, 'YYYYMMDD')
+    // ] = dynamicMediaForDay;
+    // LocalStorage.set('dynamicMedia', dynamicMedia);
 
     return {
       error: false,
@@ -835,17 +846,18 @@ const getWeMedia = async (lookupDate: Date) => {
     };
   } catch (e) {
     console.error('getWeMedia', e);
-    const dynamicMedia: Record<
-      string,
-      Record<string, DynamicMediaObject[]>
-    > = LocalStorage.getItem('dynamicMedia') || {};
-    const returnVal =
-      dynamicMedia[currentCongregation.value]?.[
-        date.formatDate(lookupDate, 'YYYYMMDD')
-      ] ?? [];
+    // const dynamicMedia: Record<
+    //   string,
+    //   Record<string, DynamicMediaObject[]>
+    // > = LocalStorage.getItem('dynamicMedia') || {};
+    // const returnVal =
+    //   dynamicMedia[currentCongregation.value]?.[
+    //     date.formatDate(lookupDate, 'YYYYMMDD')
+    //   ] ?? [];
     return {
       error: true,
-      media: returnVal,
+      media: [],
+      // media: returnVal,
     };
   }
 };
@@ -861,8 +873,8 @@ function sanitizeId(id: string) {
 const getMwMedia = async (lookupDate: Date) => {
   const currentState = useCurrentStateStore();
   const { getSettingValue } = currentState;
-  const { currentCongregation, currentSongbook } = storeToRefs(currentState);
-  lookupDate = dateFromString(lookupDate.toISOString());
+  const { currentSongbook } = storeToRefs(currentState);
+  lookupDate = dateFromString(lookupDate);
   try {
     // if not monday, get the previous monday
     const monday = getSpecificWeekday(lookupDate, 0);
@@ -940,36 +952,37 @@ const getMwMedia = async (lookupDate: Date) => {
 
     const dynamicMediaForDay = await dynamicMediaMapper(allMedia, lookupDate);
 
-    const dynamicMedia: Record<
-      string,
-      Record<string, DynamicMediaObject[]>
-    > = LocalStorage.getItem('dynamicMedia') || {};
-    if (!dynamicMedia[currentCongregation.value])
-      dynamicMedia[currentCongregation.value] = {} as Record<
-        string,
-        DynamicMediaObject[]
-      >;
+    // const dynamicMedia: Record<
+    //   string,
+    //   Record<string, DynamicMediaObject[]>
+    // > = LocalStorage.getItem('dynamicMedia') || {};
+    // if (!dynamicMedia[currentCongregation.value])
+    //   dynamicMedia[currentCongregation.value] = {} as Record<
+    //     string,
+    //     DynamicMediaObject[]
+    //   >;
 
-    dynamicMedia[currentCongregation.value][
-      date.formatDate(lookupDate, 'YYYYMMDD')
-    ] = dynamicMediaForDay;
+    // dynamicMedia[currentCongregation.value][
+    //   date.formatDate(lookupDate, 'YYYYMMDD')
+    // ] = dynamicMediaForDay;
 
-    LocalStorage.set('dynamicMedia', dynamicMedia);
+    // LocalStorage.set('dynamicMedia', dynamicMedia);
     return {
       error: false,
       media: dynamicMediaForDay,
     };
   } catch (e) {
     console.error('getMwMedia', e);
-    const dynamicMedia: Record<
-      string,
-      Record<string, DynamicMediaObject[]>
-    > = LocalStorage.getItem('dynamicMedia') || {};
-    const returnVal =
-      dynamicMedia[currentCongregation.value]?.[
-        date.formatDate(lookupDate, 'YYYYMMDD')
-      ] ?? [];
-    return { error: true, media: returnVal };
+    // const dynamicMedia: Record<
+    //   string,
+    //   Record<string, DynamicMediaObject[]>
+    // > = LocalStorage.getItem('dynamicMedia') || {};
+    // const returnVal =
+    //   dynamicMedia[currentCongregation.value]?.[
+    //     date.formatDate(lookupDate, 'YYYYMMDD')
+    //   ] ?? [];
+    return { error: true, media: [] };
+    // return { error: true, media: returnVal };
   }
 };
 
@@ -1274,7 +1287,14 @@ const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
       if (bestItem) filteredMediaItemLinks.push(bestItem);
     }
   }
-  addToDownloadsWithLimit(filteredMediaItemLinks, dir);
+  for (const mediaLink of mediaLinks) {
+    downloadFileIfNeeded({
+      dir,
+      lowPriority: true,
+      size: mediaLink.filesize,
+      url: mediaLink.file.url,
+    });
+  }
 };
 
 const downloadBackgroundMusic = () => {
@@ -1296,19 +1316,6 @@ const downloadBackgroundMusic = () => {
     pub: currentSongbook.value.pub,
   });
 };
-
-async function addToDownloadsWithLimit(mediaLinks: MediaLink[], dir: string) {
-  const queue = new PQueue({ concurrency: 3 });
-  for (const mediaLink of mediaLinks) {
-    queue.add(() =>
-      downloadFileIfNeeded({
-        dir,
-        size: mediaLink.filesize,
-        url: mediaLink.file.url,
-      }),
-    );
-  }
-}
 
 const downloadJwpub = async (
   publication: PublicationFetcher,

@@ -123,26 +123,25 @@ export const useCurrentStateStore = defineStore('current-state', {
       return state.mediaPlayer.url !== '';
     },
     selectedDateObject(state) {
-      if (state.lookupPeriod.length === 0) return {} as DateInfo;
-      return (
-        state.lookupPeriod.find(
-          (day) => date.getDateDiff(day.date, state.selectedDate, 'days') === 0,
-        ) || state.lookupPeriod[0]
-      );
+      const jwStore = useJwStore();
+      const { lookupPeriod } = storeToRefs(jwStore);
+      if (!lookupPeriod.value[state.currentCongregation]?.length)
+        return {} as DateInfo;
+      return (lookupPeriod.value[state.currentCongregation].find(
+        (day) => date.getDateDiff(day.date, state.selectedDate, 'days') === 0,
+      ) || lookupPeriod.value[0]) as DateInfo;
     },
   },
-
   state: () => {
     return {
       currentCongregation: '' as string,
       downloadProgress: {} as DownloadProgressItems,
-      downloads: {} as {
+      downloadedFiles: {} as {
         [key: string]: DownloadedFile | Promise<DownloadedFile>;
       },
       extractedFiles: {} as {
         [key: string]: Promise<string>;
       },
-      lookupPeriod: [] as DateInfo[],
       mediaPlayer: {
         action: '',
         // duration: 0,

@@ -4,6 +4,7 @@ import { LocalStorage } from 'quasar';
 import { date } from 'quasar';
 import { findBestResolution, getPubMediaLinks } from 'src/helpers/jw-media';
 import { useCurrentStateStore } from 'src/stores/current-state';
+import { DateInfo } from 'src/types/dates';
 import { jwLanguage } from 'src/types/languages';
 import { DynamicMediaObject } from 'src/types/media';
 import { MediaLink, PublicationFetcher } from 'src/types/publications';
@@ -203,6 +204,10 @@ export const useJwStore = defineStore('jw-store', {
           updated: Date;
         };
       },
+      lookupPeriod: (LocalStorage.getItem('lookupPeriod') || {}) as Record<
+        string,
+        DateInfo[]
+      >,
       mediaSort: (LocalStorage.getItem('mediaSort') || {}) as {
         [key: string]: {
           [key: string]: string[];

@@ -37,6 +37,7 @@ export interface DownloadProgressItems {
 export interface FileDownloader {
   dir: string;
   filename?: string;
+  lowPriority?: boolean;
   notify?: boolean;
   size?: number;
   url: string;

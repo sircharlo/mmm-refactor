@@ -67,7 +67,7 @@
 <script setup lang="ts">
 import { OBSWebSocketError } from 'obs-websocket-js';
 import { storeToRefs } from 'pinia';
-import { obsWebSocket } from 'src/boot/obs';
+import { obsWebSocket } from 'src/boot/globals';
 import { isImage } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useObsStateStore } from 'src/stores/obs-state';

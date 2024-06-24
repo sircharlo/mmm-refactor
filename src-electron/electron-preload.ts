@@ -305,7 +305,6 @@ contextBridge.exposeInMainWorld('electronApi', {
   path,
   pathToFileURL: (path: string) => {
     const url: typeof import('url') = require('node:url');
-    console.log('pathToFileURL', path, url.pathToFileURL(path).href);
     return url.pathToFileURL(path).href;
   },
   registerShortcut,

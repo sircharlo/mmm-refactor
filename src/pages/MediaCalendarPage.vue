@@ -684,14 +684,13 @@ const { currentScene, obsConnectionState } = storeToRefs(obsState);
 const jwStore = useJwStore();
 const { addToAdditionMediaMap, removeFromAdditionMediaMap, updateJwSongs } =
   jwStore;
-const { additionalMediaMaps, customDurations, mediaSort } =
+const { additionalMediaMaps, customDurations, lookupPeriod, mediaSort } =
   storeToRefs(jwStore);
 const currentState = useCurrentStateStore();
 const {
   currentCongregation,
   currentSettings,
   getDatedAdditionalMediaDirectory,
-  lookupPeriod,
   mediaPaused,
   mediaPlayer,
   mediaPlaying,
@@ -792,9 +791,9 @@ const mapOrder =
 
 // todo: watch length instead? less heavy?
 const mediaItems = computed(() => {
-  return datedAdditionalMediaMap.value
-    .concat(selectedDateObject.value?.dynamicMedia)
-    .filter((mediaItem) => mediaItem?.fileUrl) as DynamicMediaObject[];
+  return datedAdditionalMediaMap.value.concat(
+    selectedDateObject.value?.dynamicMedia,
+  );
 });
 
 watch(mediaItems, (newValue) => {
@@ -818,7 +817,6 @@ watch(
       newVal[currentCongregation.value][selectedDate.value] =
         datedAdditionalMediaMap.value
           .concat(selectedDateObject.value?.dynamicMedia)
-          .filter((mediaItem) => mediaItem?.fileUrl)
           .map((item: DynamicMediaObject) => item.uniqueId);
     }
     sortableMediaItems.value.sort(
@@ -873,23 +871,24 @@ watch(
   },
 );
 
-const fetchMediaFromCalendar = async () => {
-  const fetchResult = await fetchMedia();
-  if (Object.keys(fetchResult).length > 0) {
-    for (const [date, error] of Object.entries(fetchResult)) {
-      if (error) {
-        createTemporaryNotification({
-          caption: !currentSettings.value?.langFallback
-            ? t('tryConfiguringFallbackLanguage')
-            : '',
-          message: date + ' | ' + t('errorDownloadingMeetingMedia'),
-          timeout: 10000,
-          type: 'negative',
-        });
-      }
+watch(
+  lookupPeriod.value[currentCongregation.value]
+    ?.filter((d) => d.error)
+    .map((d) => date.formatDate(d.date, 'YYYY/MM/DD')),
+  (newVal) => {
+    console.log('RECALCULATING ERRORS', newVal);
+    for (const date of newVal) {
+      createTemporaryNotification({
+        caption: !currentSettings.value?.langFallback
+          ? t('tryConfiguringFallbackLanguage')
+          : '',
+        message: date + ' | ' + t('errorDownloadingMeetingMedia'),
+        timeout: 10000,
+        type: 'negative',
+      });
     }
-  }
-};
+  },
+);
 
 onMounted(async () => {
   window.addEventListener('localFiles-browsed', localFilesBrowsedListener);
@@ -902,14 +901,16 @@ onMounted(async () => {
     durations[newVal] ||= {};
   });
 
-  selectedDate.value = date.formatDate(
-    lookupPeriod.value
-      .filter((day: { meeting: boolean | string }) => day.meeting)
-      .map((day) => day.date)[0],
-    'YYYY/MM/DD',
-  );
+  if (lookupPeriod.value && currentCongregation.value) {
+    selectedDate.value = date.formatDate(
+      lookupPeriod.value[currentCongregation.value]
+        ?.filter((day: { meeting: boolean | string }) => day.meeting)
+        .map((day) => day.date)[0],
+      'YYYY/MM/DD',
+    );
+  }
   sendObsSceneEvent('camera');
-  fetchMediaFromCalendar();
+  fetchMedia();
 });
 
 function inferExtension(filename: string, filetype?: string) {

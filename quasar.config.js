@@ -23,8 +23,6 @@ module.exports = configure(function (/* ctx */) {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
 
-    // app boot file (/src/boot)
-    // --> boot files are part of "main.js"
     // https://v2.quasar.dev/options/animations
     animations: ['fadeIn', 'fadeOut'],
 
@@ -37,7 +35,7 @@ module.exports = configure(function (/* ctx */) {
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ['sentry', 'i18n', 'axios', 'obs'],
+    boot: ['sentry', 'i18n', 'axios', 'globals'],
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {

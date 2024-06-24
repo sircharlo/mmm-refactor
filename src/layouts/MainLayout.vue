@@ -95,12 +95,12 @@
             }}</q-tooltip>
             <q-popup-proxy breakpoint="1000" v-model="datePickerActive">
               <q-date
+                :event-color="getEventDayColor"
                 :events="getEventDates()"
                 :navigation-max-year-month="maxDate()"
                 :navigation-min-year-month="minDate()"
                 :options="dateOptions"
                 class="non-selectable"
-                event-color="primary"
                 landscape
                 v-model="selectedDate"
               >
@@ -361,7 +361,7 @@ import {
   cleanAdditionalMediaFolder,
   cleanLocalStorage,
 } from 'src/helpers/cleanup';
-import { getLookupPeriod } from 'src/helpers/date';
+import { updateLookupPeriod } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import {
   downloadAdditionalRemoteVideo,
@@ -402,7 +402,6 @@ const {
   currentCongregation,
   currentSettings,
   downloadProgress,
-  lookupPeriod,
   mediaPlaying,
   onlyShowInvalid,
   selectedDate,
@@ -415,6 +414,7 @@ congregationSettings.$subscribe((_, state) => {
 
 const jwStore = useJwStore();
 const { resetSort, updateJwLanguages } = jwStore;
+const { lookupPeriod } = storeToRefs(jwStore);
 jwStore.$subscribe((_, state) => {
   LocalStorage.set('jwLanguages', state.jwLanguages);
   LocalStorage.set('jwSongs', state.jwSongs);
@@ -422,6 +422,7 @@ jwStore.$subscribe((_, state) => {
   LocalStorage.set('mediaSort', state.mediaSort);
   LocalStorage.set('customDurations', state.customDurations);
   LocalStorage.set('additionalMediaMaps', state.additionalMediaMaps);
+  LocalStorage.set('lookupPeriod', state.lookupPeriod);
 });
 
 // Ref and reactive initializations
@@ -445,7 +446,7 @@ watch(currentCongregation, (newCongregation) => {
     }
   } else {
     downloadProgress.value = {};
-    lookupPeriod.value = getLookupPeriod();
+    updateLookupPeriod();
     registerAllCustomShortcuts();
     downloadBackgroundMusic();
   }
@@ -493,7 +494,7 @@ watch(
     currentSettings.value?.weDay,
   ],
   () => {
-    lookupPeriod.value = getLookupPeriod();
+    updateLookupPeriod();
   },
 );
 
@@ -515,9 +516,11 @@ watch(
   },
 );
 
-
 const dateOptions = (lookupDate: string) => {
-  const dateArray: Date[] = lookupPeriod.value.map((day) => day.date);
+  if (!lookupPeriod.value || !lookupPeriod.value) return true;
+  const dateArray: Date[] = lookupPeriod.value[currentCongregation.value]?.map(
+    (day) => day.date,
+  );
   // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
   const minDate = date.getMinDate(...dateArray);
   // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
@@ -529,22 +532,29 @@ const dateOptions = (lookupDate: string) => {
 };
 
 const minDate = () => {
-  const dateArray: Date[] = lookupPeriod.value.map((day) => day.date);
+  if (!lookupPeriod.value || !currentCongregation.value) return undefined;
+  const dateArray: Date[] = lookupPeriod.value[currentCongregation.value]?.map(
+    (day) => day.date,
+  );
   // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
   const minDate = date.getMinDate(...dateArray);
   return date.formatDate(minDate, 'YYYY/MM');
 };
 
 const maxDate = () => {
-  const dateArray: Date[] = lookupPeriod.value.map((day) => day.date);
+  if (!lookupPeriod.value || !currentCongregation.value) return undefined;
+  const dateArray: Date[] = lookupPeriod.value[currentCongregation.value]?.map(
+    (day) => day.date,
+  );
   // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
   const maxDate = date.getMaxDate(...dateArray);
   return date.formatDate(maxDate, 'YYYY/MM');
 };
 
 const getEventDates = () => {
-  return lookupPeriod.value
-    .filter((day) => day.meeting)
+  if (!lookupPeriod.value || !currentCongregation.value) return [];
+  return lookupPeriod.value[currentCongregation.value]
+    ?.filter((day) => day.meeting)
     .map((day) => date.formatDate(day.date, 'YYYY/MM/DD'));
 };
 
@@ -669,6 +679,16 @@ const remoteVideosFiltered = computed(() => {
     );
   return useableVideos.value.slice(0, 50);
 });
+
+const getEventDayColor = (eventDate: string) => {
+  if(!lookupPeriod.value || !currentCongregation.value) return 'primary';
+  const isLoaded =
+    lookupPeriod.value[currentCongregation.value]?.find(
+      (d) => date.getDateDiff(eventDate, d.date, 'days') === 0,
+    )?.loading === false;
+  if (!isLoaded) return 'warning';
+  return 'primary';
+};
 
 onMounted(() => {
   document.title = 'Meeting Media Manager';

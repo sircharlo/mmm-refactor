@@ -1,11 +1,9 @@
 import { storeToRefs } from 'pinia';
 import { date } from 'quasar';
 import { useCurrentStateStore } from 'src/stores/current-state';
+import { useJwStore } from 'src/stores/jw';
 import { DateInfo } from 'src/types/dates';
 import { DynamicMediaObject } from 'src/types/media';
-// const currentState = useCurrentStateStore();
-// const { getSettingValue } = currentState
-// const { selectedDateObject } = storeToRefs(currentState);
 
 const daysInFuture = 35;
 
@@ -113,15 +111,23 @@ const isWeMeetingDay = (lookupDate: Date) => {
   return getSettingValue('weDay') == getWeekDay(lookupDate);
 };
 
-// function isMeetingDay(lookupDate: Date) {
-//   const mwMeetingDay = isMwMeetingDay(lookupDate);
-//   const weMeetingDay = isWeMeetingDay(lookupDate);
-//   return mwMeetingDay || weMeetingDay;
-// }
-
-function getLookupPeriod() {
-  return Array.from({ length: daysInFuture }, (_, i) => {
-    const dayDate = date.addToDate(new Date(), { days: i });
+function updateLookupPeriod() {
+  const currentState = useCurrentStateStore();
+  const { currentCongregation } = storeToRefs(currentState);
+  const jwStore = useJwStore();
+  const { lookupPeriod } = storeToRefs(jwStore);
+  if (!lookupPeriod.value[currentCongregation.value]?.length)
+    lookupPeriod.value[currentCongregation.value] = [];
+  lookupPeriod.value[currentCongregation.value] = lookupPeriod.value[
+    currentCongregation.value
+  ]?.filter((day) => {
+    return !isInPast(day.date);
+  });
+  const futureDates = Array.from({ length: daysInFuture }, (_, i) => {
+    const dayDate = date.addToDate(
+      date.buildDate({ hour: 0, milliseconds: 0, minute: 0, second: 0 }),
+      { day: i },
+    );
     return {
       date: dayDate as Date,
       dynamicMedia: [] as DynamicMediaObject[],
@@ -131,19 +137,30 @@ function getLookupPeriod() {
         : isWeMeetingDay(dayDate)
           ? 'we'
           : false,
-      today: datesAreSame(dayDate, new Date()),
     };
   }) as DateInfo[];
+  lookupPeriod.value[currentCongregation.value].push(
+    ...futureDates.filter(
+      (day) =>
+        !lookupPeriod.value[currentCongregation.value]
+          ?.map((d) => date.formatDate(d.date, 'YYYY/MM/DD'))
+          .includes(date.formatDate(day.date, 'YYYY/MM/DD')),
+    ),
+  );
+  const todayDate = lookupPeriod.value[currentCongregation.value]?.find((d) =>
+    datesAreSame(new Date(d.date), new Date()),
+  );
+  if (todayDate) todayDate.today = true;
 }
 
 export {
   dateFromString,
   datesAreSame,
   daysInFuture,
-  getLookupPeriod,
   getSpecificWeekday,
   getWeekDay,
   isCoWeek,
   isInPast,
   isMwMeetingDay,
+  updateLookupPeriod,
 };
