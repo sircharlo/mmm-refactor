@@ -153,15 +153,11 @@ const setWindowPosition = (
     );
 };
 
-const moveMediaWindow = ({
-  noEvent,
-  targetScreen,
-  windowedMode,
-}: {
-  noEvent?: boolean;
-  targetScreen?: number;
-  windowedMode?: boolean;
-}) => {
+const moveMediaWindow = (
+  noEvent?: boolean,
+  targetScreen?: number,
+  windowedMode?: boolean,
+) => {
   console.log('moveMediaWindow', targetScreen, windowedMode);
   const allScreens = getAllScreens();
   const otherScreens = allScreens.filter((screen) => !screen.mainWindow);
@@ -215,15 +211,15 @@ screen.removeAllListeners('display-added');
 screen.removeAllListeners('display-removed');
 
 screen.on('display-metrics-changed', () => {
-  moveMediaWindow({});
+  moveMediaWindow();
 });
 
 screen.on('display-added', () => {
-  moveMediaWindow({});
+  moveMediaWindow();
 });
 
 screen.on('display-removed', () => {
-  moveMediaWindow({});
+  moveMediaWindow();
 });
 
 const isWritable = (filePath: fs.PathLike) => {
@@ -248,7 +244,7 @@ const toggleMediaWindow = (action: string) => {
   const mediaWindow = getMediaWindow();
   if (!mediaWindow) return;
   if (action === 'show') {
-    moveMediaWindow({});
+    moveMediaWindow();
     if (!mediaWindow.isVisible()) {
       mediaWindow.show();
     }

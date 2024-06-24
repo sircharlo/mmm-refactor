@@ -139,7 +139,7 @@ defineProps<{
 
 const currentState = useCurrentStateStore();
 const { currentSettings, mediaPlayer } = storeToRefs(currentState);
-const mediaDisplayPopup = ref()
+const mediaDisplayPopup = ref();
 const appSettings = useAppSettingsStore();
 const { screenPreferences } = storeToRefs(appSettings);
 const screenList = ref(getAllScreens());
@@ -161,11 +161,11 @@ watch(
   () => screenPreferences.value,
   (newScreenPreferences) => {
     console.log('newScreenPreferences', newScreenPreferences);
-    moveMediaWindow({
-      noEvent: true,
-      targetScreen: newScreenPreferences.preferredScreenNumber,
-      windowedMode: newScreenPreferences.preferWindowed,
-    });
+    moveMediaWindow(
+      true,
+      newScreenPreferences.preferredScreenNumber,
+      newScreenPreferences.preferWindowed,
+    );
   },
   { deep: true, immediate: true },
 );
