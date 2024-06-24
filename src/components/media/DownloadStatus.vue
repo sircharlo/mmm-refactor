@@ -68,7 +68,7 @@
               )"
             >
               <q-item-label caption lines="1">
-                {{ basename(url as string) }}
+                {{ url && path.basename(url as string) }}
               </q-item-label>
               <q-space />
               <q-item-section avatar class="q-pr-none" style="align-items: end">
@@ -108,7 +108,6 @@ const { downloadProgress } = storeToRefs(currentState);
 
 // Setup component
 const { path } = electronApi;
-const basename = path.basename;
 
 // Method to filter downloads by status
 const filteredDownloads = (

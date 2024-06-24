@@ -8,9 +8,14 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 const { sentryVitePlugin } = require('@sentry/vite-plugin');
+const { sentryEsbuildPlugin } = require('@sentry/esbuild-plugin');
+// use mergeConfig helper to avoid overwriting the default config
+const { mergeConfig } = require('vite');
+
 const { configure } = require('quasar/wrappers');
 const path = require('path');
 // const inject  = require('@rollup/plugin-inject')
+const { version } = require('./package.json');
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -39,57 +44,38 @@ module.exports = configure(function (/* ctx */) {
         const nodePolyfillWebpackPlugin = require('node-polyfill-webpack-plugin');
         chain.plugin('node-polyfill').use(nodePolyfillWebpackPlugin);
       },
-
       extendViteConf(viteConf) {
-        if (!viteConf.optimizeDeps) viteConf.optimizeDeps = {};
+        // if (!viteConf.optimizeDeps) viteConf.optimizeDeps = {};
         // if (!viteConf.optimizeDeps.exclude) viteConf.optimizeDeps.exclude = [
         //   'pdfjs-dist',
         // ];
-        if (!viteConf.optimizeDeps.esbuildOptions)
-          viteConf.optimizeDeps.esbuildOptions = {};
-        if (!viteConf.optimizeDeps.esbuildOptions.define)
-          viteConf.optimizeDeps.esbuildOptions.define = {};
-        viteConf.optimizeDeps.esbuildOptions.define.global = 'window';
-        if (!viteConf.build) viteConf.build = {};
-        viteConf.build.sourcemap = true;
-        if (!viteConf.build.plugins) viteConf.build.plugins = [];
-        viteConf.build.plugins.push(
+        viteConf.optimizeDeps = mergeConfig(viteConf, {
+          esbuildOptions: {
+            define: {
+              global: 'window',
+            },
+          },
+        });
+
+        viteConf.build = mergeConfig(viteConf.build, {
+          sourcemap: true,
+        });
+        if (!viteConf.plugins) viteConf.plugins = [];
+        viteConf.plugins.push(
           sentryVitePlugin({
+            authToken: process.env.SENTRY_AUTH_TOKEN,
             org: 'jw-projects',
             project: 'mmm-v2',
+            release: {
+              name: version,
+            },
           }),
         );
       },
-
-      // vueRouterBase,
-      // vueDevtools,
-      // vueOptionsAPI: false,
-
-      // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
-
-      // publicPath: '/',
-      // analyze: true,
-      // env: {},
-      // rawDefine: {}
-      // ignorePublicFolder: true,
-      // minify: false,
-      // polyfillModulePreload: true,
-      // distDir
-
-      // extendViteConf(viteConf) {
-      //   // do something with viteConf... change it in-place
-      //   viteConf.resolve = {
-      //     alias: {
-      //       ...viteConf.resolve.alias, // that's important we want to keep the alias set by quasar team
-      //       fs: require.resolve('fs'),
-      //       // child_process: require.resolve('rollup-plugin-node-builtins'),
-      //     },
-      //   };
-      // },
       extendWebpack(cfg, {}) {
         cfg.externals = ['better-sqlite3'];
       },
-
+      sourcemap: true,
       target: {
         // browser: ['esnext', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
         browser: ['esnext'],
@@ -149,27 +135,19 @@ module.exports = configure(function (/* ctx */) {
       // https: true
       open: true, // opens browser window automatically
     },
-
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/configuring-electron
     electron: {
-      // extendElectronMainConf (esbuildConf)
-      // extendElectronPreloadConf (esbuildConf)
-
       builder: {
-        // https://www.electron.build/configuration/configuration
-
         appId: 'sircharlo.meeting-media-manager-v2',
         artifactName: 'meeting-media-manager-${version}.${ext}',
         buildDependenciesFromSource: true,
         generateUpdatesFilesForAllChannels: true,
         linux: {
           category: 'Utility',
-          icon: 'icons/',
+          icon: 'icons/icon.png',
           publish: ['github'],
           target: 'AppImage',
         },
-        // directories: {
-        //   output: 'build',
         mac: {
           icon: 'icons/icon.icns',
           publish: ['github'],
@@ -183,7 +161,6 @@ module.exports = configure(function (/* ctx */) {
           oneClick: false,
         },
         productName: 'Meeting Media Manager',
-        // },
         win: {
           icon: 'icons/icon.ico',
           publish: ['github'],
@@ -198,33 +175,41 @@ module.exports = configure(function (/* ctx */) {
 
       bundler: 'builder', // 'packager' or 'builder'
 
-      inspectPort: 5858,
-
-      packager: {
-        // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
-        // OS X / Mac App Store
-        // appBundleId: '',
-        // appCategoryType: '',
-        // osxSign: '',
-        // protocol: 'myapp://path',
-        // Windows only
-        // win32metadata: { ... }
+      extendElectronMainConf: (esbuildConf) => {
+        esbuildConf.sourcemap = true;
+        if (!esbuildConf.plugins) esbuildConf.plugins = [];
+        esbuildConf.plugins.push(
+          sentryEsbuildPlugin({
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            org: 'jw-projects',
+            project: 'mmm-v2',
+            release: {
+              name: version,
+            },
+          }),
+        );
       },
+
+      extendElectronPreloadConf: (esbuildConf) => {
+        esbuildConf.sourcemap = true;
+        if (!esbuildConf.plugins) esbuildConf.plugins = [];
+        esbuildConf.plugins.push(
+          sentryEsbuildPlugin({
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            org: 'jw-projects',
+            project: 'mmm-v2',
+            release: {
+              name: version,
+            },
+          }),
+        );
+      },
+      inspectPort: 5858,
+      packager: {},
     },
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
-    extras: [
-      'fontawesome-v6',
-      'material-icons', // optional, you are not bound to it
-      'mdi-v7',
-      // 'ionicons-v4',
-      // 'bootstrap-icons',
-      // 'eva-icons',
-      // 'themify',
-      // 'line-awesome',
-      // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
-      // 'roboto-font', // optional, you are not bound to it
-    ],
+    extras: ['fontawesome-v6', 'material-icons', 'mdi-v7'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {

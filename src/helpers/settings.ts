@@ -10,7 +10,6 @@ import { useObsStateStore } from 'src/stores/obs-state';
 const obsState = useObsStateStore();
 const { nonMediaScenes, nonStageScenes, scenes } = storeToRefs(obsState);
 
-import { obsConnect } from 'src/helpers/obs';
 import { localeOptions } from 'src/i18n';
 
 const requiredRule: ValidationRule = (val: string) =>
@@ -49,13 +48,13 @@ const getRules = (rules: string[] | undefined) => {
 };
 
 const getActions = (actions: string[] | undefined) => {
-  // const filteredActions = actions
   actions
     ?.map(async (action) => {
-      return action == 'obsConnect' ? await obsConnect(true) : undefined;
+      return action == 'obsConnect'
+        ? window.dispatchEvent(new CustomEvent('obsConnect'))
+        : undefined;
     })
     .filter(Boolean);
-  // return filteredActions && filteredActions.length > 0 ? filteredActions[0]() : undefined;
 };
 
 const meetingTime = (hr: number, min: null | number) => {

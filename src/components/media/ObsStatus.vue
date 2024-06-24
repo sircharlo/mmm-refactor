@@ -1,11 +1,5 @@
 <template>
-  <!-- @click="obsConnectionState === 'disconnected' && obsConnect()" -->
-  <q-btn
-    class="q-ml-sm"
-    flat
-    rounded
-    v-if="currentSettings.obsEnable"
-  >
+  <q-btn class="q-ml-sm" flat rounded v-if="currentSettings.obsEnable">
     <q-icon size="sm">
       <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
         <path
@@ -18,76 +12,197 @@
         obsConnectionState === 'connected'
           ? 'positive'
           : obsConnectionState === 'disconnected'
-          ? 'negative'
-          : 'warning'
+            ? 'negative'
+            : 'warning'
       "
       floating
       rounded
       style="margin-top: 1.25em; margin-right: 0.25em"
     />
-    <q-tooltip v-if="!menuActive"> {{ $t(obsMessage ?? 'scene-selection') }} </q-tooltip>
-      <q-menu
-        @before-hide="menuActive = false"
-        @before-show="menuActive = true"
-        class="non-selectable"
-      >
-        <q-list style="min-width: 100px">
-          <template v-if="mediaScene">
-            <q-item-label header>{{ $t('media-scene') }}</q-item-label>
-            <q-item
-              :active="currentSceneUuid === mediaScene.sceneUuid"
-              @click="setObsSceneByUuid(mediaScene.sceneUuid as string)"
-              clickable
-              v-close-popup
-            >
-              <q-item-section avatar>
-                <q-icon :name="'mdi-alpha-m-circle'" />
-              </q-item-section>
-              <q-item-section>{{ mediaScene.sceneName }}</q-item-section>
-            </q-item>
-            <q-item-label header>{{ $t('other-scenes') }}</q-item-label>
-          </template>
-          <template
-            :key="scene.sceneUuid"
-            v-for="[i, scene] in Object.entries(nonMediaScenes)"
+    <q-tooltip v-if="!menuActive">
+      {{ $t(obsMessage ?? 'scene-selection') }}
+    </q-tooltip>
+    <q-menu
+      @before-hide="menuActive = false"
+      @before-show="menuActive = true"
+      class="non-selectable"
+    >
+      <q-list style="min-width: 100px">
+        <template v-if="mediaScene">
+          <q-item-label header>{{ $t('media-scene') }}</q-item-label>
+          <q-item
+            :active="currentSceneUuid === mediaScene.sceneUuid"
+            @click="setObsSceneByUuid(mediaScene.sceneUuid as string)"
+            clickable
+            v-close-popup
           >
-            <q-item
-              :active="currentSceneUuid === scene.sceneUuid"
-              @click="setObsSceneByUuid(scene.sceneUuid as string)"
-              clickable
-              v-close-popup
-            >
-              <q-item-section avatar>
-                <q-icon
-                  :name="'mdi-numeric-' + (parseInt(i) + 1) + '-circle'"
-                />
-              </q-item-section>
-              <q-item-section>{{ scene.sceneName }}</q-item-section>
-            </q-item>
-          </template>
-        </q-list>
-      </q-menu>
+            <q-item-section avatar>
+              <q-icon :name="'mdi-alpha-m-circle'" />
+            </q-item-section>
+            <q-item-section>{{ mediaScene.sceneName }}</q-item-section>
+          </q-item>
+          <q-item-label header>{{ $t('other-scenes') }}</q-item-label>
+        </template>
+        <template
+          :key="scene.sceneUuid"
+          v-for="[i, scene] in Object.entries(nonMediaScenes)"
+        >
+          <q-item
+            :active="currentSceneUuid === scene.sceneUuid"
+            @click="setObsSceneByUuid(scene.sceneUuid as string)"
+            clickable
+            v-close-popup
+          >
+            <q-item-section avatar>
+              <q-icon :name="'mdi-numeric-' + (parseInt(i) + 1) + '-circle'" />
+            </q-item-section>
+            <q-item-section>{{ scene.sceneName }}</q-item-section>
+          </q-item>
+        </template>
+      </q-list>
+    </q-menu>
   </q-btn>
 </template>
 
 <script setup lang="ts">
+import { OBSWebSocketError } from 'obs-websocket-js';
 import { storeToRefs } from 'pinia';
-import { setObsSceneByUuid } from 'src/helpers/obs';
+import { obsWebSocket } from 'src/boot/obs';
+import { isImage } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useObsStateStore } from 'src/stores/obs-state';
-import { ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 
 const currentState = useCurrentStateStore();
-const { currentSettings } = storeToRefs(currentState);
+const { currentSettings, mediaPlayer } = storeToRefs(currentState);
 
 const obsState = useObsStateStore();
 const {
+  currentScene,
   currentSceneUuid,
   mediaScene,
   nonMediaScenes,
   obsConnectionState,
   obsMessage,
+  scenes,
 } = storeToRefs(obsState);
 
 const menuActive = ref(false);
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const obsErrorHandler = (err: OBSWebSocketError) => {
+  obsConnectionState.value = 'disconnected';
+  obsMessage.value = 'obs.error';
+  obsWebSocket?.disconnect();
+  console.error('Connection closed', err.message);
+};
+
+const obsConnect = async (setup?: boolean) => {
+  if (!currentSettings.value?.obsEnable) {
+    await obsWebSocket?.disconnect();
+    obsMessage.value = 'obs.disconnected';
+    return;
+  }
+
+  const obsPort = currentSettings.value?.obsPort as string;
+  const obsPortDigits = obsPort?.toString().replace(/\D/g, '');
+  if (obsPortDigits?.length === 0) return;
+
+  obsConnectionState.value = 'connecting';
+  obsMessage.value = 'obs.connecting';
+  const obsPassword = (currentSettings.value?.obsPassword as string) || '';
+
+  // const getCurrentRoute = () => useRouter()?.currentRoute.value?.fullPath;
+
+  let attempt = 0;
+  const maxAttempts = setup ? 1 : 12;
+  const timeBetweenAttempts = 5000; // 5 seconds
+  // const previousRoute = getCurrentRoute();
+  while (attempt < maxAttempts) {
+    // if (getCurrentRoute() !== previousRoute) {
+    //   break;
+    // }
+    try {
+      const { negotiatedRpcVersion, obsWebSocketVersion } =
+        await obsWebSocket?.connect('ws://127.0.0.1:' + obsPort, obsPassword);
+      if (obsWebSocketVersion && negotiatedRpcVersion) {
+        break;
+      }
+    } catch (error) {
+      console.error(
+        `Failed to connect to OBS (attempt ${attempt + 1}/${maxAttempts})`,
+        error,
+      );
+    } finally {
+      attempt++;
+      if (attempt < maxAttempts) {
+        await sleep(timeBetweenAttempts);
+      }
+    }
+  }
+};
+
+const setObsScene = async (scene: string) => {
+  if (obsConnectionState.value !== 'connected') await obsConnect();
+  if (obsConnectionState.value !== 'connected') return;
+  const mediaScene = currentSettings.value?.obsMediaScene as string;
+  const imageScene = currentSettings.value?.obsImageScene as string;
+  const cameraScene = currentSettings.value?.obsCameraScene as string;
+  let programScene = mediaScene;
+  if (isImage(mediaPlayer.value.url) && imageScene) programScene = imageScene;
+  currentScene.value = scene;
+  const sceneUuid = scene === 'camera' ? cameraScene : programScene;
+  if (sceneUuid) obsWebSocket?.call('SetCurrentProgramScene', { sceneUuid });
+};
+
+const setObsSceneByUuid = async (sceneUuid: string) => {
+  if (obsConnectionState.value !== 'connected') await obsConnect(false);
+  if (sceneUuid) {
+    obsWebSocket?.call('SetCurrentProgramScene', { sceneUuid });
+  }
+};
+
+const setObsSceneListener = (event: CustomEventInit) => {
+  try {
+    console.log('setObsSceneListener', event.detail);
+    setObsScene(event.detail);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('obsSceneEvent', setObsSceneListener);
+
+  obsWebSocket.on('ConnectionClosed', obsErrorHandler);
+  obsWebSocket.on('ConnectionError', obsErrorHandler);
+  obsWebSocket.on(
+    'CurrentProgramSceneChanged',
+    (data: { sceneUuid: string }) => {
+      currentSceneUuid.value = data.sceneUuid;
+    },
+  );
+  obsWebSocket.on('Identified', async () => {
+    obsConnectionState.value = 'connected';
+    obsMessage.value = 'obs.connected';
+    const sceneList = await obsWebSocket?.call('GetSceneList');
+    if (sceneList) {
+      scenes.value = sceneList.scenes.reverse();
+      currentSceneUuid.value = sceneList.currentProgramSceneUuid;
+    }
+  });
+  obsWebSocket.on('SceneListChanged', (data) => {
+    scenes.value = data.scenes;
+  });
+});
+
+onUnmounted(() => {
+  window.removeEventListener('obsSceneEvent', setObsSceneListener);
+
+  obsWebSocket.removeAllListeners('ConnectionClosed');
+  obsWebSocket.removeAllListeners('ConnectionError');
+  obsWebSocket.removeAllListeners('CurrentProgramSceneChanged');
+  obsWebSocket.removeAllListeners('Identified');
+  obsWebSocket.removeAllListeners('SceneListChanged');
+});
 </script>

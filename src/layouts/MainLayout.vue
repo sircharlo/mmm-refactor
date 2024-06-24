@@ -3,8 +3,8 @@
     <q-header bordered class="bg-primary text-white">
       <q-toolbar class="q-pl-none">
         <q-toolbar-title>
-          <q-avatar class="q-px-sm q-mr-md">
-            <img src="src/assets/master-icon.png" />
+          <q-avatar class="q-px-sm q-mr-md" rounded>
+            <img src="icon.png" />
           </q-avatar>
           {{ $t(route.meta.title as string) }}
         </q-toolbar-title>
@@ -237,7 +237,6 @@
           </q-dialog>
         </template>
         <template v-else-if="route.fullPath === '/settings'">
-          <!-- <q-btn color="negative" v-if="invalidSettings()"> -->
           <q-toggle
             :label="$t('only-show-settings-that-are-not-valid')"
             color="red"
@@ -247,7 +246,6 @@
             v-model="onlyShowInvalid"
           >
           </q-toggle>
-          <!-- </q-badge> -->
         </template>
       </q-toolbar>
     </q-header>
@@ -261,18 +259,9 @@
       <q-toolbar class="bg-blue-9 text-white" style="min-height: initial">
         <DownloadStatus />
         <q-space />
-        <!-- <ScenePicker /> -->
         <MusicButton />
         <SubtitlesButton />
         <ObsStatus />
-        <!-- <q-separator
-          inset
-          v-if="
-            currentSettings?.enableMediaDisplayButton &&
-            currentSettings?.enableMusicButton
-          "
-          vertical
-        /> -->
         <MediaDisplayButton />
       </q-toolbar>
     </q-footer>
@@ -366,7 +355,6 @@ import DownloadStatus from 'src/components/media/DownloadStatus.vue';
 import MediaDisplayButton from 'src/components/media/MediaDisplayButton.vue';
 import MusicButton from 'src/components/media/MusicButton.vue';
 import ObsStatus from 'src/components/media/ObsStatus.vue';
-// import ScenePicker from 'src/components/media/ScenePicker.vue';
 import SongPicker from 'src/components/media/SongPicker.vue';
 import SubtitlesButton from 'src/components/media/SubtitlesButton.vue';
 import {

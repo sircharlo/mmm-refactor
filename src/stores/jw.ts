@@ -24,25 +24,29 @@ const oldDate = new Date(0);
 export const useJwStore = defineStore('jw-store', {
   actions: {
     addToAdditionMediaMap(mediaArray: DynamicMediaObject[]) {
-      if (!mediaArray.length) return;
-      const currentState = useCurrentStateStore();
-      if (!this.additionalMediaMaps[currentState.currentCongregation])
-        this.additionalMediaMaps[currentState.currentCongregation] = {};
-      if (
-        !this.additionalMediaMaps[currentState.currentCongregation][
-          currentState.selectedDate
-        ]
-      )
+      try {
+        if (!mediaArray.length) return;
+        const currentState = useCurrentStateStore();
+        if (!this.additionalMediaMaps[currentState.currentCongregation])
+          this.additionalMediaMaps[currentState.currentCongregation] = {};
+        if (
+          !this.additionalMediaMaps[currentState.currentCongregation][
+            currentState.selectedDate
+          ]
+        )
+          this.additionalMediaMaps[currentState.currentCongregation][
+            currentState.selectedDate
+          ] = [];
+        const currentArray =
+          this.additionalMediaMaps[currentState.currentCongregation][
+            currentState.selectedDate
+          ];
         this.additionalMediaMaps[currentState.currentCongregation][
           currentState.selectedDate
-        ] = [];
-      const currentArray =
-        this.additionalMediaMaps[currentState.currentCongregation][
-          currentState.selectedDate
-        ];
-      this.additionalMediaMaps[currentState.currentCongregation][
-        currentState.selectedDate
-      ] = uniqueById([...currentArray, ...mediaArray]);
+        ] = uniqueById([...currentArray, ...mediaArray]);
+      } catch (e) {
+        console.error(e);
+      }
     },
     removeFromAdditionMediaMap(uniqueId: string) {
       const currentState = useCurrentStateStore();

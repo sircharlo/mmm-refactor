@@ -18,14 +18,7 @@ export interface ElectronApi {
   getAppDataPath: () => string;
   getUserDataPath: () => string;
   klawSync: typeof import('klaw-sync');
-  moveMediaWindow: ({
-    targetScreen,
-    windowedMode,
-  }: {
-    noEvent: boolean;
-    targetScreen?: number;
-    windowedMode?: boolean;
-  }) => void;
+  moveMediaWindow: (jsonString: string) => void;
   openFileDialog: () => Promise<Electron.OpenDialogReturnValue>;
   openFolderDialog: () => string[];
   path: typeof import('path');

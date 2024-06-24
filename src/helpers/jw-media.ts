@@ -67,6 +67,11 @@ const downloadFileIfNeeded = async ({
   size,
   url,
 }: FileDownloader) => {
+  if (!url)
+    return {
+      new: false,
+      path: '',
+    };
   fs.ensureDirSync(dir);
   if (!filename) filename = path.basename(url);
   filename = sanitize(filename);
@@ -93,6 +98,12 @@ const downloadFileIfNeeded = async ({
 };
 
 const downloadFile = async ({ dir, filename, url }: FileDownloader) => {
+  if (!url) {
+    return {
+      error: true,
+      path: '',
+    };
+  }
   if (!filename) filename = path.basename(url);
   filename = sanitize(filename);
   const { downloadProgress } = storeToRefs(useCurrentStateStore());
@@ -133,42 +144,57 @@ const downloadFile = async ({ dir, filename, url }: FileDownloader) => {
   };
 };
 const fetchMedia = async () => {
-  const { currentCongregation, lookupPeriod } = storeToRefs(
-    useCurrentStateStore(),
-  );
-  const route = useRoute();
   const fetchErrors = {} as Record<string, boolean>;
-  lookupPeriod.value
-    .filter((day) => day.meeting)
-    .forEach((day) => {
+  try {
+    const { currentCongregation, lookupPeriod } = storeToRefs(
+      useCurrentStateStore(),
+    );
+    const meetingDays = lookupPeriod.value.filter((day) => day.meeting);
+    meetingDays.forEach((day) => {
       day.loading = true;
     });
-  const queue = new PQueue({ concurrency: 3 });
-  for (const day of lookupPeriod.value.filter((day) => day.meeting)) {
-    queue.add(async () => {
-      if (
-        !currentCongregation.value ||
-        !['/media-calendar', '/setup-wizard'].includes(route.fullPath)
-      )
-        return;
-      const dayDate = day.date;
-      // day.loading = true;
-      let fetchResult = null;
-      if (day.meeting === 'we') {
-        fetchResult = await getWeMedia(dayDate);
-      } else if (day.meeting === 'mw') {
-        fetchResult = await getMwMedia(dayDate);
+    const queue = new PQueue({ concurrency: 3 });
+    for (const day of meetingDays) {
+      try {
+        const route = useRoute();
+        queue.add(async () => {
+          if (
+            !currentCongregation.value ||
+            !['/media-calendar', '/setup-wizard'].includes(route.fullPath)
+          )
+            return;
+          const dayDate = day.date;
+          console.log(dayDate);
+          if (!dayDate) {
+            fetchErrors[date.formatDate(day.date, 'YYYY/MM/DD')] = true;
+            day.loading = false;
+            return;
+          }
+          // day.loading = true;
+          let fetchResult = null;
+          if (day.meeting === 'we') {
+            fetchResult = await getWeMedia(dayDate);
+          } else if (day.meeting === 'mw') {
+            fetchResult = await getMwMedia(dayDate);
+          }
+          if (fetchResult) {
+            day.dynamicMedia = fetchResult.media;
+            if (fetchResult.error)
+              fetchErrors[date.formatDate(dayDate, 'YYYY/MM/DD')] =
+                fetchResult.error;
+          }
+          day.loading = false;
+        });
+      } catch (error) {
+        console.error(error);
+        fetchErrors[date.formatDate(day.date, 'YYYY/MM/DD')] = true;
+        day.loading = false;
       }
-      if (fetchResult) {
-        day.dynamicMedia = fetchResult.media;
-        if (fetchResult.error)
-          fetchErrors[date.formatDate(dayDate, 'YYYY/MM/DD')] =
-            fetchResult.error;
-      }
-      day.loading = false;
-    });
+    }
+    await queue.onIdle();
+  } catch (error) {
+    console.error(error);
   }
-  await queue.onIdle();
   return fetchErrors;
 };
 
@@ -1065,7 +1091,8 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
           .filter((i) => i !== undefined)
           .map((i) => i?.toString()) as string[];
         for (const test of params) {
-          if (!path.basename(file.path).includes(test)) match = false;
+          if (!file.path || !path.basename(file.path).includes(test))
+            match = false;
         }
         if (
           !publication.fileformat ||
@@ -1094,7 +1121,7 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
   const mediaItemLinks: MediaLink[] =
     responseObject.files[publication.langwritten][publication.fileformat];
   const bestItem = findBestResolution(mediaItemLinks) as MediaLink;
-  if (!bestItem) {
+  if (!bestItem?.file?.url) {
     return '';
   }
   const downloadedFile = (await downloadFileIfNeeded({
@@ -1236,7 +1263,7 @@ const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
       !publication.maxTrack || mediaLink.track < publication.maxTrack,
   );
 
-  const dir = getPublicationDirectory(publication, true);
+  const dir = getPublicationDirectory(publication);
   const filteredMediaItemLinks = [] as MediaLink[];
   for (const mediaItemLink of mediaLinks) {
     const currentTrack = mediaItemLink.track;

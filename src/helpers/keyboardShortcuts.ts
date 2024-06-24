@@ -40,13 +40,6 @@ const registerCustomShortcut = (
 ) => {
   const currentState = useCurrentStateStore();
   const { currentSettings } = storeToRefs(currentState);
-  console.log(
-    'Registering custom keyboardShortcuts',
-    shortcutName,
-    keySequence,
-    currentSettings.value[shortcutName],
-    currentSettings.value.enableKeyboardShortcuts,
-  );
   if (
     !shortcutCallbacks[shortcutName] ||
     !currentSettings.value ||
@@ -56,7 +49,6 @@ const registerCustomShortcut = (
     return;
   if (!keySequence) keySequence = currentSettings.value[shortcutName] as string;
   registerShortcut(keySequence, shortcutCallbacks[shortcutName]!);
-  console.log('Registered shortcut', keySequence, shortcutName);
 };
 
 const registerAllCustomShortcuts = () => {
@@ -68,12 +60,10 @@ const registerAllCustomShortcuts = () => {
 const unregisterAllCustomShortcuts = () => {
   const currentState = useCurrentStateStore();
   const { currentSettings } = storeToRefs(currentState);
-  console.log('Unregistering all shortcuts');
   for (const shortcutName of Object.keys(
     shortcutCallbacks,
   ) as (keyof SettingsValues)[]) {
     if (shortcutName || !currentSettings.value[shortcutName]) continue;
-    console.log('Unregistering shortcut', shortcutName);
     unregisterShortcut(shortcutName);
   }
 };
