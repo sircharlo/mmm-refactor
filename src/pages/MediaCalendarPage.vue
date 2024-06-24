@@ -294,23 +294,21 @@
               </div>
             </div>
           </q-item-section>
-          <q-item-section class="q-px-sm" side v-if="media.paragraph">
+          <q-item-section class="q-pl-lg q-pr-none" side v-if="media.paragraph">
             <q-chip
               :clickable="false"
-              :label="media.paragraph"
-              icon="fas fa-paragraph"
+              :icon="
+                media.paragraph !== 9999
+                  ? 'fas fa-paragraph'
+                  : 'mdi-asterisk-circle-outline'
+              "
+              :label="
+                media.paragraph !== 9999 ? media.paragraph : $t('footnote')
+              "
               square
-              v-if="media.paragraph !== 9999"
-            />
-            <q-chip
-              :clickable="false"
-              :label="$t('footnote')"
-              icon="mdi-asterisk-circle-outline"
-              square
-              v-else
             />
           </q-item-section>
-          <q-item-section class="q-px-sm" side v-else-if="media.song">
+          <q-item-section class="q-pl-lg q-pr-none" side v-else-if="media.song">
             <q-chip
               :clickable="false"
               :label="media.song.toString()"
@@ -319,7 +317,7 @@
               square
             />
           </q-item-section>
-          <q-item-section class="q-px-sm">
+          <q-item-section class="q-px-lg">
             <div class="ellipsis-3-lines">
               {{
                 media.title ||

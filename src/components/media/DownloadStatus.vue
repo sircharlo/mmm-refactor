@@ -1,10 +1,12 @@
 <template>
-  {{ online }}
   <q-btn
     :icon="
-      Object.values(downloadProgress).filter((item) => item.error).length === 0
-        ? 'mdi-cloud-check-variant'
-        : 'mdi-cloud'
+      !online
+        ? 'mdi-cloud-off'
+        : Object.values(downloadProgress).filter((item) => item.error)
+              .length === 0
+          ? 'mdi-cloud-check-variant'
+          : 'mdi-cloud-alert'
     "
     :loading="
       Object.values(downloadProgress).filter((item) => item.loaded).length > 0
@@ -95,6 +97,12 @@
         </q-list>
       </div>
     </q-popup-proxy>
+    <q-badge
+      :color="online ? 'positive' : 'negative'"
+      floating
+      rounded
+      style="margin-top: 1.25em; margin-right: 0.25em"
+    />
   </q-btn>
 </template>
 
