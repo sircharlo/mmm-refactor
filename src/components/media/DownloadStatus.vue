@@ -102,46 +102,36 @@ import { electronApi } from 'src/helpers/electron-api';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { DownloadProgressItems } from 'src/types/media';
 
-// Initialize store and destructure reactive properties
 const currentState = useCurrentStateStore();
 const { downloadProgress } = storeToRefs(currentState);
-
-// Setup component
 const { path } = electronApi;
 
-// Method to filter downloads by status
 const filteredDownloads = (
   obj: DownloadProgressItems,
   status: 'complete' | 'error' | 'loaded',
 ) =>
   Object.fromEntries(
     Object.entries(obj)
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      .filter(([_, item]) => item[status])
+      .filter(([, item]) => item[status])
       .sort(([keyA], [keyB]) =>
         path.basename(keyA).localeCompare(path.basename(keyB)),
       ),
   ) as DownloadProgressItems;
 
-// Method to check if downloads have a specific status
 const hasStatus = (
   obj: DownloadProgressItems,
   status: 'complete' | 'error' | 'loaded',
 ) => Object.values(obj).some((item) => item[status]);
 
-// Method to calculate progress value
 const progressValue = (item: { loaded?: number; total?: number }) =>
   item.loaded && item.total ? (item.loaded / item.total) * 100 : 0;
 
-// Method to check if progress is available
 const showProgress = (item: { loaded?: number; total?: number }) =>
   item.loaded && item.total;
 
-// Method to determine status color
 const statusColor = (status: string) =>
   status === 'complete' ? 'positive' : 'negative';
 
-// Status configuration
 const statusConfig = [
   { icon: '', label: 'inProgress', status: 'loaded' },
   { icon: 'mdi-alert-circle', label: 'errors', status: 'error' },

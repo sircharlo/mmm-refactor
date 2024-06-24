@@ -16,6 +16,7 @@ const { configure } = require('quasar/wrappers');
 const path = require('path');
 // const inject  = require('@rollup/plugin-inject')
 const { version } = require('./package.json');
+const devMode = process.env.NODE_ENV === 'development';
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -56,21 +57,22 @@ module.exports = configure(function (/* ctx */) {
             },
           },
         });
-
-        viteConf.build = mergeConfig(viteConf.build, {
-          sourcemap: true,
-        });
-        if (!viteConf.plugins) viteConf.plugins = [];
-        viteConf.plugins.push(
-          sentryVitePlugin({
-            authToken: process.env.SENTRY_AUTH_TOKEN,
-            org: 'jw-projects',
-            project: 'mmm-v2',
-            release: {
-              name: version,
-            },
-          }),
-        );
+        if (!devMode) {
+          viteConf.build = mergeConfig(viteConf.build, {
+            sourcemap: true,
+          });
+          if (!viteConf.plugins) viteConf.plugins = [];
+          viteConf.plugins.push(
+            sentryVitePlugin({
+              authToken: process.env.SENTRY_AUTH_TOKEN,
+              org: 'jw-projects',
+              project: 'mmm-v2',
+              release: {
+                name: version,
+              },
+            }),
+          );
+        }
       },
       extendWebpack(cfg, {}) {
         cfg.externals = ['better-sqlite3'];
@@ -176,33 +178,37 @@ module.exports = configure(function (/* ctx */) {
       bundler: 'builder', // 'packager' or 'builder'
 
       extendElectronMainConf: (esbuildConf) => {
-        esbuildConf.sourcemap = true;
-        if (!esbuildConf.plugins) esbuildConf.plugins = [];
-        esbuildConf.plugins.push(
-          sentryEsbuildPlugin({
-            authToken: process.env.SENTRY_AUTH_TOKEN,
-            org: 'jw-projects',
-            project: 'mmm-v2',
-            release: {
-              name: version,
-            },
-          }),
-        );
+        if (!devMode) {
+          esbuildConf.sourcemap = true;
+          if (!esbuildConf.plugins) esbuildConf.plugins = [];
+          esbuildConf.plugins.push(
+            sentryEsbuildPlugin({
+              authToken: process.env.SENTRY_AUTH_TOKEN,
+              org: 'jw-projects',
+              project: 'mmm-v2',
+              release: {
+                name: version,
+              },
+            }),
+          );
+        }
       },
 
       extendElectronPreloadConf: (esbuildConf) => {
-        esbuildConf.sourcemap = true;
-        if (!esbuildConf.plugins) esbuildConf.plugins = [];
-        esbuildConf.plugins.push(
-          sentryEsbuildPlugin({
-            authToken: process.env.SENTRY_AUTH_TOKEN,
-            org: 'jw-projects',
-            project: 'mmm-v2',
-            release: {
-              name: version,
-            },
-          }),
-        );
+        if (!devMode) {
+          esbuildConf.sourcemap = true;
+          if (!esbuildConf.plugins) esbuildConf.plugins = [];
+          esbuildConf.plugins.push(
+            sentryEsbuildPlugin({
+              authToken: process.env.SENTRY_AUTH_TOKEN,
+              org: 'jw-projects',
+              project: 'mmm-v2',
+              release: {
+                name: version,
+              },
+            }),
+          );
+        }
       },
       inspectPort: 5858,
       packager: {},

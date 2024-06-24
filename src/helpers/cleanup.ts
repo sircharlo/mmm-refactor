@@ -19,7 +19,6 @@ const cleanLocalStorage = () => {
       const storageElement = LocalStorage.getItem(storageElementName);
       let changesMade = false;
       if (storageElement) {
-        console.log(storageElementName, storageElement);
         for (const congregation of Object.keys(storageElement)) {
           // @ts-expect-error LocalStorage typing mishap here
           for (const dateKey of Object.keys(storageElement[congregation])) {
@@ -37,9 +36,8 @@ const cleanLocalStorage = () => {
               },
               false,
             );
-            console.log(dateKey);
             if (isInPast(strippedDateKeyAsDate)) {
-              console.log('removing', dateKey);
+              console.log('Removing from localStorage:', congregation, dateKey);
               // @ts-expect-error LocalStorage typing mishap here
               delete storageElement[congregation][dateKey];
               changesMade = true;
@@ -102,12 +100,14 @@ const cleanAdditionalMediaFolder = () => {
       );
     };
     const filePaths = flattenedFilePaths(additionalMediaMaps);
-    console.log(filePaths);
     const dirListing = klawSync(additionalMediaPath, { nodir: true });
     for (const file of dirListing) {
       const additionalMediaFile = path.resolve(file.path);
       if (!filePaths.includes(additionalMediaFile)) {
-        console.log('removing', additionalMediaFile);
+        console.log(
+          'Removing orphan additional media file:',
+          additionalMediaFile,
+        );
         fs.rmSync(additionalMediaFile);
       }
     }

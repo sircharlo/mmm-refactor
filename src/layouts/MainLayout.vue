@@ -438,7 +438,6 @@ const router = useRouter();
 const miniState = ref(true);
 
 watch(currentCongregation, (newCongregation) => {
-  console.log('currentCongregation changed', currentCongregation.value);
   if (!newCongregation) {
     if (route.fullPath !== '/congregation-selector') {
       router.push({ path: '/congregation-selector' });
@@ -466,7 +465,6 @@ const navigateToCongregationSelector = () => {
 };
 
 watch(currentSettings, (newSettings) => {
-  console.log('currentSettings changed', newSettings);
   if (!newSettings) navigateToCongregationSelector();
 });
 
@@ -613,7 +611,6 @@ const getJwVideos = async () => {
         parentCategory: string;
       }[] = [{ key: 'LatestVideos', parentCategory: '' }];
       const subcategoriesRequest = await getSubcategories('VideoOnDemand');
-      console.log('subcategoriesRequest', subcategoriesRequest);
       const subcategoriesFirstLevel =
         subcategoriesRequest.category.subcategories.map((s) => s.key);
       for (const subcategoryFirstLevel of subcategoriesFirstLevel) {
@@ -625,7 +622,6 @@ const getJwVideos = async () => {
           }),
         );
       }
-      console.log('subcategories', subcategories);
       let index = 0;
       for (const category of subcategories) {
         const request = (await get(

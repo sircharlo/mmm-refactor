@@ -130,7 +130,6 @@ watch(
 watch(
   () => mediaPlayer.value?.action,
   (newAction) => {
-    console.log('action', newAction);
     if (!mediaElement.value) return;
     if (newAction.toLowerCase().includes('pause')) {
       mediaElement.value.pause();
@@ -144,7 +143,6 @@ watch(
 watch(
   () => mediaPlayer.value?.seekTo,
   (newPosition) => {
-    console.log('newPosition', newPosition);
     if (!mediaElement.value) return;
     mediaElement.value.currentTime = newPosition;
   },
@@ -158,6 +156,7 @@ const playMedia = () => {
   // mediaElement.value.onpause = () => {
   //   mediaPlayer.value.seekTo = mediaElement.value?.currentTime || 0;
   // };
+
   mediaElement.value.onended = () => {
     mediaPlayer.value.currentPosition = 0;
     mediaPlayer.value.seekTo = 0;

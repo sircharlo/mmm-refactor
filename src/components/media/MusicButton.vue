@@ -220,14 +220,12 @@ const musicPopup = ref(false);
 watch(
   () => currentSettings.value?.enableMusicButton,
   (newMusicButtonEnabled) => {
-    console.log('newMusicButtonEnabled', newMusicButtonEnabled);
     if (!newMusicButtonEnabled) stopMusic();
   },
 );
 
-const toggleMusicListener = (event: CustomEventInit) => {
+const toggleMusicListener = () => {
   try {
-    console.log('toggleMusic-update', event.detail);
     if (!currentSettings.value?.enableMusicButton) return;
     if (musicPlaying.value) {
       stopMusic();

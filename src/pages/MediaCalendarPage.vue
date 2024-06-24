@@ -713,7 +713,6 @@ const zoomReset = (elemId: string, forced = false) => {
 };
 
 function stopMedia(elemId: string) {
-  console.log('stopMedia', elemId);
   zoomReset(elemId, true);
   mediaPlayer.value.action = 'stop';
   mediaPlayer.value.url = '';
@@ -964,9 +963,7 @@ const copyToDatedAdditionalMedia = async (files: string[]) => {
     );
     const trimFilepathAsNeeded = (filepath: string) => {
       let filepathSize = new Blob([filepath]).size;
-      console.log(filepathSize);
       while (filepathSize > 230) {
-        console.log(filepathSize);
         const overBy = filepathSize - 230;
         const baseName = path
           .basename(filepath)
@@ -977,9 +974,7 @@ const copyToDatedAdditionalMedia = async (files: string[]) => {
           newBaseName + path.extname(filepath),
         );
         filepathSize = new Blob([filepath]).size;
-        console.log(filepathSize, filepath);
       }
-      console.log(filepath);
       return filepath;
     };
     datedAdditionalMediaPath = trimFilepathAsNeeded(datedAdditionalMediaPath);
@@ -1067,7 +1062,6 @@ const addToFiles = async (
             url: filepath,
           })
         ).path;
-        console.log('filepath', filepath);
       } else if (isImageString(filepath)) {
         const [preamble, data] = filepath.split(';base64,');
         const ext = preamble.split('/')[1];

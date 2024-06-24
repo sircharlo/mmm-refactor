@@ -164,7 +164,6 @@ const setObsSceneByUuid = async (sceneUuid: string) => {
 
 const setObsSceneListener = (event: CustomEventInit) => {
   try {
-    console.log('setObsSceneListener', event.detail);
     setObsScene(event.detail);
   } catch (error) {
     console.error(error);
