@@ -1,5 +1,11 @@
 <template>
-  <q-btn class="q-ml-sm" flat rounded v-if="currentSettings.obsEnable">
+  <q-btn
+    @click="scenePicker = true"
+    class="q-ml-sm"
+    flat
+    rounded
+    v-if="currentSettings.obsEnable"
+  >
     <q-icon size="sm">
       <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
         <path
@@ -19,48 +25,44 @@
       rounded
       style="margin-top: 1.25em; margin-right: 0.25em"
     />
-    <q-tooltip v-if="!menuActive">
+    <q-tooltip v-if="!scenePicker">
       {{ $t(obsMessage ?? 'scene-selection') }}
     </q-tooltip>
-    <q-menu
-      @before-hide="menuActive = false"
-      @before-show="menuActive = true"
-      class="non-selectable"
-    >
-      <q-list style="min-width: 100px">
-        <template v-if="mediaScene">
-          <q-item-label header>{{ $t('media-scene') }}</q-item-label>
-          <q-item
-            :active="currentSceneUuid === mediaScene.sceneUuid"
-            @click="setObsSceneByUuid(mediaScene.sceneUuid as string)"
-            clickable
-            v-close-popup
+    <q-popup-proxy>
+      <div
+        :class="'rounded-borders bg-grey-' + $q.dark.isActive ? '2' : '9'"
+        style="width: 80vw;"
+      >
+        <q-card-section>
+          <div class="text-h6">{{ $t('scene-selection') }}</div>
+        </q-card-section>
+
+        <q-card-section>
+          <div class="row q-col-gutter-md">
+          <template
+            :key="scene.sceneUuid"
+            v-for="scene in [mediaScene].concat(nonMediaScenes).filter(Boolean)"
           >
-            <q-item-section avatar>
-              <q-icon :name="'mdi-alpha-m-circle'" />
-            </q-item-section>
-            <q-item-section>{{ mediaScene.sceneName }}</q-item-section>
-          </q-item>
-          <q-item-label header>{{ $t('other-scenes') }}</q-item-label>
-        </template>
-        <template
-          :key="scene.sceneUuid"
-          v-for="[i, scene] in Object.entries(nonMediaScenes)"
-        >
-          <q-item
-            :active="currentSceneUuid === scene.sceneUuid"
-            @click="setObsSceneByUuid(scene.sceneUuid as string)"
-            clickable
-            v-close-popup
-          >
-            <q-item-section avatar>
-              <q-icon :name="'mdi-numeric-' + (parseInt(i) + 1) + '-circle'" />
-            </q-item-section>
-            <q-item-section>{{ scene.sceneName }}</q-item-section>
-          </q-item>
-        </template>
-      </q-list>
-    </q-menu>
+          <div :class="'col-' + (([mediaScene].concat(nonMediaScenes).filter(Boolean).length < 4) ? (12 / [mediaScene].concat(nonMediaScenes).filter(Boolean).length).toString() : '3')">
+            <q-btn
+              :color="
+                currentSceneUuid === scene?.sceneUuid
+                  ? 'warning'
+                  : scene?.sceneUuid === mediaScene?.sceneUuid
+                    ? 'primary'
+                    : 'primary'
+              "
+              :label="scene?.sceneName as string"
+              @click="setObsSceneByUuid(scene?.sceneUuid as string)"
+              class="q-py-md q-px-lg full-width"
+              size="1.5em"
+            />
+          </div>
+          </template>
+        </div>
+        </q-card-section>
+      </div>
+    </q-popup-proxy>
   </q-btn>
 </template>
 
@@ -87,7 +89,7 @@ const {
   scenes,
 } = storeToRefs(obsState);
 
-const menuActive = ref(false);
+const scenePicker = ref(false);
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const obsErrorHandler = (err: OBSWebSocketError) => {
