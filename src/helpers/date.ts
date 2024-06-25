@@ -111,12 +111,13 @@ const isWeMeetingDay = (lookupDate: Date) => {
   return getSettingValue('weDay') == getWeekDay(lookupDate);
 };
 
-function updateLookupPeriod() {
+function updateLookupPeriod(reset = false) {
   const currentState = useCurrentStateStore();
   const { currentCongregation } = storeToRefs(currentState);
+  if (!currentCongregation.value) return;
   const jwStore = useJwStore();
   const { lookupPeriod } = storeToRefs(jwStore);
-  if (!lookupPeriod.value[currentCongregation.value]?.length)
+  if (!lookupPeriod.value[currentCongregation.value]?.length || reset)
     lookupPeriod.value[currentCongregation.value] = [];
   lookupPeriod.value[currentCongregation.value] = lookupPeriod.value[
     currentCongregation.value

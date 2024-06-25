@@ -52,6 +52,9 @@ const registerCustomShortcut = (
 };
 
 const registerAllCustomShortcuts = () => {
+  const currentState = useCurrentStateStore();
+  const { currentSettings } = storeToRefs(currentState);
+  if (!currentSettings.value) return;
   unregisterAllCustomShortcuts();
   for (const shortcutName of Object.keys(shortcutCallbacks)) {
     registerCustomShortcut(shortcutName as keyof SettingsValues);
@@ -61,6 +64,7 @@ const registerAllCustomShortcuts = () => {
 const unregisterAllCustomShortcuts = () => {
   const currentState = useCurrentStateStore();
   const { currentSettings } = storeToRefs(currentState);
+  if (!currentSettings.value) return;
   for (const shortcutName of Object.keys(
     shortcutCallbacks,
   ) as (keyof SettingsValues)[]) {

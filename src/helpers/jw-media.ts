@@ -79,34 +79,47 @@ const downloadFileIfNeeded = async ({
       concurrency: 5,
     });
   const queue = queues.downloads[currentCongregation.value];
-  return queue.add(
-    async () => {
-      fs.ensureDirSync(dir);
-      if (!filename) filename = path.basename(url);
-      filename = sanitize(filename);
-      const destinationPath = path.join(dir, filename);
-      const remoteSize: number =
-        size ||
-        (await axios({ method: 'HEAD', url }).then(
-          (response) => +response.headers['content-length'] || 0,
-        ));
-      if (fs.existsSync(destinationPath)) {
-        const stat = fs.statSync(destinationPath);
-        const localSize = stat.size;
-        if (localSize === remoteSize) {
-          return {
-            new: false,
-            path: destinationPath,
-          };
+  return (
+    queue.add(
+      async () => {
+        fs.ensureDirSync(dir);
+        if (!filename) filename = path.basename(url);
+        filename = sanitize(filename);
+        const destinationPath = path.join(dir, filename);
+        const remoteSize: number =
+          size ||
+          (await axios({ method: 'HEAD', url }).then(
+            (response) => +response.headers['content-length'] || 0,
+          ));
+        if (fs.existsSync(destinationPath)) {
+          const stat = fs.statSync(destinationPath);
+          const localSize = stat.size;
+          if (localSize === remoteSize) {
+            return {
+              new: false,
+              path: destinationPath,
+            };
+          }
         }
-      }
-      const { downloadedFiles } = storeToRefs(useCurrentStateStore());
-      if (!downloadedFiles.value[url])
-        downloadedFiles.value[url] = downloadFile({ dir, filename, size, url });
-      return downloadedFiles.value[url];
-    },
-    { priority: lowPriority ? 10 : 100 },
-  ) as Promise<DownloadedFile>;
+        const { downloadedFiles } = storeToRefs(useCurrentStateStore());
+        if (!downloadedFiles.value[url])
+          downloadedFiles.value[url] = downloadFile({
+            dir,
+            filename,
+            size,
+            url,
+          });
+        return downloadedFiles.value[url];
+      },
+      { priority: lowPriority ? 10 : 100 },
+    ) as Promise<DownloadedFile>
+  ).catch((error) => {
+    console.error(error);
+    return {
+      new: false,
+      path: '',
+    };
+  });
 };
 
 const downloadFile = async ({ dir, filename, url }: FileDownloader) => {
@@ -177,27 +190,35 @@ const fetchMedia = async () => {
     const queue = queues.meetings[currentCongregation.value];
     for (const day of meetingsToFetch) {
       try {
-        queue.add(async () => {
-          const dayDate = day.date;
-          if (!dayDate) {
+        queue
+          .add(async () => {
+            if (!day) return;
+            const dayDate = day.date;
+            if (!dayDate) {
+              day.loading = false;
+              day.complete = false;
+              day.error = true;
+              return;
+            }
+            let fetchResult = null;
+            if (day.meeting === 'we') {
+              fetchResult = await getWeMedia(dayDate);
+            } else if (day.meeting === 'mw') {
+              fetchResult = await getMwMedia(dayDate);
+            }
+            if (fetchResult) {
+              day.dynamicMedia = fetchResult.media;
+              day.error = fetchResult.error;
+              day.complete = !fetchResult.error;
+            }
+            day.loading = false;
+          })
+          .catch((error) => {
+            console.error(error);
             day.loading = false;
             day.complete = false;
             day.error = true;
-            return;
-          }
-          let fetchResult = null;
-          if (day.meeting === 'we') {
-            fetchResult = await getWeMedia(dayDate);
-          } else if (day.meeting === 'mw') {
-            fetchResult = await getMwMedia(dayDate);
-          }
-          if (fetchResult) {
-            day.dynamicMedia = fetchResult.media;
-            day.error = fetchResult.error;
-            day.complete = !fetchResult.error;
-          }
-          day.loading = false;
-        });
+          });
       } catch (error) {
         console.error(error);
         day.loading = false;

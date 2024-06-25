@@ -455,6 +455,7 @@ watch(currentCongregation, (newCongregation, oldCongregation) => {
       router.push({ path: '/congregation-selector' });
       return;
     }
+    selectedDate.value = '';
   } else {
     downloadProgress.value = {};
     updateLookupPeriod();
@@ -522,14 +523,16 @@ watch(
 
 watch(
   () => [
+    currentCongregation.value,
     currentSettings.value?.lang,
     currentSettings.value?.langFallback,
     currentSettings.value?.langSubtitles,
     currentSettings.value?.mwDay,
     currentSettings.value?.weDay,
   ],
-  () => {
-    updateLookupPeriod();
+  ([newCurrentCongregation, , , , ,], [oldCurrentCongregation, , , , ,]) => {
+    if (newCurrentCongregation === oldCurrentCongregation)
+      updateLookupPeriod(true);
   },
 );
 

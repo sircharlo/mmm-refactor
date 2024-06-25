@@ -898,11 +898,13 @@ onMounted(async () => {
     const durations = (customDurations.value[currentCongregation.value] ||= {});
     durations[newVal] ||= {};
   });
-
-  if (lookupPeriod.value && currentCongregation.value) {
+  if (
+    currentCongregation.value &&
+    lookupPeriod.value[currentCongregation.value]
+  ) {
     selectedDate.value = date.formatDate(
       lookupPeriod.value[currentCongregation.value]
-        ?.filter((day: { meeting: boolean | string }) => day.meeting)
+        ?.filter((day) => day.meeting)
         .map((day) => day.date)[0],
       'YYYY/MM/DD',
     );
