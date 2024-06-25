@@ -864,7 +864,9 @@ dragAndDrop({
 watch(
   () => [mediaPlaying.value, mediaPaused.value],
   ([newMediaPlaying, newMediaPaused]) => {
-    sendObsSceneEvent(!newMediaPlaying || newMediaPaused ? 'camera' : 'media');
+    sendObsSceneEvent(
+      newMediaPaused ? 'camera' : newMediaPlaying ? 'media' : 'camera',
+    );
     updateConfig(mediaList.value, { disabled: !!newMediaPlaying });
   },
 );
