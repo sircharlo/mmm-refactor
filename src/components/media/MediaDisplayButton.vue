@@ -160,18 +160,22 @@ watch(
 watch(
   () => screenPreferences.value,
   (newScreenPreferences) => {
-    console.log('newScreenPreferences', newScreenPreferences);
-    console.log(
-      'moveMediaWindow',
-      newScreenPreferences.preferredScreenNumber,
-      newScreenPreferences.preferWindowed,
-      true,
-    );
-    moveMediaWindow(
-      newScreenPreferences.preferredScreenNumber,
-      newScreenPreferences.preferWindowed,
-      true,
-    );
+    try {
+      console.log('newScreenPreferences', newScreenPreferences);
+      console.log(
+        'moveMediaWindow',
+        newScreenPreferences.preferredScreenNumber,
+        newScreenPreferences.preferWindowed,
+        true,
+      );
+      moveMediaWindow(
+        newScreenPreferences.preferredScreenNumber,
+        newScreenPreferences.preferWindowed,
+        true,
+      );
+    } catch (error) {
+      console.error(error);
+    }
   },
   { deep: true, immediate: true },
 );

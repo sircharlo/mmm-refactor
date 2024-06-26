@@ -20,62 +20,69 @@ const { convert, decompress, executeQuery, fs, path, toggleMediaWindow } =
 const { pad } = format;
 
 const formatTime = (time: number) => {
-  if (!time) return '00:00';
-  if (Number.isNaN(time)) return '..:..';
-  const minutes = Math.floor(time / 60);
-  const seconds = Math.floor(time % 60);
-  return `${pad(minutes.toString(), 2, '0')}:${pad(seconds.toString(), 2)}`;
+  try {
+    if (!time) return '00:00';
+    if (Number.isNaN(time)) return '..:..';
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${pad(minutes.toString(), 2, '0')}:${pad(seconds.toString(), 2)}`;
+  } catch (error) {
+    return '..:..';
+  }
+};
+
+const isFileOfType = (filepath: string, validExtensions: string[]) => {
+  try {
+    if (!filepath) return false;
+    const fileExtension = path.parse(filepath).ext.toLowerCase();
+    return validExtensions.includes(fileExtension);
+  } catch (error) {
+    return false;
+  }
 };
 
 const isImage = (filepath: string) => {
-  if (!filepath) return false;
-  const validExtensions = [
+  return isFileOfType(filepath, [
     '.png',
     '.jpg',
     '.jpeg',
     '.gif',
     '.bmp',
     '.webp',
-    // '.svg',
     '.webm',
-  ];
-  const fileExtension = path.parse(filepath).ext.toLowerCase();
-  return validExtensions.includes(fileExtension);
+  ]);
 };
 
 const isHeic = (filepath: string) => {
-  if (!filepath) return false;
-  const validExtensions = ['.heic'];
-  const fileExtension = path.parse(filepath).ext.toLowerCase();
-  return validExtensions.includes(fileExtension);
+  return isFileOfType(filepath, ['.heic']);
 };
 
 const isSvg = (filepath: string) => {
-  if (!filepath) return false;
-  const validExtensions = ['.svg'];
-  const fileExtension = path.parse(filepath).ext.toLowerCase();
-  return validExtensions.includes(fileExtension);
+  return isFileOfType(filepath, ['.svg']);
 };
 
 const isVideo = (filepath: string) => {
-  if (!filepath) return false;
-  const validExtensions = ['.mp4', '.mov', '.mkv', '.avi', '.webm'];
-  const fileExtension = path.parse(filepath).ext.toLowerCase();
-  return validExtensions.includes(fileExtension);
+  return isFileOfType(filepath, ['.mp4', '.mov', '.mkv', '.avi', '.webm']);
 };
 
 const isAudio = (filepath: string) => {
-  if (!filepath) return false;
-  const validExtensions = ['.mp3', '.wav', '.ogg', '.flac'];
-  const fileExtension = path.parse(filepath).ext.toLowerCase();
-  return validExtensions.includes(fileExtension);
+  return isFileOfType(filepath, ['.mp3', '.wav', '.ogg', '.flac']);
 };
 
 const isPdf = (filepath: string) => {
-  if (!filepath) return false;
-  const validExtensions = ['.pdf'];
-  const fileExtension = path.parse(filepath).ext.toLowerCase();
-  return validExtensions.includes(fileExtension);
+  return isFileOfType(filepath, ['.pdf']);
+};
+
+const isArchive = (filepath: string) => {
+  return isFileOfType(filepath, ['.zip']);
+};
+
+const isJwpub = (filepath: string) => {
+  return isFileOfType(filepath, ['.jwpub']);
+};
+
+const isJwPlaylist = (filepath: string) => {
+  return isFileOfType(filepath, ['.jwlplaylist']);
 };
 
 const isSong = (multimediaItem: MultimediaItem) => {
@@ -89,49 +96,43 @@ const isSong = (multimediaItem: MultimediaItem) => {
   return multimediaItem.Track.toString();
 };
 
-const isArchive = (filepath: string) => {
-  if (!filepath) return false;
-  const validExtensions = ['.zip'];
-  const fileExtension = path.parse(filepath).ext.toLowerCase();
-  return validExtensions.includes(fileExtension);
-};
-
-const isJwpub = (filepath: string) => {
-  if (!filepath) return false;
-  const validExtensions = ['.jwpub'];
-  const fileExtension = path.parse(filepath).ext.toLowerCase();
-  return validExtensions.includes(fileExtension);
-};
-
-const isJwPlaylist = (filepath: string) => {
-  if (!filepath) return false;
-  const validExtensions = ['.jwlplaylist'];
-  const fileExtension = path.parse(filepath).ext.toLowerCase();
-  return validExtensions.includes(fileExtension);
-};
-
 const isRemoteUrl = (url: string) => {
+  if (!url) return false;
   return url.startsWith('http://') || url.startsWith('https://');
 };
 
 const isImageString = (url: string) => {
+  if (!url) return false;
   return url.startsWith('data:image');
 };
 
 const jwpubDecompressor = async (jwpubPath: string, outputPath: string) => {
-  await decompress(jwpubPath, outputPath);
-  await decompress(path.join(outputPath, 'contents'), outputPath);
-  return outputPath;
+  try {
+    await decompress(jwpubPath, outputPath);
+    await decompress(path.join(outputPath, 'contents'), outputPath);
+    return outputPath;
+  } catch (error) {
+    console.error(error);
+    return jwpubPath;
+  }
 };
 
 const decompressJwpub = async (jwpubPath: string, outputPath?: string) => {
-  const { extractedFiles } = storeToRefs(useCurrentStateStore());
-  if (!isJwpub(jwpubPath)) return jwpubPath;
-  if (!outputPath)
-    outputPath = path.join(getTempDirectory(), path.basename(jwpubPath));
-  if (!extractedFiles.value[outputPath])
-    extractedFiles.value[outputPath] = jwpubDecompressor(jwpubPath, outputPath);
-  return extractedFiles.value[outputPath];
+  try {
+    const { extractedFiles } = storeToRefs(useCurrentStateStore());
+    if (!isJwpub(jwpubPath)) return jwpubPath;
+    if (!outputPath)
+      outputPath = path.join(getTempDirectory(), path.basename(jwpubPath));
+    if (!extractedFiles.value[outputPath])
+      extractedFiles.value[outputPath] = jwpubDecompressor(
+        jwpubPath,
+        outputPath,
+      );
+    return extractedFiles.value[outputPath];
+  } catch (error) {
+    console.error(error);
+    return jwpubPath;
+  }
 };
 
 const getMediaFromJwPlaylist = async (
@@ -139,20 +140,21 @@ const getMediaFromJwPlaylist = async (
   selectedDateValue: Date,
   destPath: string,
 ) => {
-  if (!jwPlaylistPath) return [];
-  const outputPath = path.join(destPath, path.basename(jwPlaylistPath));
-  await decompress(jwPlaylistPath, outputPath);
-  const dbFile = findDb(outputPath);
-  if (!dbFile) return [];
-  const playlistName = (
-    executeQuery(
+  try {
+    if (!jwPlaylistPath) return [];
+    const outputPath = path.join(destPath, path.basename(jwPlaylistPath));
+    await decompress(jwPlaylistPath, outputPath);
+    const dbFile = findDb(outputPath);
+    if (!dbFile) return [];
+    const playlistName = (
+      executeQuery(
+        dbFile,
+        'SELECT Name FROM Tag ORDER BY TagId ASC LIMIT 1;',
+      ) as PlaylistTagItem[]
+    )[0].Name;
+    const playlistItems = executeQuery(
       dbFile,
-      'SELECT Name FROM Tag ORDER BY TagId ASC LIMIT 1;',
-    ) as PlaylistTagItem[]
-  )[0].Name;
-  const playlistItems = executeQuery(
-    dbFile,
-    `SELECT
+      `SELECT
         pi.PlaylistItemId,
         pi.Label,
         pi.StartTrimOffsetTicks,
@@ -185,116 +187,139 @@ const getMediaFromJwPlaylist = async (
         PlaylistItemLocationMap plm ON pi.PlaylistItemId = plm.PlaylistItemId
       LEFT JOIN
         Location l ON plm.LocationId = l.LocationId`,
-  ) as JwPlaylistItem[];
-  const playlistMediaItems = playlistItems.map((item) => {
-    item.ThumbnailFilePath = path.join(outputPath, item.ThumbnailFilePath);
-    if (
-      fs.existsSync(item.ThumbnailFilePath) &&
-      !item.ThumbnailFilePath.includes('.jpg')
-    ) {
-      fs.renameSync(item.ThumbnailFilePath, item.ThumbnailFilePath + '.jpg');
-      item.ThumbnailFilePath += '.jpg';
-    }
-    return {
-      FilePath: item.IndependentMediaFilePath
-        ? path.join(outputPath, item.IndependentMediaFilePath)
-        : '',
-      IssueTagNumber: item.IssueTagNumber,
-      KeySymbol: item.KeySymbol,
-      Label: playlistName + ' - ' + item.Label,
-      MimeType: item.MimeType,
-      ThumbnailFilePath: item.ThumbnailFilePath || '',
-      Track: item.Track,
-    };
-  }) as MultimediaItem[];
+    ) as JwPlaylistItem[];
+    const playlistMediaItems = playlistItems.map((item) => {
+      item.ThumbnailFilePath = path.join(outputPath, item.ThumbnailFilePath);
+      if (
+        fs.existsSync(item.ThumbnailFilePath) &&
+        !item.ThumbnailFilePath.includes('.jpg')
+      ) {
+        fs.renameSync(item.ThumbnailFilePath, item.ThumbnailFilePath + '.jpg');
+        item.ThumbnailFilePath += '.jpg';
+      }
+      return {
+        FilePath: item.IndependentMediaFilePath
+          ? path.join(outputPath, item.IndependentMediaFilePath)
+          : '',
+        IssueTagNumber: item.IssueTagNumber,
+        KeySymbol: item.KeySymbol,
+        Label: playlistName + ' - ' + item.Label,
+        MimeType: item.MimeType,
+        ThumbnailFilePath: item.ThumbnailFilePath || '',
+        Track: item.Track,
+      };
+    }) as MultimediaItem[];
 
-  await processMissingMediaInfo(playlistMediaItems);
-  const dynamicPlaylistMediaItems = await dynamicMediaMapper(
-    playlistMediaItems,
-    selectedDateValue,
-    true,
-  );
-  return dynamicPlaylistMediaItems;
+    await processMissingMediaInfo(playlistMediaItems);
+    const dynamicPlaylistMediaItems = await dynamicMediaMapper(
+      playlistMediaItems,
+      selectedDateValue,
+      true,
+    );
+    return dynamicPlaylistMediaItems;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
 };
 
 const findDb = (publicationDirectory: string) => {
   if (!fs.existsSync(publicationDirectory)) return '';
-  return fs
-    .readdirSync(publicationDirectory)
-    .map((filename) => path.join(publicationDirectory, filename))
-    .find((filename) => {
-      return filename.includes('.db');
-    });
+  try {
+    return fs
+      .readdirSync(publicationDirectory)
+      .map((filename) => path.join(publicationDirectory, filename))
+      .find((filename) => {
+        return filename.includes('.db');
+      });
+  } catch (error) {
+    console.error(error);
+    return '';
+  }
 };
 
 const convertHeicToJpg = async (filepath: string) => {
   if (!isHeic(filepath)) return filepath;
-  const buffer = fs.readFileSync(filepath);
-  const output = await convert({
-    buffer,
-    format: 'JPEG',
-  });
-  const existingPath = path.parse(filepath);
-  const newPath = `${existingPath.dir}/${existingPath.name}.jpg`;
-  fs.writeFileSync(newPath, Buffer.from(output));
-  return newPath;
+  try {
+    const buffer = fs.readFileSync(filepath);
+    const output = await convert({
+      buffer,
+      format: 'JPEG',
+    });
+    const existingPath = path.parse(filepath);
+    const newPath = `${existingPath.dir}/${existingPath.name}.jpg`;
+    fs.writeFileSync(newPath, Buffer.from(output));
+    return newPath;
+  } catch (error) {
+    console.error(error);
+    return filepath;
+  }
 };
 
 const convertSvgToJpg = async (filepath: string): Promise<string> => {
-  if (!isSvg(filepath)) return filepath;
+  try {
+    if (!isSvg(filepath)) return filepath;
 
-  const canvas = document.createElement('canvas');
-  canvas.width = FULL_HD.width * 2;
-  canvas.height = FULL_HD.height * 2;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return filepath;
+    const canvas = document.createElement('canvas');
+    canvas.width = FULL_HD.width * 2;
+    canvas.height = FULL_HD.height * 2;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return filepath;
 
-  const img = new Image();
-  img.src = getFileUrl(filepath);
+    const img = new Image();
+    img.src = getFileUrl(filepath);
 
-  return new Promise((resolve, reject) => {
-    img.onload = function () {
-      const canvasW = canvas.width,
-        canvasH = canvas.height;
-      const imgW = img.naturalWidth || canvasW,
-        imgH = img.naturalHeight || canvasH;
-      const wRatio = canvasW / imgW,
-        hRatio = canvasH / imgH;
-      if (wRatio < hRatio) {
-        canvas.height = canvasW * (imgH / imgW);
-      } else {
-        canvas.width = canvasH * (imgW / imgH);
-      }
-      const ratio = Math.min(wRatio, hRatio);
-      ctx.drawImage(img, 0, 0, imgW * ratio, imgH * ratio);
-      ctx.globalCompositeOperation = 'destination-over';
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      const outputImg = canvas.toDataURL('image/png');
-      const existingPath = path.parse(filepath);
-      const newPath = `${existingPath.dir}/${existingPath.name}.jpg`;
-      try {
-        fs.writeFileSync(
-          newPath,
-          Buffer.from(outputImg.split(',')[1], 'base64'),
-        );
-        resolve(newPath);
-      } catch (error) {
+    return new Promise((resolve, reject) => {
+      img.onload = function () {
+        const canvasW = canvas.width,
+          canvasH = canvas.height;
+        const imgW = img.naturalWidth || canvasW,
+          imgH = img.naturalHeight || canvasH;
+        const wRatio = canvasW / imgW,
+          hRatio = canvasH / imgH;
+        if (wRatio < hRatio) {
+          canvas.height = canvasW * (imgH / imgW);
+        } else {
+          canvas.width = canvasH * (imgW / imgH);
+        }
+        const ratio = Math.min(wRatio, hRatio);
+        ctx.drawImage(img, 0, 0, imgW * ratio, imgH * ratio);
+        ctx.globalCompositeOperation = 'destination-over';
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const outputImg = canvas.toDataURL('image/png');
+        const existingPath = path.parse(filepath);
+        const newPath = `${existingPath.dir}/${existingPath.name}.jpg`;
+        try {
+          fs.writeFileSync(
+            newPath,
+            Buffer.from(outputImg.split(',')[1], 'base64'),
+          );
+          resolve(newPath);
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      img.onerror = function (error) {
         reject(error);
-      }
-    };
-
-    img.onerror = function (error) {
-      reject(error);
-    };
-  });
+      };
+    });
+  } catch (error) {
+    console.error(error);
+    return filepath;
+  }
 };
 
 const showMediaWindow = (state: boolean) => {
-  const currentState = useCurrentStateStore();
-  const { mediaPlayer } = storeToRefs(currentState);
-  mediaPlayer.value.windowVisible = state;
-  toggleMediaWindow(state ? 'show' : 'hide');
+  try {
+    const currentState = useCurrentStateStore();
+    const { mediaPlayer } = storeToRefs(currentState);
+    mediaPlayer.value.windowVisible = state;
+    toggleMediaWindow(state ? 'show' : 'hide');
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 export {
