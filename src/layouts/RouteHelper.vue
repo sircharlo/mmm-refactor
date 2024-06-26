@@ -1,21 +1,30 @@
 <template>
   <!-- not used -->
-   <p></p>
+  <p></p>
 </template>
 
 <script setup>
-import { onBeforeMount } from 'vue'
-import { useRouter } from 'vue-router'
-const router = useRouter()
+import { onBeforeMount } from 'vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 function searchParam(key) {
-  return new URLSearchParams(location.search).get(key)
+  try {
+    return new URLSearchParams(location.search).get(key);
+  } catch (error) {
+    console.error(error);
+    return '';
+  }
 }
 
 onBeforeMount(() => {
-  const param = searchParam('page')
-  if (param) {
-    router.push({ path: `/${param}` })
+  try {
+    const param = searchParam('page');
+    if (param) {
+      router.push({ path: `/${param}` });
+    }
+  } catch (error) {
+    console.error(error);
   }
-})
+});
 </script>

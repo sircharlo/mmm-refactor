@@ -4,12 +4,13 @@ import { storeToRefs } from 'pinia';
 import { FULL_HD } from 'src/helpers/converters';
 import { electronApi } from 'src/helpers/electron-api';
 import { downloadFileIfNeeded, getJwMediaInfo } from 'src/helpers/jw-media';
-import { isImage, isVideo } from 'src/helpers/mediaPlayback';
+import { isFileUrl, isImage, isVideo } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { PublicationFetcher } from 'src/types/publications';
 import { MultimediaItem } from 'src/types/sqlite';
 
-const { fs, getUserDataPath, klawSync, path, pathToFileURL } = electronApi;
+const { fileUrlToPath, fs, getUserDataPath, klawSync, path, pathToFileURL } =
+  electronApi;
 
 const getPublicationsPath = () => path.join(getUserDataPath(), 'Publications');
 
@@ -23,32 +24,42 @@ const getTempDirectory = () => {
 };
 
 const getPublicationDirectory = (publication: PublicationFetcher) => {
-  const dir = path.join(
-    getPublicationsPath(),
-    publication.pub +
-      '_' +
-      publication.langwritten +
-      (publication.issue ? '_' + publication.issue.toString() : ''),
-  );
-  fs.ensureDirSync(dir);
-  return dir;
+  try {
+    const dir = path.join(
+      getPublicationsPath(),
+      publication.pub +
+        '_' +
+        publication.langwritten +
+        (publication.issue ? '_' + publication.issue.toString() : ''),
+    );
+    fs.ensureDirSync(dir);
+    return dir;
+  } catch (error) {
+    console.error(error);
+    return path.resolve('./');
+  }
 };
 const getPublicationDirectoryContents = (
   publication: PublicationFetcher,
   filter?: string,
 ) => {
-  const dir = getPublicationDirectory(publication);
-  if (!fs.existsSync(dir)) return [];
-  const files = klawSync(dir, {
-    filter: (file) => {
-      if (!filter || !file.path) return true;
-      return path
-        .basename(file.path.toLowerCase())
-        .includes(filter.toLowerCase());
-    },
-    nodir: true,
-  });
-  return files as Item[];
+  try {
+    const dir = getPublicationDirectory(publication);
+    if (!fs.existsSync(dir)) return [];
+    const files = klawSync(dir, {
+      filter: (file) => {
+        if (!filter || !file.path) return true;
+        return path
+          .basename(file.path.toLowerCase())
+          .includes(filter.toLowerCase());
+      },
+      nodir: true,
+    });
+    return files as Item[];
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
 };
 
 const getFileUrl = (path: string) => {
@@ -83,6 +94,10 @@ const getDurationFromMediaPath: (mediaPath: string) => Promise<number> = (
   });
 };
 
+const convertFileUrl = (path: string): string => {
+  return isFileUrl(path) ? fileUrlToPath(path) : path;
+};
+
 const getThumbnailFromVideoPath: (
   videoPath: string,
   thumbnailPath: string,
@@ -92,7 +107,8 @@ const getThumbnailFromVideoPath: (
       reject(new Error('No video path provided'));
       return;
     }
-
+    videoPath = convertFileUrl(videoPath);
+    thumbnailPath = convertFileUrl(thumbnailPath);
     if (!fs.existsSync(videoPath)) {
       reject(new Error('Video path does not exist: ' + videoPath));
       return;
@@ -148,62 +164,74 @@ const getThumbnailFromVideoPath: (
 };
 
 const getThumbnailUrl = async (filepath: string, forceRefresh?: boolean) => {
-  let thumbnailUrl = '';
-  if (isImage(filepath)) {
-    thumbnailUrl = getFileUrl(filepath);
-  } else if (isVideo(filepath)) {
-    const thumbnailPath = filepath.split('.')[0] + '.jpg';
-    if (fs.existsSync(thumbnailPath)) {
-      thumbnailUrl = getFileUrl(thumbnailPath);
-    } else {
-      thumbnailUrl = await getThumbnailFromVideoPath(filepath, thumbnailPath);
+  try {
+    let thumbnailUrl = '';
+    if (isImage(filepath)) {
+      thumbnailUrl = getFileUrl(filepath);
+    } else if (isVideo(filepath)) {
+      const thumbnailPath = filepath.split('.')[0] + '.jpg';
+      if (fs.existsSync(thumbnailPath)) {
+        thumbnailUrl = getFileUrl(thumbnailPath);
+      } else {
+        thumbnailUrl = await getThumbnailFromVideoPath(filepath, thumbnailPath);
+      }
     }
+    return thumbnailUrl + (forceRefresh ? '?timestamp=' + Date.now() : '');
+  } catch (error) {
+    console.error(error);
+    return '';
   }
-  return thumbnailUrl + (forceRefresh ? '?timestamp=' + Date.now() : '');
 };
 
 const getSubtitlesUrl = async (
   multimediaItem: MultimediaItem,
   comparisonDuration: number,
 ) => {
-  const currentState = useCurrentStateStore();
-  const { currentSettings } = storeToRefs(currentState);
-  if (!currentSettings.value?.enableSubtitles) return '';
-  let subtitlesUrl = '';
-  if (
-    isVideo(multimediaItem.FilePath) &&
-    multimediaItem.KeySymbol &&
-    multimediaItem.Track
-  ) {
-    let subtitlesPath = multimediaItem.FilePath.split('.')[0] + '.vtt';
-    const subtitleLang = currentSettings.value?.langSubtitles;
-    const subtitleFetcher: PublicationFetcher = {
-      fileformat: 'mp4',
-      issue: multimediaItem.IssueTagNumber,
-      langwritten: subtitleLang ?? currentSettings.value?.lang,
-      pub: multimediaItem.KeySymbol,
-      track: multimediaItem.Track,
-    };
-    const { duration, subtitles } = await getJwMediaInfo(subtitleFetcher);
-    if (!subtitles) return '';
-    if (duration && Math.abs(duration - comparisonDuration) > 10) return '';
-    const subtitlesFilename = path.basename(subtitles);
-    const subDirectory = getPublicationDirectory(subtitleFetcher);
-    await downloadFileIfNeeded({
-      dir: subDirectory,
-      filename: subtitlesFilename,
-      url: subtitles,
-    });
-    subtitlesPath = path.join(subDirectory, subtitlesFilename);
-    if (fs.existsSync(subtitlesPath)) {
-      subtitlesUrl = getFileUrl(subtitlesPath);
+  try {
+    const currentState = useCurrentStateStore();
+    const { currentSettings } = storeToRefs(currentState);
+    if (!currentSettings.value?.enableSubtitles) throw new Error('No settings');
+    let subtitlesUrl = '';
+    if (
+      isVideo(multimediaItem.FilePath) &&
+      multimediaItem.KeySymbol &&
+      multimediaItem.Track
+    ) {
+      let subtitlesPath = multimediaItem.FilePath.split('.')[0] + '.vtt';
+      const subtitleLang = currentSettings.value?.langSubtitles;
+      const subtitleFetcher: PublicationFetcher = {
+        fileformat: 'mp4',
+        issue: multimediaItem.IssueTagNumber,
+        langwritten: subtitleLang ?? currentSettings.value?.lang,
+        pub: multimediaItem.KeySymbol,
+        track: multimediaItem.Track,
+      };
+      const { duration, subtitles } = await getJwMediaInfo(subtitleFetcher);
+      if (!subtitles) throw new Error('No subtitles found');
+      if (duration && Math.abs(duration - comparisonDuration) > 10)
+        throw new Error('Duration mismatch');
+      const subtitlesFilename = path.basename(subtitles);
+      const subDirectory = getPublicationDirectory(subtitleFetcher);
+      await downloadFileIfNeeded({
+        dir: subDirectory,
+        filename: subtitlesFilename,
+        url: subtitles,
+      });
+      subtitlesPath = path.join(subDirectory, subtitlesFilename);
+      if (fs.existsSync(subtitlesPath)) {
+        subtitlesUrl = getFileUrl(subtitlesPath);
+      } else {
+        throw new Error('Subtitles file not found: ' + subtitlesPath);
+      }
     } else {
+      console.info('No subtitles available for: ' + multimediaItem.FilePath);
       return '';
     }
-  } else {
+    return subtitlesUrl;
+  } catch (error) {
+    console.warn(error);
     return '';
   }
-  return subtitlesUrl;
 };
 
 export {

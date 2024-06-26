@@ -63,3 +63,84 @@
     margin: -2.5vh -2vh;
   }
 }
+
+.meeting-section {
+  border-left: 10px solid;
+}
+
+.meeting-section.meeting-section-skeleton {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.meeting-section-begin {
+  margin-top: 1em;
+}
+
+.meeting-section-end {
+  margin-bottom: 1em;
+}
+
+.meeting-section-tgw {
+  border-color: rgb(60, 127, 139);
+  background-color: rgb(60, 127, 139, 0.1);
+}
+/*
+.meeting-section-begin-tgw {
+  border-top: 5px solid rgb(60, 127, 139, 0.25);
+}
+
+.meeting-section-end-tgw {
+  border-bottom: 5px solid rgb(60, 127, 139, 0.25);
+} */
+
+.meeting-section-ayfm {
+  border-color: rgb(214, 143, 0);
+  background-color: rgb(214, 143, 0, 0.1);
+}
+
+/* .meeting-section-begin-ayfm {
+  border-top: 5px solid rgb(214, 143, 0, 0.25);
+}
+
+.meeting-section-end-ayfm {
+  border-bottom: 5px solid rgb(214, 143, 0, 0.25);
+} */
+
+.meeting-section-lac {
+  border-color: rgb(191, 47, 19);
+  background-color: rgb(191, 47, 19, 0.1);
+}
+
+/* .meeting-section-begin-lac {
+  border-top: 5px solid rgb(191, 47, 19, 0.25);
+}
+
+.meeting-section-end-lac {
+  border-bottom: 5px solid rgb(191, 47, 19, 0.25);
+} */
+
+.meeting-section-wt {
+  border-color: rgb(214, 143, 0);
+  background-color: rgb(214, 143, 0, 0.1);
+}
+
+/* .meeting-section-begin-wt {
+  border-top: 5px solid rgb(214, 143, 0, 0.25);
+}
+
+.meeting-section-end-wt {
+  border-bottom: 5px solid rgb(214, 143, 0, 0.25);
+} */
+
+.meeting-section-additional {
+  border-color: rgb(91, 60, 136);
+  background-color: rgb(91, 60, 136, 0.1);
+}
+/*
+.meeting-section-begin-additional {
+  border-top: 5px solid rgb(91, 60, 136, 0.25);
+}
+
+.meeting-section-end-additional {
+  border-bottom: 5px solid rgb(91, 60, 136, 0.25);
+} */

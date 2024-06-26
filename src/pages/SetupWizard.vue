@@ -582,21 +582,8 @@
           </q-stepper-navigation>
         </q-step>
       </template>
-
-      <!--
-    {
-      title: 'Where should media be stored?',
-      subtitle:
-        'Choose the folder in which media to be played at meetings should be saved on this computer.',
-      settings: [props.requiredSettings['app.localOutputPath']],
-      onComplete: () => {
-        if (!firstRunParams.value.companionToJw) startMediaSync()
-      },
-    },
- */ -->
     </q-stepper>
   </q-page>
-  <!-- <pre>{{ currentSettings }}</pre> -->
 </template>
 
 <script setup lang="ts">
@@ -649,7 +636,11 @@ watch(
 );
 
 const goToPage = (path: string) => {
-  router.push({ path });
+  try {
+    router.push({ path });
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const step = ref(0);

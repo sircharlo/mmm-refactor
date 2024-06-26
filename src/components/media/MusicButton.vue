@@ -95,91 +95,113 @@ const currentSongRemainingTime = ref('..:..');
 const timeRemainingBeforeMusicStop = ref();
 
 function stopMusic() {
-  if (!musicPlayer.value) return;
-  musicStopping.value = true;
-  if (musicPlayer.value.volume > 0) {
-    const fadeOutTime = 7500; // 7.5 seconds
-    const fadeInterval = 50;
-    musicPlayer.value.volume -= Math.min(
-      musicPlayer.value.volume,
-      100 / (fadeOutTime / fadeInterval) / 100,
-    );
-    fadeOutTimer.value = setTimeout(stopMusic, fadeInterval);
-  } else {
-    musicPlayer.value.pause();
-    musicPlaying.value = false;
-    musicStopping.value = false;
+  try {
+    if (!musicPlayer.value) return;
+    musicStopping.value = true;
+    if (musicPlayer.value.volume > 0) {
+      const fadeOutTime = 7500; // 7.5 seconds
+      const fadeInterval = 50;
+      musicPlayer.value.volume -= Math.min(
+        musicPlayer.value.volume,
+        100 / (fadeOutTime / fadeInterval) / 100,
+      );
+      fadeOutTimer.value = setTimeout(stopMusic, fadeInterval);
+    } else {
+      musicPlayer.value.pause();
+      musicPlaying.value = false;
+      musicStopping.value = false;
+    }
+  } catch (error) {
+    console.error(error);
   }
 }
 
 const getNextSongUrl = () => {
-  if (!songList.value.length) {
-    songList.value = getPublicationDirectoryContents(
-      { langwritten: 'E', pub: 'sjjm' },
-      'mp3',
-    ).sort(() => Math.random() - 0.5);
+  try {
+    if (!songList.value.length) {
+      songList.value = getPublicationDirectoryContents(
+        { langwritten: 'E', pub: 'sjjm' },
+        'mp3',
+      ).sort(() => Math.random() - 0.5);
+    }
+    if (!songList.value.length) return '';
+    let nextSong = songList.value.shift() as klawSync.Item;
+    songList.value = songList.value.concat(nextSong);
+    return getFileUrl(nextSong.path);
+  } catch (error) {
+    console.error(error);
+    return '';
   }
-  if (!songList.value.length) return '';
-  let nextSong = songList.value.shift() as klawSync.Item;
-  songList.value = songList.value.concat(nextSong);
-  return getFileUrl(nextSong.path);
 };
 
 function playMusic() {
-  if (
-    !musicPlayer.value ||
-    !musicPlayerSource.value ||
-    !currentSettings.value?.enableMusicButton
-  )
-    return;
-  musicPlayer.value.volume =
-    (currentSettings.value?.musicVolume ?? 100)  / 100 ?? 1;
-  musicPlayerSource.value.src = getNextSongUrl();
-  musicPlayer.value.load();
-  musicPlayer.value
-    .play()
-    .then(() => {
-      musicPlaying.value = true;
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-  musicPlayer.value.onended = () => {
-    if (!musicPlayer.value || !musicPlayerSource.value) return;
+  try {
+    if (
+      !musicPlayer.value ||
+      !musicPlayerSource.value ||
+      !currentSettings.value?.enableMusicButton
+    )
+      return;
+    musicPlayer.value.volume =
+      (currentSettings.value?.musicVolume ?? 100) / 100 ?? 1;
     musicPlayerSource.value.src = getNextSongUrl();
     musicPlayer.value.load();
-    musicPlayer.value.play().catch((error) => {
-      console.error(error);
-    });
-  };
-  musicPlayer.value.ontimeupdate = () => {
-    if (!musicPlayer.value) return;
-    const remainingTime = Math.floor(
-      musicPlayer.value.duration - musicPlayer.value.currentTime,
-    );
-    currentSongRemainingTime.value = formatTime(remainingTime);
-    const timeBeforeMeeting = remainingTimeBeforeMeetingStart();
-    if (timeBeforeMeeting && !musicStoppedAutomatically.value) {
-      timeRemainingBeforeMusicStop.value = (timeBeforeMeeting as number) - 60;
-      if (timeRemainingBeforeMusicStop.value <= 0 && !musicStopping.value) {
-        stopMusic();
-        musicStoppedAutomatically.value = true;
+    musicPlayer.value
+      .play()
+      .then(() => {
+        musicPlaying.value = true;
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    musicPlayer.value.onended = () => {
+      if (!musicPlayer.value || !musicPlayerSource.value) return;
+      musicPlayerSource.value.src = getNextSongUrl();
+      musicPlayer.value.load();
+      musicPlayer.value.play().catch((error) => {
+        console.error(error);
+      });
+    };
+    musicPlayer.value.ontimeupdate = () => {
+      try {
+        if (!musicPlayer.value) return;
+        const remainingTime = Math.floor(
+          musicPlayer.value.duration - musicPlayer.value.currentTime,
+        );
+        currentSongRemainingTime.value = formatTime(remainingTime);
+        const timeBeforeMeeting = remainingTimeBeforeMeetingStart();
+        if (timeBeforeMeeting && !musicStoppedAutomatically.value) {
+          timeRemainingBeforeMusicStop.value =
+            (timeBeforeMeeting as number) - 60;
+          if (timeRemainingBeforeMusicStop.value <= 0 && !musicStopping.value) {
+            stopMusic();
+            musicStoppedAutomatically.value = true;
+          }
+        }
+      } catch (error) {
+        console.error(error);
       }
-    }
-  };
+    };
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 const meetingDay = ref(false);
 
 onMounted(() => {
-  meetingDay.value =
-    selectedDateObject.value?.today && !!selectedDateObject.value?.meeting;
-  if (
-    currentSettings.value?.enableMusicButton &&
-    currentSettings.value?.autoStartMusic &&
-    meetingDay.value
-  ) {
-    playMusic();
+  try {
+    meetingDay.value =
+      selectedDateObject.value?.today && !!selectedDateObject.value?.meeting;
+    if (
+      currentSettings.value?.enableMusicButton &&
+      currentSettings.value?.autoStartMusic &&
+      meetingDay.value
+    ) {
+      playMusic();
+    }
+  } catch (error) {
+    console.error(error);
   }
 });
 
@@ -189,36 +211,46 @@ onMounted(() => {
  * @return {string|null} The remaining time in hours and minutes, optionally formatted, or null if there is no meeting day selected.
  */
 const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
-  if (meetingDay.value) {
-    const now = new Date();
-    const weMeeting = selectedDateObject.value?.meeting === 'we';
-    const meetingStartTime = weMeeting
-      ? currentSettings.value?.weStartTime
-      : currentSettings.value?.mwStartTime;
-    const [hours, minutes] = meetingStartTime.split(':').map(Number);
-    const meetingStartDateTime = new Date(now);
-    meetingStartDateTime.setHours(hours, minutes, 0, 0);
-    const dateDiff = date.getDateDiff(meetingStartDateTime, now, 'seconds');
-    if (dateDiff < 0) {
-      return null;
-    } else {
-      if (formatted) {
-        return formatTime(dateDiff);
+  try {
+    if (meetingDay.value) {
+      const now = new Date();
+      const weMeeting = selectedDateObject.value?.meeting === 'we';
+      const meetingStartTime = weMeeting
+        ? currentSettings.value?.weStartTime
+        : currentSettings.value?.mwStartTime;
+      const [hours, minutes] = meetingStartTime.split(':').map(Number);
+      const meetingStartDateTime = new Date(now);
+      meetingStartDateTime.setHours(hours, minutes, 0, 0);
+      const dateDiff = date.getDateDiff(meetingStartDateTime, now, 'seconds');
+      if (dateDiff < 0) {
+        return null;
       } else {
-        return dateDiff;
+        if (formatted) {
+          return formatTime(dateDiff);
+        } else {
+          return dateDiff;
+        }
       }
+    } else {
+      return null;
     }
-  } else {
+  } catch (error) {
+    console.error(error);
     return null;
   }
 };
 
 const musicRemainingTime = computed(() => {
-  if (!musicPlayer.value) return '..:..';
-  if (musicStopping.value) return ref(t('music.stopping')).value;
-  if (meetingDay.value && timeRemainingBeforeMusicStop.value > 0)
-    return formatTime(timeRemainingBeforeMusicStop.value);
-  return currentSongRemainingTime.value;
+  try {
+    if (!musicPlayer.value) return '..:..';
+    if (musicStopping.value) return ref(t('music.stopping')).value;
+    if (meetingDay.value && timeRemainingBeforeMusicStop.value > 0)
+      return formatTime(timeRemainingBeforeMusicStop.value);
+    return currentSongRemainingTime.value;
+  } catch (error) {
+    console.error(error);
+    return '..:..';
+  }
 });
 
 const musicPopup = ref(false);

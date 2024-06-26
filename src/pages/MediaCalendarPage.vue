@@ -620,7 +620,6 @@ import { dragAndDrop } from '@formkit/drag-and-drop/vue';
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { Buffer } from 'buffer';
 import DOMPurify from 'dompurify';
-import mime from 'mime';
 import { storeToRefs } from 'pinia';
 import { date, uid } from 'quasar';
 import { electronApi } from 'src/helpers/electron-api';
@@ -647,6 +646,7 @@ import {
   findDb,
   formatTime,
   getMediaFromJwPlaylist,
+  inferExtension,
   isArchive,
   isAudio,
   isHeic,
@@ -720,48 +720,60 @@ function stopMedia(elemId: string) {
 }
 
 function zoomIn(elemId: string) {
-  panzooms[elemId].zoomIn();
+  try {
+    panzooms[elemId].zoomIn();
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 function zoomOut(elemId: string) {
-  panzooms[elemId].zoomOut();
-  zoomReset(elemId);
+  try {
+    panzooms[elemId].zoomOut();
+    zoomReset(elemId);
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 const initiatePanzoom = (elemId: string) => {
-  const elem = document.getElementById(elemId);
-  const width = elem?.clientWidth || 0;
-  const height = elem?.clientHeight || 0;
-  if (!elem) return;
-  panzooms[elemId] = Panzoom(elem, {
-    animate: true,
-    maxScale: 5,
-    minScale: 1,
-    panOnlyWhenZoomed: true,
-  });
+  try {
+    const elem = document.getElementById(elemId);
+    const width = elem?.clientWidth || 0;
+    const height = elem?.clientHeight || 0;
+    if (!elem) return;
+    panzooms[elemId] = Panzoom(elem, {
+      animate: true,
+      maxScale: 5,
+      minScale: 1,
+      panOnlyWhenZoomed: true,
+    });
 
-  elem.addEventListener('panzoomend', () => {
-    zoomReset(elemId);
-  });
+    elem.addEventListener('panzoomend', () => {
+      zoomReset(elemId);
+    });
 
-  elem.addEventListener(
-    'panzoomchange',
-    (e: HTMLElementEventMap['panzoomchange']) => {
-      mediaPlayer.value.scale = e.detail.scale;
-      if (width > 0) mediaPlayer.value.x = e.detail.x / width;
-      if (height > 0) mediaPlayer.value.y = e.detail.y / height;
-    },
-  );
+    elem.addEventListener(
+      'panzoomchange',
+      (e: HTMLElementEventMap['panzoomchange']) => {
+        mediaPlayer.value.scale = e.detail.scale;
+        if (width > 0) mediaPlayer.value.x = e.detail.x / width;
+        if (height > 0) mediaPlayer.value.y = e.detail.y / height;
+      },
+    );
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 const mediaList = ref();
 const sortableMediaItems = ref([] as DynamicMediaObject[]);
 const datedAdditionalMediaMap = computed(() => {
-  return currentCongregation.value && selectedDate.value
-    ? additionalMediaMaps.value[currentCongregation.value]?.[
-        selectedDate.value
-      ] || []
-    : [];
+  return (
+    additionalMediaMaps.value[currentCongregation.value]?.[
+      selectedDate.value
+    ] ?? []
+  );
 });
 
 function deleteMedia() {
@@ -773,55 +785,81 @@ function deleteMedia() {
 const mapOrder =
   (sortOrder: string | string[] | undefined) =>
   (a: DynamicMediaObject, b: DynamicMediaObject) => {
-    const key = 'uniqueId';
-    if (!sortOrder) return 0;
-    return sortOrder.indexOf(a[key]) > sortOrder.indexOf(b[key]) ? 1 : -1;
+    try {
+      const key = 'uniqueId';
+      if (!sortOrder) return 0;
+      return sortOrder.indexOf(a[key]) > sortOrder.indexOf(b[key]) ? 1 : -1;
+    } catch (e) {
+      console.error(e);
+      return 0;
+    }
   };
 
-// const fileUrlIsValid = (fileUrl: PathLike) => {
-//   if (!fileUrl) {
-//     return false;
-//   } else if (!fs.existsSync(fileUrlToPath(fileUrl))) return false;
-//   else {
-//     return true;
-//   }
-// };
-
-// todo: watch length instead? less heavy?
-const mediaItems = computed(() => {
-  return datedAdditionalMediaMap.value.concat(
-    selectedDateObject.value?.dynamicMedia,
-  );
-});
-
-watch(mediaItems, (newValue) => {
-  if (newValue && currentCongregation.value && selectedDate.value) {
-    if (!mediaSort.value[currentCongregation.value])
-      mediaSort.value[currentCongregation.value] = {};
-    sortableMediaItems.value = newValue.sort(
-      mapOrder(mediaSort.value[currentCongregation.value][selectedDate.value]),
-    );
-  }
-});
+watch(
+  () => [
+    selectedDateObject.value.date,
+    datedAdditionalMediaMap.value?.length,
+    selectedDateObject.value?.dynamicMedia?.length,
+  ],
+  (
+    [newSelectedDate, newAdditionalMediaListLength, newDynamicMediaListLength],
+    [oldSelectedDate, oldAdditionalMediaListLength, oldDynamicMediaListLength],
+  ) => {
+    try {
+      if (
+        newSelectedDate !== oldSelectedDate ||
+        newAdditionalMediaListLength !== oldAdditionalMediaListLength ||
+        newDynamicMediaListLength !== oldDynamicMediaListLength
+      ) {
+        const combinedMediaItems = datedAdditionalMediaMap.value.concat(
+          selectedDateObject.value?.dynamicMedia ?? [],
+        );
+        if (
+          combinedMediaItems &&
+          currentCongregation.value &&
+          selectedDate.value
+        ) {
+          if (!mediaSort.value[currentCongregation.value]) {
+            mediaSort.value[currentCongregation.value] = {};
+          }
+          sortableMediaItems.value = combinedMediaItems.sort(
+            mapOrder(
+              mediaSort.value[currentCongregation.value][selectedDate.value],
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  },
+);
 
 watch(
-  mediaSort,
-  (newVal) => {
-    if (
-      currentCongregation.value &&
-      selectedDate.value &&
-      newVal[currentCongregation.value][selectedDate.value]?.length === 0
-    ) {
-      newVal[currentCongregation.value][selectedDate.value] =
-        datedAdditionalMediaMap.value
-          .concat(selectedDateObject.value?.dynamicMedia)
-          .map((item: DynamicMediaObject) => item.uniqueId);
+  Object.keys(mediaSort),
+  () => {
+    try {
+      if (
+        currentCongregation.value &&
+        selectedDate.value &&
+        mediaSort.value[currentCongregation.value][selectedDate.value]
+          ?.length === 0
+      ) {
+        mediaSort.value[currentCongregation.value][selectedDate.value] =
+          datedAdditionalMediaMap.value
+            .concat(selectedDateObject.value?.dynamicMedia)
+            .map((item: DynamicMediaObject) => item.uniqueId);
+      }
+      sortableMediaItems.value.sort(
+        mapOrder(
+          mediaSort.value[currentCongregation.value][selectedDate.value],
+        ),
+      );
+    } catch (e) {
+      console.error(e);
     }
-    sortableMediaItems.value.sort(
-      mapOrder(newVal[currentCongregation.value][selectedDate.value]),
-    );
   },
-  { deep: true },
+  // { deep: true },
 );
 
 const updateMediaSortPlugin: DNDPlugin = (parent) => {
@@ -896,92 +934,91 @@ onMounted(async () => {
   window.addEventListener('remoteVideo-loaded', remoteVideoLoaded);
 
   watch(selectedDate, (newVal) => {
-    if (!currentCongregation.value || !newVal) return;
-    const durations = (customDurations.value[currentCongregation.value] ||= {});
-    durations[newVal] ||= {};
+    try {
+      if (!currentCongregation.value || !newVal) return;
+      const durations = (customDurations.value[currentCongregation.value] ||=
+        {});
+      durations[newVal] ||= {};
+    } catch (e) {
+      console.error(e);
+    }
   });
-  if (
-    currentCongregation.value &&
-    lookupPeriod.value[currentCongregation.value]
-  ) {
-    selectedDate.value = date.formatDate(
+
+  try {
+    if (
+      currentCongregation.value &&
       lookupPeriod.value[currentCongregation.value]
-        ?.filter((day) => day.meeting)
-        .map((day) => day.date)[0],
-      'YYYY/MM/DD',
-    );
+    ) {
+      selectedDate.value = date.formatDate(
+        lookupPeriod.value[currentCongregation.value]
+          ?.filter((day) => day.meeting)
+          .map((day) => day.date)[0],
+        'YYYY/MM/DD',
+      );
+    }
+  } catch (e) {
+    console.error(e);
   }
   sendObsSceneEvent('camera');
   fetchMedia();
 });
 
-function inferExtension(filename: string, filetype?: string) {
-  if (!filetype) return filename;
-  const extension = mime.extension(filetype);
-  if (!extension) {
-    console.warn(
-      'Could not determine the file extension from the provided file type',
-    );
-    return filename;
-  }
-  const hasExtension = /\.[0-9a-z]+$/i.test(filename);
-  if (hasExtension) {
-    return filename;
-  }
-  return `${filename}.${extension}`;
-}
-
 const addJwpubDocumentMediaToFiles = async (document: DocumentItem) => {
-  additionalLoading.value = true;
-  jwpubImportDocuments.value = [];
-  jwpubImportLoading.value = true;
-  const publication = getPublicationInfoFromDb(jwpubImportDb.value);
-  let multimediaItems = getDocumentMultimediaItems({
-    db: jwpubImportDb.value,
-    docId: document.DocumentId,
-  }).map((multimediaItem) =>
-    addFullFilePathToMultimediaItem(multimediaItem, publication),
-  );
-  await processMissingMediaInfo(multimediaItems);
-  const dynamicMediaItems = await dynamicMediaMapper(
-    multimediaItems,
-    selectedDateObject.value?.date,
-    true,
-  );
-  addToAdditionMediaMap(dynamicMediaItems);
-  jwpubImportDb.value = '';
-  jwpubImportLoading.value = false;
-  additionalLoading.value = false;
+  try {
+    additionalLoading.value = true;
+    jwpubImportDocuments.value = [];
+    jwpubImportLoading.value = true;
+    const publication = getPublicationInfoFromDb(jwpubImportDb.value);
+    let multimediaItems = getDocumentMultimediaItems({
+      db: jwpubImportDb.value,
+      docId: document.DocumentId,
+    }).map((multimediaItem) =>
+      addFullFilePathToMultimediaItem(multimediaItem, publication),
+    );
+    await processMissingMediaInfo(multimediaItems);
+    const dynamicMediaItems = await dynamicMediaMapper(
+      multimediaItems,
+      selectedDateObject.value?.date,
+      true,
+    );
+    addToAdditionMediaMap(dynamicMediaItems);
+    jwpubImportDb.value = '';
+    jwpubImportLoading.value = false;
+    additionalLoading.value = false;
+  } catch (e) {
+    console.error(e);
+  }
 };
 
 const copyToDatedAdditionalMedia = async (files: string[]) => {
   const datedAdditionalMediaDir = getDatedAdditionalMediaDirectory.value;
   fs.ensureDirSync(datedAdditionalMediaDir);
 
+  const trimFilepathAsNeeded = (filepath: string) => {
+    let filepathSize = new Blob([filepath]).size;
+    while (filepathSize > 230) {
+      const overBy = filepathSize - 230;
+      const baseName = path
+        .basename(filepath)
+        .slice(0, -path.extname(filepath).length);
+      const newBaseName = baseName.slice(0, -overBy);
+      filepath = path.join(
+        datedAdditionalMediaDir,
+        newBaseName + path.extname(filepath),
+      );
+      filepathSize = new Blob([filepath]).size;
+    }
+    return filepath;
+  };
+
   for (const filepathToCopy of files) {
-    if (!filepathToCopy || !fs.existsSync(filepathToCopy)) continue;
-    let datedAdditionalMediaPath = path.join(
-      datedAdditionalMediaDir,
-      path.basename(filepathToCopy),
-    );
-    const trimFilepathAsNeeded = (filepath: string) => {
-      let filepathSize = new Blob([filepath]).size;
-      while (filepathSize > 230) {
-        const overBy = filepathSize - 230;
-        const baseName = path
-          .basename(filepath)
-          .slice(0, -path.extname(filepath).length);
-        const newBaseName = baseName.slice(0, -overBy);
-        filepath = path.join(
-          datedAdditionalMediaDir,
-          newBaseName + path.extname(filepath),
-        );
-        filepathSize = new Blob([filepath]).size;
-      }
-      return filepath;
-    };
-    datedAdditionalMediaPath = trimFilepathAsNeeded(datedAdditionalMediaPath);
     try {
+      if (!filepathToCopy || !fs.existsSync(filepathToCopy)) continue;
+      let datedAdditionalMediaPath = path.join(
+        datedAdditionalMediaDir,
+        path.basename(filepathToCopy),
+      );
+      datedAdditionalMediaPath = trimFilepathAsNeeded(datedAdditionalMediaPath);
       const uniqueId = sanitizeId(
         date.formatDate(selectedDate.value, 'YYYYMMDD') +
           '-' +
@@ -997,7 +1034,7 @@ const copyToDatedAdditionalMedia = async (files: string[]) => {
 
       await addToAdditionMediaMapFromPath(datedAdditionalMediaPath, uniqueId);
     } catch (error) {
-      console.error(error, filepathToCopy, datedAdditionalMediaPath);
+      console.error(error, filepathToCopy);
     }
   }
 };
@@ -1126,24 +1163,36 @@ const addToFiles = async (
           filepath,
           selectedDateObject.value?.date,
           getDatedAdditionalMediaDirectory.value,
-        ).then((additionalMedia) => {
-          addToAdditionMediaMap(additionalMedia);
-        });
+        )
+          .then((additionalMedia) => {
+            addToAdditionMediaMap(additionalMedia);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
       } else if (isArchive(filepath)) {
         const unzipDirectory = path.join(
           getTempDirectory(),
           path.basename(filepath),
         );
         if (fs.existsSync(unzipDirectory)) fs.removeSync(unzipDirectory);
-        decompress(filepath, unzipDirectory).then(() => {
-          addToFiles(
-            fs.readdirSync(unzipDirectory).map((file) => {
-              return {
-                path: path.join(unzipDirectory, file),
-              };
-            }),
-          ).then(() => fs.removeSync(unzipDirectory));
-        });
+        decompress(filepath, unzipDirectory)
+          .then(() => {
+            addToFiles(
+              fs.readdirSync(unzipDirectory).map((file) => {
+                return {
+                  path: path.join(unzipDirectory, file),
+                };
+              }),
+            )
+              .then(() => fs.removeSync(unzipDirectory))
+              .catch((error) => {
+                console.error(error);
+              });
+          })
+          .catch((error) => {
+            console.error(error);
+          });
       } else {
         createTemporaryNotification({
           caption: filepath ? path.basename(filepath) : filepath,
@@ -1166,35 +1215,43 @@ const addToFiles = async (
 const dropActive = (event: DragEvent) => {
   event.preventDefault();
   event.stopPropagation();
-  if (!event.relatedTarget && event.dataTransfer?.effectAllowed === 'all') {
+  if (!event?.relatedTarget && event?.dataTransfer?.effectAllowed === 'all') {
     dragging.value = true;
   }
 };
 const dropEnd = (event: DragEvent) => {
   event.preventDefault();
   event.stopPropagation();
-  if (event.dataTransfer?.files.length) {
-    const droppedStuff = Array.from(event.dataTransfer.files) as {
-      filetype?: string;
-      path: string;
-    }[];
-    let noLocalDroppedFiles =
-      droppedStuff.filter((file) => file.path).length === 0;
-    if (noLocalDroppedFiles && droppedStuff.length > 0) {
-      // maybe its a drag and drop from a web browser?
-      let html = event.dataTransfer.getData('text/html');
-      let sanitizedHtml = DOMPurify.sanitize(html);
-      let src = new DOMParser()
-        .parseFromString(sanitizedHtml, 'text/html')
-        .querySelector('img')?.src;
-      const filetype = Array.from(event.dataTransfer.items).find(
-        (item) => item.kind === 'file',
-      )?.type;
-      if (src) droppedStuff[0] = { filetype, path: src };
+  try {
+    if (event.dataTransfer?.files.length) {
+      const droppedStuff = Array.from(event.dataTransfer.files) as {
+        filetype?: string;
+        path: string;
+      }[];
+      let noLocalDroppedFiles =
+        droppedStuff.filter((file) => file.path).length === 0;
+      if (noLocalDroppedFiles && droppedStuff.length > 0) {
+        // maybe its a drag and drop from a web browser?
+        let html = event.dataTransfer.getData('text/html');
+        let sanitizedHtml = DOMPurify.sanitize(html);
+        let src = new DOMParser()
+          .parseFromString(sanitizedHtml, 'text/html')
+          .querySelector('img')?.src;
+        const filetype = Array.from(event.dataTransfer.items).find(
+          (item) => item.kind === 'file',
+        )?.type;
+        if (src) droppedStuff[0] = { filetype, path: src };
+      }
+      addToFiles(droppedStuff)
+        .then(() => {
+          additionalLoading.value = false;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     }
-    addToFiles(droppedStuff).then(() => {
-      additionalLoading.value = false;
-    });
+  } catch (error) {
+    console.error(error);
   }
   dragging.value = false;
 };
@@ -1206,57 +1263,83 @@ const dropEnd = (event: DragEvent) => {
 const mediaDurationPopups = ref({} as { [key: string]: boolean });
 
 const showMediaDurationPopup = (media: DynamicMediaObject) => {
-  if (!currentCongregation.value) return;
-  customDurations.value[currentCongregation.value] ??= {};
-  customDurations.value[currentCongregation.value][selectedDate.value] ??= {};
-  customDurations.value[currentCongregation.value][selectedDate.value][
-    media.uniqueId
-  ] ??= {
-    max: media.duration,
-    min: 0,
-  };
-  mediaDurationPopups.value[media.uniqueId] = true;
+  try {
+    if (!currentCongregation.value) return;
+    customDurations.value[currentCongregation.value] ??= {};
+    customDurations.value[currentCongregation.value][selectedDate.value] ??= {};
+    customDurations.value[currentCongregation.value][selectedDate.value][
+      media.uniqueId
+    ] ??= {
+      max: media.duration,
+      min: 0,
+    };
+    mediaDurationPopups.value[media.uniqueId] = true;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const resetMediaDuration = (media: DynamicMediaObject) => {
-  customDurations.value[currentCongregation.value] ??= {};
-  customDurations.value[currentCongregation.value][selectedDate.value] ??= {};
-  customDurations.value[currentCongregation.value][selectedDate.value][
-    media.uniqueId
-  ] = {
-    max: media.duration,
-    min: 0,
-  };
+  try {
+    customDurations.value[currentCongregation.value] ??= {};
+    customDurations.value[currentCongregation.value][selectedDate.value] ??= {};
+    customDurations.value[currentCongregation.value][selectedDate.value][
+      media.uniqueId
+    ] = {
+      max: media.duration,
+      min: 0,
+    };
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const imageLoadingError = (media: DynamicMediaObject) => {
-  console.error('imageLoadingError', media);
-  const thumbnailUrl = media.thumbnailUrl;
+  console.warn(
+    'Unable to load thumbnail for media; trying to reload from file.',
+    media,
+  );
   media.thumbnailUrl = '';
-  media.thumbnailUrl = thumbnailUrl ?? getThumbnailUrl(media.fileUrl);
+  getThumbnailUrl(media.fileUrl)
+    .then((thumbnailUrl) => {
+      media.thumbnailUrl = thumbnailUrl;
+      console.warn('Reloaded thumbnail', thumbnailUrl);
+    })
+    .catch((error) => {
+      media.thumbnailUrl = '';
+      console.error(error);
+    });
 };
 
 const localFilesBrowsedListener = (event: CustomEventInit) => {
-  addToFiles(event.detail).then(() => {
-    additionalLoading.value = false;
-  });
+  addToFiles(event.detail)
+    .then(() => {
+      additionalLoading.value = false;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 };
 
 const getLocalFiles = async () => {
-  openFileDialog().then((result) => {
-    if (result.filePaths.length > 0) {
-      addToFiles(
-        result.filePaths.map((path) => {
-          return {
-            path,
-          };
-        }),
-      ).then(() => {
-        additionalLoading.value = false;
-      });
-    }
-    dragging.value = false;
-  });
+  openFileDialog()
+    .then((result) => {
+      if (result.filePaths.length > 0) {
+        addToFiles(
+          result.filePaths.map((path) => {
+            return {
+              path,
+            };
+          }),
+        ).then(() => {
+          additionalLoading.value = false;
+        });
+      }
+      dragging.value = false;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 };
 
 const remoteVideoLoading = () => {
@@ -1295,86 +1378,3 @@ onUnmounted(() => {
   });
 });
 </script>
-
-<style scoped>
-.meeting-section {
-  border-left: 10px solid;
-}
-
-.meeting-section-skeleton {
-  border-color: rgba(0, 0, 0, 0.12);
-}
-
-.meeting-section-begin {
-  margin-top: 1em;
-}
-
-.meeting-section-end {
-  margin-bottom: 1em;
-}
-
-.meeting-section-tgw {
-  border-color: rgb(60, 127, 139);
-  background-color: rgb(60, 127, 139, 0.1);
-}
-/*
-.meeting-section-begin-tgw {
-  border-top: 5px solid rgb(60, 127, 139, 0.25);
-}
-
-.meeting-section-end-tgw {
-  border-bottom: 5px solid rgb(60, 127, 139, 0.25);
-} */
-
-.meeting-section-ayfm {
-  border-color: rgb(214, 143, 0);
-  background-color: rgb(214, 143, 0, 0.1);
-}
-
-/* .meeting-section-begin-ayfm {
-  border-top: 5px solid rgb(214, 143, 0, 0.25);
-}
-
-.meeting-section-end-ayfm {
-  border-bottom: 5px solid rgb(214, 143, 0, 0.25);
-} */
-
-.meeting-section-lac {
-  border-color: rgb(191, 47, 19);
-  background-color: rgb(191, 47, 19, 0.1);
-}
-
-/* .meeting-section-begin-lac {
-  border-top: 5px solid rgb(191, 47, 19, 0.25);
-}
-
-.meeting-section-end-lac {
-  border-bottom: 5px solid rgb(191, 47, 19, 0.25);
-} */
-
-.meeting-section-wt {
-  border-color: rgb(214, 143, 0);
-  background-color: rgb(214, 143, 0, 0.1);
-}
-
-/* .meeting-section-begin-wt {
-  border-top: 5px solid rgb(214, 143, 0, 0.25);
-}
-
-.meeting-section-end-wt {
-  border-bottom: 5px solid rgb(214, 143, 0, 0.25);
-} */
-
-.meeting-section-additional {
-  border-color: rgb(91, 60, 136);
-  background-color: rgb(91, 60, 136, 0.1);
-}
-/*
-.meeting-section-begin-additional {
-  border-top: 5px solid rgb(91, 60, 136, 0.25);
-}
-
-.meeting-section-end-additional {
-  border-bottom: 5px solid rgb(91, 60, 136, 0.25);
-} */
-</style>

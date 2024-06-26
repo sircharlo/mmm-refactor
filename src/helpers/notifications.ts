@@ -8,22 +8,26 @@ const createTemporaryNotification = ({
   timeout = 2000,
   type,
 }: QNotifyCreateOptions) => {
-  return Notify.create({
-    actions: [
-      {
-        color: 'white',
-        icon: 'mdi-close',
-        round: true,
-      },
-    ],
-    group: false,
-    message,
-    timeout,
-    ...(caption && { caption }),
-    ...(type && { type }),
-    ...(icon && { icon }),
-    ...(group && { group }),
-  });
+  try {
+    return Notify.create({
+      actions: [
+        {
+          color: 'white',
+          icon: 'mdi-close',
+          round: true,
+        },
+      ],
+      group: false,
+      message,
+      timeout,
+      ...(caption && { caption }),
+      ...(type && { type }),
+      ...(icon && { icon }),
+      ...(group && { group }),
+    });
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 export { createTemporaryNotification };

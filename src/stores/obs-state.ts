@@ -35,8 +35,4 @@ export const useObsStateStore = defineStore('obs-state', {
       scenes: [] as JsonObject[],
     };
   },
-
-  // actions: {
-
-  // },
 });

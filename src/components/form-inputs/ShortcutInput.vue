@@ -94,15 +94,19 @@ watch(
 );
 
 const handleKeyPress = (event: KeyboardEvent) => {
-  const { altKey, ctrlKey, key, metaKey, shiftKey } = event;
-  const keys = [];
-  if (ctrlKey) keys.push('Ctrl');
-  if (shiftKey) keys.push('Shift');
-  if (altKey) keys.push('Alt');
-  if (metaKey) keys.push('Meta');
-  if (key.length < 3 && keys.length > 0) {
-    keys.push(key);
-    localValue.value = keys.join('+');
+  try {
+    const { altKey, ctrlKey, key, metaKey, shiftKey } = event;
+    const keys = [];
+    if (ctrlKey) keys.push('Ctrl');
+    if (shiftKey) keys.push('Shift');
+    if (altKey) keys.push('Alt');
+    if (metaKey) keys.push('Meta');
+    if (key.length < 3 && keys.length > 0) {
+      keys.push(key);
+      localValue.value = keys.join('+');
+    }
+  } catch (e) {
+    console.error(e);
   }
 };
 

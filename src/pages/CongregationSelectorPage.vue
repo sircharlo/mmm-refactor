@@ -81,6 +81,7 @@ function chooseCongregation(
   congregation: number | string,
   initialLoad?: boolean,
 ) {
+  try {
   const invalidSettings = setCongregation(congregation);
   if (congregation) {
     updateYeartext();
@@ -93,10 +94,14 @@ function chooseCongregation(
       router.push('/media-calendar');
     }
   }
+  } catch (error) {
+    console.error(error);
+    router.push('/');
+  }
 }
 
 const isHomePage = computed(() => {
-  return route.path === '/initial-congregation-selector';
+  return route?.path === '/initial-congregation-selector';
 });
 
 function createNewCongregation() {

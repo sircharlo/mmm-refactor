@@ -1,5 +1,5 @@
 import { getLanguages, getYeartext } from 'boot/axios';
-import { defineStore } from 'pinia';
+import { defineStore, storeToRefs } from 'pinia';
 import { LocalStorage } from 'quasar';
 import { date } from 'quasar';
 import { findBestResolution, getPubMediaLinks } from 'src/helpers/jw-media';
@@ -50,51 +50,62 @@ export const useJwStore = defineStore('jw-store', {
       }
     },
     removeFromAdditionMediaMap(uniqueId: string) {
-      const currentState = useCurrentStateStore();
-      if (
-        uniqueId &&
-        currentState.currentCongregation &&
-        currentState.selectedDate &&
-        this.additionalMediaMaps[currentState.currentCongregation] &&
-        this.additionalMediaMaps[currentState.currentCongregation][
-          currentState.selectedDate
-        ]
-      ) {
-        const currentArray =
+      try {
+        const currentState = useCurrentStateStore();
+        if (
+          uniqueId &&
+          currentState.currentCongregation &&
+          currentState.selectedDate &&
+          this.additionalMediaMaps[currentState.currentCongregation] &&
           this.additionalMediaMaps[currentState.currentCongregation][
             currentState.selectedDate
-          ];
-        this.additionalMediaMaps[currentState.currentCongregation][
-          currentState.selectedDate
-        ] = uniqueById(
-          currentArray.filter((media) => media.uniqueId !== uniqueId),
-        );
+          ]
+        ) {
+          const currentArray =
+            this.additionalMediaMaps[currentState.currentCongregation][
+              currentState.selectedDate
+            ];
+          this.additionalMediaMaps[currentState.currentCongregation][
+            currentState.selectedDate
+          ] = uniqueById(
+            currentArray.filter((media) => media.uniqueId !== uniqueId),
+          );
+        }
+      } catch (e) {
+        console.error(e);
       }
     },
     resetSort() {
-      const currentState = useCurrentStateStore();
-      if (
-        currentState.currentCongregation &&
-        currentState.selectedDate &&
-        this.mediaSort[currentState.currentCongregation]
-      ) {
-        this.mediaSort[currentState.currentCongregation][
-          currentState.selectedDate
-        ] = [];
+      try {
+        const currentState = useCurrentStateStore();
+        const { currentCongregation, selectedDate } = storeToRefs(currentState);
+        if (
+          currentCongregation.value &&
+          selectedDate.value &&
+          this.mediaSort[currentCongregation.value]
+        ) {
+          this.mediaSort[currentCongregation.value][selectedDate.value] = [];
+        }
+      } catch (e) {
+        console.error(e);
       }
     },
     async updateJwLanguages() {
-      const now = new Date();
-      const monthsSinceUpdated = date.getDateDiff(
-        now,
-        this.jwLanguages.updated,
-        'months',
-      );
-      if (monthsSinceUpdated > 3) {
-        this.jwLanguages = {
-          list: await getLanguages(),
-          updated: now,
-        };
+      try {
+        const now = new Date();
+        const monthsSinceUpdated = date.getDateDiff(
+          now,
+          this.jwLanguages.updated,
+          'months',
+        );
+        if (monthsSinceUpdated > 3) {
+          this.jwLanguages = {
+            list: await getLanguages(),
+            updated: now,
+          };
+        }
+      } catch (e) {
+        console.error(e);
       }
     },
     async updateJwSongs() {

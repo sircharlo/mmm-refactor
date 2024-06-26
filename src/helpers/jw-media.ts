@@ -88,9 +88,9 @@ const downloadFileIfNeeded = async ({
         const destinationPath = path.join(dir, filename);
         const remoteSize: number =
           size ||
-          (await axios({ method: 'HEAD', url }).then(
-            (response) => +response.headers['content-length'] || 0,
-          ));
+          (await axios({ method: 'HEAD', url })
+            .then((response) => +response.headers['content-length'] || 0)
+            .catch(() => 0));
         if (fs.existsSync(destinationPath)) {
           const stat = fs.statSync(destinationPath);
           const localSize = stat.size;
@@ -268,166 +268,191 @@ const getDbFromJWPUB = async (publication: PublicationFetcher) => {
 };
 
 const getPublicationInfoFromDb = (db: string) => {
-  const publication = {} as PublicationFetcher;
-  const pubQuery = (
-    executeQuery(db, 'SELECT * FROM Publication') as PublicationItem[]
-  )[0];
-  publication.pub = pubQuery.UndatedSymbol;
-  publication.issue = pubQuery.IssueTagNumber;
-  publication.langwritten = mepslangs[pubQuery.MepsLanguageIndex];
-  return publication as PublicationFetcher;
+  try {
+    const publication = {} as PublicationFetcher;
+    const pubQuery = (
+      executeQuery(db, 'SELECT * FROM Publication') as PublicationItem[]
+    )[0];
+    publication.pub = pubQuery.UndatedSymbol;
+    publication.issue = pubQuery.IssueTagNumber;
+    publication.langwritten = mepslangs[pubQuery.MepsLanguageIndex];
+    return publication as PublicationFetcher;
+  } catch (error) {
+    console.error(error);
+    return { issue: '', langwritten: '', pub: '' } as PublicationFetcher;
+  }
 };
 
 function addFullFilePathToMultimediaItem(
   multimediaItem: MultimediaItem,
   publication: PublicationFetcher,
 ) {
-  return {
-    ...multimediaItem,
-    ...(multimediaItem.FilePath
-      ? {
-          FilePath: path.join(
-            getPublicationDirectory(publication),
-            multimediaItem.FilePath,
-          ),
-        }
-      : {}),
-  };
+  try {
+    return {
+      ...multimediaItem,
+      ...(multimediaItem.FilePath
+        ? {
+            FilePath: path.join(
+              getPublicationDirectory(publication),
+              multimediaItem.FilePath,
+            ),
+          }
+        : {}),
+    };
+  } catch (error) {
+    console.error(error);
+    return multimediaItem;
+  }
 }
 
 const getMultimediaMepsLangs = (source: MultimediaItemsFetcher) => {
-  const multimediaMepsLangs = [] as MultimediaItem[];
-  for (const table of [
-    'Multimedia',
-    'DocumentMultimedia',
-    'ExtractMultimedia',
-  ]) {
-    // exists
-    const tableExists =
-      (
-        executeQuery(
-          source.db,
-          `SELECT * FROM sqlite_master WHERE type='table' AND name='${table}'`,
-        ) as TableItem[]
-      ).map((item) => item.name).length > 0;
-    if (!tableExists) continue;
-    const columnQueryResult = executeQuery(
-      source.db,
-      `PRAGMA table_info(${table})`,
-    ) as TableItem[];
+  try {
+    const multimediaMepsLangs = [] as MultimediaItem[];
+    for (const table of [
+      'Multimedia',
+      'DocumentMultimedia',
+      'ExtractMultimedia',
+    ]) {
+      // exists
+      const tableExists =
+        (
+          executeQuery(
+            source.db,
+            `SELECT * FROM sqlite_master WHERE type='table' AND name='${table}'`,
+          ) as TableItem[]
+        ).map((item) => item.name).length > 0;
+      if (!tableExists) continue;
+      const columnQueryResult = executeQuery(
+        source.db,
+        `PRAGMA table_info(${table})`,
+      ) as TableItem[];
 
-    const columnMLIExists = columnQueryResult.some(
-      (column) => column.name === 'MepsLanguageIndex',
-    );
-    const columnKSExists = columnQueryResult.some(
-      (column) => column.name === 'KeySymbol',
-    );
-
-    if (columnKSExists && columnMLIExists)
-      multimediaMepsLangs.push(
-        ...(executeQuery(
-          source.db,
-          `SELECT DISTINCT KeySymbol, Track, IssueTagNumber, MepsLanguageIndex from ${table} ORDER by KeySymbol, IssueTagNumber, Track`,
-        ) as MultimediaItem[]),
+      const columnMLIExists = columnQueryResult.some(
+        (column) => column.name === 'MepsLanguageIndex',
       );
+      const columnKSExists = columnQueryResult.some(
+        (column) => column.name === 'KeySymbol',
+      );
+
+      if (columnKSExists && columnMLIExists)
+        multimediaMepsLangs.push(
+          ...(executeQuery(
+            source.db,
+            `SELECT DISTINCT KeySymbol, Track, IssueTagNumber, MepsLanguageIndex from ${table} ORDER by KeySymbol, IssueTagNumber, Track`,
+          ) as MultimediaItem[]),
+        );
+    }
+    return multimediaMepsLangs;
+  } catch (error) {
+    console.error(error);
+    return [];
   }
-  return multimediaMepsLangs;
 };
 
 const getMediaVideoMarkers = (
   source: MultimediaItemsFetcher,
   mediaId: number,
 ) => {
-  const mediaVideoMarkers = executeQuery(
-    source.db,
-    `SELECT * from VideoMarker WHERE MultimediaId = ${mediaId} ORDER by StartTimeTicks`,
-  ) as VideoMarker[];
-  return mediaVideoMarkers;
+  try {
+    const mediaVideoMarkers = executeQuery(
+      source.db,
+      `SELECT * from VideoMarker WHERE MultimediaId = ${mediaId} ORDER by StartTimeTicks`,
+    ) as VideoMarker[];
+    return mediaVideoMarkers;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
 };
 
 const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
-  const currentState = useCurrentStateStore();
-  const { currentSettings } = storeToRefs(currentState);
-  const DocumentMultimediaTable = (
-    executeQuery(
+  try {
+    const currentState = useCurrentStateStore();
+    const { currentSettings } = storeToRefs(currentState);
+    const DocumentMultimediaTable = (
+      executeQuery(
+        source.db,
+        "SELECT * FROM sqlite_master WHERE type='table' AND name='DocumentMultimedia'",
+      ) as TableItem[]
+    ).map((item) => item.name);
+    const mmTable =
+      DocumentMultimediaTable.length === 0
+        ? 'Multimedia'
+        : (DocumentMultimediaTable[0] as string);
+    const columnQueryResult = executeQuery(
       source.db,
-      "SELECT * FROM sqlite_master WHERE type='table' AND name='DocumentMultimedia'",
-    ) as TableItem[]
-  ).map((item) => item.name);
-  const mmTable =
-    DocumentMultimediaTable.length === 0
-      ? 'Multimedia'
-      : (DocumentMultimediaTable[0] as string);
-  const columnQueryResult = executeQuery(
-    source.db,
-    `PRAGMA table_info(${mmTable})`,
-  ) as TableItem[];
+      `PRAGMA table_info(${mmTable})`,
+    ) as TableItem[];
 
-  const ParagraphColumnsExist = columnQueryResult.some(
-    (column) => column.name === 'BeginParagraphOrdinal',
-  );
+    const ParagraphColumnsExist = columnQueryResult.some(
+      (column) => column.name === 'BeginParagraphOrdinal',
+    );
 
-  const targetParNrExists = (
-    executeQuery(source.db, "PRAGMA table_info('Question')") as TableItem[]
-  )
-    .map((item) => item.name)
-    .includes('TargetParagraphNumberLabel');
+    const targetParNrExists = (
+      executeQuery(source.db, "PRAGMA table_info('Question')") as TableItem[]
+    )
+      .map((item) => item.name)
+      .includes('TargetParagraphNumberLabel');
 
-  const suppressZoomExists = (
-    executeQuery(source.db, "PRAGMA table_info('Multimedia')") as TableItem[]
-  )
-    .map((item) => item.name)
-    .includes('SuppressZoom') as boolean;
+    const suppressZoomExists = (
+      executeQuery(source.db, "PRAGMA table_info('Multimedia')") as TableItem[]
+    )
+      .map((item) => item.name)
+      .includes('SuppressZoom') as boolean;
 
-  // let select = 'SELECT Multimedia.DocumentId, Multimedia.MultimediaId, ';
-  const select = 'SELECT * ';
-  let from = 'FROM Multimedia ';
-  if (mmTable === 'DocumentMultimedia') {
-    from +=
-      'INNER JOIN DocumentMultimedia ON DocumentMultimedia.MultimediaId = Multimedia.MultimediaId ';
-    from += `INNER JOIN DocumentParagraph ON ${mmTable}.BeginParagraphOrdinal = DocumentParagraph.ParagraphIndex `;
+    // let select = 'SELECT Multimedia.DocumentId, Multimedia.MultimediaId, ';
+    const select = 'SELECT * ';
+    let from = 'FROM Multimedia ';
+    if (mmTable === 'DocumentMultimedia') {
+      from +=
+        'INNER JOIN DocumentMultimedia ON DocumentMultimedia.MultimediaId = Multimedia.MultimediaId ';
+      from += `INNER JOIN DocumentParagraph ON ${mmTable}.BeginParagraphOrdinal = DocumentParagraph.ParagraphIndex `;
+    }
+    from += `INNER JOIN Document ON ${mmTable}.DocumentId = Document.DocumentId `;
+
+    let where = ` WHERE ${
+      source.docId || source.docId === 0
+        ? `Document.DocumentId = ${source.docId}`
+        : `Document.MepsDocumentId = ${source.mepsId}`
+    }`;
+
+    const videoString =
+      "(Multimedia.MimeType LIKE '%video%' OR Multimedia.MimeType LIKE '%audio%')";
+    const imgString = `(Multimedia.MimeType LIKE '%image%' ${
+      currentSettings.value?.includePrinted
+        ? ''
+        : ' AND Multimedia.CategoryType <> 4 AND Multimedia.CategoryType <> 6'
+    } AND Multimedia.CategoryType <> 9 AND Multimedia.CategoryType <> 10 AND Multimedia.CategoryType <> 25)`;
+
+    where += ` AND (${videoString} OR ${imgString})`;
+
+    if (
+      'BeginParagraphOrdinal' in source &&
+      'EndParagraphOrdinal' in source &&
+      ParagraphColumnsExist
+    ) {
+      where += ` AND ${mmTable}.BeginParagraphOrdinal >= ${source.BeginParagraphOrdinal} AND ${mmTable}.EndParagraphOrdinal <= ${source.EndParagraphOrdinal}`;
+    }
+
+    const groupAndSort = ParagraphColumnsExist
+      ? ' GROUP BY Multimedia.MultimediaId ORDER BY DocumentParagraph.BeginPosition'
+      : '';
+
+    if (targetParNrExists && ParagraphColumnsExist) {
+      from += ` LEFT JOIN Question ON Question.DocumentId = ${mmTable}.DocumentId AND Question.TargetParagraphOrdinal = ${mmTable}.BeginParagraphOrdinal `;
+    }
+    if (suppressZoomExists) {
+      where += ' AND Multimedia.SuppressZoom <> 1';
+    }
+    const items = executeQuery(
+      source.db,
+      `${select} ${from} ${where} ${groupAndSort}`,
+    ) as MultimediaItem[];
+    return items;
+  } catch (error) {
+    console.error(error);
+    return [];
   }
-  from += `INNER JOIN Document ON ${mmTable}.DocumentId = Document.DocumentId `;
-
-  let where = ` WHERE ${
-    source.docId || source.docId === 0
-      ? `Document.DocumentId = ${source.docId}`
-      : `Document.MepsDocumentId = ${source.mepsId}`
-  }`;
-
-  const videoString =
-    "(Multimedia.MimeType LIKE '%video%' OR Multimedia.MimeType LIKE '%audio%')";
-  const imgString = `(Multimedia.MimeType LIKE '%image%' ${
-    currentSettings.value?.includePrinted
-      ? ''
-      : ' AND Multimedia.CategoryType <> 4 AND Multimedia.CategoryType <> 6'
-  } AND Multimedia.CategoryType <> 9 AND Multimedia.CategoryType <> 10 AND Multimedia.CategoryType <> 25)`;
-
-  where += ` AND (${videoString} OR ${imgString})`;
-
-  if (
-    'BeginParagraphOrdinal' in source &&
-    'EndParagraphOrdinal' in source &&
-    ParagraphColumnsExist
-  ) {
-    where += ` AND ${mmTable}.BeginParagraphOrdinal >= ${source.BeginParagraphOrdinal} AND ${mmTable}.EndParagraphOrdinal <= ${source.EndParagraphOrdinal}`;
-  }
-
-  const groupAndSort = ParagraphColumnsExist
-    ? ' GROUP BY Multimedia.MultimediaId ORDER BY DocumentParagraph.BeginPosition'
-    : '';
-
-  if (targetParNrExists && ParagraphColumnsExist) {
-    from += ` LEFT JOIN Question ON Question.DocumentId = ${mmTable}.DocumentId AND Question.TargetParagraphOrdinal = ${mmTable}.BeginParagraphOrdinal `;
-  }
-  if (suppressZoomExists) {
-    where += ' AND Multimedia.SuppressZoom <> 1';
-  }
-  const items = executeQuery(
-    source.db,
-    `${select} ${from} ${where} ${groupAndSort}`,
-  ) as MultimediaItem[];
-  return items;
 };
 
 const getDocumentExtractItems = async (db: string, docId: number) => {
@@ -570,7 +595,7 @@ const getWtIssue = async (
     )[0]?.DocumentId;
     return { db, docId, issueString, publication, weekNr };
   } catch (e: unknown) {
-    console.error(e);
+    console.warn(e);
     return {
       db: '',
       docId: -1,
@@ -589,84 +614,88 @@ const dynamicMediaMapper = async (
   lookupDate: Date,
   additional?: boolean,
 ): Promise<DynamicMediaObject[]> => {
-  let middleSongParagraphOrdinal = 0;
-  if (!additional) {
-    const songs = allMedia.filter((m) => isSong(m));
-    if (songs.length === 3)
-      middleSongParagraphOrdinal = songs[1].BeginParagraphOrdinal;
-
-    if (isCoWeek(lookupDate)) {
-      // The last songs for both MW and WE meeting get replaced during the CO visit
-      const lastParagraphOrdinal =
-        allMedia[allMedia.length - 1].BeginParagraphOrdinal || 0;
-      allMedia.pop();
-      if (isMwMeetingDay(lookupDate)) {
-        // Also remove CBS media if it's the MW meeting, since the CBS is skipped during the CO visit
-        allMedia = allMedia.filter(
-          (m) => m.BeginParagraphOrdinal < lastParagraphOrdinal - 2,
-        );
+  try {
+    let middleSongParagraphOrdinal = 0;
+    if (!additional) {
+      const songs = allMedia.filter((m) => isSong(m));
+      if (songs.length === 3)
+        middleSongParagraphOrdinal = songs[1].BeginParagraphOrdinal;
+      if (isCoWeek(lookupDate)) {
+        // The last songs for both MW and WE meeting get replaced during the CO visit
+        const lastParagraphOrdinal =
+          allMedia[allMedia.length - 1].BeginParagraphOrdinal || 0;
+        allMedia.pop();
+        if (isMwMeetingDay(lookupDate)) {
+          // Also remove CBS media if it's the MW meeting, since the CBS is skipped during the CO visit
+          allMedia = allMedia.filter(
+            (m) => m.BeginParagraphOrdinal < lastParagraphOrdinal - 2,
+          );
+        }
       }
     }
-  }
-  const mediaPromises = allMedia
-    .filter((m) => m.FilePath)
-    .map(async (m) => {
-      if (isSvg(m.FilePath)) m.FilePath = await convertSvgToJpg(m.FilePath);
-      const mediaIsSong = isSong(m);
-      const thumbnailUrl = await getThumbnailUrl(
-        m.ThumbnailFilePath || m.FilePath,
-      );
-      const video = isVideo(m.FilePath);
-      const audio = isAudio(m.FilePath);
-      let duration = 0;
-      if (video || audio) {
-        duration = await getDurationFromMediaPath(m.FilePath);
-      }
-      let section = additional ? 'additional' : 'wt';
-      if (middleSongParagraphOrdinal > 0) {
-        //this is a meeting with 3 songs
-        if (m.BeginParagraphOrdinal >= middleSongParagraphOrdinal) {
-          // LAC
-          section = 'lac';
-        } else if (m.BeginParagraphOrdinal >= 18) {
-          // AYFM
-          section = 'ayfm';
-        } else {
-          // TGW
-          section = 'tgw';
+    const mediaPromises = allMedia
+      .filter((m) => m.FilePath)
+      .map(async (m) => {
+        if (isSvg(m.FilePath)) m.FilePath = await convertSvgToJpg(m.FilePath);
+        const mediaIsSong = isSong(m);
+        const thumbnailUrl = await getThumbnailUrl(
+          m.ThumbnailFilePath || m.FilePath,
+        );
+        const video = isVideo(m.FilePath);
+        const audio = isAudio(m.FilePath);
+        let duration = 0;
+        if (video || audio) {
+          duration = await getDurationFromMediaPath(m.FilePath);
         }
-        // iscoweek
-      }
-      return {
-        duration: duration,
-        fileUrl: getFileUrl(m.FilePath),
-        isAdditional: !!additional,
-        isAudio: audio,
-        isImage: isImage(m.FilePath),
-        isVideo: video,
-        markers: m.VideoMarkers,
-        paragraph: m.TargetParagraphNumberLabel,
-        section, // if is we: wt; else, if >= middle song: LAC; >= (middle song - 8???): AYFM; else: TGW
-        song: mediaIsSong,
-        subtitlesUrl: await getSubtitlesUrl(m, duration),
-        thumbnailUrl,
-        title: mediaIsSong ? m.Label.replace(/^\d+\.\s*/, '') : m.Label,
-        uniqueId: sanitizeId(
-          date.formatDate(lookupDate, 'YYYYMMDD') +
-            '-' +
-            getFileUrl(m.FilePath),
-        ),
-      } as DynamicMediaObject;
-    });
-  return Promise.all(mediaPromises);
+        let section = additional ? 'additional' : 'wt';
+        if (middleSongParagraphOrdinal > 0) {
+          //this is a meeting with 3 songs
+          if (m.BeginParagraphOrdinal >= middleSongParagraphOrdinal) {
+            // LAC
+            section = 'lac';
+          } else if (m.BeginParagraphOrdinal >= 18) {
+            // AYFM
+            section = 'ayfm';
+          } else {
+            // TGW
+            section = 'tgw';
+          }
+          // iscoweek
+        }
+        return {
+          duration: duration,
+          fileUrl: getFileUrl(m.FilePath),
+          isAdditional: !!additional,
+          isAudio: audio,
+          isImage: isImage(m.FilePath),
+          isVideo: video,
+          markers: m.VideoMarkers,
+          paragraph: m.TargetParagraphNumberLabel,
+          section, // if is we: wt; else, if >= middle song: LAC; >= (middle song - 8???): AYFM; else: TGW
+          song: mediaIsSong,
+          subtitlesUrl: await getSubtitlesUrl(m, duration),
+          thumbnailUrl,
+          title: mediaIsSong ? m.Label.replace(/^\d+\.\s*/, '') : m.Label,
+          uniqueId: sanitizeId(
+            date.formatDate(lookupDate, 'YYYYMMDD') +
+              '-' +
+              getFileUrl(m.FilePath),
+          ),
+        } as DynamicMediaObject;
+      });
+    return Promise.all(mediaPromises);
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
 };
 
 const getWeMedia = async (lookupDate: Date) => {
-  const currentState = useCurrentStateStore();
-  const { currentSongbook } = storeToRefs(currentState);
-  const { currentSettings } = storeToRefs(currentState);
-  lookupDate = dateFromString(lookupDate);
   try {
+    const currentState = useCurrentStateStore();
+    const { currentSongbook } = storeToRefs(currentState);
+    const { currentSettings } = storeToRefs(currentState);
+    lookupDate = dateFromString(lookupDate);
     const monday = getSpecificWeekday(lookupDate, 0);
 
     const getIssue = async (monday: Date, lang: string) => {
@@ -868,19 +897,24 @@ const getWeMedia = async (lookupDate: Date) => {
 };
 
 function sanitizeId(id: string) {
-  const regex = /[a-zA-Z0-9\-_:.]/g;
-  const sanitizedString = id.replace(regex, function (match) {
-    return match;
-  });
-  return sanitizedString;
+  try {
+    const regex = /[a-zA-Z0-9\-_:.]/g;
+    const sanitizedString = id.replace(regex, function (match) {
+      return match;
+    });
+    return sanitizedString;
+  } catch (e) {
+    console.error('sanitizeId', e);
+    return id;
+  }
 }
 
 const getMwMedia = async (lookupDate: Date) => {
-  const currentState = useCurrentStateStore();
-  const { currentSettings } = storeToRefs(currentState);
-  const { currentSongbook } = storeToRefs(currentState);
-  lookupDate = dateFromString(lookupDate);
   try {
+    const currentState = useCurrentStateStore();
+    const { currentSettings } = storeToRefs(currentState);
+    const { currentSongbook } = storeToRefs(currentState);
+    lookupDate = dateFromString(lookupDate);
     // if not monday, get the previous monday
     const monday = getSpecificWeekday(lookupDate, 0);
     const issue = date.subtractFromDate(monday, {
@@ -966,232 +1000,271 @@ const getMwMedia = async (lookupDate: Date) => {
 };
 
 async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
-  const currentState = useCurrentStateStore();
-  const { currentSettings } = storeToRefs(currentState);
-  for (const media of allMedia.filter(
-    (m) =>
-      m.KeySymbol && (!m.Label || !m.FilePath || !fs.existsSync(m.FilePath)),
-  )) {
-    if (!media.KeySymbol) {
-      continue;
-    }
-    const langsWritten = [
-      media.AlternativeLanguage,
-      currentSettings.value?.lang,
-      currentSettings.value?.langFallback,
-    ];
-    for (const langwritten of langsWritten) {
-      if (!langwritten) {
+  try {
+    const currentState = useCurrentStateStore();
+    const { currentSettings } = storeToRefs(currentState);
+    for (const media of allMedia.filter(
+      (m) =>
+        m.KeySymbol && (!m.Label || !m.FilePath || !fs.existsSync(m.FilePath)),
+    )) {
+      if (!media.KeySymbol) {
         continue;
       }
-      const publicationFetcher = {
-        fileformat: media.MimeType?.includes('audio') ? 'MP3' : 'MP4',
-        issue: media.IssueTagNumber,
-        langwritten,
-        pub: media.KeySymbol,
-        ...(typeof media.Track === 'number' &&
-          media.Track > 0 && { track: media.Track }),
-      };
-      if (!media.FilePath || !fs.existsSync(media.FilePath)) {
-        media.FilePath = await downloadMissingMedia(publicationFetcher);
-      }
-      if (!media.Label) {
-        media.Label =
-          media.Label ||
-          media.Caption ||
-          (await getJwMediaInfo(publicationFetcher)).title;
+      const langsWritten = [
+        media.AlternativeLanguage,
+        currentSettings.value?.lang,
+        currentSettings.value?.langFallback,
+      ];
+      for (const langwritten of langsWritten) {
+        try {
+          if (!langwritten) {
+            continue;
+          }
+          const publicationFetcher = {
+            fileformat: media.MimeType?.includes('audio') ? 'MP3' : 'MP4',
+            issue: media.IssueTagNumber,
+            langwritten,
+            pub: media.KeySymbol,
+            ...(typeof media.Track === 'number' &&
+              media.Track > 0 && { track: media.Track }),
+          };
+          if (!media.FilePath || !fs.existsSync(media.FilePath)) {
+            media.FilePath = await downloadMissingMedia(publicationFetcher);
+          }
+          if (!media.Label) {
+            media.Label =
+              media.Label ||
+              media.Caption ||
+              (await getJwMediaInfo(publicationFetcher)).title;
+          }
+        } catch (e) {
+          console.error('processMissingMediaInfo', e);
+        }
       }
     }
+  } catch (e) {
+    console.error('processMissingMediaInfo', e);
   }
 }
 
 const getPubMediaLinks = async (publication: PublicationFetcher) => {
-  const { currentSongbook, downloadProgress } = storeToRefs(
-    useCurrentStateStore(),
-  );
-  const url = 'https://b.jw-cdn.org/apis/pub-media/GETPUBMEDIALINKS';
-  if (!publication.fileformat) publication.fileformat = '';
-  if (publication.pub === 'sjjm') {
-    publication.pub = currentSongbook.value.pub;
-    // publication.fileformat = currentSongbook.value.fileformat;
-  }
-  publication.fileformat = publication.fileformat.toUpperCase();
-  const params = {
-    alllangs: '0',
-    fileformat: publication.fileformat,
-    issue: publication.issue?.toString() || '',
-    langwritten: publication.langwritten,
-    output: 'json',
-    pub: publication.pub,
-    track: publication.track?.toString() || '',
-    txtCMSLang: 'E',
-  };
-  const response = await get(urlWithParamsToString(url, params));
-  if (!response) {
-    downloadProgress.value[
-      [
-        publication.pub,
-        publication.langwritten,
-        publication.issue,
-        publication.track,
-        publication.fileformat,
-      ]
-        .filter(Boolean)
-        .join('_')
-    ] = {
-      error: true,
+  try {
+    const { currentSongbook, downloadProgress } = storeToRefs(
+      useCurrentStateStore(),
+    );
+    const url = 'https://b.jw-cdn.org/apis/pub-media/GETPUBMEDIALINKS';
+    if (!publication.fileformat) publication.fileformat = '';
+    if (publication.pub === 'sjjm') {
+      publication.pub = currentSongbook.value.pub;
+      // publication.fileformat = currentSongbook.value.fileformat;
+    }
+    publication.fileformat = publication.fileformat.toUpperCase();
+    const params = {
+      alllangs: '0',
+      fileformat: publication.fileformat,
+      issue: publication.issue?.toString() || '',
+      langwritten: publication.langwritten,
+      output: 'json',
+      pub: publication.pub,
+      track: publication.track?.toString() || '',
+      txtCMSLang: 'E',
     };
+    const response = await get(urlWithParamsToString(url, params));
+    if (!response) {
+      downloadProgress.value[
+        [
+          publication.pub,
+          publication.langwritten,
+          publication.issue,
+          publication.track,
+          publication.fileformat,
+        ]
+          .filter(Boolean)
+          .join('_')
+      ] = {
+        error: true,
+      };
+    }
+    return response;
+  } catch (e) {
+    console.error('getPubMediaLinks', e);
+    return null;
   }
-  return response;
 };
 
 export function findBestResolution(
   mediaLinks: MediaItemsMediatorFile[] | MediaLink[],
 ) {
-  const currentState = useCurrentStateStore();
-  const { currentSettings } = storeToRefs(currentState);
-  let bestItem = null;
-  let bestHeight = 0;
-  const maxRes = parseInt(currentSettings.value?.maxRes?.replace(/\D/g, ''));
-  if (mediaLinks.some((m) => !m.subtitled))
-    mediaLinks = mediaLinks.filter((m) => !m.subtitled) as MediaLink[];
-  for (const mediaLink of mediaLinks) {
-    if (
-      mediaLink.frameHeight <= maxRes &&
-      mediaLink.frameHeight >= bestHeight
-    ) {
-      bestItem = Object.hasOwn(mediaLink, 'progressiveDownloadURL')
-        ? (mediaLink as MediaItemsMediatorFile)
-        : (mediaLink as MediaLink);
-      bestHeight = mediaLink.frameHeight;
+  try {
+    const currentState = useCurrentStateStore();
+    const { currentSettings } = storeToRefs(currentState);
+    let bestItem = null;
+    let bestHeight = 0;
+    const maxRes = parseInt(currentSettings.value?.maxRes?.replace(/\D/g, ''));
+    if (mediaLinks.some((m) => !m.subtitled))
+      mediaLinks = mediaLinks.filter((m) => !m.subtitled) as MediaLink[];
+    for (const mediaLink of mediaLinks) {
+      if (
+        mediaLink.frameHeight <= maxRes &&
+        mediaLink.frameHeight >= bestHeight
+      ) {
+        bestItem = Object.hasOwn(mediaLink, 'progressiveDownloadURL')
+          ? (mediaLink as MediaItemsMediatorFile)
+          : (mediaLink as MediaLink);
+        bestHeight = mediaLink.frameHeight;
+      }
     }
+    return bestItem;
+  } catch (e) {
+    console.error('findBestResolution', e);
+    return mediaLinks.length > 0 ? mediaLinks[mediaLinks.length - 1] : [];
   }
-  return bestItem;
 }
 
 const downloadMissingMedia = async (publication: PublicationFetcher) => {
-  const pubDir = getPublicationDirectory(publication);
-  const responseObject = await getPubMediaLinks(publication);
-  if (!responseObject?.files) {
-    if (!fs.existsSync(pubDir)) return ''; // Publication not found
-    const files = klawSync(pubDir, {
-      filter: (file) => {
-        let match = true;
-        const params = [publication.issue, publication.track, publication.pub]
-          .filter((i) => i !== undefined)
-          .map((i) => i?.toString()) as string[];
-        for (const test of params) {
-          if (!file.path || !path.basename(file.path).includes(test))
+  try {
+    const pubDir = getPublicationDirectory(publication);
+    const responseObject = await getPubMediaLinks(publication);
+    if (!responseObject?.files) {
+      if (!fs.existsSync(pubDir)) return ''; // Publication not found
+      const files = klawSync(pubDir, {
+        filter: (file) => {
+          let match = true;
+          const params = [publication.issue, publication.track, publication.pub]
+            .filter((i) => i !== undefined)
+            .map((i) => i?.toString()) as string[];
+          for (const test of params) {
+            if (!file.path || !path.basename(file.path).includes(test))
+              match = false;
+          }
+          if (
+            !publication.fileformat ||
+            !path
+              .extname(file.path)
+              .toLowerCase()
+              .includes(publication.fileformat?.toLowerCase())
+          )
             match = false;
-        }
-        if (
-          !publication.fileformat ||
-          !path
-            .extname(file.path)
-            .toLowerCase()
-            .includes(publication.fileformat?.toLowerCase())
-        )
-          match = false;
-        return match;
-      },
-      nodir: true,
-    });
-    console.warn(
-      'No response, falling back to cache',
-      publication,
-      pubDir,
-      files,
-    );
-    return files.length > 0 ? files[0].path : '';
-  }
-  if (!publication.fileformat)
-    publication.fileformat = Object.keys(
-      responseObject.files[publication.langwritten],
-    )[0];
-  const mediaItemLinks: MediaLink[] =
-    responseObject.files[publication.langwritten][publication.fileformat];
-  const bestItem = findBestResolution(mediaItemLinks) as MediaLink;
-  if (!bestItem?.file?.url) {
+          return match;
+        },
+        nodir: true,
+      });
+      console.warn(
+        'No response, falling back to cache',
+        publication,
+        pubDir,
+        files,
+      );
+      return files.length > 0 ? files[0].path : '';
+    }
+    if (!publication.fileformat)
+      publication.fileformat = Object.keys(
+        responseObject.files[publication.langwritten],
+      )[0];
+    const mediaItemLinks: MediaLink[] =
+      responseObject.files[publication.langwritten][publication.fileformat];
+    const bestItem = findBestResolution(mediaItemLinks) as MediaLink;
+    if (!bestItem?.file?.url) {
+      return '';
+    }
+    const downloadedFile = (await downloadFileIfNeeded({
+      dir: pubDir,
+      size: bestItem.filesize,
+      url: bestItem.file.url,
+    })) as DownloadedFile;
+
+    const jwMediaInfo = await getJwMediaInfo(publication);
+    const { currentSettings } = storeToRefs(useCurrentStateStore());
+    for (const itemUrl of [
+      currentSettings.value.enableSubtitles ? jwMediaInfo.subtitles : undefined,
+      jwMediaInfo.thumbnail,
+    ].filter(Boolean)) {
+      if (!itemUrl) continue;
+      const itemFilename =
+        path.basename(bestItem.file.url).split('.')[0] + path.extname(itemUrl);
+      if (
+        itemUrl &&
+        bestItem.file?.url &&
+        (downloadedFile?.new || !fs.existsSync(path.join(pubDir, itemFilename)))
+      ) {
+        await downloadFileIfNeeded({
+          dir: pubDir,
+          filename: itemFilename,
+          url: itemUrl,
+        });
+      }
+    }
+    return downloadedFile?.path;
+  } catch (e) {
+    console.error('downloadMissingMedia', e);
     return '';
   }
-  const downloadedFile = (await downloadFileIfNeeded({
-    dir: pubDir,
-    size: bestItem.filesize,
-    url: bestItem.file.url,
-  })) as DownloadedFile;
-
-  const jwMediaInfo = await getJwMediaInfo(publication);
-  const { currentSettings } = storeToRefs(useCurrentStateStore());
-  for (const itemUrl of [
-    currentSettings.value.enableSubtitles ? jwMediaInfo.subtitles : undefined,
-    jwMediaInfo.thumbnail,
-  ].filter(Boolean)) {
-    if (!itemUrl) continue;
-    const itemFilename =
-      path.basename(bestItem.file.url).split('.')[0] + path.extname(itemUrl);
-    if (
-      itemUrl &&
-      bestItem.file?.url &&
-      (downloadedFile?.new || !fs.existsSync(path.join(pubDir, itemFilename)))
-    ) {
-      await downloadFileIfNeeded({
-        dir: pubDir,
-        filename: itemFilename,
-        url: itemUrl,
-      });
-    }
-  }
-  return downloadedFile?.path;
 };
 
 const downloadAdditionalRemoteVideo = async (
   mediaItemLinks: MediaItemsMediatorFile[],
 ) => {
-  window.dispatchEvent(
-    new CustomEvent('remoteVideo-loading', {
-      detail: true,
-    }),
-  );
-  const currentState = useCurrentStateStore();
-  const { getDatedAdditionalMediaDirectory } = storeToRefs(currentState);
-  const bestItem = findBestResolution(mediaItemLinks) as MediaItemsMediatorFile;
-  let downloadedFile: DownloadedFile = { path: '' };
-  if (bestItem) {
-    downloadedFile = (await downloadFileIfNeeded({
-      dir: getDatedAdditionalMediaDirectory.value,
-      size: bestItem.filesize,
-      url: bestItem.progressiveDownloadURL,
-    })) as DownloadedFile;
+  try {
+    window.dispatchEvent(
+      new CustomEvent('remoteVideo-loading', {
+        detail: true,
+      }),
+    );
+    const currentState = useCurrentStateStore();
+    const { getDatedAdditionalMediaDirectory } = storeToRefs(currentState);
+    const bestItem = findBestResolution(
+      mediaItemLinks,
+    ) as MediaItemsMediatorFile;
+    let downloadedFile: DownloadedFile = { path: '' };
+    if (bestItem) {
+      downloadedFile = (await downloadFileIfNeeded({
+        dir: getDatedAdditionalMediaDirectory.value,
+        size: bestItem.filesize,
+        url: bestItem.progressiveDownloadURL,
+      })) as DownloadedFile;
+    }
+    window.dispatchEvent(
+      new CustomEvent('remoteVideo-loaded', {
+        detail: downloadedFile,
+      }),
+    );
+  } catch (e) {
+    console.error('downloadAdditionalRemoteVideo', e);
   }
-  window.dispatchEvent(
-    new CustomEvent('remoteVideo-loaded', {
-      detail: downloadedFile,
-    }),
-  );
 };
 
 function getBestImageUrl(images: ImageTypeSizes, size?: keyof ImageSizes) {
-  const preferredOrder: (keyof ImageTypeSizes)[] = ['wss', 'lsr', 'sqr', 'pnr'];
-  for (const key of preferredOrder) {
-    if (images.hasOwnProperty(key)) {
-      const sizes: (keyof ImageSizes)[] = size
-        ? [size]
-        : ['sm', 'md', 'lg', 'xl'];
-      for (const size of sizes) {
-        if (images[key].hasOwnProperty(size)) {
-          return images[key][size];
+  try {
+    const preferredOrder: (keyof ImageTypeSizes)[] = [
+      'wss',
+      'lsr',
+      'sqr',
+      'pnr',
+    ];
+    for (const key of preferredOrder) {
+      if (images.hasOwnProperty(key)) {
+        const sizes: (keyof ImageSizes)[] = size
+          ? [size]
+          : ['sm', 'md', 'lg', 'xl'];
+        for (const size of sizes) {
+          if (images[key].hasOwnProperty(size)) {
+            return images[key][size];
+          }
+        }
+        // If none of the preferred sizes are found, return any other size
+        const otherSizes = (
+          Object.keys(images[key]) as (keyof ImageSizes)[]
+        ).filter((size) => !sizes.includes(size));
+        if (otherSizes.length > 0) {
+          return images[key][otherSizes[0]];
         }
       }
-      // If none of the preferred sizes are found, return any other size
-      const otherSizes = (
-        Object.keys(images[key]) as (keyof ImageSizes)[]
-      ).filter((size) => !sizes.includes(size));
-      if (otherSizes.length > 0) {
-        return images[key][otherSizes[0]];
-      }
     }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    return '';
   }
-  return '';
 }
 
 const getJwMediaInfo = async (publication: PublicationFetcher) => {
@@ -1227,117 +1300,133 @@ const getJwMediaInfo = async (publication: PublicationFetcher) => {
 };
 
 const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
-  const { downloadProgress } = storeToRefs(useCurrentStateStore());
-  const publicationInfo: Publication = await getPubMediaLinks(publication);
-  if (!publication.fileformat) return;
-  if (!publicationInfo?.files) {
-    downloadProgress.value[
-      [
-        publication.pub,
-        publication.langwritten,
-        publication.issue,
-        publication.track,
-        publication.fileformat,
-      ]
-        .filter(Boolean)
-        .join('_')
-    ] = {
-      error: true,
-    };
-    return;
-  }
-  const mediaLinks: MediaLink[] = publicationInfo.files[
-    publication.langwritten
-  ][publication.fileformat].filter(
-    (mediaLink) =>
-      !publication.maxTrack || mediaLink.track < publication.maxTrack,
-  );
-
-  const dir = getPublicationDirectory(publication);
-  const filteredMediaItemLinks = [] as MediaLink[];
-  for (const mediaItemLink of mediaLinks) {
-    const currentTrack = mediaItemLink.track;
-    if (!filteredMediaItemLinks.some((m) => m.track === currentTrack)) {
-      const bestItem = findBestResolution(
-        mediaLinks.filter((m) => m.track === currentTrack),
-      ) as MediaLink;
-      if (bestItem) filteredMediaItemLinks.push(bestItem);
+  try {
+    const { downloadProgress } = storeToRefs(useCurrentStateStore());
+    const publicationInfo: Publication = await getPubMediaLinks(publication);
+    if (!publication.fileformat) return;
+    if (!publicationInfo?.files) {
+      downloadProgress.value[
+        [
+          publication.pub,
+          publication.langwritten,
+          publication.issue,
+          publication.track,
+          publication.fileformat,
+        ]
+          .filter(Boolean)
+          .join('_')
+      ] = {
+        error: true,
+      };
+      return;
     }
-  }
-  for (const mediaLink of mediaLinks) {
-    downloadFileIfNeeded({
-      dir,
-      lowPriority: true,
-      size: mediaLink.filesize,
-      url: mediaLink.file.url,
-    });
+    const mediaLinks: MediaLink[] = publicationInfo.files[
+      publication.langwritten
+    ][publication.fileformat].filter(
+      (mediaLink) =>
+        !publication.maxTrack || mediaLink.track < publication.maxTrack,
+    );
+
+    const dir = getPublicationDirectory(publication);
+    const filteredMediaItemLinks = [] as MediaLink[];
+    for (const mediaItemLink of mediaLinks) {
+      const currentTrack = mediaItemLink.track;
+      if (!filteredMediaItemLinks.some((m) => m.track === currentTrack)) {
+        const bestItem = findBestResolution(
+          mediaLinks.filter((m) => m.track === currentTrack),
+        ) as MediaLink;
+        if (bestItem) filteredMediaItemLinks.push(bestItem);
+      }
+    }
+    for (const mediaLink of mediaLinks) {
+      downloadFileIfNeeded({
+        dir,
+        lowPriority: true,
+        size: mediaLink.filesize,
+        url: mediaLink.file.url,
+      });
+    }
+  } catch (e) {
+    console.error('downloadPubMediaFiles', e);
   }
 };
 
 const downloadBackgroundMusic = () => {
-  const { currentSettings, currentSongbook } = storeToRefs(
-    useCurrentStateStore(),
-  );
-  if (
-    !currentSongbook.value ||
-    !currentSettings.value?.lang ||
-    !currentSettings.value.enableMusicButton
-  )
-    return;
-  downloadPubMediaFiles({
-    fileformat: currentSongbook.value.fileformat,
-    langwritten: currentSongbook.value.signLanguage
-      ? currentSettings.value.lang
-      : 'E',
-    maxTrack: MAX_SONGS,
-    pub: currentSongbook.value.pub,
-  });
+  try {
+    const { currentSettings, currentSongbook } = storeToRefs(
+      useCurrentStateStore(),
+    );
+    if (
+      !currentSongbook.value ||
+      !currentSettings.value?.lang ||
+      !currentSettings.value.enableMusicButton
+    )
+      return;
+    downloadPubMediaFiles({
+      fileformat: currentSongbook.value.fileformat,
+      langwritten: currentSongbook.value.signLanguage
+        ? currentSettings.value.lang
+        : 'E',
+      maxTrack: MAX_SONGS,
+      pub: currentSongbook.value.pub,
+    });
+  } catch (e) {
+    console.error('downloadBackgroundMusic', e);
+  }
 };
 
 const downloadJwpub = async (
   publication: PublicationFetcher,
 ): Promise<DownloadedFile> => {
-  const { downloadProgress } = storeToRefs(useCurrentStateStore());
-  publication.fileformat = 'JWPUB';
-  const handleDownloadError = () => {
-    downloadProgress.value[
-      [
-        publication.pub,
-        publication.langwritten,
-        publication.issue,
-        publication.track,
-        publication.fileformat,
-      ]
-        .filter(Boolean)
-        .join('_')
-    ] = {
-      error: true,
+  try {
+    const { downloadProgress } = storeToRefs(useCurrentStateStore());
+    publication.fileformat = 'JWPUB';
+    const handleDownloadError = () => {
+      downloadProgress.value[
+        [
+          publication.pub,
+          publication.langwritten,
+          publication.issue,
+          publication.track,
+          publication.fileformat,
+        ]
+          .filter(Boolean)
+          .join('_')
+      ] = {
+        error: true,
+      };
+      return {
+        new: false,
+        path: '',
+      };
     };
+    const publicationInfo: Publication = await getPubMediaLinks(publication);
+    if (!publicationInfo?.files) {
+      return handleDownloadError();
+    }
+    const mediaLinks: MediaLink[] =
+      publicationInfo.files[publication.langwritten][
+        publication.fileformat
+      ].filter(
+        (mediaLink) =>
+          !publication.maxTrack || mediaLink.track < publication.maxTrack,
+      ) || [];
+    if (!mediaLinks.length) {
+      return handleDownloadError();
+    }
+
+    return (await downloadFileIfNeeded({
+      dir: getPublicationDirectory(publication),
+      size: mediaLinks[0].filesize,
+      url: mediaLinks[0].file.url,
+    })) as DownloadedFile;
+  } catch (e) {
+    console.error('downloadJwpub', e);
     return {
       new: false,
       path: '',
     };
-  };
-  const publicationInfo: Publication = await getPubMediaLinks(publication);
-  if (!publicationInfo?.files) {
-    return handleDownloadError();
   }
-  const mediaLinks: MediaLink[] =
-    publicationInfo.files[publication.langwritten][
-      publication.fileformat
-    ].filter(
-      (mediaLink) =>
-        !publication.maxTrack || mediaLink.track < publication.maxTrack,
-    ) || [];
-  if (!mediaLinks.length) {
-    return handleDownloadError();
-  }
-
-  return (await downloadFileIfNeeded({
-    dir: getPublicationDirectory(publication),
-    size: mediaLinks[0].filesize,
-    url: mediaLinks[0].file.url,
-  })) as DownloadedFile;
 };
 
 export {

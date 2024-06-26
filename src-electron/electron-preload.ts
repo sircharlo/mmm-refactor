@@ -38,7 +38,6 @@ import {
 import * as sqlite3 from 'better-sqlite3';
 import decompress from 'decompress';
 import { contextBridge } from 'electron';
-import { PathLike } from 'fs';
 import fs from 'fs-extra';
 import convert from 'heic-convert';
 import klawSync from 'klaw-sync';
@@ -78,6 +77,7 @@ const getAllScreens = () => {
 };
 
 const getWindowScreen = (window: Electron.BrowserWindow) => {
+  if (!window) return 0;
   const allScreens = getAllScreens();
   const windowDisplay = screen.getDisplayMatching(window.getBounds());
   return allScreens.findIndex((display) => display.id === windowDisplay.id);
@@ -276,8 +276,8 @@ contextBridge.exposeInMainWorld('electronApi', {
       return {};
     }
   },
-  fileUrlToPath: (fileurl: PathLike) => {
-    const url = require('node:url');
+  fileUrlToPath: (fileurl: string) => {
+    const url: typeof import('url') = require('node:url');
     return url.fileURLToPath(fileurl);
   },
   fs,
@@ -290,8 +290,8 @@ contextBridge.exposeInMainWorld('electronApi', {
   },
   klawSync,
   moveMediaWindow,
-  openFileDialog: async () => {
-    return await dialog.showOpenDialog({
+  openFileDialog: () => {
+    return dialog.showOpenDialog({
       properties: ['openFile', 'multiSelections'],
     });
   },
@@ -307,14 +307,22 @@ contextBridge.exposeInMainWorld('electronApi', {
   },
   registerShortcut,
   setAutoStartAtLogin: (value: boolean) => {
-    app.setLoginItemSettings({
-      openAtLogin: value,
-    });
+    try {
+      app.setLoginItemSettings({
+        openAtLogin: value,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   },
   setMediaWindowPosition: (x: number, y: number) => {
-    const mediaWindow = getMediaWindow();
-    if (mediaWindow) {
-      mediaWindow.setPosition(x, y);
+    try {
+      const mediaWindow = getMediaWindow();
+      if (mediaWindow) {
+        mediaWindow.setPosition(x, y);
+      }
+    } catch (error) {
+      console.error(error);
     }
   },
   toggleMediaWindow,

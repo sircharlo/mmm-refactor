@@ -1,24 +1,40 @@
+import { defaultSettings } from 'src/defaults/settings';
 import { electronApi } from 'src/helpers/electron-api';
 import { OldAppConfig, SettingsValues } from 'src/types/settings';
 const { fs, getAppDataPath, klawSync, path } = electronApi;
 
 const getOldVersionPath = () => {
-  const oldVersionPath = path.join(getAppDataPath(), 'meeting-media-manager');
-  return fs.existsSync(oldVersionPath) ? oldVersionPath : false;
+  try {
+    const oldVersionPath = path.join(getAppDataPath(), 'meeting-media-manager');
+    return fs.existsSync(oldVersionPath) ? oldVersionPath : false;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };
 
 const oldPrefsFilterFn = (item: { path: string }) => {
-  if (!item?.path) return false;
-  const oldPrefsFilterFnBasename = path.basename(item.path);
-  return (
-    oldPrefsFilterFnBasename.startsWith('prefs') &&
-    oldPrefsFilterFnBasename.endsWith('.json')
-  );
+  try {
+    if (!item?.path) return false;
+    const oldPrefsFilterFnBasename = path.basename(item.path);
+    return (
+      oldPrefsFilterFnBasename.startsWith('prefs') &&
+      oldPrefsFilterFnBasename.endsWith('.json')
+    );
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };
 
 const getOldPrefsPaths = (oldPath: string) => {
-  if (!oldPath) return [];
-  return klawSync(oldPath, { filter: oldPrefsFilterFn });
+  try {
+    if (!oldPath) return [];
+    return klawSync(oldPath, { filter: oldPrefsFilterFn });
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
 };
 
 const parsePrefsFile = (path: string) => {
@@ -32,52 +48,57 @@ const parsePrefsFile = (path: string) => {
 };
 
 const buildNewPrefsObject = (oldPrefs: OldAppConfig) => {
-  const newPrefsObject: SettingsValues = {
-    autoStartAtLogin: oldPrefs.app.autoRunAtBoot || false,
-    autoStartMusic: oldPrefs.meeting.autoStartMusic || true,
-    coWeek: oldPrefs.meeting.coWeek || '',
-    congregationName: oldPrefs.app.congregationName || '',
-    darkMode: 'auto',
-    enableKeyboardShortcuts:
-      oldPrefs.media.mediaWinShortcut ||
-      oldPrefs.media.ppBackward ||
-      oldPrefs.media.ppForward ||
-      // oldPrefs.media.presentShortcut ||
-      oldPrefs.meeting.shuffleShortcut
-        ? true
-        : false,
-    enableMediaDisplayButton: oldPrefs.media.enableMediaDisplayButton || true,
-    enableMusicButton: oldPrefs.meeting.enableMusicButton || true,
-    // enableMusicFadeOut: oldPrefs.meeting.enableMusicFadeOut || true,
-    enableSubtitles: oldPrefs.media.enableSubtitles || false,
-    excludeFootnotes: oldPrefs.media.excludeFootnotes || false,
-    excludeTh: oldPrefs.media.excludeTh || true,
-    hideMediaLogo: oldPrefs.media.hideMediaLogo || false,
-    includePrinted: oldPrefs.media.includePrinted || true,
-    jwlCompanionMode: false,
-    lang: oldPrefs.media.lang || '',
-    langFallback: oldPrefs.media.langFallback || '',
-    langSubtitles: oldPrefs.media.langSubs || '',
-    localAppLang: oldPrefs.app.localAppLang || 'en-US',
-    maxRes: oldPrefs.media.maxRes || '720p',
-    musicVolume: oldPrefs.meeting.musicVolume || 100,
-    mwDay: oldPrefs.meeting.mwDay?.toString() || '',
-    mwStartTime: oldPrefs.meeting.mwStartTime?.toString() || '',
-    obsCameraScene: oldPrefs.app.obs.cameraScene || '',
-    obsEnable: oldPrefs.app.obs.enable || false,
-    obsImageScene: oldPrefs.app.obs.imageScene || '',
-    obsMediaScene: oldPrefs.app.obs.mediaScene || '',
-    obsPassword: oldPrefs.app.obs.password || '',
-    obsPort: oldPrefs.app.obs.port?.toString() || '',
-    shortcutMediaNext: oldPrefs.media.ppForward || '',
-    shortcutMediaPrevious: oldPrefs.media.ppBackward || '',
-    shortcutMediaWindow: oldPrefs.media.mediaWinShortcut || '',
-    shortcutMusic: oldPrefs.meeting.shuffleShortcut || '',
-    // preferredOutput: oldPrefs.media.preferredOutput || '',
-    weDay: oldPrefs.meeting.weDay?.toString() || '',
-    weStartTime: oldPrefs.meeting.weStartTime?.toString() || '',
-  };
-  return newPrefsObject;
+  try {
+    const newPrefsObject: SettingsValues = {
+      autoStartAtLogin: oldPrefs.app.autoRunAtBoot || false,
+      autoStartMusic: oldPrefs.meeting.autoStartMusic || true,
+      coWeek: oldPrefs.meeting.coWeek || '',
+      congregationName: oldPrefs.app.congregationName || '',
+      darkMode: 'auto',
+      enableKeyboardShortcuts:
+        oldPrefs.media.mediaWinShortcut ||
+        oldPrefs.media.ppBackward ||
+        oldPrefs.media.ppForward ||
+        // oldPrefs.media.presentShortcut ||
+        oldPrefs.meeting.shuffleShortcut
+          ? true
+          : false,
+      enableMediaDisplayButton: oldPrefs.media.enableMediaDisplayButton || true,
+      enableMusicButton: oldPrefs.meeting.enableMusicButton || true,
+      // enableMusicFadeOut: oldPrefs.meeting.enableMusicFadeOut || true,
+      enableSubtitles: oldPrefs.media.enableSubtitles || false,
+      excludeFootnotes: oldPrefs.media.excludeFootnotes || false,
+      excludeTh: oldPrefs.media.excludeTh || true,
+      hideMediaLogo: oldPrefs.media.hideMediaLogo || false,
+      includePrinted: oldPrefs.media.includePrinted || true,
+      jwlCompanionMode: false,
+      lang: oldPrefs.media.lang || '',
+      langFallback: oldPrefs.media.langFallback || '',
+      langSubtitles: oldPrefs.media.langSubs || '',
+      localAppLang: oldPrefs.app.localAppLang || 'en-US',
+      maxRes: oldPrefs.media.maxRes || '720p',
+      musicVolume: oldPrefs.meeting.musicVolume || 100,
+      mwDay: oldPrefs.meeting.mwDay?.toString() || '',
+      mwStartTime: oldPrefs.meeting.mwStartTime?.toString() || '',
+      obsCameraScene: oldPrefs.app.obs.cameraScene || '',
+      obsEnable: oldPrefs.app.obs.enable || false,
+      obsImageScene: oldPrefs.app.obs.imageScene || '',
+      obsMediaScene: oldPrefs.app.obs.mediaScene || '',
+      obsPassword: oldPrefs.app.obs.password || '',
+      obsPort: oldPrefs.app.obs.port?.toString() || '',
+      shortcutMediaNext: oldPrefs.media.ppForward || '',
+      shortcutMediaPrevious: oldPrefs.media.ppBackward || '',
+      shortcutMediaWindow: oldPrefs.media.mediaWinShortcut || '',
+      shortcutMusic: oldPrefs.meeting.shuffleShortcut || '',
+      // preferredOutput: oldPrefs.media.preferredOutput || '',
+      weDay: oldPrefs.meeting.weDay?.toString() || '',
+      weStartTime: oldPrefs.meeting.weStartTime?.toString() || '',
+    };
+    return newPrefsObject;
+  } catch (error) {
+    console.error(error);
+    return defaultSettings;
+  }
 };
 
 export {

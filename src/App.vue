@@ -4,6 +4,6 @@
 
 <script setup lang="ts">
 defineOptions({
-  name: 'MeetingMediaManagerv2',
+  name: 'MeetingMediaManager-v2',
 });
 </script>

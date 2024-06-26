@@ -23,53 +23,71 @@ const shortcutCallbacks: Partial<Record<keyof SettingsValues, () => void>> = {
 };
 
 const getCurrentShortcuts = () => {
-  const currentState = useCurrentStateStore();
-  const { currentSettings } = storeToRefs(currentState);
-  const shortcuts = [];
-  for (const shortcutName of Object.keys(shortcutCallbacks)) {
-    const shortcutVal =
-      currentSettings.value[shortcutName as keyof SettingsValues];
-    if (shortcutVal) shortcuts.push(shortcutVal);
+  try {
+    const currentState = useCurrentStateStore();
+    const { currentSettings } = storeToRefs(currentState);
+    const shortcuts = [];
+    for (const shortcutName of Object.keys(shortcutCallbacks)) {
+      const shortcutVal =
+        currentSettings.value[shortcutName as keyof SettingsValues];
+      if (shortcutVal) shortcuts.push(shortcutVal);
+    }
+    return shortcuts;
+  } catch (error) {
+    console.error(error);
+    return [];
   }
-  return shortcuts;
 };
 
 const registerCustomShortcut = (
   shortcutName: Partial<keyof SettingsValues>,
   keySequence?: string,
 ) => {
-  const currentState = useCurrentStateStore();
-  const { currentSettings } = storeToRefs(currentState);
-  if (
-    !shortcutCallbacks[shortcutName] ||
-    !currentSettings.value ||
-    !currentSettings.value[shortcutName] ||
-    !currentSettings.value.enableKeyboardShortcuts
-  )
-    return;
-  if (!keySequence) keySequence = currentSettings.value[shortcutName] as string;
-  registerShortcut(keySequence, shortcutCallbacks[shortcutName]!);
+  try {
+    const currentState = useCurrentStateStore();
+    const { currentSettings } = storeToRefs(currentState);
+    if (
+      !shortcutCallbacks[shortcutName] ||
+      !currentSettings.value ||
+      !currentSettings.value[shortcutName] ||
+      !currentSettings.value.enableKeyboardShortcuts
+    )
+      return;
+    if (!keySequence)
+      keySequence = currentSettings.value[shortcutName] as string;
+    registerShortcut(keySequence, shortcutCallbacks[shortcutName]!);
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const registerAllCustomShortcuts = () => {
-  const currentState = useCurrentStateStore();
-  const { currentSettings } = storeToRefs(currentState);
-  if (!currentSettings.value) return;
-  unregisterAllCustomShortcuts();
-  for (const shortcutName of Object.keys(shortcutCallbacks)) {
-    registerCustomShortcut(shortcutName as keyof SettingsValues);
+  try {
+    const currentState = useCurrentStateStore();
+    const { currentSettings } = storeToRefs(currentState);
+    if (!currentSettings.value) return;
+    unregisterAllCustomShortcuts();
+    for (const shortcutName of Object.keys(shortcutCallbacks)) {
+      registerCustomShortcut(shortcutName as keyof SettingsValues);
+    }
+  } catch (error) {
+    console.error(error);
   }
 };
 
 const unregisterAllCustomShortcuts = () => {
-  const currentState = useCurrentStateStore();
-  const { currentSettings } = storeToRefs(currentState);
-  if (!currentSettings.value) return;
-  for (const shortcutName of Object.keys(
-    shortcutCallbacks,
-  ) as (keyof SettingsValues)[]) {
-    if (!shortcutName || !currentSettings.value[shortcutName]) continue;
-    unregisterShortcut(currentSettings.value[shortcutName] as string);
+  try {
+    const currentState = useCurrentStateStore();
+    const { currentSettings } = storeToRefs(currentState);
+    if (!currentSettings.value) return;
+    for (const shortcutName of Object.keys(
+      shortcutCallbacks,
+    ) as (keyof SettingsValues)[]) {
+      if (!shortcutName || !currentSettings.value[shortcutName]) continue;
+      unregisterShortcut(currentSettings.value[shortcutName] as string);
+    }
+  } catch (error) {
+    console.error(error);
   }
 };
 

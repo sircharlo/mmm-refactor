@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer';
+import mime from 'mime';
 import { storeToRefs } from 'pinia';
 import { format } from 'quasar';
 import { FULL_HD } from 'src/helpers/converters';
@@ -99,6 +100,27 @@ const isSong = (multimediaItem: MultimediaItem) => {
 const isRemoteUrl = (url: string) => {
   if (!url) return false;
   return url.startsWith('http://') || url.startsWith('https://');
+};
+
+const isFileUrl = (url: string) => {
+  if (!url) return false;
+  return url.startsWith('file://');
+};
+
+const inferExtension = (filename: string, filetype?: string) => {
+  if (!filetype) return filename;
+  const extension = mime.extension(filetype);
+  if (!extension) {
+    console.warn(
+      'Could not determine the file extension from the provided file type',
+    );
+    return filename;
+  }
+  const hasExtension = /\.[0-9a-z]+$/i.test(filename);
+  if (hasExtension) {
+    return filename;
+  }
+  return `${filename}.${extension}`;
 };
 
 const isImageString = (url: string) => {
@@ -329,8 +351,10 @@ export {
   findDb,
   formatTime,
   getMediaFromJwPlaylist,
+  inferExtension,
   isArchive,
   isAudio,
+  isFileUrl,
   isHeic,
   isImage,
   isImageString,

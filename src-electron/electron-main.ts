@@ -172,7 +172,10 @@ function createWindow() {
   mediaWindow.loadURL(process.env.APP_URL + '?page=media-player');
 }
 
-app.whenReady().then(createWindow);
+app
+  .whenReady()
+  .then(createWindow)
+  .catch((err) => console.error(err));
 
 app.on('window-all-closed', () => {
   if (platform !== 'darwin') {

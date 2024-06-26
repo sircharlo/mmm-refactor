@@ -94,9 +94,13 @@ const { customDurations, yeartexts } = storeToRefs(jwStore);
 const panzoom: Ref<PanzoomObject | undefined> = ref();
 
 const initiatePanzoom = () => {
-  const imageElem = document.getElementById('mediaImage');
-  if (!imageElem) return;
-  panzoom.value = Panzoom(imageElem);
+  try {
+    const imageElem = document.getElementById('mediaImage');
+    if (!imageElem) return;
+    panzoom.value = Panzoom(imageElem);
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 const $q = useQuasar();
@@ -121,13 +125,17 @@ watch(
 watch(
   () => [mediaPlayer.value?.scale, mediaPlayer.value?.x, mediaPlayer.value?.y],
   ([newScale, newX, newY]) => {
-    if (!mediaElement.value) {
-      const imageElem = document.getElementById('mediaImage');
-      const width = imageElem?.clientWidth || 0;
-      const height = imageElem?.clientHeight || 0;
-      panzoom.value?.zoom(newScale, panzoomOptions);
-      if (width > 0 && height > 0)
-        panzoom.value?.pan(newX * width, newY * height, panzoomOptions);
+    try {
+      if (!mediaElement.value) {
+        const imageElem = document.getElementById('mediaImage');
+        const width = imageElem?.clientWidth || 0;
+        const height = imageElem?.clientHeight || 0;
+        panzoom.value?.zoom(newScale, panzoomOptions);
+        if (width > 0 && height > 0)
+          panzoom.value?.pan(newX * width, newY * height, panzoomOptions);
+      }
+    } catch (e) {
+      console.log(e);
     }
   },
 );
@@ -135,14 +143,18 @@ watch(
 watch(
   () => mediaPlayer.value?.action,
   (newAction) => {
-    if (!mediaElement.value) return;
-    if (newAction.toLowerCase().includes('pause')) {
-      mediaElement.value.pause();
-      // mediaElement.value.currentTime = mediaPlayer.value.currentPosition;
-    } else if (newAction.toLowerCase().includes('play')) {
-      mediaElement.value.play().catch((error) => {
-        console.error(error);
-      });
+    try {
+      if (!mediaElement.value) return;
+      if (newAction.toLowerCase().includes('pause')) {
+        mediaElement.value.pause();
+        // mediaElement.value.currentTime = mediaPlayer.value.currentPosition;
+      } else if (newAction.toLowerCase().includes('play')) {
+        mediaElement.value.play().catch((error) => {
+          console.error(error);
+        });
+      }
+    } catch (e) {
+      console.log(e);
     }
   },
 );
@@ -150,63 +162,75 @@ watch(
 watch(
   () => mediaPlayer.value?.seekTo,
   (newPosition) => {
-    if (!mediaElement.value) return;
-    mediaElement.value.currentTime = newPosition;
+    try {
+      if (!mediaElement.value) return;
+      mediaElement.value.currentTime = newPosition;
+    } catch (e) {
+      console.log(e);
+    }
   },
 );
 
 const playMedia = () => {
-  if (!mediaElement.value) {
-    return;
-  }
+  try {
+    if (!mediaElement.value) {
+      return;
+    }
 
-  // mediaElement.value.onpause = () => {
-  //   mediaPlayer.value.seekTo = mediaElement.value?.currentTime || 0;
-  // };
+    // mediaElement.value.onpause = () => {
+    //   mediaPlayer.value.seekTo = mediaElement.value?.currentTime || 0;
+    // };
 
-  mediaElement.value.onended = () => {
-    mediaPlayer.value.currentPosition = 0;
-    mediaPlayer.value.seekTo = 0;
-    mediaPlayer.value.url = '';
-    mediaPlayer.value.uniqueId = '';
-    mediaPlayer.value.action =
-      mediaPlayer.value.action === 'backgroundMusicPlay'
-        ? 'backgroundMusicCurrentEnded'
-        : '';
-  };
+    mediaElement.value.onended = () => {
+      mediaPlayer.value.currentPosition = 0;
+      mediaPlayer.value.seekTo = 0;
+      mediaPlayer.value.url = '';
+      mediaPlayer.value.uniqueId = '';
+      mediaPlayer.value.action =
+        mediaPlayer.value.action === 'backgroundMusicPlay'
+          ? 'backgroundMusicCurrentEnded'
+          : '';
+    };
 
-  mediaElement.value.ontimeupdate = () => {
-    const currentTime = mediaElement.value?.currentTime || 0;
-    mediaPlayer.value.currentPosition = currentTime;
-    // mediaPlayer.value.seekTo = currentTime;
+    mediaElement.value.ontimeupdate = () => {
+      try {
+        const currentTime = mediaElement.value?.currentTime || 0;
+        mediaPlayer.value.currentPosition = currentTime;
+        // mediaPlayer.value.seekTo = currentTime;
+        if (
+          customDurations?.value?.[currentCongregation.value]?.[
+            selectedDate.value
+          ]?.[mediaPlayer.value.uniqueId]
+        ) {
+          const customStartStop = customDurations?.value?.[
+            currentCongregation.value
+          ]?.[selectedDate.value]?.[mediaPlayer.value.uniqueId] ?? { max: 0 };
+          if (currentTime >= customStartStop.max) {
+            // updateMediaPlayer('currentPosition', customStartStop.min);
+            mediaPlayer.value.url = '';
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    let customStartStop = { max: 0, min: 0 };
     if (
       customDurations?.value?.[currentCongregation.value]?.[
         selectedDate.value
       ]?.[mediaPlayer.value.uniqueId]
     ) {
-      const customStartStop = customDurations?.value?.[
-        currentCongregation.value
-      ]?.[selectedDate.value]?.[mediaPlayer.value.uniqueId] ?? { max: 0 };
-      if (currentTime >= customStartStop.max) {
-        // updateMediaPlayer('currentPosition', customStartStop.min);
-        mediaPlayer.value.url = '';
-      }
+      customStartStop = customDurations?.value?.[currentCongregation.value]?.[
+        selectedDate.value
+      ]?.[mediaPlayer.value.uniqueId] ?? { min: 0 };
     }
-  };
-  let customStartStop = { max: 0, min: 0 };
-  if (
-    customDurations?.value?.[currentCongregation.value]?.[selectedDate.value]?.[
-      mediaPlayer.value.uniqueId
-    ]
-  ) {
-    customStartStop = customDurations?.value?.[currentCongregation.value]?.[
-      selectedDate.value
-    ]?.[mediaPlayer.value.uniqueId] ?? { min: 0 };
+    mediaElement.value.currentTime = customStartStop.min;
+    mediaElement.value.play().catch((error) => {
+      console.error(error);
+    });
+  } catch (e) {
+    console.error(e);
   }
-  mediaElement.value.currentTime = customStartStop.min;
-  mediaElement.value.play().catch((error) => {
-    console.error(error);
-  });
 };
 
 function onResize(size: { height: number; width: number }) {

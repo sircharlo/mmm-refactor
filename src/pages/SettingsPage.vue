@@ -184,16 +184,25 @@ const settingsValid = ref(true);
 
 // Validation function
 const validateSettingsLocal = () => {
-  if (settingsFormDynamic.value) {
-    settingsFormDynamic.value.validate().then((success: boolean) => {
-      settingsValid.value = success;
-    });
-  }
-  for (const invalidSetting of getInvalidSettings()) {
-    expansionState.value[
-      settingsDefinitions[invalidSetting as keyof SettingsItems]
-        .group as keyof SettingsItems
-    ] = true;
+  try {
+    if (settingsFormDynamic.value) {
+      settingsFormDynamic.value
+        .validate()
+        .then((success: boolean) => {
+          settingsValid.value = success;
+        })
+        .catch(() => {
+          settingsValid.value = false;
+        });
+    }
+    for (const invalidSetting of getInvalidSettings()) {
+      expansionState.value[
+        settingsDefinitions[invalidSetting as keyof SettingsItems]
+          .group as keyof SettingsItems
+      ] = true;
+    }
+  } catch (error) {
+    console.error(error);
   }
 };
 

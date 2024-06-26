@@ -13,12 +13,13 @@ export const useCongregationSettingsStore = defineStore(
         return newId;
       },
       deleteCongregation(id: number | string) {
+        if (!id) return;
         delete this.congregations[id];
       },
     },
     getters: {
       congregationCount(state) {
-        return Object.keys(state.congregations).length;
+        return Object.keys(state.congregations)?.length;
       },
     },
 

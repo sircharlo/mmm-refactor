@@ -31,7 +31,7 @@
     <q-popup-proxy>
       <div
         :class="'rounded-borders bg-grey-' + $q.dark.isActive ? '2' : '9'"
-        style="width: 80vw;"
+        style="width: 80vw"
       >
         <q-card-section>
           <div class="text-h6">{{ $t('scene-selection') }}</div>
@@ -39,27 +39,41 @@
 
         <q-card-section>
           <div class="row q-col-gutter-md">
-          <template
-            :key="scene.sceneUuid"
-            v-for="scene in [mediaScene].concat(nonMediaScenes).filter(Boolean)"
-          >
-          <div :class="'col-' + (([mediaScene].concat(nonMediaScenes).filter(Boolean).length < 4) ? (12 / [mediaScene].concat(nonMediaScenes).filter(Boolean).length).toString() : '3')">
-            <q-btn
-              :color="
-                currentSceneUuid === scene?.sceneUuid
-                  ? 'warning'
-                  : scene?.sceneUuid === mediaScene?.sceneUuid
-                    ? 'primary'
-                    : 'primary'
-              "
-              :label="scene?.sceneName as string"
-              @click="setObsSceneByUuid(scene?.sceneUuid as string)"
-              class="q-py-md q-px-lg full-width"
-              size="1.5em"
-            />
+            <template
+              :key="scene.sceneUuid"
+              v-for="scene in [mediaScene]
+                .concat(nonMediaScenes)
+                .filter(Boolean)"
+            >
+              <div
+                :class="
+                  'col-' +
+                  ([mediaScene].concat(nonMediaScenes).filter(Boolean).length <
+                  4
+                    ? (
+                        12 /
+                        [mediaScene].concat(nonMediaScenes).filter(Boolean)
+                          .length
+                      ).toString()
+                    : '3')
+                "
+              >
+                <q-btn
+                  :color="
+                    currentSceneUuid === scene?.sceneUuid
+                      ? 'warning'
+                      : scene?.sceneUuid === mediaScene?.sceneUuid
+                        ? 'primary'
+                        : 'primary'
+                  "
+                  :label="scene?.sceneName as string"
+                  @click="setObsSceneByUuid(scene?.sceneUuid as string)"
+                  class="q-py-md q-px-lg full-width"
+                  size="1.5em"
+                />
+              </div>
+            </template>
           </div>
-          </template>
-        </div>
         </q-card-section>
       </div>
     </q-popup-proxy>
@@ -100,61 +114,69 @@ const obsErrorHandler = (err: OBSWebSocketError) => {
 };
 
 const obsConnect = async (setup?: boolean) => {
-  if (!currentSettings.value?.obsEnable) {
-    await obsWebSocket?.disconnect();
-    obsMessage.value = 'obs.disconnected';
-    return;
-  }
+  try {
+    if (!currentSettings.value?.obsEnable) {
+      await obsWebSocket?.disconnect();
+      obsMessage.value = 'obs.disconnected';
+      return;
+    }
 
-  const obsPort = currentSettings.value?.obsPort as string;
-  const obsPortDigits = obsPort?.toString().replace(/\D/g, '');
-  if (obsPortDigits?.length === 0) return;
+    const obsPort = currentSettings.value?.obsPort as string;
+    const obsPortDigits = obsPort?.toString().replace(/\D/g, '');
+    if (obsPortDigits?.length === 0) return;
 
-  obsConnectionState.value = 'connecting';
-  obsMessage.value = 'obs.connecting';
-  const obsPassword = (currentSettings.value?.obsPassword as string) || '';
+    obsConnectionState.value = 'connecting';
+    obsMessage.value = 'obs.connecting';
+    const obsPassword = (currentSettings.value?.obsPassword as string) || '';
 
-  // const getCurrentRoute = () => useRouter()?.currentRoute.value?.fullPath;
+    // const getCurrentRoute = () => useRouter()?.currentRoute.value?.fullPath;
 
-  let attempt = 0;
-  const maxAttempts = setup ? 1 : 12;
-  const timeBetweenAttempts = 5000; // 5 seconds
-  // const previousRoute = getCurrentRoute();
-  while (attempt < maxAttempts) {
-    // if (getCurrentRoute() !== previousRoute) {
-    //   break;
-    // }
-    try {
-      const { negotiatedRpcVersion, obsWebSocketVersion } =
-        await obsWebSocket?.connect('ws://127.0.0.1:' + obsPort, obsPassword);
-      if (obsWebSocketVersion && negotiatedRpcVersion) {
-        break;
-      }
-    } catch (error) {
-      console.error(
-        `Failed to connect to OBS (attempt ${attempt + 1}/${maxAttempts})`,
-        error,
-      );
-    } finally {
-      attempt++;
-      if (attempt < maxAttempts) {
-        await sleep(timeBetweenAttempts);
+    let attempt = 0;
+    const maxAttempts = setup ? 1 : 12;
+    const timeBetweenAttempts = 5000; // 5 seconds
+    // const previousRoute = getCurrentRoute();
+    while (attempt < maxAttempts) {
+      // if (getCurrentRoute() !== previousRoute) {
+      //   break;
+      // }
+      try {
+        const { negotiatedRpcVersion, obsWebSocketVersion } =
+          await obsWebSocket?.connect('ws://127.0.0.1:' + obsPort, obsPassword);
+        if (obsWebSocketVersion && negotiatedRpcVersion) {
+          break;
+        }
+      } catch (error) {
+        console.error(
+          `Failed to connect to OBS (attempt ${attempt + 1}/${maxAttempts})`,
+          error,
+        );
+      } finally {
+        attempt++;
+        if (attempt < maxAttempts) {
+          await sleep(timeBetweenAttempts);
+        }
       }
     }
+  } catch (error) {
+    console.error(error);
   }
 };
 
 const setObsScene = async (scene: string) => {
-  if (obsConnectionState.value !== 'connected') await obsConnect();
-  if (obsConnectionState.value !== 'connected') return;
-  const mediaScene = currentSettings.value?.obsMediaScene as string;
-  const imageScene = currentSettings.value?.obsImageScene as string;
-  const cameraScene = currentSettings.value?.obsCameraScene as string;
-  let programScene = mediaScene;
-  if (isImage(mediaPlayer.value.url) && imageScene) programScene = imageScene;
-  currentScene.value = scene;
-  const sceneUuid = scene === 'camera' ? cameraScene : programScene;
-  if (sceneUuid) obsWebSocket?.call('SetCurrentProgramScene', { sceneUuid });
+  try {
+    if (obsConnectionState.value !== 'connected') await obsConnect();
+    if (obsConnectionState.value !== 'connected') return;
+    const mediaScene = currentSettings.value?.obsMediaScene as string;
+    const imageScene = currentSettings.value?.obsImageScene as string;
+    const cameraScene = currentSettings.value?.obsCameraScene as string;
+    let programScene = mediaScene;
+    if (isImage(mediaPlayer.value.url) && imageScene) programScene = imageScene;
+    currentScene.value = scene;
+    const sceneUuid = scene === 'camera' ? cameraScene : programScene;
+    if (sceneUuid) obsWebSocket?.call('SetCurrentProgramScene', { sceneUuid });
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const setObsSceneByUuid = async (sceneUuid: string) => {
@@ -173,38 +195,48 @@ const setObsSceneListener = (event: CustomEventInit) => {
 };
 
 onMounted(() => {
-  window.addEventListener('obsConnectFromSettings', () => obsConnect(true));
-  window.addEventListener('obsSceneEvent', setObsSceneListener);
+  try {
+    window.addEventListener('obsConnectFromSettings', () => obsConnect(true));
+    window.addEventListener('obsSceneEvent', setObsSceneListener);
 
-  obsWebSocket.on('ConnectionClosed', obsErrorHandler);
-  obsWebSocket.on('ConnectionError', obsErrorHandler);
-  obsWebSocket.on(
-    'CurrentProgramSceneChanged',
-    (data: { sceneUuid: string }) => {
-      currentSceneUuid.value = data.sceneUuid;
-    },
-  );
-  obsWebSocket.on('Identified', async () => {
-    obsConnectionState.value = 'connected';
-    obsMessage.value = 'obs.connected';
-    const sceneList = await obsWebSocket?.call('GetSceneList');
-    if (sceneList) {
-      scenes.value = sceneList.scenes.reverse();
-      currentSceneUuid.value = sceneList.currentProgramSceneUuid;
-    }
-  });
-  obsWebSocket.on('SceneListChanged', (data) => {
-    scenes.value = data.scenes;
-  });
+    obsWebSocket.on('ConnectionClosed', obsErrorHandler);
+    obsWebSocket.on('ConnectionError', obsErrorHandler);
+    obsWebSocket.on(
+      'CurrentProgramSceneChanged',
+      (data: { sceneUuid: string }) => {
+        currentSceneUuid.value = data.sceneUuid;
+      },
+    );
+    obsWebSocket.on('Identified', async () => {
+      obsConnectionState.value = 'connected';
+      obsMessage.value = 'obs.connected';
+      const sceneList = await obsWebSocket?.call('GetSceneList');
+      if (sceneList) {
+        scenes.value = sceneList.scenes.reverse();
+        currentSceneUuid.value = sceneList.currentProgramSceneUuid;
+      }
+    });
+    obsWebSocket.on('SceneListChanged', (data) => {
+      scenes.value = data.scenes;
+    });
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 onUnmounted(() => {
-  window.removeEventListener('obsSceneEvent', setObsSceneListener);
+  try {
+    window.removeEventListener('obsConnectFromSettings', setObsSceneListener);
+    window.removeEventListener('obsSceneEvent', setObsSceneListener);
 
-  obsWebSocket.removeAllListeners('ConnectionClosed');
-  obsWebSocket.removeAllListeners('ConnectionError');
-  obsWebSocket.removeAllListeners('CurrentProgramSceneChanged');
-  obsWebSocket.removeAllListeners('Identified');
-  obsWebSocket.removeAllListeners('SceneListChanged');
+
+    obsWebSocket.removeAllListeners('ConnectionClosed');
+    obsWebSocket.removeAllListeners('ConnectionError');
+    obsWebSocket.removeAllListeners('CurrentProgramSceneChanged');
+    obsWebSocket.removeAllListeners('Identified');
+    obsWebSocket.removeAllListeners('SceneListChanged');
+  } catch (error) {
+    console.error(error);
+  }
 });
 </script>

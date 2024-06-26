@@ -216,14 +216,7 @@
                         "
                         v-ripple
                       >
-                        <q-img :src="getBestImageUrl(video.images, 'md')">
-                          <!-- <div class="absolute-bottom">
-                            <div class="text-subtitle2">{{ video.title }}</div>
-                            <div class="text-caption">
-                              {{ video.naturalKey }}
-                            </div>
-                          </div> -->
-                        </q-img>
+                        <q-img :src="getBestImageUrl(video.images, 'md')" />
                         <q-card-section>
                           <div class="text-subtitle1 q-mb-xs">
                             {{ video.title }}
@@ -239,6 +232,7 @@
                   </template>
                 </div>
               </q-card-section>
+              <q-inner-loading :showing="remoteVideoLoading" />
             </q-card>
           </q-dialog>
         </template>
@@ -447,23 +441,27 @@ const router = useRouter();
 const miniState = ref(true);
 
 watch(currentCongregation, (newCongregation, oldCongregation) => {
-  if (oldCongregation && queues.meetings[oldCongregation]) {
-    queues.meetings[oldCongregation].pause();
-  }
-  if (!newCongregation) {
-    if (route.fullPath !== '/congregation-selector') {
-      router.push({ path: '/congregation-selector' });
-      return;
+  try {
+    if (oldCongregation && queues.meetings[oldCongregation]) {
+      queues.meetings[oldCongregation].pause();
     }
-    selectedDate.value = '';
-  } else {
-    downloadProgress.value = {};
-    updateLookupPeriod();
-    registerAllCustomShortcuts();
-    downloadBackgroundMusic();
-    if (queues.meetings[newCongregation]) {
-      queues.meetings[newCongregation].start();
+    if (!newCongregation) {
+      if (route.fullPath !== '/congregation-selector') {
+        router.push({ path: '/congregation-selector' });
+        return;
+      }
+      selectedDate.value = '';
+    } else {
+      downloadProgress.value = {};
+      updateLookupPeriod();
+      registerAllCustomShortcuts();
+      downloadBackgroundMusic();
+      if (queues.meetings[newCongregation]) {
+        queues.meetings[newCongregation].start();
+      }
     }
+  } catch (error) {
+    console.error(error);
   }
 });
 
@@ -489,16 +487,24 @@ watch(online, (isNowOnline) => {
 });
 
 watch(route, (newVal) => {
-  const { congregations } = storeToRefs(congregationSettings);
-  drawer.value = !(
-    newVal.fullPath.includes('wizard') &&
-    Object.keys(congregations.value).length < 2
-  );
+  try {
+    const { congregations } = storeToRefs(congregationSettings);
+    drawer.value = !(
+      newVal.fullPath.includes('wizard') &&
+      Object.keys(congregations.value).length < 2
+    );
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 const navigateToCongregationSelector = () => {
-  if (route.fullPath !== '/congregation-selector') {
-    router.push({ path: '/congregation-selector' });
+  try {
+    if (route.fullPath !== '/congregation-selector') {
+      router.push({ path: '/congregation-selector' });
+    }
+  } catch (error) {
+    console.error(error);
   }
 };
 
@@ -556,45 +562,65 @@ watch(
 );
 
 const dateOptions = (lookupDate: string) => {
-  if (!lookupPeriod.value || !lookupPeriod.value) return true;
-  const dateArray: Date[] = lookupPeriod.value[currentCongregation.value]?.map(
-    (day) => day.date,
-  );
-  // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
-  const minDate = date.getMinDate(...dateArray);
-  // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
-  const maxDate = date.getMaxDate(...dateArray);
-  return (
-    date.getDateDiff(lookupDate, minDate, 'days') >= 0 &&
-    date.getDateDiff(lookupDate, maxDate, 'days') <= 0
-  );
+  try {
+    if (!lookupPeriod.value || !lookupPeriod.value) return true;
+    const dateArray: Date[] = lookupPeriod.value[
+      currentCongregation.value
+    ]?.map((day) => day.date);
+    // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
+    const minDate = date.getMinDate(...dateArray);
+    // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
+    const maxDate = date.getMaxDate(...dateArray);
+    return (
+      date.getDateDiff(lookupDate, minDate, 'days') >= 0 &&
+      date.getDateDiff(lookupDate, maxDate, 'days') <= 0
+    );
+  } catch (error) {
+    console.error(error);
+    return true;
+  }
 };
 
 const minDate = () => {
-  if (!lookupPeriod.value || !currentCongregation.value) return undefined;
-  const dateArray: Date[] = lookupPeriod.value[currentCongregation.value]?.map(
-    (day) => day.date,
-  );
-  // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
-  const minDate = date.getMinDate(...dateArray);
-  return date.formatDate(minDate, 'YYYY/MM');
+  try {
+    if (!lookupPeriod.value || !currentCongregation.value) return undefined;
+    const dateArray: Date[] = lookupPeriod.value[
+      currentCongregation.value
+    ]?.map((day) => day.date);
+    // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
+    const minDate = date.getMinDate(...dateArray);
+    return date.formatDate(minDate, 'YYYY/MM');
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
 };
 
 const maxDate = () => {
-  if (!lookupPeriod.value || !currentCongregation.value) return undefined;
-  const dateArray: Date[] = lookupPeriod.value[currentCongregation.value]?.map(
-    (day) => day.date,
-  );
-  // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
-  const maxDate = date.getMaxDate(...dateArray);
-  return date.formatDate(maxDate, 'YYYY/MM');
+  try {
+    if (!lookupPeriod.value || !currentCongregation.value) return undefined;
+    const dateArray: Date[] = lookupPeriod.value[
+      currentCongregation.value
+    ]?.map((day) => day.date);
+    // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
+    const maxDate = date.getMaxDate(...dateArray);
+    return date.formatDate(maxDate, 'YYYY/MM');
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
 };
 
 const getEventDates = () => {
-  if (!lookupPeriod.value || !currentCongregation.value) return [];
-  return lookupPeriod.value[currentCongregation.value]
-    ?.filter((day) => day.meeting)
-    .map((day) => date.formatDate(day.date, 'YYYY/MM/DD'));
+  try {
+    if (!lookupPeriod.value || !currentCongregation.value) return [];
+    return lookupPeriod.value[currentCongregation.value]
+      ?.filter((day) => day.meeting)
+      .map((day) => date.formatDate(day.date, 'YYYY/MM/DD'));
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
 };
 
 // Ref for UI states
@@ -606,6 +632,7 @@ const remoteVideosLoadingProgress = ref(0);
 const remoteVideos: Ref<MediaItemsMediatorItem[]> = ref([]);
 const remoteVideoFilter = ref('');
 const remoteVideosIncludeAudioDescription = ref(false);
+const remoteVideoLoading = ref(false);
 
 if (!migrations.value.includes('firstRun')) {
   const migrationResult = runMigration('firstRun');
@@ -624,20 +651,24 @@ cleanLocalStorage();
 cleanAdditionalMediaFolder();
 
 const getLocalFiles = async () => {
-  openFileDialog().then((result) => {
-    if (result.filePaths.length > 0) {
-      window.dispatchEvent(
-        new CustomEvent('localFiles-browsed', {
-          detail: result.filePaths.map((path) => {
-            return {
-              path,
-            };
+  openFileDialog()
+    .then((result) => {
+      if (result.filePaths.length > 0) {
+        window.dispatchEvent(
+          new CustomEvent('localFiles-browsed', {
+            detail: result.filePaths.map((path) => {
+              return {
+                path,
+              };
+            }),
           }),
-        }),
-      );
-    }
-    localUploadPopup.value = false;
-  });
+        );
+      }
+      localUploadPopup.value = false;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 };
 
 const getJwVideos = async () => {
@@ -714,13 +745,19 @@ const remoteVideosFiltered = computed(() => {
 });
 
 const getEventDayColor = (eventDate: string) => {
-  if (!lookupPeriod.value || !currentCongregation.value) return 'primary';
-  const isLoaded =
-    lookupPeriod.value[currentCongregation.value]?.find(
-      (d) => date.getDateDiff(eventDate, d.date, 'days') === 0,
-    )?.loading === false;
-  if (!isLoaded) return 'warning';
-  return 'primary';
+  try {
+    if (!lookupPeriod.value || !currentCongregation.value)
+      throw new Error('No congregation or lookup period');
+    const isLoaded =
+      lookupPeriod.value[currentCongregation.value]?.find(
+        (d) => date.getDateDiff(eventDate, d.date, 'days') === 0,
+      )?.loading === false;
+    if (!isLoaded) return 'warning';
+  } catch (error) {
+    console.error(error);
+  } finally {
+    return 'primary';
+  }
 };
 
 onMounted(() => {

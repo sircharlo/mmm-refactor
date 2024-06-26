@@ -1,5 +1,5 @@
 <template>
-  <q-dialog persistent v-model="localValue">
+  <q-dialog v-model="localValue">
     <q-card class="non-selectable" style="min-width: 500px">
       <q-card-section>
         <div class="text-h6">{{ $t('choose-a-song') }}</div>
@@ -24,7 +24,12 @@
         />
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn :label="$t('cancel')" @click="dismissPopup" color="negative" flat />
+        <q-btn
+          :label="$t('cancel')"
+          @click="dismissPopup"
+          color="negative"
+          flat
+        />
         <q-btn
           :label="$t('add-song')"
           @click="addSong(selectedSong)"
@@ -32,6 +37,7 @@
           flat
         />
       </q-card-actions>
+      <q-inner-loading :showing="loading" />
     </q-card>
   </q-dialog>
 </template>
@@ -62,38 +68,45 @@ const jwStore = useJwStore();
 const { addToAdditionMediaMap } = jwStore;
 
 const localValue = ref(props.modelValue);
+const loading = ref(false);
 const songOptions = ref(currentSongs.value);
 const selectedSong = ref<{ label: string; value: number } | null>(null);
 
 const dismissPopup = () => {
   localValue.value = false;
+  loading.value = false;
   selectedSong.value = null;
 };
 
 const addSong = async (
   selectedSong: { label: string; value: number } | null,
 ) => {
-  if (selectedSong?.value) {
-    const multimediaItem = {
-      KeySymbol: currentSongbook.value.pub,
-      Track: selectedSong.value,
-    } as MultimediaItem;
-    await processMissingMediaInfo([multimediaItem]);
-    const additionalMedia = await dynamicMediaMapper(
-      [multimediaItem],
-      selectedDateObject.value?.date,
-      true,
-    );
-    addToAdditionMediaMap(additionalMedia);
+  try {
+    loading.value = true;
+    if (selectedSong?.value) {
+      const multimediaItem = {
+        KeySymbol: currentSongbook.value.pub,
+        Track: selectedSong.value,
+      } as MultimediaItem;
+      await processMissingMediaInfo([multimediaItem]);
+      const additionalMedia = await dynamicMediaMapper(
+        [multimediaItem],
+        selectedDateObject.value?.date,
+        true,
+      );
+      addToAdditionMediaMap(additionalMedia);
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    dismissPopup();
   }
-  dismissPopup();
 };
 
 const filterFn = (val: string, update: (callback: () => void) => void) => {
   update(() => {
-    const needle = val.toLowerCase();
     songOptions.value = currentSongs.value.filter((v) =>
-      v.title.toLowerCase().includes(needle),
+      val ? v.title.toLowerCase().includes(val.toLowerCase()) : true,
     );
   });
 };
