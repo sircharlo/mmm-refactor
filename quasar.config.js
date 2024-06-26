@@ -39,10 +39,10 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
-      chainWebpack(chain) {
-        const nodePolyfillWebpackPlugin = require('node-polyfill-webpack-plugin');
-        chain.plugin('node-polyfill').use(nodePolyfillWebpackPlugin);
-      },
+      // chainWebpack(chain) {
+      //   const nodePolyfillWebpackPlugin = require('node-polyfill-webpack-plugin');
+      //   chain.plugin('node-polyfill').use(nodePolyfillWebpackPlugin);
+      // },
       extendViteConf(viteConf) {
         // if (!viteConf.optimizeDeps) viteConf.optimizeDeps = {};
         // if (!viteConf.optimizeDeps.exclude) viteConf.optimizeDeps.exclude = [

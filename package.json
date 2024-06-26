@@ -64,7 +64,6 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-perfectionist": "^2.10.0",
     "eslint-plugin-vue": "^9.0.0",
-    "node-polyfill-webpack-plugin": "^3.0.0",
     "prettier": "^3.3.2",
     "process": "^0.11.10",
     "typescript": "~5.4.5",
