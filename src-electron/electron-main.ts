@@ -111,9 +111,10 @@ function createWindow() {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
+    backgroundColor: 'grey',
     height: 600,
     // icon: path.resolve(__dirname, 'icons/icon.png'), // tray icon
-    // backgroundColor: 'black',
+    show: false,
     useContentSize: true,
     webPreferences: {
       backgroundThrottling: false,
@@ -144,12 +145,17 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = undefined;
   });
+
   mediaWindow?.on('closed', () => {
     mediaWindow = undefined;
   });
 
   mainWindow.on('close', () => {
     mediaWindow?.close();
+  });
+
+  mainWindow?.once('ready-to-show', () => {
+    mainWindow?.show();
   });
 
   if (!mediaWindow) {
