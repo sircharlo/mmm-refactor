@@ -9,7 +9,7 @@
       <!-- @vue-ignore-->
       <q-item :key="id" clickable v-for="(prefs, id) in congregations" v-ripple>
         <q-item-section @click="chooseCongregation(id)">
-          {{ getSettingValue('congregationName', id) || $t('noName') }}
+          {{ congregations[id]?.congregationName ?? $t('noName') }}
         </q-item-section>
         <q-item-section side>
           <q-btn
@@ -64,7 +64,6 @@ import { useRoute, useRouter } from 'vue-router';
 
 const congregationSettings = useCongregationSettingsStore();
 const currentState = useCurrentStateStore();
-const { getSettingValue } = currentState;
 const jwStore = useJwStore();
 const { updateYeartext } = jwStore;
 Dark.set('auto');

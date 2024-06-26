@@ -84,7 +84,6 @@ defineProps<{
 const currentState = useCurrentStateStore();
 const { currentSettings, mediaPlaying, selectedDateObject } =
   storeToRefs(currentState);
-const { getSettingValue } = currentState;
 const musicPlayer = ref<HTMLAudioElement | undefined>();
 const musicPlayerSource = ref<HTMLSourceElement | undefined>();
 const musicPlaying = ref(false);
@@ -134,7 +133,7 @@ function playMusic() {
   )
     return;
   musicPlayer.value.volume =
-    (getSettingValue('musicVolume') as number) / 100 ?? 1;
+    (currentSettings.value?.musicVolume ?? 100)  / 100 ?? 1;
   musicPlayerSource.value.src = getNextSongUrl();
   musicPlayer.value.load();
   musicPlayer.value
@@ -194,8 +193,8 @@ const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
     const now = new Date();
     const weMeeting = selectedDateObject.value?.meeting === 'we';
     const meetingStartTime = weMeeting
-      ? (getSettingValue('weStartTime') as string)
-      : (getSettingValue('mwStartTime') as string);
+      ? currentSettings.value?.weStartTime
+      : currentSettings.value?.mwStartTime;
     const [hours, minutes] = meetingStartTime.split(':').map(Number);
     const meetingStartDateTime = new Date(now);
     meetingStartDateTime.setHours(hours, minutes, 0, 0);

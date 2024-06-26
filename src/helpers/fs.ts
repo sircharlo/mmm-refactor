@@ -1,5 +1,6 @@
 import { Buffer } from 'buffer';
 import { Item } from 'klaw-sync';
+import { storeToRefs } from 'pinia';
 import { FULL_HD } from 'src/helpers/converters';
 import { electronApi } from 'src/helpers/electron-api';
 import { downloadFileIfNeeded, getJwMediaInfo } from 'src/helpers/jw-media';
@@ -166,8 +167,8 @@ const getSubtitlesUrl = async (
   comparisonDuration: number,
 ) => {
   const currentState = useCurrentStateStore();
-  const { getSettingValue } = currentState;
-  if (!getSettingValue('enableSubtitles')) return '';
+  const { currentSettings } = storeToRefs(currentState);
+  if (!currentSettings.value?.enableSubtitles) return '';
   let subtitlesUrl = '';
   if (
     isVideo(multimediaItem.FilePath) &&
@@ -175,11 +176,11 @@ const getSubtitlesUrl = async (
     multimediaItem.Track
   ) {
     let subtitlesPath = multimediaItem.FilePath.split('.')[0] + '.vtt';
-    const subtitleLang = getSettingValue('langSubtitles') as string;
+    const subtitleLang = currentSettings.value?.langSubtitles;
     const subtitleFetcher: PublicationFetcher = {
       fileformat: 'mp4',
       issue: multimediaItem.IssueTagNumber,
-      langwritten: subtitleLang ?? (getSettingValue('lang') as string),
+      langwritten: subtitleLang ?? currentSettings.value?.lang,
       pub: multimediaItem.KeySymbol,
       track: multimediaItem.Track,
     };

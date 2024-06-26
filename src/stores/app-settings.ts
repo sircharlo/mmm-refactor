@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia';
+import { defineStore, storeToRefs } from 'pinia';
 import { LocalStorage, uid } from 'quasar';
 import {
   buildNewPrefsObject,
@@ -13,6 +13,7 @@ export const useAppSettingsStore = defineStore('app-settings', {
   actions: {
     runMigration(type?: string) {
       try {
+        const { congregations } = storeToRefs(useCongregationSettingsStore());
         if (!type) return [];
         if (type === 'firstRun') {
           const oldVersionPath = getOldVersionPath();
@@ -22,8 +23,7 @@ export const useAppSettingsStore = defineStore('app-settings', {
               const oldPrefs: OldAppConfig = parsePrefsFile(oldPrefsPath.path);
               const newPrefsObject = buildNewPrefsObject(oldPrefs);
               const newCongId = uid();
-              useCongregationSettingsStore().congregations[newCongId] =
-                newPrefsObject;
+              congregations.value[newCongId] = newPrefsObject;
             }
           }
         } else {

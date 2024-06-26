@@ -57,7 +57,7 @@ import {
   VideoMarker,
 } from 'src/types/sqlite';
 
-const { executeQuery, fs, klawSync, path } = electronApi;
+const { executeQuery, fileUrlToPath, fs, klawSync, path } = electronApi;
 const FEB_2023 = 20230200;
 const FOOTNOTE_TAR_PAR = 9999;
 
@@ -175,7 +175,14 @@ const fetchMedia = async () => {
     const { lookupPeriod } = storeToRefs(useJwStore());
     const meetingsToFetch = lookupPeriod.value[
       currentCongregation.value
-    ]?.filter((day) => day.meeting && !day.complete);
+    ]?.filter((day) => {
+      return (
+        (day.meeting && !day.complete) ||
+        day.dynamicMedia.some(
+          (media) => !fs.existsSync(fileUrlToPath(media.fileUrl)),
+        )
+      );
+    });
     if (meetingsToFetch.length === 0) return;
     meetingsToFetch.forEach((day) => {
       day.loading = true;
@@ -340,7 +347,7 @@ const getMediaVideoMarkers = (
 
 const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
   const currentState = useCurrentStateStore();
-  const { getSettingValue } = currentState;
+  const { currentSettings } = storeToRefs(currentState);
   const DocumentMultimediaTable = (
     executeQuery(
       source.db,
@@ -391,7 +398,7 @@ const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
   const videoString =
     "(Multimedia.MimeType LIKE '%video%' OR Multimedia.MimeType LIKE '%audio%')";
   const imgString = `(Multimedia.MimeType LIKE '%image%' ${
-    getSettingValue('includePrinted')
+    currentSettings.value?.includePrinted
       ? ''
       : ' AND Multimedia.CategoryType <> 4 AND Multimedia.CategoryType <> 6'
   } AND Multimedia.CategoryType <> 9 AND Multimedia.CategoryType <> 10 AND Multimedia.CategoryType <> 25)`;
@@ -426,7 +433,7 @@ const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
 const getDocumentExtractItems = async (db: string, docId: number) => {
   try {
     const currentState = useCurrentStateStore();
-    const { getSettingValue } = currentState;
+    const { currentSettings } = storeToRefs(currentState);
     const extracts = executeQuery(
       // ${currentSongbook.value.pub === 'sjjm'
       //   ? "AND NOT UniqueEnglishSymbol = 'sjj' "
@@ -444,7 +451,7 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
     AND NOT UniqueEnglishSymbol LIKE 'mwbr%'
     AND NOT UniqueEnglishSymbol = 'sjj'
     ${
-      (getSettingValue('excludeTh') as boolean)
+      currentSettings.value?.excludeTh
         ? "AND NOT UniqueEnglishSymbol = 'th' "
         : ''
     }
@@ -457,7 +464,7 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
 
     const allExtractItems = [];
     for (const extract of extracts) {
-      extract.Lang = getSettingValue('lang') as string;
+      extract.Lang = currentSettings.value?.lang;
       if (extract.Link) {
         try {
           const matches = extract.Link.match(/\/(.*)\//);
@@ -474,13 +481,13 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
         : extract.UniqueEnglishSymbol.replace(/\d/g, '');
 
       if (symbol === 'snnw') return []; // That's the "old new songs" songbook; we don't need images from that
-      let extractLang = extract.Lang ?? (getSettingValue('lang') as string);
+      let extractLang = extract.Lang ?? currentSettings.value?.lang;
       let extractDb = await getDbFromJWPUB({
         issue: extract.IssueTagNumber,
         langwritten: extractLang,
         pub: symbol,
       });
-      const langFallback = getSettingValue('langFallback') as string;
+      const langFallback = currentSettings.value?.langFallback;
       if (!extractDb && langFallback) {
         extractDb = await getDbFromJWPUB({
           issue: extract.IssueTagNumber,
@@ -657,7 +664,7 @@ const dynamicMediaMapper = async (
 const getWeMedia = async (lookupDate: Date) => {
   const currentState = useCurrentStateStore();
   const { currentSongbook } = storeToRefs(currentState);
-  const { getSettingValue } = currentState;
+  const { currentSettings } = storeToRefs(currentState);
   lookupDate = dateFromString(lookupDate);
   try {
     const monday = getSpecificWeekday(lookupDate, 0);
@@ -672,12 +679,12 @@ const getWeMedia = async (lookupDate: Date) => {
 
     let { db, docId, issueString, publication, weekNr } = await getIssue(
       monday,
-      getSettingValue('lang') as string,
+      currentSettings.value?.lang,
     );
     if (db?.length === 0) {
       ({ db, docId, issueString, publication, weekNr } = await getIssue(
         monday,
-        getSettingValue('langFallback') as string,
+        currentSettings.value?.langFallback,
       ));
     }
     if (!db || docId < 0) {
@@ -741,7 +748,7 @@ const getWeMedia = async (lookupDate: Date) => {
           )
           .filter((v) => {
             return (
-              !(getSettingValue('excludeFootnotes') as boolean) ||
+              !currentSettings.value?.excludeFootnotes ||
               v.TargetParagraphNumberLabel < FOOTNOTE_TAR_PAR
             );
           }),
@@ -800,11 +807,13 @@ const getWeMedia = async (lookupDate: Date) => {
         .map((item) => {
           const match = item.Link.match(/\/(.*)\//);
           const langOverride = match ? match[1].split(':')[0] : '';
-          return langOverride === getSettingValue('lang') ? '' : langOverride;
+          return langOverride === currentSettings.value?.lang
+            ? ''
+            : langOverride;
         });
     } catch (e: unknown) {
       console.error(e);
-      songLangs = songs.map(() => getSettingValue('lang') as string);
+      songLangs = songs.map(() => currentSettings.value?.lang);
     }
     const mergedSongs = songs
       .map((song, index) => ({
@@ -843,44 +852,17 @@ const getWeMedia = async (lookupDate: Date) => {
       );
       if (videoMarkers) media.VideoMarkers = videoMarkers;
     }
-
     await processMissingMediaInfo(allMedia);
-
     const dynamicMediaForDay = await dynamicMediaMapper(allMedia, lookupDate);
-
-    // const dynamicMedia: Record<
-    //   string,
-    //   Record<string, DynamicMediaObject[]>
-    // > = LocalStorage.getItem('dynamicMedia') || {};
-    // if (!dynamicMedia[currentCongregation.value])
-    //   dynamicMedia[currentCongregation.value] = {} as Record<
-    //     string,
-    //     DynamicMediaObject[]
-    //   >;
-
-    // dynamicMedia[currentCongregation.value][
-    //   date.formatDate(lookupDate, 'YYYYMMDD')
-    // ] = dynamicMediaForDay;
-    // LocalStorage.set('dynamicMedia', dynamicMedia);
-
     return {
       error: false,
       media: dynamicMediaForDay,
     };
   } catch (e) {
     console.error('getWeMedia', e);
-    // const dynamicMedia: Record<
-    //   string,
-    //   Record<string, DynamicMediaObject[]>
-    // > = LocalStorage.getItem('dynamicMedia') || {};
-    // const returnVal =
-    //   dynamicMedia[currentCongregation.value]?.[
-    //     date.formatDate(lookupDate, 'YYYYMMDD')
-    //   ] ?? [];
     return {
       error: true,
       media: [],
-      // media: returnVal,
     };
   }
 };
@@ -895,7 +877,7 @@ function sanitizeId(id: string) {
 
 const getMwMedia = async (lookupDate: Date) => {
   const currentState = useCurrentStateStore();
-  const { getSettingValue } = currentState;
+  const { currentSettings } = storeToRefs(currentState);
   const { currentSongbook } = storeToRefs(currentState);
   lookupDate = dateFromString(lookupDate);
   try {
@@ -916,9 +898,9 @@ const getMwMedia = async (lookupDate: Date) => {
       return await getDbFromJWPUB(publication);
     };
 
-    let db = await getMwbIssue(getSettingValue('lang') as string);
+    let db = await getMwbIssue(currentSettings.value?.lang);
     if (!db) {
-      db = await getMwbIssue(getSettingValue('langFallback') as string);
+      db = await getMwbIssue(currentSettings.value?.langFallback);
     }
     if (!db) {
       throw new Error('No db found');
@@ -972,46 +954,20 @@ const getMwMedia = async (lookupDate: Date) => {
       }
     }
     await processMissingMediaInfo(allMedia);
-
     const dynamicMediaForDay = await dynamicMediaMapper(allMedia, lookupDate);
-
-    // const dynamicMedia: Record<
-    //   string,
-    //   Record<string, DynamicMediaObject[]>
-    // > = LocalStorage.getItem('dynamicMedia') || {};
-    // if (!dynamicMedia[currentCongregation.value])
-    //   dynamicMedia[currentCongregation.value] = {} as Record<
-    //     string,
-    //     DynamicMediaObject[]
-    //   >;
-
-    // dynamicMedia[currentCongregation.value][
-    //   date.formatDate(lookupDate, 'YYYYMMDD')
-    // ] = dynamicMediaForDay;
-
-    // LocalStorage.set('dynamicMedia', dynamicMedia);
     return {
       error: false,
       media: dynamicMediaForDay,
     };
   } catch (e) {
     console.error('getMwMedia', e);
-    // const dynamicMedia: Record<
-    //   string,
-    //   Record<string, DynamicMediaObject[]>
-    // > = LocalStorage.getItem('dynamicMedia') || {};
-    // const returnVal =
-    //   dynamicMedia[currentCongregation.value]?.[
-    //     date.formatDate(lookupDate, 'YYYYMMDD')
-    //   ] ?? [];
     return { error: true, media: [] };
-    // return { error: true, media: returnVal };
   }
 };
 
 async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
   const currentState = useCurrentStateStore();
-  const { getSettingValue } = currentState;
+  const { currentSettings } = storeToRefs(currentState);
   for (const media of allMedia.filter(
     (m) =>
       m.KeySymbol && (!m.Label || !m.FilePath || !fs.existsSync(m.FilePath)),
@@ -1021,8 +977,8 @@ async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
     }
     const langsWritten = [
       media.AlternativeLanguage,
-      getSettingValue('lang') as string,
-      getSettingValue('langFallback') as string,
+      currentSettings.value?.lang,
+      currentSettings.value?.langFallback,
     ];
     for (const langwritten of langsWritten) {
       if (!langwritten) {
@@ -1093,12 +1049,10 @@ export function findBestResolution(
   mediaLinks: MediaItemsMediatorFile[] | MediaLink[],
 ) {
   const currentState = useCurrentStateStore();
-  const { getSettingValue } = currentState;
+  const { currentSettings } = storeToRefs(currentState);
   let bestItem = null;
   let bestHeight = 0;
-  const maxRes = parseInt(
-    (getSettingValue('maxRes') as string).replace(/\D/g, ''),
-  );
+  const maxRes = parseInt(currentSettings.value?.maxRes?.replace(/\D/g, ''));
   if (mediaLinks.some((m) => !m.subtitled))
     mediaLinks = mediaLinks.filter((m) => !m.subtitled) as MediaLink[];
   for (const mediaLink of mediaLinks) {

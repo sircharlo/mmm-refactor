@@ -79,17 +79,17 @@ const getWeekDay = (lookupDate: Date) => {
       lookupDate.getDay() === 0
         ? lookupDate.getDay() + 6
         : lookupDate.getDay() - 1;
-    return dayNumber;
+    return dayNumber.toString();
   } catch (error) {
     console.log(error);
-    return 0;
+    return '0';
   }
 };
 
 function getSpecificWeekday(date: Date, desiredWeekday: number) {
   try {
     if (!date) throw new Error('No date');
-    if (!desiredWeekday) throw new Error('No desired weekday');
+    if (desiredWeekday == null) throw new Error('No desired weekday');
     desiredWeekday++;
     desiredWeekday = desiredWeekday === 7 ? 0 : desiredWeekday;
     const difference = (date.getDay() - desiredWeekday + 7) % 7;
@@ -116,10 +116,10 @@ function isCoWeek(lookupDate: Date) {
   try {
     if (!lookupDate) throw new Error('No lookup date');
     const currentState = useCurrentStateStore();
-    const { getSettingValue } = currentState;
-    const coWeekSet = !!(getSettingValue('coWeek') as string);
+    const { currentSettings } = storeToRefs(currentState);
+    const coWeekSet = !!currentSettings.value?.coWeek;
     if (!coWeekSet) return false;
-    const coWeekTuesday = dateFromString(getSettingValue('coWeek') as string);
+    const coWeekTuesday = dateFromString(currentSettings.value?.coWeek);
     const coMonday = getSpecificWeekday(coWeekTuesday, 0);
     const lookupWeekMonday = getSpecificWeekday(lookupDate, 0);
     return datesAreSame(coMonday, lookupWeekMonday);
@@ -133,13 +133,13 @@ const isMwMeetingDay = (lookupDate: Date) => {
   try {
     if (!lookupDate) throw new Error('No lookup date');
     const currentState = useCurrentStateStore();
-    const { getSettingValue } = currentState;
+    const { currentSettings } = storeToRefs(currentState);
     const coWeek = isCoWeek(lookupDate);
     if (coWeek) {
-      const coWeekTuesday = dateFromString(getSettingValue('coWeek') as string);
+      const coWeekTuesday = dateFromString(currentSettings.value?.coWeek);
       return datesAreSame(coWeekTuesday, lookupDate);
     } else {
-      return getSettingValue('mwDay') == getWeekDay(lookupDate);
+      return currentSettings.value?.mwDay == getWeekDay(lookupDate);
     }
   } catch (error) {
     console.log(error);
@@ -151,8 +151,8 @@ const isWeMeetingDay = (lookupDate: Date) => {
   try {
     if (!lookupDate) throw new Error('No lookup date');
     const currentState = useCurrentStateStore();
-    const { getSettingValue } = currentState;
-    return getSettingValue('weDay') == getWeekDay(lookupDate);
+    const { currentSettings } = storeToRefs(currentState);
+    return currentSettings.value?.weDay == getWeekDay(lookupDate);
   } catch (error) {
     console.log(error);
     return false;
@@ -211,7 +211,6 @@ export {
   datesAreSame,
   daysInFuture,
   getSpecificWeekday,
-  getWeekDay,
   isCoWeek,
   isInPast,
   isMwMeetingDay,

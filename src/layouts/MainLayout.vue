@@ -489,9 +489,10 @@ watch(online, (isNowOnline) => {
 });
 
 watch(route, (newVal) => {
+  const { congregations } = storeToRefs(congregationSettings);
   drawer.value = !(
     newVal.fullPath.includes('wizard') &&
-    Object.keys(congregationSettings.congregations).length < 2
+    Object.keys(congregations.value).length < 2
   );
 });
 
@@ -641,13 +642,12 @@ const getLocalFiles = async () => {
 
 const getJwVideos = async () => {
   try {
+    if (!currentSettings.value) return;
     if (remoteVideosLoadingProgress.value < 1) {
-      const currentState = useCurrentStateStore();
-      const { getSettingValue } = currentState;
       const getSubcategories = async (category: string) => {
         return (await get(
           `https://b.jw-cdn.org/apis/mediator/v1/categories/${
-            getSettingValue('lang') as string
+            currentSettings.value?.lang
           }/${category}?detailed=1&mediaLimit=0&clientType=www`,
         )) as JwVideoCategory;
       };
@@ -671,7 +671,7 @@ const getJwVideos = async () => {
       for (const category of subcategories) {
         const request = (await get(
           `https://b.jw-cdn.org/apis/mediator/v1/categories/${
-            getSettingValue('lang') as string
+            currentSettings.value?.lang
           }/${category.key}?detailed=0&clientType=www`,
         )) as JwVideoCategory;
         remoteVideos.value = remoteVideos.value

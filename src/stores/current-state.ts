@@ -22,24 +22,18 @@ export const useCurrentStateStore = defineStore('current-state', {
         settingsDefinitions,
       )) {
         if (settingsDefinition.rules?.includes('notEmpty')) {
+          const congregationSettingsStore = useCongregationSettingsStore();
+          const { congregations } = storeToRefs(congregationSettingsStore);
           if (
-            !this.getSettingValue(
-              settingsDefinitionId as keyof SettingsValues,
-              congregation,
-            )
+            !congregations.value[congregation][
+              settingsDefinitionId as keyof SettingsValues
+            ]
           ) {
             invalidSettings.push(settingsDefinitionId);
           }
         }
       }
       return invalidSettings as (keyof SettingsValues)[];
-    },
-    getSettingValue(id: keyof SettingsValues, congregation?: number | string) {
-      const congregationSettingsStore = useCongregationSettingsStore();
-      const congregations = congregationSettingsStore.congregations;
-      if (!congregation) congregation = this.currentCongregation;
-      if (!congregation) return null;
-      return congregations[congregation][id];
     },
     invalidSettings(congregation?: number | string) {
       if (!congregation) congregation = this.currentCongregation;
@@ -64,9 +58,9 @@ export const useCurrentStateStore = defineStore('current-state', {
     },
     currentSettings(state) {
       const congregationSettingsStore = useCongregationSettingsStore();
-      const congregations = congregationSettingsStore.congregations;
+      const { congregations } = storeToRefs(congregationSettingsStore);
       return Object.keys(congregations).length > 0
-        ? congregations[state.currentCongregation]
+        ? congregations.value[state.currentCongregation]
         : ({} as SettingsValues);
     },
     currentSongbook() {
