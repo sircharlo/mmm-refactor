@@ -100,6 +100,23 @@
             icon="mdi-overscan"
           />
         </q-card-section>
+        <q-card-section>
+          <q-btn
+            :color="mediaPlayer.customBackground ? 'negative' : 'primary'"
+            :icon="
+              'mdi-image' + (mediaPlayer.customBackground ? '-remove' : '')
+            "
+            @click="chooseCustomBackground(!!mediaPlayer.customBackground)"
+          >
+            <q-tooltip
+              >{{
+                mediaPlayer.customBackground
+                  ? $t('reset-custom-background')
+                  : $t('set-custom-background')
+              }}
+            </q-tooltip> </q-btn
+          >'
+        </q-card-section>
         <q-separator />
         <q-card-actions>
           <q-btn
@@ -126,12 +143,13 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { electronApi } from 'src/helpers/electron-api';
-import { showMediaWindow } from 'src/helpers/mediaPlayback';
+import { isImage, showMediaWindow } from 'src/helpers/mediaPlayback';
 import { useAppSettingsStore } from 'src/stores/app-settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 
-const { getAllScreens, moveMediaWindow } = electronApi;
+const { getAllScreens, moveMediaWindow, openFileDialog, pathToFileURL } =
+  electronApi;
 
 defineProps<{
   disabled?: boolean;
@@ -143,6 +161,31 @@ const mediaDisplayPopup = ref();
 const appSettings = useAppSettingsStore();
 const { screenPreferences } = storeToRefs(appSettings);
 const screenList = ref(getAllScreens());
+
+const chooseCustomBackground = async (reset?: boolean) => {
+  try {
+    if (reset) {
+      mediaPlayer.value.customBackground = '';
+      return;
+    } else {
+      const backgroundPicker = await openFileDialog(true);
+      // todo: add a jwpub image picker if selected file is a JWPUB
+      if (
+        !backgroundPicker.canceled &&
+        backgroundPicker.filePaths[0] &&
+        isImage(backgroundPicker.filePaths[0])
+      ) {
+        mediaPlayer.value.customBackground = pathToFileURL(
+          backgroundPicker.filePaths[0],
+        );
+      } else {
+        mediaPlayer.value.customBackground = '';
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 watch(
   () => [

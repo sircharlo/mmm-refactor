@@ -361,5 +361,7 @@
   "filter": "Filtre",
   "clear": "Supprimer",
   "no-key-combination": "Entrez une combinaison de touches à l'aide de votre clavier maintenant.",
-  "enter-key-combination": "Choisir un raccourci"
+  "enter-key-combination": "Choisir un raccourci",
+  "reset-custom-background": "Enlever l'arrière-plan personnalisé",
+  "set-custom-background": "Choisir un arrière-plan personnalisé"
 }

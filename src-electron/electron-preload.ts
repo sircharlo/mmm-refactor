@@ -290,11 +290,12 @@ contextBridge.exposeInMainWorld('electronApi', {
   },
   klawSync,
   moveMediaWindow,
-  openFileDialog: () => {
+  openFileDialog: (single?: boolean) => {
     return dialog.showOpenDialog({
-      properties: ['openFile', 'multiSelections'],
+      properties: single ? ['openFile'] : ['openFile', 'multiSelections'],
     });
   },
+
   openFolderDialog: () => {
     return dialog.showOpenDialogSync({
       properties: ['openDirectory'],

@@ -1,5 +1,7 @@
 <template>
-  <!-- {{ mediaPlayer }} -->
+  <!-- <template v-if="mediaPlayer.customBackground">
+    {{ mediaPlayer.customBackground }}
+  </template> -->
   <q-page-container
     class="q-electron-drag vertical-middle overflow-hidden"
     padding
@@ -47,15 +49,25 @@
         >
           <source :src="mediaPlayer.url" ref="mediaElementSource" />
         </audio>
+        <template v-if="mediaPlayer.customBackground">
+          <q-img
+            :src="mediaPlayer.customBackground"
+            class="fitSnugly"
+            fit="contain"
+            id="customBackground"
+            no-spinner
+            ref="customBackground"
+          />
+        </template>
         <div
           class="q-pa-md center"
           id="yeartext"
+          v-else-if="!currentSettings?.jwlCompanionMode"
           v-html="
             (yeartexts[new Date().getFullYear()] &&
               yeartexts[new Date().getFullYear()][currentSettings?.lang]) ??
             ''
           "
-          v-if="!currentSettings?.jwlCompanionMode"
         />
         <div
           id="yeartextLogoContainer"

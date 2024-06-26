@@ -178,5 +178,7 @@
   "filter": "Filter",
   "clear": "Clear",
   "no-key-combination": "Enter a key combination now using your keyboard.",
-  "enter-key-combination": "Choose a shortcut"
+  "enter-key-combination": "Choose a shortcut",
+  "reset-custom-background": "Remove custom background",
+  "set-custom-background": "Choose a custom background"
 }

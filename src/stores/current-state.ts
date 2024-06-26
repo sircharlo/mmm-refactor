@@ -148,8 +148,8 @@ export const useCurrentStateStore = defineStore('current-state', {
       },
       mediaPlayer: {
         action: '',
-        // duration: 0,
         currentPosition: 0,
+        customBackground: '',
         scale: 1,
         seekTo: 0,
         subtitlesUrl: '',

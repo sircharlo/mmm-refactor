@@ -23,7 +23,7 @@ export interface ElectronApi {
     windowedMode?: boolean,
     noEvent?: boolean,
   ) => void;
-  openFileDialog: () => Promise<Electron.OpenDialogReturnValue>;
+  openFileDialog: (single?: boolean) => Promise<Electron.OpenDialogReturnValue>;
   openFolderDialog: () => string[];
   path: typeof import('path');
   pathToFileURL: (path: string) => string;
