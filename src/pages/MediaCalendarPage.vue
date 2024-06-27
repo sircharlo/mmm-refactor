@@ -795,9 +795,23 @@ const mapOrder =
     }
   };
 
+const generateMediaList = () => {
+  const combinedMediaItems = datedAdditionalMediaMap.value.concat(
+    selectedDateObject.value?.dynamicMedia ?? [],
+  );
+  if (combinedMediaItems && currentCongregation.value && selectedDate.value) {
+    if (!mediaSort.value[currentCongregation.value]) {
+      mediaSort.value[currentCongregation.value] = {};
+    }
+    sortableMediaItems.value = combinedMediaItems.sort(
+      mapOrder(mediaSort.value[currentCongregation.value][selectedDate.value]),
+    );
+  }
+};
+
 watch(
   () => [
-    selectedDateObject.value.date,
+    selectedDateObject.value?.date,
     datedAdditionalMediaMap.value?.length,
     selectedDateObject.value?.dynamicMedia?.length,
   ],
@@ -811,23 +825,7 @@ watch(
         newAdditionalMediaListLength !== oldAdditionalMediaListLength ||
         newDynamicMediaListLength !== oldDynamicMediaListLength
       ) {
-        const combinedMediaItems = datedAdditionalMediaMap.value.concat(
-          selectedDateObject.value?.dynamicMedia ?? [],
-        );
-        if (
-          combinedMediaItems &&
-          currentCongregation.value &&
-          selectedDate.value
-        ) {
-          if (!mediaSort.value[currentCongregation.value]) {
-            mediaSort.value[currentCongregation.value] = {};
-          }
-          sortableMediaItems.value = combinedMediaItems.sort(
-            mapOrder(
-              mediaSort.value[currentCongregation.value][selectedDate.value],
-            ),
-          );
-        }
+        generateMediaList();
       }
     } catch (e) {
       console.error(e);
@@ -836,7 +834,7 @@ watch(
 );
 
 watch(
-  Object.keys(mediaSort),
+  mediaSort,
   () => {
     try {
       if (
@@ -860,6 +858,7 @@ watch(
     }
   },
   // { deep: true },
+  { immediate: true },
 );
 
 const updateMediaSortPlugin: DNDPlugin = (parent) => {
@@ -943,7 +942,7 @@ onMounted(async () => {
       console.error(e);
     }
   });
-
+  generateMediaList();
   try {
     if (
       currentCongregation.value &&
