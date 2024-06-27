@@ -52,10 +52,11 @@ jobs:
         if: ${{ steps.compare-versions.outputs.VERSION_MATCH == 'false' }}
         run: exit 1
 
-      - name: 'Create a pull request with the new version'
-        uses: r7kamura/bump-request@v0
+      - name: Pull Request Version Bump
+        uses: r7kamura/bump-request@v0.4.1
         with:
           release_type: 'patch'
+
 
       # - name: Stop rest of actions since package.json version is the same
       #   if: steps.compare-versions.outputs.NEW_VERSION
