@@ -188,14 +188,9 @@ const chooseCustomBackground = async (reset?: boolean) => {
 };
 
 watch(
-  () => [
-    currentSettings.value?.enableMediaDisplayButton,
-    currentSettings.value?.jwlCompanionMode,
-  ],
-  ([newMediaDisplayEnabled, newJwlCompanionMode]) => {
-    if (newMediaDisplayEnabled && !newJwlCompanionMode) {
-      showMediaWindow(newMediaDisplayEnabled);
-    }
+  () => currentSettings.value?.enableMediaDisplayButton,
+  (newMediaDisplayEnabled) => {
+    showMediaWindow(newMediaDisplayEnabled);
   },
   { immediate: true },
 );
