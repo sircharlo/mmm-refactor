@@ -19,6 +19,7 @@ pull_request_rules:
       - or:
         - author = dependabot[bot]
         - title ~= chore\(deps
+        - title ~= Change version to
     actions:
       update:
       merge:
