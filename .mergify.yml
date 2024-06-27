@@ -16,7 +16,9 @@ pull_request_rules:
  #       method: squash
   - name: Automatically merge Dependabot PRs
     conditions:
-      - author = dependabot[bot]
+      - or:
+        - author = dependabot[bot]
+        - title ~= chore\(deps
     actions:
       update:
       merge:
