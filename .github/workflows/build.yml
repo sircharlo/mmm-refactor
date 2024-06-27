@@ -96,7 +96,7 @@ jobs:
       - run: yarn install && yarn global add @quasar/cli
 
       - name: Build and Publish Electron App
-        run: yarn quasar build -m electron
+        run: yarn quasar build -m electron --publish always
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
