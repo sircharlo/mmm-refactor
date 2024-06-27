@@ -74,21 +74,6 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Read package version
-        uses: ZvonimirSun/read-package-version-actions@v2
-        id: package-version
-
-      - name: Get Latest Release Version
-        id: get-latest-release
-        uses: ddbaptiste/get-latest-release@v1.0.0
-
-      - name: Version check
-        run: |
-          echo "Current package.json version: ${{ steps.package-version.outputs.version }}"
-          echo "Latest release version: ${{ steps.get-latest-release.outputs.latest-release }}"
 
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v4
