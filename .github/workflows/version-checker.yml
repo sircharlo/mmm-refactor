@@ -24,31 +24,33 @@ jobs:
           repository: ${{ github.repository }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-
-      - name: Version check
+      - name: Compare versions and increment if needed
+        id: compare-versions
         run: |
-          echo "Current package.json version: ${{ steps.package-version.outputs.version }}"
-          echo "Latest release version: ${{ steps.get-latest-release.outputs.release }}"
+          PACKAGE_VERSION="${{ steps.package-version.outputs.version }}"
+          GITHUB_RELEASE_VERSION="${{ steps.get-latest-release.outputs.release }}"
 
+          # Strip leading 'v' if present
+          GITHUB_RELEASE_VERSION="${GITHUB_RELEASE_VERSION#v}"
 
-      # - name: Compare versions and increment if needed
-      #   id: compare-versions
-      #   run: |
-      #     PACKAGE_VERSION="${{ steps.package-version.outputs.version }}"
-      #     GITHUB_RELEASE_VERSION="${{ steps.get-latest-release.outputs.latest-release }}"
+          echo "Package version: $PACKAGE_VERSION"
+          echo "GitHub release version: $GITHUB_RELEASE_VERSION"
 
-      #     # Strip leading 'v' if present
-      #     GITHUB_RELEASE_VERSION="${GITHUB_RELEASE_VERSION#v}"
+          if [ "$PACKAGE_VERSION" = "$GITHUB_RELEASE_VERSION" ]; then
+            NEW_VERSION=true
+            echo "New version: $NEW_VERSION"
+            echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
+            exit 0
+          fi
 
-      #     echo "Package version: $PACKAGE_VERSION"
-      #     echo "GitHub release version: $GITHUB_RELEASE_VERSION"
+      - name: Stop if the version in package.json is not the same as the latest release
+        if: !steps.compare-versions.outputs.NEW_VERSION
+        run: exit 1
 
-      #     if [ "$PACKAGE_VERSION" = "$GITHUB_RELEASE_VERSION" ]; then
-      #       NEW_VERSION=true
-      #       echo "New version: $NEW_VERSION"
-      #       echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
-      #       exit 0
-      #     fi
+      - name: Bump version in package.json
+        if: steps.compare-versions.outputs.NEW_VERSION
+        uses: maks-stupak/gh-action-bump-version@v7.1.5
+
 
       # - name: Stop rest of actions since package.json version is the same
       #   if: steps.compare-versions.outputs.NEW_VERSION
