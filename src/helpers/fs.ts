@@ -190,42 +190,43 @@ const getSubtitlesUrl = async (
   try {
     const currentState = useCurrentStateStore();
     const { currentSettings } = storeToRefs(currentState);
-    if (!currentSettings.value?.enableSubtitles) throw new Error('No settings');
     let subtitlesUrl = '';
-    if (
-      isVideo(multimediaItem.FilePath) &&
-      multimediaItem.KeySymbol &&
-      multimediaItem.Track
-    ) {
-      let subtitlesPath = multimediaItem.FilePath.split('.')[0] + '.vtt';
-      const subtitleLang = currentSettings.value?.langSubtitles;
-      const subtitleFetcher: PublicationFetcher = {
-        fileformat: 'mp4',
-        issue: multimediaItem.IssueTagNumber,
-        langwritten: subtitleLang ?? currentSettings.value?.lang,
-        pub: multimediaItem.KeySymbol,
-        track: multimediaItem.Track,
-      };
-      const { duration, subtitles } = await getJwMediaInfo(subtitleFetcher);
-      if (!subtitles) throw new Error('No subtitles found');
-      if (duration && Math.abs(duration - comparisonDuration) > 10)
-        throw new Error('Duration mismatch');
-      const subtitlesFilename = path.basename(subtitles);
-      const subDirectory = getPublicationDirectory(subtitleFetcher);
-      await downloadFileIfNeeded({
-        dir: subDirectory,
-        filename: subtitlesFilename,
-        url: subtitles,
-      });
-      subtitlesPath = path.join(subDirectory, subtitlesFilename);
-      if (fs.existsSync(subtitlesPath)) {
-        subtitlesUrl = getFileUrl(subtitlesPath);
+    if (currentSettings.value?.enableSubtitles) {
+      if (
+        isVideo(multimediaItem.FilePath) &&
+        multimediaItem.KeySymbol &&
+        multimediaItem.Track
+      ) {
+        let subtitlesPath = multimediaItem.FilePath.split('.')[0] + '.vtt';
+        const subtitleLang = currentSettings.value?.langSubtitles;
+        const subtitleFetcher: PublicationFetcher = {
+          fileformat: 'mp4',
+          issue: multimediaItem.IssueTagNumber,
+          langwritten: subtitleLang ?? currentSettings.value?.lang,
+          pub: multimediaItem.KeySymbol,
+          track: multimediaItem.Track,
+        };
+        const { duration, subtitles } = await getJwMediaInfo(subtitleFetcher);
+        if (!subtitles) throw new Error('No subtitles found');
+        if (duration && Math.abs(duration - comparisonDuration) > 10)
+          throw new Error('Duration mismatch');
+        const subtitlesFilename = path.basename(subtitles);
+        const subDirectory = getPublicationDirectory(subtitleFetcher);
+        await downloadFileIfNeeded({
+          dir: subDirectory,
+          filename: subtitlesFilename,
+          url: subtitles,
+        });
+        subtitlesPath = path.join(subDirectory, subtitlesFilename);
+        if (fs.existsSync(subtitlesPath)) {
+          subtitlesUrl = getFileUrl(subtitlesPath);
+        } else {
+          throw new Error('Subtitles file not found: ' + subtitlesPath);
+        }
       } else {
-        throw new Error('Subtitles file not found: ' + subtitlesPath);
+        console.info('No subtitles available for: ' + multimediaItem.FilePath);
+        return '';
       }
-    } else {
-      console.info('No subtitles available for: ' + multimediaItem.FilePath);
-      return '';
     }
     return subtitlesUrl;
   } catch (error) {
