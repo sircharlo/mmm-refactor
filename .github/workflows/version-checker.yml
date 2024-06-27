@@ -19,12 +19,13 @@ jobs:
 
       - name: Get Latest Release Version
         id: get-latest-release
-        uses: ddbaptiste/get-latest-release@v1.0.0
+        uses: pozetroninc/github-action-get-latest-release@v0.8.0
+
 
       - name: Version check
         run: |
           echo "Current package.json version: ${{ steps.package-version.outputs.version }}"
-          echo "Latest release version: ${{ steps.get-latest-release.outputs.latest-release }}"
+          echo "Latest release version: ${{ steps.get-latest-release.outputs.release }}"
 
 
       # - name: Compare versions and increment if needed
