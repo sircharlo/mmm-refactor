@@ -61,9 +61,6 @@
       style="margin-top: 1.25em; margin-right: 0.25em"
     />
   </q-btn>
-  <audio class="hidden" controls ref="musicPlayer">
-    <source ref="musicPlayerSource" type="audio/mpeg" />
-  </audio>
 </template>
 
 <script setup lang="ts">
@@ -84,8 +81,10 @@ defineProps<{
 const currentState = useCurrentStateStore();
 const { currentSettings, mediaPlaying, selectedDateObject } =
   storeToRefs(currentState);
-const musicPlayer = ref<HTMLAudioElement | undefined>();
-const musicPlayerSource = ref<HTMLSourceElement | undefined>();
+const musicPlayer = ref<HTMLAudioElement>(document.createElement('audio'));
+const musicPlayerSource = ref<HTMLSourceElement>(
+  document.createElement('source'),
+);
 const musicPlaying = ref(false);
 const fadeOutTimer = ref();
 const musicStopping = ref(false);
@@ -110,6 +109,7 @@ function stopMusic() {
       musicPlayer.value.pause();
       musicPlaying.value = false;
       musicStopping.value = false;
+      document.getElementsByTagName('body')[0].removeChild(musicPlayer.value);
     }
   } catch (error) {
     console.error(error);
@@ -136,12 +136,9 @@ const getNextSongUrl = () => {
 
 function playMusic() {
   try {
-    if (
-      !musicPlayer.value ||
-      !musicPlayerSource.value ||
-      !currentSettings.value?.enableMusicButton
-    )
-      return;
+    if (!currentSettings.value?.enableMusicButton) return;
+    musicPlayer.value.appendChild(musicPlayerSource.value);
+    document.getElementsByTagName('body')[0].append(musicPlayer.value);
     musicPlayer.value.volume =
       (currentSettings.value?.musicVolume ?? 100) / 100 ?? 1;
     musicPlayerSource.value.src = getNextSongUrl();
@@ -189,21 +186,24 @@ function playMusic() {
 
 const meetingDay = ref(false);
 
-onMounted(() => {
-  try {
-    meetingDay.value =
-      selectedDateObject.value?.today && !!selectedDateObject.value?.meeting;
-    if (
-      currentSettings.value?.enableMusicButton &&
-      currentSettings.value?.autoStartMusic &&
-      meetingDay.value
-    ) {
-      playMusic();
+watch(
+  () => [selectedDateObject.value?.today, selectedDateObject.value?.meeting],
+  ([newToday, newMeeting]) => {
+    try {
+      meetingDay.value = !!newToday && !!newMeeting;
+      if (
+        currentSettings.value?.enableMusicButton &&
+        currentSettings.value?.autoStartMusic &&
+        meetingDay.value
+      ) {
+        playMusic();
+      }
+    } catch (error) {
+      console.error(error);
     }
-  } catch (error) {
-    console.error(error);
-  }
-});
+  },
+  { immediate: true },
+);
 
 /**
  * Calculates the remaining time before the meeting starts based on the selected meeting day and start time settings.
