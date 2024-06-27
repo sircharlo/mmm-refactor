@@ -54,6 +54,7 @@ jobs:
           fi
           echo "Versions are equal: $VERSION_MATCH"
           echo "VERSION_MATCH=${VERSION_MATCH}" >> $GITHUB_ENV
+          echo "VERSION_MATCH=${VERSION_MATCH}" >> $GITHUB_OUTPUT
           exit 0
 
       - name: Create a pull request with version bump if needed
