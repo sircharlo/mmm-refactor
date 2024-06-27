@@ -25,7 +25,7 @@ queue_rules:
   # If you have other queues defined, add this at the end so it is processed last
   - name: dep-update
     batch_size: 10
-    # Wait for up to 30 minutes for the batch to fill up
-    batch_max_wait_time: 30 min
+    # Wait for up to 15 minutes for the batch to fill up
+    batch_max_wait_time: 15 min
     queue_conditions:
       - author = dependabot[bot]
