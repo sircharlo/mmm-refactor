@@ -714,6 +714,11 @@
   resolved "https://registry.yarnpkg.com/@sentry/babel-plugin-component-annotate/-/babel-plugin-component-annotate-2.19.0.tgz#70dcccb336bcec24148e1c9cd4e37724cebf5673"
   integrity sha512-N2k8cMYu/7X6mzAH5j6bMeNcXQBJLL0lVAF63TDS57hUiT1v2uEqbeYFdH2CZBHb2LepLbMRXmvErIwy76FLTw==
 
+"@sentry/babel-plugin-component-annotate@2.20.1":
+  version "2.20.1"
+  resolved "https://registry.yarnpkg.com/@sentry/babel-plugin-component-annotate/-/babel-plugin-component-annotate-2.20.1.tgz#204c63ed006a048f48f633876e1b8bacf87a9722"
+  integrity sha512-4mhEwYTK00bIb5Y9UWIELVUfru587Vaeg0DQGswv4aIRHIiMKLyNqCEejaaybQ/fNChIZOKmvyqXk430YVd7Qg==
+
 "@sentry/browser@8.11.0":
   version "8.11.0"
   resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-8.11.0.tgz#9e0282a9136d138c8b6c001f0ac9face9a9ce18b"
@@ -734,6 +739,20 @@
   dependencies:
     "@babel/core" "^7.18.5"
     "@sentry/babel-plugin-component-annotate" "2.19.0"
+    "@sentry/cli" "^2.22.3"
+    dotenv "^16.3.1"
+    find-up "^5.0.0"
+    glob "^9.3.2"
+    magic-string "0.30.8"
+    unplugin "1.0.1"
+
+"@sentry/bundler-plugin-core@2.20.1":
+  version "2.20.1"
+  resolved "https://registry.yarnpkg.com/@sentry/bundler-plugin-core/-/bundler-plugin-core-2.20.1.tgz#c9dd35e2177a4c22ecf675558eb84fbc2607e465"
+  integrity sha512-6ipbmGzHekxeRCbp7eoefr6bdd/lW4cNA9eNnrmd9+PicubweGaZZbH2NjhFHsaxzgOezwipDHjrTaap2kTHgw==
+  dependencies:
+    "@babel/core" "^7.18.5"
+    "@sentry/babel-plugin-component-annotate" "2.20.1"
     "@sentry/cli" "^2.22.3"
     dotenv "^16.3.1"
     find-up "^5.0.0"
@@ -824,12 +843,12 @@
   dependencies:
     "@sentry/types" "8.11.0"
 
-"@sentry/vite-plugin@^2.19.0":
-  version "2.19.0"
-  resolved "https://registry.yarnpkg.com/@sentry/vite-plugin/-/vite-plugin-2.19.0.tgz#c7938fb13eee15036963b87d7b12c4fc851e488b"
-  integrity sha512-xmntz/bvRwhhU9q2thZas1vQQch9CLMyD8oCfYlNqN57t5XKhIs2dsCU/uS7HCnxIXuuUb/cZtIS7AXVg16fFA==
+"@sentry/vite-plugin@^2.20.1":
+  version "2.20.1"
+  resolved "https://registry.yarnpkg.com/@sentry/vite-plugin/-/vite-plugin-2.20.1.tgz#80d5639fca3f68fbf81c316883272ffb34dbc544"
+  integrity sha512-IOYAJRcV+Uqn0EL8rxcoCvE77PbtGzKjP+B6iIgDZ229AWbpfbpWY8zHCcufwdDzb5PtgOhWWHT74iAsNyij/A==
   dependencies:
-    "@sentry/bundler-plugin-core" "2.19.0"
+    "@sentry/bundler-plugin-core" "2.20.1"
     unplugin "1.0.1"
 
 "@sentry/vue@^8.9.2":
