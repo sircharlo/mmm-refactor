@@ -1125,7 +1125,6 @@ const addToFiles = async (
           message: t('pdfFilesNotSupported'),
           type: 'warning',
         });
-        // todo: eventually support PDF import
       } else if (isJwpub(filepath)) {
         jwpubImportLoading.value = true;
         const unzipDir = await decompressJwpub(filepath);

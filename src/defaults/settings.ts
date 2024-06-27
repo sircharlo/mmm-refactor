@@ -191,7 +191,6 @@ export const settingsDefinitions: SettingsItems = {
     group: 'advanced',
     type: 'toggle',
   },
-  // todo: test implementation of excludeFootnotes
   excludeFootnotes: {
     depends: 'enableMediaDisplayButton',
     group: 'advanced',

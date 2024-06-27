@@ -169,7 +169,6 @@ const chooseCustomBackground = async (reset?: boolean) => {
       return;
     } else {
       const backgroundPicker = await openFileDialog(true);
-      // todo: add a jwpub image picker if selected file is a JWPUB
       if (
         !backgroundPicker.canceled &&
         backgroundPicker.filePaths[0] &&

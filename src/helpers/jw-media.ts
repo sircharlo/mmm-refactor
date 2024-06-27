@@ -484,8 +484,7 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
     ) as MultimediaExtractItem[];
 
     // AND NOT RefPublication.PublicationCategorySymbol = 'web'
-    // TODO: add toggle to enable/disable web publication multimedia
-    // Right now, enabled
+    // To think about: should we add a toggle to enable/disable web publication multimedia?
 
     const allExtractItems = [];
     for (const extract of extracts) {
