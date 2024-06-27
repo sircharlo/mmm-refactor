@@ -38,17 +38,18 @@ jobs:
 
           if [ "$PACKAGE_VERSION" = "$GITHUB_RELEASE_VERSION" ]; then
             NEW_VERSION=true
-            echo "New version: $NEW_VERSION"
-            echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
-            exit 0
+          else
+            NEW_VERSION=false
           fi
+          echo "New version: $NEW_VERSION"
+          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
+          exit 0
 
       - name: Stop if the version in package.json is not the same as the latest release
-        if: !steps.compare-versions.outputs.NEW_VERSION
+        if:  ${{ steps.compare-versions.outputs.VERSION_MATCH == 'false' }}
         run: exit 1
 
       - name: Bump version in package.json
-        if: steps.compare-versions.outputs.NEW_VERSION
         uses: maks-stupak/gh-action-bump-version@v7.1.5
 
 
