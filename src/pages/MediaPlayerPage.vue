@@ -62,20 +62,14 @@
         <div
           class="q-pa-md center"
           id="yeartext"
-          v-else-if="!currentSettings?.jwlCompanionMode"
+          v-else
           v-html="
             (yeartexts[new Date().getFullYear()] &&
               yeartexts[new Date().getFullYear()][currentSettings?.lang]) ??
             ''
           "
         />
-        <div
-          id="yeartextLogoContainer"
-          v-if="
-            !currentSettings?.hideMediaLogo &&
-            !currentSettings?.jwlCompanionMode
-          "
-        >
+        <div id="yeartextLogoContainer" v-if="!currentSettings?.hideMediaLogo">
           <p id="yeartextLogo"></p>
         </div>
       </div>
@@ -119,13 +113,6 @@ const $q = useQuasar();
 let mediaElement: Ref<HTMLVideoElement | undefined> = ref();
 const mediaImage: Ref<HTMLImageElement | undefined> = ref();
 const panzoomOptions = { animate: true, duration: 1000 };
-
-watch(
-  () => mediaPlayer.value?.url,
-  (newUrl) => {
-    if (currentSettings.value?.jwlCompanionMode) showMediaWindow(!!newUrl);
-  },
-);
 
 watch(
   () => currentCongregation.value,

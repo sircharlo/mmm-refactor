@@ -25,7 +25,6 @@ export interface SettingsValues {
   excludeTh: boolean;
   hideMediaLogo: boolean;
   includePrinted: boolean;
-  jwlCompanionMode: boolean;
   // keepOriginalsAfterConversion: boolean;
   lang: string;
   langFallback: string;
@@ -52,7 +51,6 @@ export interface SettingsValues {
   shortcutMediaPrevious: string;
   shortcutMediaWindow: string;
   shortcutMusic: string;
-  // preferredOutput: string;
   // [key: string]: unknown;
   weDay: string;
   weStartTime: string;

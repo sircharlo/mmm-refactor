@@ -305,7 +305,8 @@
         :to="{ path: '/congregation-selector', exact: true }"
         clickable
         v-ripple
-      >
+        >
+        <!-- @click="currentCongregation = ''" -->
         <q-item-section avatar>
           <q-icon name="mdi-account-group" />
         </q-item-section>

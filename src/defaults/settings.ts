@@ -151,13 +151,6 @@ export const settingsDefinitions: SettingsItems = {
 
   // Advanced
 
-  // todo: implement preferredOutput
-  // preferredOutput: {
-  //   depends: 'enableMediaDisplayButton',
-  //   group: 'advanced',
-  //   list: 'screens',
-  //   type: 'list',
-  // },
   enableKeyboardShortcuts: {
     group: 'advanced',
     type: 'toggle',
@@ -187,11 +180,6 @@ export const settingsDefinitions: SettingsItems = {
     group: 'advanced',
     list: 'resolutions',
     type: 'list',
-  },
-  jwlCompanionMode: {
-    depends: 'enableMediaDisplayButton',
-    group: 'advanced',
-    type: 'toggle',
   },
   hideMediaLogo: {
     depends: 'enableMediaDisplayButton',
@@ -401,7 +389,6 @@ export const defaultSettings: SettingsValues = {
   excludeTh: true,
   hideMediaLogo: false,
   includePrinted: true,
-  jwlCompanionMode: false,
   shortcutMediaNext: '',
   shortcutMediaPrevious: '',
   shortcutMediaWindow: '',
@@ -427,7 +414,6 @@ export const defaultSettings: SettingsValues = {
   obsMediaScene: '',
   obsPassword: '',
   obsPort: '',
-  // preferredOutput: '',
   // specialCong: false,
   weDay: '',
   weStartTime: '',

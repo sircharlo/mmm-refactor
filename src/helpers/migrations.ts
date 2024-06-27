@@ -71,7 +71,6 @@ const buildNewPrefsObject = (oldPrefs: OldAppConfig) => {
       excludeTh: oldPrefs.media.excludeTh || true,
       hideMediaLogo: oldPrefs.media.hideMediaLogo || false,
       includePrinted: oldPrefs.media.includePrinted || true,
-      jwlCompanionMode: false,
       lang: oldPrefs.media.lang || '',
       langFallback: oldPrefs.media.langFallback || '',
       langSubtitles: oldPrefs.media.langSubs || '',
@@ -90,7 +89,6 @@ const buildNewPrefsObject = (oldPrefs: OldAppConfig) => {
       shortcutMediaPrevious: oldPrefs.media.ppBackward || '',
       shortcutMediaWindow: oldPrefs.media.mediaWinShortcut || '',
       shortcutMusic: oldPrefs.meeting.shuffleShortcut || '',
-      // preferredOutput: oldPrefs.media.preferredOutput || '',
       weDay: oldPrefs.meeting.weDay?.toString() || '',
       weStartTime: oldPrefs.meeting.weStartTime?.toString() || '',
     };

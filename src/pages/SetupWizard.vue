@@ -211,47 +211,9 @@
       <!-- KH STAGE START -->
       <template v-if="usingAtKh">
         <q-step
+          :caption="$t('good-start')"
           :done="step > 100"
           :name="100"
-          :title="$t('companion-to-jw-library')"
-          icon="mdi-podium-silver"
-        >
-          <p class="text-subtitle1">
-            {{ $t('will-you-be-using-this-app-as-a-companion-to-jw-library') }}
-          </p>
-          <p>
-            {{
-              $t(
-                'select-no-if-you-plan-on-using-m-to-display-all-meeting-media-this-will-activate-fully-automated-meeting-media-retrieval-yeartext-display-background-music-playback-and-other-practical-features-close-jw-library-before-proceeding-if-you-select-no',
-              )
-            }}
-          </p>
-          <q-stepper-navigation>
-            <q-btn
-              :label="$t('no')"
-              @click="
-                companionToJwl = false;
-                step++;
-              "
-              class="q-ml-sm"
-              color="primary"
-            />
-            <q-btn
-              :label="$t('yes')"
-              @click="
-                companionToJwl = true;
-                step = 102;
-              "
-              class="q-ml-sm"
-              color="primary"
-              flat
-            />
-          </q-stepper-navigation>
-        </q-step>
-        <q-step
-          :caption="$t('good-start')"
-          :done="step > 101"
-          :name="101"
           :title="$t('excellent')"
           icon="mdi-check"
         >
@@ -273,8 +235,8 @@
         </q-step>
 
         <q-step
-          :done="step > 102"
-          :name="102"
+          :done="step > 101"
+          :name="101"
           :title="$t('media-display')"
           icon="mdi-television"
         >
@@ -300,7 +262,7 @@
             <q-btn :label="$t('continue')" @click="step++" color="primary" />
             <q-btn
               :label="$t('back')"
-              @click="companionToJwl ? (step = 100) : step--"
+              @click="step--"
               class="q-ml-sm"
               color="primary"
               flat
@@ -308,8 +270,8 @@
           </q-stepper-navigation>
         </q-step>
         <q-step
-          :done="step > 103"
-          :name="103"
+          :done="step > 102"
+          :name="102"
           :title="$t('setupWizard.backgroundMusic')"
           icon="mdi-music"
         >
@@ -336,8 +298,8 @@
           </q-stepper-navigation>
         </q-step>
         <q-step
-          :done="step > 104"
-          :name="104"
+          :done="step > 103"
+          :name="103"
           :title="$t('obsEnable')"
           icon="mdi-cctv"
         >
@@ -366,8 +328,8 @@
         </q-step>
         <template v-if="obsUsed">
           <q-step
-            :done="step > 105"
-            :name="105"
+            :done="step > 104"
+            :name="104"
             :title="$t('obs-studio-integration')"
             icon="mdi-cctv"
           >
@@ -402,8 +364,8 @@
           </q-step>
           <template v-if="obsIntegrate">
             <q-step
-              :done="step > 106"
-              :name="106"
+              :done="step > 105"
+              :name="105"
               :title="$t('obs-studio-configuration')"
               icon="mdi-cogs"
             >
@@ -433,8 +395,8 @@
               </q-stepper-navigation>
             </q-step>
             <q-step
-              :done="step > 107"
-              :name="107"
+              :done="step > 106"
+              :name="106"
               :title="$t('obs-studio-port-and-password')"
               icon="mdi-form-textbox-password"
             >
@@ -474,8 +436,8 @@
               </q-stepper-navigation>
             </q-step>
             <q-step
-              :done="step > 108"
-              :name="108"
+              :done="step > 107"
+              :name="107"
               :title="$t('obs-studio-stage-scene')"
               icon="mdi-lectern"
             >
@@ -509,8 +471,8 @@
               </q-stepper-navigation>
             </q-step>
             <q-step
-              :done="step > 109"
-              :name="109"
+              :done="step > 108"
+              :name="108"
               :title="$t('obs-studio-media-scene')"
               icon="mdi-lectern"
             >
@@ -603,7 +565,6 @@ const currentState = useCurrentStateStore();
 const { currentSettings } = storeToRefs(currentState);
 
 const usingAtKh = ref(false);
-const companionToJwl = ref(true);
 const obsUsed = ref(false);
 const obsIntegrate = ref(false);
 
@@ -612,14 +573,10 @@ const { updateYeartext } = jwStore;
 const router = useRouter();
 
 watch(
-  () => [usingAtKh.value, companionToJwl.value],
-  ([newUsingAtKh, newCompanionToJwl]) => {
+  () => usingAtKh.value,
+  (newUsingAtKh) => {
     currentSettings.value.enableMediaDisplayButton = newUsingAtKh;
-    if (newUsingAtKh) {
-      currentSettings.value.autoStartMusic = !newCompanionToJwl;
-      // currentSettings.value.enableMusicFadeOut = !newCompanionToJwl;
-      currentSettings.value.jwlCompanionMode = newCompanionToJwl;
-    }
+    currentSettings.value.autoStartMusic = newUsingAtKh;
   },
 );
 watch(obsIntegrate, (newObsIntegrate) => {
