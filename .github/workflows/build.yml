@@ -2,9 +2,11 @@ name: Build/release
 
 on:
   push:
-    paths-ignore:
-      - '.github/**'
+    branches:
+      - main
+      - release-*
   pull_request:
+  workflow_dispatch:
 
 jobs:
 
