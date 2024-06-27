@@ -34,7 +34,7 @@
     "p-queue": "^8.0.1",
     "pinia": "^2.1.7",
     "pinia-shared-state": "^0.5.1",
-    "quasar": "^2.8.0",
+    "quasar": "^2.16.4",
     "sanitize-filename": "^1.6.3",
     "upath": "^2.0.1",
     "vue": "^3.4.30",
