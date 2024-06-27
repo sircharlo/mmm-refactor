@@ -600,7 +600,7 @@
     vite "^2.9.13"
     webpack-merge "^5.8.0"
 
-"@quasar/cli@^2.4.0":
+"@quasar/cli@^2.4.1":
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/@quasar/cli/-/cli-2.4.1.tgz#b65088f2a3b5825535a1f571a31fdb48cc11a672"
   integrity sha512-MrOmlqdkQhBxfPMbSrch3O7ClCAc0sLTLp9AWLzdB7uNaLbxcLP6zXN8+EPhDzFfMyxdG7jBP0FKEi7Wh+ezrQ==
@@ -620,7 +620,7 @@
     route-cache "^0.5.0"
     update-notifier "^6.0.2"
 
-"@quasar/extras@^1.16.4":
+"@quasar/extras@^1.16.11":
   version "1.16.11"
   resolved "https://registry.yarnpkg.com/@quasar/extras/-/extras-1.16.11.tgz#84b1efb9097a6e58c3ebfdd5da83ac658056a35c"
   integrity sha512-sbTBHOA+Hi7ah0P6qSm+xfRXqwJ94ct3NKA3Lkq3iNPYuHD7VXbSWtP2eA7Cu9Fd0WjVoPbngf6yFGg46U3IfQ==
@@ -1080,10 +1080,17 @@
   dependencies:
     "@types/node" "*"
 
-"@types/node@*", "@types/node@^20.14.6", "@types/node@^20.9.0":
+"@types/node@*", "@types/node@^20.9.0":
   version "20.14.8"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.14.8.tgz#45c26a2a5de26c3534a9504530ddb3b27ce031ac"
   integrity sha512-DO+2/jZinXfROG7j7WKFn/3C6nFwxy2lLpgLjEXJz+0XKphZlTLJ14mo8Vfg8X5BWN6XjyESXq+LcYdT7tR3bA==
+  dependencies:
+    undici-types "~5.26.4"
+
+"@types/node@^20.14.9":
+  version "20.14.9"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.14.9.tgz#12e8e765ab27f8c421a1820c99f5f313a933b420"
+  integrity sha512-06OCtnTXtWOZBJlRApleWndH4JsRVs1pDCc8dLSQp+7PpUpX3ePdHyeNSFTeSe7FtKyQkrlPvHwJOW3SLd8Oyg==
   dependencies:
     undici-types "~5.26.4"
 
@@ -1674,7 +1681,7 @@ at-least-node@^1.0.0:
   resolved "https://registry.yarnpkg.com/at-least-node/-/at-least-node-1.0.0.tgz#602cd4b46e844ad4effc92a8011a3c46e0238dc2"
   integrity sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==
 
-autoprefixer@^10.4.2:
+autoprefixer@^10.4.19:
   version "10.4.19"
   resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-10.4.19.tgz#ad25a856e82ee9d7898c59583c1afeb3fa65f89f"
   integrity sha512-BaENR2+zBZ8xXhM4pUaKUxlVdxZ0EZhjvbopwnXmxRUfqDmwSpC2lAi/QXvx7NRdPCo1WKEcEF6mV64si1z4Ew==
@@ -6746,7 +6753,7 @@ vue-tsc@^1.8.22:
     "@vue/language-core" "1.8.27"
     semver "^7.5.4"
 
-vue@^3.4.29:
+vue@^3.4.30:
   version "3.4.30"
   resolved "https://registry.yarnpkg.com/vue/-/vue-3.4.30.tgz#02c75c63a21e305c38a937866d8ee2269b62bbb4"
   integrity sha512-NcxtKCwkdf1zPsr7Y8+QlDBCGqxvjLXF2EX+yi76rV5rrz90Y6gK1cq0olIhdWGgrlhs9ElHuhi9t3+W5sG5Xw==
