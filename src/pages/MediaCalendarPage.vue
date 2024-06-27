@@ -99,7 +99,7 @@
               style="width: 150px; height: 84px"
               v-if="media.isAudio"
             >
-              <q-icon name="mdi-music" size="lg" />
+              <q-icon name="mdi-music-clef-treble" size="lg" />
             </div>
             <q-img
               :id="media.uniqueId"
@@ -549,7 +549,7 @@
         </q-card-section>
         <q-card-actions align="right" class="text-primary">
           <q-btn :label="$t('cancel')" @click="mediaToDelete = ''" flat />
-          <q-btn :label="$t('delete')" @click="deleteMedia()" flat />
+          <q-btn :label="$t('delete')" @click="deleteMedia()" color="negative" flat />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -640,8 +640,7 @@ import {
   sanitizeId,
 } from 'src/helpers/jw-media';
 import {
-  convertHeicToJpg,
-  convertSvgToJpg,
+  convertImageIfNeeded,
   decompressJwpub,
   findDb,
   formatTime,
@@ -649,14 +648,12 @@ import {
   inferExtension,
   isArchive,
   isAudio,
-  isHeic,
   isImage,
   isImageString,
   isJwPlaylist,
   isJwpub,
   isPdf,
   isRemoteUrl,
-  isSvg,
   isVideo,
 } from 'src/helpers/mediaPlayback';
 import { createTemporaryNotification } from 'src/helpers/notifications';
@@ -834,25 +831,15 @@ watch(
 );
 
 watch(
-  mediaSort,
-  () => {
+  () => mediaSort.value?.[currentCongregation.value]?.[selectedDate.value],
+  (newMediaSort) => {
     try {
-      if (
-        currentCongregation.value &&
-        selectedDate.value &&
-        mediaSort.value[currentCongregation.value][selectedDate.value]
-          ?.length === 0
-      ) {
-        mediaSort.value[currentCongregation.value][selectedDate.value] =
-          datedAdditionalMediaMap.value
-            .concat(selectedDateObject.value?.dynamicMedia)
-            .map((item: DynamicMediaObject) => item.uniqueId);
+      if (newMediaSort && newMediaSort.length === 0) {
+        newMediaSort = datedAdditionalMediaMap.value
+          .concat(selectedDateObject.value?.dynamicMedia)
+          .map((item: DynamicMediaObject) => item.uniqueId);
       }
-      sortableMediaItems.value.sort(
-        mapOrder(
-          mediaSort.value[currentCongregation.value][selectedDate.value],
-        ),
-      );
+      sortableMediaItems.value.sort(mapOrder(newMediaSort));
     } catch (e) {
       console.error(e);
     }
@@ -909,9 +896,10 @@ watch(
 );
 
 watch(
-  lookupPeriod.value[currentCongregation.value]
-    ?.filter((d) => d.error)
-    .map((d) => date.formatDate(d.date, 'YYYY/MM/DD')),
+  () =>
+    lookupPeriod.value[currentCongregation.value]
+      ?.filter((d) => d.error)
+      .map((d) => date.formatDate(d.date, 'YYYY/MM/DD')),
   (newVal) => {
     console.log('RECALCULATING ERRORS', newVal);
     for (const date of newVal) {
@@ -1110,12 +1098,7 @@ const addToFiles = async (
         filepath = tempFilepath;
       }
 
-      // Check if file is HEIC or SVG first; if so, convert to JPG
-      if (isHeic(filepath)) {
-        filepath = await convertHeicToJpg(filepath);
-      } else if (isSvg(filepath)) {
-        filepath = await convertSvgToJpg(filepath);
-      }
+      filepath = await convertImageIfNeeded(filepath)
 
       if (isImage(filepath) || isVideo(filepath) || isAudio(filepath)) {
         copyToDatedAdditionalMedia([filepath]);

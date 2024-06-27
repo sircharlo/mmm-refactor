@@ -6,7 +6,7 @@
     :outline="disabled"
     @click="musicPopup = false"
     class="q-ml-sm"
-    icon="mdi-music"
+    icon="mdi-music-clef-treble"
     no-caps
     rounded
     v-if="currentSettings?.enableMusicButton"

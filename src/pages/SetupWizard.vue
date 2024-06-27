@@ -273,7 +273,7 @@
           :done="step > 102"
           :name="102"
           :title="$t('setupWizard.backgroundMusic')"
-          icon="mdi-music"
+          icon="mdi-music-clef-treble"
         >
           <p>
             {{ $t('also-look-for-this-button-in-m-s-footer') }}
@@ -572,13 +572,10 @@ const jwStore = useJwStore();
 const { updateYeartext } = jwStore;
 const router = useRouter();
 
-watch(
-  () => usingAtKh.value,
-  (newUsingAtKh) => {
-    currentSettings.value.enableMediaDisplayButton = newUsingAtKh;
-    currentSettings.value.autoStartMusic = newUsingAtKh;
-  },
-);
+watch(usingAtKh, (newUsingAtKh) => {
+  currentSettings.value.enableMediaDisplayButton = newUsingAtKh;
+  currentSettings.value.autoStartMusic = newUsingAtKh;
+});
 watch(obsIntegrate, (newObsIntegrate) => {
   if (newObsIntegrate && obsUsed.value) {
     currentSettings.value.obsEnable = true;

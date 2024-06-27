@@ -333,6 +333,17 @@ const convertSvgToJpg = async (filepath: string): Promise<string> => {
   }
 };
 
+const convertImageIfNeeded = async (filepath: string) => {
+  if (isHeic(filepath)) {
+    return await convertHeicToJpg(filepath);
+  } else if (isSvg(filepath)) {
+    return await convertSvgToJpg(filepath);
+  } else {
+    return filepath;
+  }
+};
+
+
 const showMediaWindow = (state: boolean) => {
   try {
     const currentState = useCurrentStateStore();
@@ -346,6 +357,7 @@ const showMediaWindow = (state: boolean) => {
 
 export {
   convertHeicToJpg,
+  convertImageIfNeeded,
   convertSvgToJpg,
   decompressJwpub,
   findDb,

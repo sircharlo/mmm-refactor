@@ -174,5 +174,8 @@
   "yes": "Oui",
   "you-can-also-use-the-button-below-to-browse-for-files": "Vous pouvez également parcourir et sélectionner des fichiers manuellement, si vous le désirez.",
   "zoom-in": "Agrandir",
-  "zoom-out": "Réduire"
+  "zoom-out": "Réduire",
+  "add-video-jw-org": "Ajouter une vidéo depuis JW.org",
+  "please-use-image-or-jwpub": "Veuillez sélectionner une image ou un fichier JWPUB qui contient une image",
+  "choose-an-image": "Choisissez une image"
 }

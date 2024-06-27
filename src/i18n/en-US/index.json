@@ -173,5 +173,8 @@
   "yes": "Yes",
   "you-can-also-use-the-button-below-to-browse-for-files": "You can also browse for files manually if you prefer.",
   "zoom-in": "Zoom in",
-  "zoom-out": "Zoom out"
+  "zoom-out": "Zoom out",
+  "add-video-jw-org": "Add a video from JW.org",
+  "please-use-image-or-jwpub": "Please select an image file or a JWPUB file that contains an image",
+  "choose-an-image": "Choose an image"
 }

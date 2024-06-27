@@ -22,13 +22,12 @@ import {
   getThumbnailUrl,
 } from 'src/helpers/fs';
 import {
-  convertSvgToJpg,
+  convertImageIfNeeded,
   decompressJwpub,
   findDb,
   isAudio,
   isImage,
   isSong,
-  isSvg,
   isVideo,
 } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
@@ -635,7 +634,7 @@ const dynamicMediaMapper = async (
     const mediaPromises = allMedia
       .filter((m) => m.FilePath)
       .map(async (m) => {
-        if (isSvg(m.FilePath)) m.FilePath = await convertSvgToJpg(m.FilePath);
+        m.FilePath = await convertImageIfNeeded(m.FilePath);
         const mediaIsSong = isSong(m);
         const thumbnailUrl = await getThumbnailUrl(
           m.ThumbnailFilePath || m.FilePath,
@@ -1232,7 +1231,7 @@ const downloadAdditionalRemoteVideo = async (
   }
 };
 
-function getBestImageUrl(images: ImageTypeSizes, size?: keyof ImageSizes) {
+function getBestImageUrl(images: ImageTypeSizes, minSize?: keyof ImageSizes) {
   try {
     const preferredOrder: (keyof ImageTypeSizes)[] = [
       'wss',
@@ -1240,20 +1239,18 @@ function getBestImageUrl(images: ImageTypeSizes, size?: keyof ImageSizes) {
       'sqr',
       'pnr',
     ];
+    const sizeOrder: (keyof ImageSizes)[] = ['sm', 'md', 'lg', 'xl'];
+    const startIndex = minSize ? sizeOrder.indexOf(minSize) : 0;
+    const sizesToConsider = sizeOrder.slice(startIndex);
     for (const key of preferredOrder) {
       if (images.hasOwnProperty(key)) {
-        const sizes: (keyof ImageSizes)[] = size
-          ? [size]
-          : ['sm', 'md', 'lg', 'xl'];
-        for (const size of sizes) {
-          if (images[key].hasOwnProperty(size)) {
-            return images[key][size];
-          }
+        for (const size of sizesToConsider) {
+          if (size in images[key]) return images[key][size];
         }
         // If none of the preferred sizes are found, return any other size
         const otherSizes = (
           Object.keys(images[key]) as (keyof ImageSizes)[]
-        ).filter((size) => !sizes.includes(size));
+        ).filter((size) => !sizesToConsider.includes(size));
         if (otherSizes.length > 0) {
           return images[key][otherSizes[0]];
         }
@@ -1261,7 +1258,6 @@ function getBestImageUrl(images: ImageTypeSizes, size?: keyof ImageSizes) {
     }
   } catch (e) {
     console.error(e);
-  } finally {
     return '';
   }
 }
