@@ -60,7 +60,7 @@ jobs:
           exit 0
 
       - name: Create a pull request with version bump if needed
-        if: ${{ steps.compare-versions.outputs.VERSION_MATCH == 'true' }}
+        if: ${{ steps.compare-versions.outputs.VERSION_MATCH == 'false' }}
         uses: r7kamura/bump-request@v0.4.1
         with:
           release_type: 'patch'
