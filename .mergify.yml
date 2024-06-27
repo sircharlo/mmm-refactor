@@ -18,14 +18,16 @@ pull_request_rules:
     conditions:
       - author = dependabot[bot]
     actions:
-      #merge:
-      queue:
+      update:
+      merge:
+        method: rebase
+      #queue:
 
-queue_rules:
+#queue_rules:
   # If you have other queues defined, add this at the end so it is processed last
-  - name: dep-update
-    batch_size: 10
+ # - name: dep-update
+   # batch_size: 10
     # Wait for up to 15 minutes for the batch to fill up
-    batch_max_wait_time: 15 min
-    queue_conditions:
-      - author = dependabot[bot]
+  #  batch_max_wait_time: 15 min
+  #  queue_conditions:
+   #   - author = dependabot[bot]
