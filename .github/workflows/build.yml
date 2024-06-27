@@ -48,12 +48,12 @@ jobs:
           echo "Package version: $PACKAGE_VERSION"
           echo "GitHub release version: $GITHUB_RELEASE_VERSION"
           if [ "$PACKAGE_VERSION" = "$GITHUB_RELEASE_VERSION" ]; then
-            NEW_VERSION=true
+            VERSION_MATCH=true
           else
-            NEW_VERSION=false
+            VERSION_MATCH=false
           fi
-          echo "New version: $NEW_VERSION"
-          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
+          echo "Versions are equal: $VERSION_MATCH"
+          echo "VERSION_MATCH=${VERSION_MATCH}" >> $GITHUB_ENV
           exit 0
 
       - name: Create a pull request with version bump if needed
