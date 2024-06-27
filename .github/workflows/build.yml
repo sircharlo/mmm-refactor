@@ -67,7 +67,6 @@ jobs:
 
   release:
     needs: version_checker
-    if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -76,7 +75,7 @@ jobs:
 
     steps:
       - name: Exit gracefully if build is not needed
-        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'true' }}
+        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
         run: exit 0
 
       - name: Check out Git repository
