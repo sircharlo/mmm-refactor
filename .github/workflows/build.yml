@@ -27,9 +27,6 @@ jobs:
       - name: Get Latest Release Version
         id: get-latest-release
         uses: ddbaptiste/get-latest-release@v1.0.0
-        with:
-          repository: ${{ github.repository }}
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Version check
         run: |
