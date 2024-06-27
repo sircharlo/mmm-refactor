@@ -5,10 +5,12 @@ on:
 
 jobs:
   version_checker:
-    permissions:
-      contents: write
 
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
 
     steps:
       - name: Check out Git repository
