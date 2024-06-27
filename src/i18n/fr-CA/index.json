@@ -1,6 +1,9 @@
 {
   "add-media-files": "Ajouter des fichiers multimédias",
   "add-song": "Ajouter un cantique",
+  "add-video-jw-org": "Ajouter une vidéo depuis JW.org",
+  "advanced": "Avancé",
+  "advancedDescription": "Les utilisateurs calés voudront peut-être modifier ces paramètres, mais la configuration par défaut est généralement suffisante.",
   "all": "Tout",
   "almost-done": "Presque fini!",
   "also-look-for-this-button-in-m-s-footer": "Recherchez également ce bouton dans le pied de page de M³ :",
@@ -17,6 +20,7 @@
   "browse": "Parcourir",
   "cancel": "Annuler",
   "choose-a-song": "Choisissez un cantique",
+  "choose-an-image": "Choisissez une image",
   "cleanCache": "Vider le cache des médias",
   "clear": "Supprimer",
   "clicking-it-will-allow-you-to-start-and-stop-the-playback-of-background-music-music-will-start-playing-automatically-before-a-meeting-is-scheduled-to-start-when-m-is-launched-and-will-also-stop-automatically-before-the-meeting-starts-however-background-music-playback-will-need-to-be-manually-started-after-the-concluding-prayer-using-this-button": "En cliquant dessus, vous pourrez démarrer et arrêter la lecture de la musique de fond. La musique de fond jouera automatiquement avant le début d'une réunion lorsque M³ est lancé, et s'arrêtera automatiquement avant le début de la réunion. Cependant, la lecture de la musique de fond devra être démarrée manuellement après la prière finale, à l'aide de ce bouton.",
@@ -40,6 +44,7 @@
   "does-your-kingdom-hall-use-a-program-called-obs-studio": "Un programme appelé OBS Studio est-il utilisé dans votre salle du Royaume ?",
   "doing-so-will-greatly-simplify-and-facilitate-sharing-media-during-hybrid-meetings": "Cela simplifiera et facilitera grandement le partage de médias lors de réunions hybrides.",
   "download-status": "État des téléchargements",
+  "enableKeyboardShortcuts": "Activer les raccourcis clavier",
   "enableMediaDisplayButton": "Activer la fonction de lecture des médias",
   "enableMusicButton": "Activer la fonction de musique de fond",
   "enableSubtitles": "Activer les sous-titres pour les vidéos",
@@ -126,6 +131,7 @@
   "other-scenes": "Autres scènes",
   "pdfFilesNotSupported": "Les fichiers PDF ne sont pas encore pris en charge",
   "play-music": "Jouer la musique",
+  "please-use-image-or-jwpub": "Veuillez sélectionner une image ou un fichier JWPUB qui contient une image",
   "please-wait-downloading-media-for-this-day": "Veuillez patienter, téléchargement des médias pour cette journée en cours...",
   "projecting": "Projection en cours",
   "question-mark": " ?",
@@ -139,6 +145,8 @@
   "setupWizard.intro": "M³ est une application conçue pour permettre la lecture rapide et facile de médias lors des réunions de l'assemblée. Configurons quelques éléments avant de commencer.",
   "setupWizard.meetingDaysTimes": "Horaire des réunions",
   "setupWizard.welcome": "Bienvenue à M³",
+  "shortcutMediaWindow": "Raccourci pour afficher/masquer la fenêtre média",
+  "shortcutMusic": "Raccourci pour jouer/arrêter la musique de fond",
   "show-image-for-zoom-participants": "Afficher l'image pour les participants Zoom",
   "show-media-display": "Afficher la fenêtre des médias",
   "skip-for-now": "Ignorer pour l'instant",
@@ -174,8 +182,5 @@
   "yes": "Oui",
   "you-can-also-use-the-button-below-to-browse-for-files": "Vous pouvez également parcourir et sélectionner des fichiers manuellement, si vous le désirez.",
   "zoom-in": "Agrandir",
-  "zoom-out": "Réduire",
-  "add-video-jw-org": "Ajouter une vidéo depuis JW.org",
-  "please-use-image-or-jwpub": "Veuillez sélectionner une image ou un fichier JWPUB qui contient une image",
-  "choose-an-image": "Choisissez une image"
+  "zoom-out": "Réduire"
 }
