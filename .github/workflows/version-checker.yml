@@ -49,16 +49,13 @@ jobs:
           exit 0
 
       - name: Stop if the version in package.json is not the same as the latest release
-        if:  ${{ steps.compare-versions.outputs.VERSION_MATCH == 'false' }}
+        if: ${{ steps.compare-versions.outputs.VERSION_MATCH == 'false' }}
         run: exit 1
 
-      - name:  'Automated Version Bump'
-        uses:  'phips28/gh-action-bump-version@master'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 'Create a pull request with the new version'
+        uses: r7kamura/bump-request@v0
         with:
-          version-type:  'patch'
-
+          release_type: 'patch'
 
       # - name: Stop rest of actions since package.json version is the same
       #   if: steps.compare-versions.outputs.NEW_VERSION
