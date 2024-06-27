@@ -59,19 +59,23 @@
             ref="customBackground"
           />
         </template>
-        <div
-          class="q-pa-md center"
-          id="yeartext"
-          v-else
-          v-html="
-            (yeartexts[new Date().getFullYear()] &&
-              yeartexts[new Date().getFullYear()][currentSettings?.lang]) ??
-            ''
-          "
-        />
-        <div id="yeartextLogoContainer" v-if="!currentSettings?.hideMediaLogo">
-          <p id="yeartextLogo"></p>
-        </div>
+        <template v-else>
+          <div
+            class="q-pa-md center"
+            id="yeartext"
+            v-html="
+              (yeartexts[new Date().getFullYear()] &&
+                yeartexts[new Date().getFullYear()][currentSettings?.lang]) ??
+              ''
+            "
+          />
+          <div
+            id="yeartextLogoContainer"
+            v-if="!currentSettings?.hideMediaLogo"
+          >
+            <p id="yeartextLogo"></p>
+          </div>
+        </template>
       </div>
     </transition>
   </q-page-container>
@@ -114,12 +118,9 @@ let mediaElement: Ref<HTMLVideoElement | undefined> = ref();
 const mediaImage: Ref<HTMLImageElement | undefined> = ref();
 const panzoomOptions = { animate: true, duration: 1000 };
 
-watch(
-  () => currentCongregation.value,
-  (newCongregation) => {
-    if (!newCongregation) showMediaWindow(false);
-  },
-);
+watch(currentCongregation, (newCongregation) => {
+  if (!newCongregation) showMediaWindow(false);
+});
 
 watch(
   () => [mediaPlayer.value?.scale, mediaPlayer.value?.x, mediaPlayer.value?.y],

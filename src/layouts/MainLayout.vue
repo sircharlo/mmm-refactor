@@ -126,29 +126,36 @@
             v-model="localUploadPopup"
           >
             <q-card>
-              <q-card-section horizontal>
-                <q-card-section>
-                  <q-icon
+              <q-card-section>
+                <div class="row self-center">
+                  <q-avatar
+                    class="q-mr-md self-center"
                     color="primary"
-                    name="mdi-cursor-default"
-                    size="lg"
+                    icon="mdi-cursor-default"
                     text-color="white"
-                /></q-card-section>
-                <q-card-section>
-                  <div class="text-h6">{{ $t('add-media-files') }}</div>
-                  <p>
-                    {{
-                      $t(
-                        'to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window',
-                      )
-                    }}
-                    {{
-                      $t(
-                        'you-can-also-use-the-button-below-to-browse-for-files',
-                      )
-                    }}
+                  />
+                  <span class="text-h6 self-center">
+                    {{ $t('add-media-files') }}
+                  </span>
+                  <q-space />
+                  <div class="text-h6 self-center">
+                    <q-btn dense flat icon="close" round v-close-popup />
+                  </div>
+                </div>
+              </q-card-section>
+              <q-card-section>
+                <p>
+                  {{
+                    $t(
+                      'to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window',
+                    )
+                  }}
                   </p>
-                </q-card-section>
+                <p>
+                  {{
+                    $t('you-can-also-use-the-button-below-to-browse-for-files')
+                  }}
+                </p>
               </q-card-section>
               <q-card-actions align="right">
                 <q-btn
@@ -157,7 +164,6 @@
                   color="primary"
                   flat
                 />
-                <q-btn :label="$t('got-it')" color="primary" v-close-popup />
               </q-card-actions>
             </q-card>
           </q-dialog>
@@ -166,18 +172,23 @@
               class="non-selectable"
               style="width: 80vw; max-width: 80vw; min-width: 3"
             >
-              <q-toolbar>
-                <q-avatar>
-                  <q-icon
+              <q-card-section>
+                <div class="row self-center">
+                  <q-avatar
+                    class="q-mr-md self-center"
                     color="primary"
-                    name="mdi-cursor-default"
-                    size="lg"
+                    icon="mdi-movie"
                     text-color="white"
                   />
-                </q-avatar>
-                <q-toolbar-title>{{ $t('add-media-files') }}</q-toolbar-title>
-                <q-btn dense flat icon="close" round v-close-popup />
-              </q-toolbar>
+                  <span class="text-h6 self-center">
+                    {{ $t('add-video-jw-org') }}
+                  </span>
+                  <q-space />
+                  <div class="text-h6 self-center">
+                    <q-btn dense flat icon="close" round v-close-popup />
+                  </div>
+                </div>
+              </q-card-section>
               <q-linear-progress
                 :value="remoteVideosLoadingProgress"
                 class="q-mt-md"
@@ -186,9 +197,14 @@
                 <div class="col-grow">
                   <q-input
                     :label="$t('filter')"
+                    clearable
                     dense
                     v-model="remoteVideoFilter"
-                  />
+                  >
+                    <template v-slot:append>
+                      <q-icon name="mdi-magnify" />
+                    </template>
+                  </q-input>
                 </div>
                 <q-toggle
                   :label="$t('include-audio-description')"
@@ -197,8 +213,19 @@
                 />
               </div>
               <q-separator />
+              <q-card-section
+                class="text-center"
+                v-if="
+                  !!(
+                    remoteVideosLoadingProgress < 1 &&
+                    (remoteVideosFiltered.length === 0 || remoteVideoFilter)
+                  )
+                "
+              >
+                <q-spinner-pie :thickness="2" color="primary" size="4em" />
+              </q-card-section>
               <q-card-section>
-                <div class="row q-col-gutter-lg">
+                <div class="row q-col-gutter-lg" style="min-height: 200px">
                   <template
                     :key="video.guid"
                     v-for="video in remoteVideosFiltered"
@@ -305,7 +332,7 @@
         :to="{ path: '/congregation-selector', exact: true }"
         clickable
         v-ripple
-        >
+      >
         <!-- @click="currentCongregation = ''" -->
         <q-item-section avatar>
           <q-icon name="mdi-account-group" />
@@ -447,11 +474,7 @@ watch(currentCongregation, (newCongregation, oldCongregation) => {
       queues.meetings[oldCongregation].pause();
     }
     if (!newCongregation) {
-      if (route.fullPath !== '/congregation-selector') {
-        router.push({ path: '/congregation-selector' });
-        return;
-      }
-      selectedDate.value = '';
+      navigateToCongregationSelector();
     } else {
       downloadProgress.value = {};
       updateLookupPeriod();
@@ -503,6 +526,7 @@ const navigateToCongregationSelector = () => {
   try {
     if (route.fullPath !== '/congregation-selector') {
       router.push({ path: '/congregation-selector' });
+      selectedDate.value = '';
     }
   } catch (error) {
     console.error(error);

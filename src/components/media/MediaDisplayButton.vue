@@ -114,8 +114,8 @@
                   ? $t('reset-custom-background')
                   : $t('set-custom-background')
               }}
-            </q-tooltip> </q-btn
-          >'
+            </q-tooltip>
+          </q-btn>
         </q-card-section>
         <q-separator />
         <q-card-actions>
@@ -138,18 +138,83 @@
       style="margin-top: 1.25em; margin-right: 0.25em"
     />
   </q-btn>
+  <q-dialog v-model="jwpubImagesExist">
+    <q-card style="width: 80vw; max-width: 80vw">
+      <q-card-section>
+        <div class="row self-center">
+          <q-avatar
+            class="q-mr-md self-center"
+            color="primary"
+            icon="mdi-image"
+            text-color="white"
+          />
+          <span class="text-h6 self-center">
+            {{ $t('choose-an-image') }}
+          </span>
+          <q-space />
+          <div class="text-h6 self-center">
+            <q-btn
+              @click="setMediaBackground()"
+              dense
+              flat
+              icon="close"
+              round
+              v-close-popup
+            />
+          </div>
+        </div>
+      </q-card-section>
+      <q-card-section class="row items-center">
+        <div class="row full-width q-col-gutter-lg">
+          <template
+            :key="jwpubImage.FilePath"
+            v-for="jwpubImage in jwpubImages"
+          >
+            <div class="col-4">
+              <q-img
+                :src="pathToFileURL(jwpubImage.FilePath)"
+                @click="setMediaBackground(jwpubImage.FilePath)"
+                class="rounded-borders shadow-10 cursor-pointer"
+                fit="contain"
+                style="max-height: 50vh"
+                v-ripple
+              />
+            </div>
+          </template>
+        </div>
+      </q-card-section>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { electronApi } from 'src/helpers/electron-api';
-import { isImage, showMediaWindow } from 'src/helpers/mediaPlayback';
+import { getTempDirectory } from 'src/helpers/fs';
+import {
+  convertImageIfNeeded,
+  decompressJwpub,
+  findDb,
+  isImage,
+  isJwpub,
+  showMediaWindow,
+} from 'src/helpers/mediaPlayback';
+import { createTemporaryNotification } from 'src/helpers/notifications';
 import { useAppSettingsStore } from 'src/stores/app-settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { MultimediaItem } from 'src/types/sqlite';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-const { getAllScreens, moveMediaWindow, openFileDialog, pathToFileURL } =
-  electronApi;
+const {
+  executeQuery,
+  fs,
+  getAllScreens,
+  moveMediaWindow,
+  openFileDialog,
+  path,
+  pathToFileURL,
+} = electronApi;
 
 defineProps<{
   disabled?: boolean;
@@ -161,6 +226,32 @@ const mediaDisplayPopup = ref();
 const appSettings = useAppSettingsStore();
 const { screenPreferences } = storeToRefs(appSettings);
 const screenList = ref(getAllScreens());
+const { t } = useI18n();
+const jwpubImportDb = ref('');
+const jwpubImages = ref([] as MultimediaItem[]);
+const jwpubImagesExist = computed(() => jwpubImages.value.length > 0);
+
+const notifyInvalidBackgroundFile = () => {
+  createTemporaryNotification({
+    message: t('please-use-image-or-jwpub'),
+  });
+};
+
+const setMediaBackground = (filepath?: string) => {
+  try {
+    if (!filepath) {
+      throw new Error('Problem with image file');
+    } else {
+      mediaPlayer.value.customBackground = pathToFileURL(filepath);
+    }
+  } catch (error) {
+    if (filepath) notifyInvalidBackgroundFile();
+    mediaPlayer.value.customBackground = '';
+  } finally {
+    jwpubImages.value = [];
+    jwpubImportDb.value = '';
+  }
+};
 
 const chooseCustomBackground = async (reset?: boolean) => {
   try {
@@ -168,17 +259,56 @@ const chooseCustomBackground = async (reset?: boolean) => {
       mediaPlayer.value.customBackground = '';
       return;
     } else {
-      const backgroundPicker = await openFileDialog(true);
-      if (
-        !backgroundPicker.canceled &&
-        backgroundPicker.filePaths[0] &&
-        isImage(backgroundPicker.filePaths[0])
-      ) {
-        mediaPlayer.value.customBackground = pathToFileURL(
-          backgroundPicker.filePaths[0],
-        );
-      } else {
+      try {
+        const backgroundPicker = await openFileDialog(true);
+        if (
+          backgroundPicker.canceled ||
+          backgroundPicker.filePaths?.length === 0
+        ) {
+          throw new Error('No file selected');
+        } else {
+          const filepath = backgroundPicker.filePaths[0];
+          filepath;
+          if (isJwpub(filepath)) {
+            const unzipDir = await decompressJwpub(filepath);
+            const db = findDb(unzipDir);
+            if (!db) throw new Error('No db file found: ' + filepath);
+            jwpubImportDb.value = db;
+            jwpubImages.value = (
+              executeQuery(
+                db,
+                "SELECT * FROM Multimedia WHERE CategoryType >= 0 AND CategoryType <> 9 AND FilePath <> '';",
+              ) as MultimediaItem[]
+            ).map((multimediaItem) => {
+              return {
+                ...multimediaItem,
+                FilePath: path.join(unzipDir, multimediaItem.FilePath),
+              };
+            });
+            if (jwpubImages.value?.length === 0) {
+              throw new Error('No multimedia in jwpub: ' + filepath);
+            }
+          } else {
+            const tempDirectory = getTempDirectory();
+            const tempFilepath = path.join(
+              tempDirectory,
+              path.basename(filepath),
+            );
+            fs.copyFileSync(filepath, tempFilepath);
+            const workingTempFilepath =
+              await convertImageIfNeeded(tempFilepath);
+            if (isImage(workingTempFilepath)) {
+              setMediaBackground(workingTempFilepath);
+            } else {
+              throw new Error('Invalid file type: ' + workingTempFilepath);
+            }
+          }
+        }
+      } catch (error) {
+        console.error(error);
+        notifyInvalidBackgroundFile();
         mediaPlayer.value.customBackground = '';
+        jwpubImportDb.value = '';
       }
     }
   } catch (error) {

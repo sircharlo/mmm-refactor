@@ -2,7 +2,21 @@
   <q-dialog v-model="localValue">
     <q-card class="non-selectable" style="min-width: 500px">
       <q-card-section>
-        <div class="text-h6">{{ $t('choose-a-song') }}</div>
+        <div class="row self-center">
+          <q-avatar
+            class="q-mr-md self-center"
+            color="primary"
+            icon="mdi-music-clef-treble"
+            text-color="white"
+          />
+          <span class="text-h6 self-center">
+            {{ $t('choose-a-song') }}
+          </span>
+          <q-space />
+          <div class="text-h6 self-center">
+            <q-btn @click="dismissPopup" dense flat icon="close" round v-close-popup />
+          </div>
+        </div>
       </q-card-section>
       <q-card-section class="q-pt-none">
         <q-select
@@ -24,12 +38,6 @@
         />
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn
-          :label="$t('cancel')"
-          @click="dismissPopup"
-          color="negative"
-          flat
-        />
         <q-btn
           :label="$t('add-song')"
           @click="addSong(selectedSong)"
