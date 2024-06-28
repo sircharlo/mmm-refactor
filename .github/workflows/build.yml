@@ -9,9 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-
   version_checker:
-
     runs-on: ubuntu-latest
 
     outputs:
@@ -23,7 +21,6 @@ jobs:
       repository-projects: write
 
     steps:
-
       - name: Check out Git repository
         uses: actions/checkout@v4
         with:
@@ -35,17 +32,21 @@ jobs:
 
       - name: Get Latest Release Version
         id: get-latest-release
-        uses: pozetroninc/github-action-get-latest-release@v0.8.0
+        # uses: pozetroninc/github-action-get-latest-release@v0.8.0
+        # with:
+        #   repository: ${{ github.repository }}
+        #   token: ${{ secrets.GITHUB_TOKEN }}
+        #   excludes: draft
+        uses: InsonusK/get-latest-release@v1.1.0
         with:
-          repository: ${{ github.repository }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          excludes: prerelease, draft
+          myToken: ${{ secrets.GITHUB_TOKEN }}
+          exclude_types: 'draft'
 
       - name: Compare versions and increment if needed
         id: compare-versions
         run: |
           PACKAGE_VERSION="${{ steps.package-version.outputs.version }}"
-          GITHUB_RELEASE_VERSION="${{ steps.get-latest-release.outputs.release }}"
+          GITHUB_RELEASE_VERSION="${{ steps.get-latest-release.outputs.tag_name }}"
           # Strip leading 'v' if present
           GITHUB_RELEASE_VERSION="${GITHUB_RELEASE_VERSION#v}"
           echo "Package version: $PACKAGE_VERSION"
