@@ -136,7 +136,7 @@ const getNextSongUrl = () => {
 
 function playMusic() {
   try {
-    if (!currentSettings.value?.enableMusicButton) return;
+    if (!currentSettings.value?.enableMusicButton || musicPlaying.value) return;
     musicPlayer.value.appendChild(musicPlayerSource.value);
     document.getElementsByTagName('body')[0].append(musicPlayer.value);
     musicPlayer.value.volume =
