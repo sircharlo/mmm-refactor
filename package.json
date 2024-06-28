@@ -79,6 +79,6 @@
     "yarn": ">= 1.21.1"
   },
   "overrides": {
-    "canvas": "../_EXCLUDED_"
+    "canvas": "Automattic/node-canvas#master"
   }
 }
