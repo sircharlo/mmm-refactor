@@ -1146,10 +1146,15 @@ const addToFiles = async (
           const mmTable = documentMultimediaTableExists
             ? 'DocumentMultimedia'
             : 'Multimedia';
-          jwpubImportDocuments.value = executeQuery(
+          const possibleJwpubImportDocuments = executeQuery(
             db,
             `SELECT DISTINCT Document.DocumentId, Title FROM Document JOIN ${mmTable} ON Document.DocumentId = ${mmTable}.DocumentId;`,
           ) as DocumentItem[];
+          if (possibleJwpubImportDocuments.length > 1) {
+            jwpubImportDocuments.value = possibleJwpubImportDocuments;
+          } else if (possibleJwpubImportDocuments.length === 1) {
+            await addJwpubDocumentMediaToFiles(possibleJwpubImportDocuments[0]);
+          }
         }
         jwpubImportLoading.value = false;
       } else if (isJwPlaylist(filepath)) {
@@ -1237,10 +1242,9 @@ const dropEnd = (event: DragEvent) => {
         )?.type;
         if (src) droppedStuff[0] = { filetype, path: src };
       }
-      addToFiles(droppedStuff)
-        .catch((error) => {
-          console.error(error);
-        });
+      addToFiles(droppedStuff).catch((error) => {
+        console.error(error);
+      });
     }
   } catch (error) {
     console.error(error);
@@ -1304,10 +1308,9 @@ const imageLoadingError = (media: DynamicMediaObject) => {
 };
 
 const localFilesBrowsedListener = (event: CustomEventInit) => {
-  addToFiles(event.detail)
-    .catch((error) => {
-      console.error(error);
-    });
+  addToFiles(event.detail).catch((error) => {
+    console.error(error);
+  });
 };
 
 const getLocalFiles = async () => {
