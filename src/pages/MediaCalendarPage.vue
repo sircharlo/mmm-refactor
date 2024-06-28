@@ -630,6 +630,7 @@ import { electronApi } from 'src/helpers/electron-api';
 import {
   getDurationFromMediaPath,
   getFileUrl,
+  getPublicationDirectory,
   getTempDirectory,
   getThumbnailUrl,
 } from 'src/helpers/fs';
@@ -1115,7 +1116,14 @@ const addToFiles = async (
         await addToFiles(convertedImages);
       } else if (isJwpub(filepath)) {
         jwpubImportLoading.value = true;
-        const unzipDir = await decompressJwpub(filepath);
+        // TODO: only decompress the db, maybe in memory, to get the publication info
+        const tempUnzipDir = await decompressJwpub(filepath);
+        const tempDb = findDb(tempUnzipDir);
+        if (!tempDb) return;
+        const publication = getPublicationInfoFromDb(tempDb);
+        const publicationDirectory = getPublicationDirectory(publication);
+        if (!publicationDirectory) return;
+        const unzipDir = await decompressJwpub(filepath, publicationDirectory);
         const db = findDb(unzipDir);
         if (!db) return;
         jwpubImportDb.value = db;

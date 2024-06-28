@@ -64,6 +64,7 @@ const getPublicationDirectoryContents = (
 
 const getFileUrl = (path: string) => {
   if (!path) return '';
+  if (isFileUrl(path)) return path;
   return pathToFileURL(path);
 };
 

@@ -885,7 +885,7 @@ const deleteCacheFiles = (type: '' | 'all' | 'smart') => {
   }
   for (const file of filesToDelete) {
     try {
-      fs.unlinkSync(file.path);
+      fs.rmSync(file.path);
     } catch (error) {
       console.error(error);
     }
