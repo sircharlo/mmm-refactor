@@ -53,7 +53,7 @@ const dateFromString = (lookupDate?: Date | string | undefined) => {
     );
     return outputDate;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return new Date();
   }
 };
@@ -64,7 +64,7 @@ const isInPast = (lookupDate: Date) => {
     const now = dateFromString();
     return date.getDateDiff(lookupDate, now, 'days') < 0;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -81,7 +81,7 @@ const getWeekDay = (lookupDate: Date) => {
         : lookupDate.getDay() - 1;
     return dayNumber.toString();
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return '0';
   }
 };
@@ -97,7 +97,7 @@ function getSpecificWeekday(date: Date, desiredWeekday: number) {
     newDate.setDate(newDate.getDate() - difference);
     return newDate;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return new Date();
   }
 }
@@ -107,7 +107,7 @@ function datesAreSame(date1: Date, date2: Date) {
     if (!date1 || !date2) throw new Error('Missing date for comparison');
     return date1.toDateString() === date2.toDateString();
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 }
@@ -124,7 +124,7 @@ function isCoWeek(lookupDate: Date) {
     const lookupWeekMonday = getSpecificWeekday(lookupDate, 0);
     return datesAreSame(coMonday, lookupWeekMonday);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 }
@@ -142,7 +142,7 @@ const isMwMeetingDay = (lookupDate: Date) => {
       return currentSettings.value?.mwDay == getWeekDay(lookupDate);
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -154,7 +154,7 @@ const isWeMeetingDay = (lookupDate: Date) => {
     const { currentSettings } = storeToRefs(currentState);
     return currentSettings.value?.weDay == getWeekDay(lookupDate);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -202,7 +202,7 @@ function updateLookupPeriod(reset = false) {
     );
     if (todayDate) todayDate.today = true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 

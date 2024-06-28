@@ -23,7 +23,7 @@ const coTuesdays = (lookupDate: string) => {
       date.getDateDiff(lookupDate, new Date(), 'days') >= 0
     );
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -43,7 +43,7 @@ const getDateOptions = (options: string[] | undefined) => {
       ? filteredOptions[0]
       : undefined;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return undefined;
   }
 };
@@ -57,7 +57,7 @@ const getRules = (rules: string[] | undefined) => {
       .filter(Boolean);
     return filteredRules as ValidationRule[];
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return undefined;
   }
 };
@@ -72,7 +72,7 @@ const getActions = (actions: string[] | undefined) => {
       })
       .filter(Boolean);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return undefined;
   }
 };
@@ -87,7 +87,7 @@ const meetingTime = (hr: number, min: null | number) => {
     }
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -108,7 +108,7 @@ const getTimeOptions = (options: string[] | undefined) => {
       ? filteredOptions[0]
       : undefined;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return undefined;
   }
 };

@@ -41,7 +41,9 @@ import { contextBridge } from 'electron';
 import fs from 'fs-extra';
 import convert from 'heic-convert';
 import klawSync from 'klaw-sync';
+import { RenderParameters } from 'pdfjs-dist/types/src/display/api';
 import { debounce } from 'quasar';
+import { FULL_HD } from 'src/helpers/converters';
 import { ScreenPreferences } from 'src/types/settings';
 import path from 'upath';
 
@@ -247,13 +249,72 @@ const registerShortcut = (keySequence: string, callback: () => void) => {
 
 const unregisterShortcut = (keySequence: string) => {
   if (!keySequence) return;
-  console.log('unregistering shortcut', keySequence);
   if (globalShortcut.isRegistered(keySequence))
     globalShortcut.unregister(keySequence);
 };
 
+const convertPdfToImages = async (pdfPath: string, outputFolder: string) => {
+  const outputImages: string[] = [];
+  try {
+    const data = [];
+    const { getDocument } = (await import(
+      'pdfjs-dist/webpack.mjs'
+    )) as typeof import('pdfjs-dist');
+
+    const loadingTask = getDocument(pdfPath);
+    const pdfDocument = await loadingTask.promise;
+    const numPages = pdfDocument.numPages;
+
+    for (let i = 1; i <= numPages; i++) {
+      try {
+        const page = await pdfDocument.getPage(i);
+        const viewport = page.getViewport({ scale: 1 });
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        if (!context) return;
+
+        const scale = Math.min(
+          (2 * FULL_HD.width) / viewport.width,
+          (2 * FULL_HD.height) / viewport.height,
+        );
+        const scaledViewport = page.getViewport({ scale: scale });
+
+        canvas.width = scaledViewport.width;
+        canvas.height = scaledViewport.height;
+
+        const renderContext: RenderParameters = {
+          canvasContext: context,
+          viewport: scaledViewport,
+        };
+
+        const renderTask = page.render(renderContext);
+        await renderTask.promise;
+
+        const pngData = canvas.toDataURL('image/png');
+        data.push(pngData);
+
+        const base64Data = pngData.replace(/^data:image\/png;base64,/, '');
+        fs.ensureDirSync(outputFolder);
+        const outputPath = path.join(
+          outputFolder,
+          `${path.basename(pdfPath)}_${i}.png`,
+        );
+        fs.writeFileSync(outputPath, base64Data, 'base64');
+        outputImages.push(outputPath);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    return outputImages;
+  } catch (error) {
+    console.error(error);
+    return outputImages;
+  }
+};
+
 contextBridge.exposeInMainWorld('electronApi', {
   convert,
+  convertPdfToImages,
   decompress,
   executeQuery: (dbPath: string, query: string) => {
     try {

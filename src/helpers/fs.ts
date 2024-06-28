@@ -63,7 +63,7 @@ const getPublicationDirectoryContents = (
 };
 
 const getFileUrl = (path: string) => {
-  if (!path || !fs.existsSync(path)) return '';
+  if (!path) return '';
   return pathToFileURL(path);
 };
 

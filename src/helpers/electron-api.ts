@@ -8,6 +8,10 @@ export interface ElectronFileFilter {
 
 export interface ElectronApi {
   convert: typeof import('heic-convert');
+  convertPdfToImages: (
+    pdfPath: string,
+    outputFolder: string,
+  ) => Promise<string[]>;
   decompress: typeof import('decompress');
   executeQuery: (dbPath: string, query: string) => QueryResponseItem[];
   fileUrlToPath: (url: PathLike) => string;
