@@ -76,7 +76,7 @@
                   v-else-if="item.icon"
                 />
               </q-item-section>
-              <q-item-section style="align-items: end">
+              <q-item-section side style="align-items: end">
                 <ToggleInput
                   :actions="item.actions"
                   v-if="item.type === 'toggle'"

@@ -241,6 +241,7 @@ export {
   getFileUrl,
   getPublicationDirectory,
   getPublicationDirectoryContents,
+  getPublicationsPath,
   getSubtitlesUrl,
   getTempDirectory,
   getThumbnailUrl,

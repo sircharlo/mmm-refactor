@@ -150,7 +150,7 @@
                       'to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window',
                     )
                   }}
-                  </p>
+                </p>
                 <p>
                   {{
                     $t('you-can-also-use-the-button-below-to-browse-for-files')
@@ -264,6 +264,50 @@
           </q-dialog>
         </template>
         <template v-else-if="route.fullPath === '/settings'">
+          <q-btn flat icon="mdi-dots-vertical" round v-if="selectedDate">
+            <q-tooltip v-if="!moreOptionsMenuActive">
+              {{ $t('tools') }}
+            </q-tooltip>
+            <q-menu
+              @before-hide="moreOptionsMenuActive = false"
+              @before-show="
+                moreOptionsMenuActive = true;
+                calculateCacheSize();
+              "
+            >
+              <q-list style="min-width: 100px">
+                <q-item-label header>{{ $t('tools') }}</q-item-label>
+                <q-item
+                  :disable="calculatingCacheSize"
+                  @click="confirmDeleteCacheFiles('smart')"
+                  clickable
+                  v-close-popup
+                >
+                  <q-item-section avatar>
+                    <q-icon color="primary" name="mdi-vacuum  " />
+                  </q-item-section>
+                  <q-item-section
+                    >{{ $t('remove-unused-cache') }}
+                    {{ unusedCacheFilesSize }}</q-item-section
+                  >
+                </q-item>
+                <q-item
+                  :disable="calculatingCacheSize"
+                  @click="confirmDeleteCacheFiles('all')"
+                  clickable
+                  v-close-popup
+                >
+                  <q-item-section avatar>
+                    <q-icon color="primary" name="mdi-bomb" />
+                  </q-item-section>
+                  <q-item-section
+                    >{{ $t('remove-all-cache') }}
+                    {{ allCacheFilesSize }}</q-item-section
+                  >
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
           <q-toggle
             :label="$t('only-show-settings-that-are-not-valid')"
             color="red"
@@ -372,11 +416,80 @@
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <q-dialog v-model="cacheClearConfirmPopup">
+      <q-card style="width: 80vw; max-width: 80vw">
+        <q-card-section>
+          <div class="row self-center">
+            <q-avatar
+              class="q-mr-md self-center"
+              color="negative"
+              icon="mdi-alert"
+              text-color="white"
+            />
+            <span class="text-h6 self-center">
+              {{ $t('are-you-sure') }}
+            </span>
+            <q-space />
+            <div class="text-h6 self-center">
+              <q-btn
+                @click="cancelDeleteCacheFiles()"
+                dense
+                flat
+                icon="close"
+                round
+                v-close-popup
+              />
+            </div>
+          </div>
+        </q-card-section>
+        <q-card-section>
+          <p>
+            {{
+              cacheClearType === 'all'
+                ? $t('are-you-sure-delete-cache')
+                : $t('are-you-sure-delete-unused-cache')
+            }}
+            {{ $t('files-listed-below') }}
+          </p>
+        </q-card-section>
+        <q-card-section>
+          <!-- <q-scroll-area > -->
+          <q-table
+            :columns="[
+              { name: 'path', label: $t('path'), field: 'path' },
+              { name: 'size', label: $t('size'), field: 'size' },
+            ]"
+            :rows="
+              cacheFiles.map((file) => ({
+                path: file.path,
+                size: prettyBytes(file.size),
+              }))
+            "
+            :virtual-scroll-sticky-size-start="48"
+            dense
+            row-key="path"
+            style="height: 200px"
+            virtual-scroll
+          />
+          <!-- </q-scroll-area> -->
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn
+            :label="$t('delete')"
+            @click="deleteCacheFiles(cacheClearType)"
+            color="negative"
+          />
+        </q-card-actions>
+        <q-inner-loading :showing="deletingCacheFiles" />
+      </q-card>
+    </q-dialog>
   </q-layout>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
+import prettyBytes from 'pretty-bytes';
 import { Dark, LocalStorage, date } from 'quasar';
 import { get } from 'src/boot/axios';
 import { queues } from 'src/boot/globals';
@@ -393,6 +506,12 @@ import {
 import { updateLookupPeriod } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import {
+  getAdditionalMediaPath,
+  getPublicationDirectory,
+  getPublicationsPath,
+  getTempDirectory,
+} from 'src/helpers/fs';
+import {
   downloadAdditionalRemoteVideo,
   downloadBackgroundMusic,
   getBestImageUrl,
@@ -406,6 +525,7 @@ import { useAppSettingsStore } from 'src/stores/app-settings';
 import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
+import { CacheFile } from 'src/types/media';
 import {
   JwVideoCategory,
   MediaItemsMediatorItem,
@@ -430,6 +550,7 @@ const { invalidSettings } = currentState;
 const {
   currentCongregation,
   currentSettings,
+  currentSongbook,
   downloadProgress,
   mediaPlaying,
   online,
@@ -438,13 +559,14 @@ const {
 } = storeToRefs(currentState);
 
 const congregationSettings = useCongregationSettingsStore();
+const { congregations } = storeToRefs(congregationSettings);
 congregationSettings.$subscribe((_, state) => {
   LocalStorage.set('congregations', state.congregations);
 });
 
 const jwStore = useJwStore();
 const { resetSort, updateJwLanguages } = jwStore;
-const { lookupPeriod } = storeToRefs(jwStore);
+const { additionalMediaMaps, lookupPeriod } = storeToRefs(jwStore);
 jwStore.$subscribe((_, state) => {
   LocalStorage.set('jwLanguages', state.jwLanguages);
   LocalStorage.set('jwSongs', state.jwSongs);
@@ -458,7 +580,8 @@ jwStore.$subscribe((_, state) => {
 // Ref and reactive initializations
 const chooseSong = ref(false);
 const mediaSortForDay = ref(true);
-const { openFileDialog, setAutoStartAtLogin } = electronApi;
+const { fs, klawSync, openFileDialog, pathToFileURL, setAutoStartAtLogin } =
+  electronApi;
 
 const { locale, t } = useI18n({ useScope: 'global' });
 const drawer = ref(true);
@@ -512,7 +635,6 @@ watch(online, (isNowOnline) => {
 
 watch(route, (newVal) => {
   try {
-    const { congregations } = storeToRefs(congregationSettings);
     drawer.value = !(
       newVal.fullPath.includes('wizard') &&
       Object.keys(congregations.value).length < 2
@@ -658,6 +780,119 @@ const remoteVideos: Ref<MediaItemsMediatorItem[]> = ref([]);
 const remoteVideoFilter = ref('');
 const remoteVideosIncludeAudioDescription = ref(false);
 const remoteVideoLoading = ref(false);
+const moreOptionsMenuActive = ref(false);
+const cacheFiles: Ref<CacheFile[]> = ref([]);
+const calculatingCacheSize = ref(false);
+const cacheClearConfirmPopup = ref(false);
+const cacheClearType = ref<'' | 'all' | 'smart'>('');
+const deletingCacheFiles = ref(false);
+
+const confirmDeleteCacheFiles = (type: 'all' | 'smart') => {
+  cacheClearType.value = type;
+  cacheClearConfirmPopup.value = true;
+};
+
+const cancelDeleteCacheFiles = () => {
+  cacheClearType.value = '';
+  cacheClearConfirmPopup.value = false;
+};
+
+const unusedCacheFilesSize = computed(() => {
+  try {
+    return prettyBytes(
+      cacheFiles.value
+        .filter((f) => f.orphaned)
+        .reduce((size, cacheFile) => size + cacheFile.size, 0),
+    );
+  } catch (error) {
+    console.error(error);
+    return prettyBytes(0);
+  }
+});
+
+const allCacheFilesSize = computed(() => {
+  try {
+    return prettyBytes(
+      cacheFiles.value.reduce((size, cacheFile) => size + cacheFile.size, 0),
+    );
+  } catch (error) {
+    console.error(error);
+    return prettyBytes(0);
+  }
+});
+
+const calculateCacheSize = async () => {
+  calculatingCacheSize.value = true;
+  cacheFiles.value = [];
+  try {
+    const cacheDirs = [
+      getAdditionalMediaPath(),
+      getTempDirectory(),
+      getPublicationsPath(),
+    ];
+    const lookupPeriodsCollections = Object.values(lookupPeriod.value).flatMap(
+      (congregationLookupPeriods) =>
+        congregationLookupPeriods.flatMap(
+          (lookupPeriods) => lookupPeriods?.dynamicMedia || [],
+        ),
+    );
+    const additionalMediaCollections = Object.values(
+      additionalMediaMaps.value,
+    ).flatMap((congregationAdditionalMediaMap) =>
+      Object.values(congregationAdditionalMediaMap).flat(),
+    );
+    const mediaFileUrls = new Set([
+      ...lookupPeriodsCollections.map((media) => media.fileUrl),
+      ...additionalMediaCollections.map((media) => media.fileUrl),
+    ]);
+    const backgroundMusicFilesDirectory = pathToFileURL(
+      getPublicationDirectory({
+        langwritten: currentSongbook.value.signLanguage
+          ? currentSettings.value.lang
+          : 'E',
+        pub: currentSongbook.value.pub,
+      }),
+    );
+    for (const cacheDir of cacheDirs) {
+      cacheFiles.value.push(
+        ...klawSync(cacheDir, {
+          nodir: true,
+        }).map((file) => {
+          const fileUrl = pathToFileURL(file.path);
+          return {
+            orphaned:
+              !(
+                fileUrl.startsWith(backgroundMusicFilesDirectory) &&
+                fileUrl.endsWith(currentSongbook.value.fileformat)
+              ) && !mediaFileUrls.has(fileUrl),
+            path: file.path,
+            size: file.stats.size,
+          };
+        }),
+      );
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  calculatingCacheSize.value = false;
+};
+
+const deleteCacheFiles = (type: '' | 'all' | 'smart') => {
+  deletingCacheFiles.value = true;
+  let filesToDelete = cacheFiles.value;
+  if (type === 'smart') {
+    filesToDelete = cacheFiles.value.filter((f) => f.orphaned);
+  }
+  for (const file of filesToDelete) {
+    try {
+      fs.unlinkSync(file.path);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  deletingCacheFiles.value = true;
+  cancelDeleteCacheFiles();
+};
 
 if (!migrations.value.includes('firstRun')) {
   const migrationResult = runMigration('firstRun');

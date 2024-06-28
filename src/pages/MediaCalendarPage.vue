@@ -12,7 +12,7 @@
       {{ $t('noDateSelected') }}
     </q-banner>
     <q-list
-      class="shadow-2 rounded-borders"
+      class="shadow-5 rounded-borders"
       ref="mediaList"
       v-else-if="selectedDate && currentCongregation"
     >
