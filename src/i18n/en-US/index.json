@@ -191,5 +191,6 @@
   "yes": "Yes",
   "you-can-also-use-the-button-below-to-browse-for-files": "You can also browse for files manually if you prefer.",
   "zoom-in": "Zoom in",
-  "zoom-out": "Zoom out"
+  "zoom-out": "Zoom out",
+  "choose-a-document-for-import": "Choose the document containing the media"
 }

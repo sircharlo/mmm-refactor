@@ -188,5 +188,6 @@
   "yes": "Oui",
   "you-can-also-use-the-button-below-to-browse-for-files": "Vous pouvez également parcourir et sélectionner des fichiers manuellement, si vous le désirez.",
   "zoom-in": "Agrandir",
-  "zoom-out": "Réduire"
+  "zoom-out": "Réduire",
+  "choose-a-document-for-import": "Choisissez le document contenant les médias"
 }

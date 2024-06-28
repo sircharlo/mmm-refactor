@@ -563,6 +563,30 @@
     <q-spinner-hourglass color="white" size="10vh" v-if="jwpubImportLoading" />
     <template v-if="!jwpubImportLoading">
       <q-card>
+        <q-card-section>
+          <div class="row self-center">
+            <q-avatar
+              class="q-mr-md self-center"
+              color="primary"
+              icon="mdi-image-multiple"
+              text-color="white"
+            />
+            <span class="text-h6 self-center">
+              {{ $t('choose-a-document-for-import') }}
+            </span>
+            <q-space />
+            <div class="text-h6 self-center">
+              <q-btn
+                @click="jwpubImportDb = ''"
+                dense
+                flat
+                icon="close"
+                round
+                v-close-popup
+              />
+            </div>
+          </div>
+        </q-card-section>
         <q-card-section class="row items-center">
           <q-list>
             <q-item
