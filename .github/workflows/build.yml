@@ -2,9 +2,6 @@ name: Build/release
 
 on:
   push:
-    branches:
-      - main
-      - bump-request-*
   pull_request:
   workflow_dispatch:
 
