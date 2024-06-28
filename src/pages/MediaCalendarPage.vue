@@ -549,7 +549,12 @@
         </q-card-section>
         <q-card-actions align="right" class="text-primary">
           <q-btn :label="$t('cancel')" @click="mediaToDelete = ''" flat />
-          <q-btn :label="$t('delete')" @click="deleteMedia()" color="negative" flat />
+          <q-btn
+            :label="$t('delete')"
+            @click="deleteMedia()"
+            color="negative"
+            flat
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -603,7 +608,6 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
-  <!-- <embed ref="pdfObject" type="application/pdf" width="500px" height="600px"> -->
 </template>
 
 <script setup lang="ts">
@@ -694,13 +698,18 @@ const {
 } = storeToRefs(currentState);
 updateJwSongs();
 const panzooms: { [key: string]: PanzoomObject } = {};
-
 const mediaToStop = ref('');
 const mediaStopPending = computed(() => !!mediaToStop.value);
-
 const mediaToDelete = ref('');
 const mediaDeletePending = computed(() => !!mediaToDelete.value);
-const { decompress, executeQuery, fs, openFileDialog, path } = electronApi;
+const {
+  convertPdfToImages,
+  decompress,
+  executeQuery,
+  fs,
+  openFileDialog,
+  path,
+} = electronApi;
 
 const zoomReset = (elemId: string, forced = false) => {
   if (panzooms[elemId]?.getScale() <= 1.25 || forced) panzooms[elemId]?.reset();
@@ -719,8 +728,8 @@ function stopMedia(elemId: string) {
 function zoomIn(elemId: string) {
   try {
     panzooms[elemId].zoomIn();
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.error(error);
   }
 }
 
@@ -728,8 +737,8 @@ function zoomOut(elemId: string) {
   try {
     panzooms[elemId].zoomOut();
     zoomReset(elemId);
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.error(error);
   }
 }
 
@@ -758,8 +767,8 @@ const initiatePanzoom = (elemId: string) => {
         if (height > 0) mediaPlayer.value.y = e.detail.y / height;
       },
     );
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.error(error);
   }
 };
 
@@ -784,7 +793,7 @@ const mapOrder =
   (a: DynamicMediaObject, b: DynamicMediaObject) => {
     try {
       const key = 'uniqueId';
-      if (!sortOrder) return 0;
+      if (!sortOrder || sortOrder.length === 0) return 0;
       return sortOrder.indexOf(a[key]) > sortOrder.indexOf(b[key]) ? 1 : -1;
     } catch (e) {
       console.error(e);
@@ -997,7 +1006,6 @@ const copyToDatedAdditionalMedia = async (files: string[]) => {
     }
     return filepath;
   };
-
   for (const filepathToCopy of files) {
     try {
       if (!filepathToCopy || !fs.existsSync(filepathToCopy)) continue;
@@ -1012,13 +1020,13 @@ const copyToDatedAdditionalMedia = async (files: string[]) => {
           getFileUrl(datedAdditionalMediaPath),
       );
       if (fs.existsSync(datedAdditionalMediaPath)) {
-        if (filepathToCopy !== datedAdditionalMediaPath)
+        if (filepathToCopy !== datedAdditionalMediaPath) {
           fs.removeSync(datedAdditionalMediaPath);
-        removeFromAdditionMediaMap(uniqueId);
+          removeFromAdditionMediaMap(uniqueId);
+        }
       }
       if (filepathToCopy !== datedAdditionalMediaPath)
         fs.copySync(filepathToCopy, datedAdditionalMediaPath);
-
       await addToAdditionMediaMapFromPath(datedAdditionalMediaPath, uniqueId);
     } catch (error) {
       console.error(error, filepathToCopy);
@@ -1039,7 +1047,6 @@ const addToAdditionMediaMapFromPath = async (
     if (isVideoFile || isAudioFile) {
       duration = await getDurationFromMediaPath(additionalFilePath);
     }
-
     if (!uniqueId) {
       uniqueId = sanitizeId(
         date.formatDate(selectedDate.value, 'YYYYMMDD') +
@@ -1074,7 +1081,6 @@ const addToFiles = async (
   for (let i = 0; i < files.length; i++) {
     let filepath = files[i]?.path;
     try {
-      console.log('file', files[i], filepath);
       if (!filepath) continue;
       // Check if file is remote URL; if so, download it
       if (isRemoteUrl(filepath)) {
@@ -1097,17 +1103,16 @@ const addToFiles = async (
         fs.writeFileSync(tempFilepath, Buffer.from(data, 'base64'));
         filepath = tempFilepath;
       }
-
-      filepath = await convertImageIfNeeded(filepath)
-
+      filepath = await convertImageIfNeeded(filepath);
       if (isImage(filepath) || isVideo(filepath) || isAudio(filepath)) {
         copyToDatedAdditionalMedia([filepath]);
       } else if (isPdf(filepath)) {
-        createTemporaryNotification({
-          icon: 'mdi-file-pdf-box',
-          message: t('pdfFilesNotSupported'),
-          type: 'warning',
+        const convertedImages = (
+          await convertPdfToImages(filepath, getTempDirectory())
+        ).map((path) => {
+          return { path };
         });
+        await addToFiles(convertedImages);
       } else if (isJwpub(filepath)) {
         jwpubImportLoading.value = true;
         const unzipDir = await decompressJwpub(filepath);
@@ -1191,6 +1196,7 @@ const addToFiles = async (
       });
     }
   }
+  additionalLoading.value = false;
 };
 
 const dropActive = (event: DragEvent) => {
@@ -1224,9 +1230,6 @@ const dropEnd = (event: DragEvent) => {
         if (src) droppedStuff[0] = { filetype, path: src };
       }
       addToFiles(droppedStuff)
-        .then(() => {
-          additionalLoading.value = false;
-        })
         .catch((error) => {
           console.error(error);
         });
@@ -1294,9 +1297,6 @@ const imageLoadingError = (media: DynamicMediaObject) => {
 
 const localFilesBrowsedListener = (event: CustomEventInit) => {
   addToFiles(event.detail)
-    .then(() => {
-      additionalLoading.value = false;
-    })
     .catch((error) => {
       console.error(error);
     });
@@ -1312,8 +1312,8 @@ const getLocalFiles = async () => {
               path,
             };
           }),
-        ).then(() => {
-          additionalLoading.value = false;
+        ).catch((error) => {
+          console.error(error);
         });
       }
       dragging.value = false;

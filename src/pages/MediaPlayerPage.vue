@@ -108,8 +108,8 @@ const initiatePanzoom = () => {
     const imageElem = document.getElementById('mediaImage');
     if (!imageElem) return;
     panzoom.value = Panzoom(imageElem);
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.error(error);
   }
 };
 
@@ -134,8 +134,8 @@ watch(
         if (width > 0 && height > 0)
           panzoom.value?.pan(newX * width, newY * height, panzoomOptions);
       }
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      console.error(error);
     }
   },
 );
@@ -153,8 +153,8 @@ watch(
           console.error(error);
         });
       }
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      console.error(error);
     }
   },
 );
@@ -165,8 +165,8 @@ watch(
     try {
       if (!mediaElement.value) return;
       mediaElement.value.currentTime = newPosition;
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      console.error(error);
     }
   },
 );

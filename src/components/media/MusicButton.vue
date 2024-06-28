@@ -138,7 +138,8 @@ function playMusic() {
   try {
     if (!currentSettings.value?.enableMusicButton || musicPlaying.value) return;
     musicPlayer.value.appendChild(musicPlayerSource.value);
-    document.getElementsByTagName('body')[0].append(musicPlayer.value);
+    musicPlayer.value.style.display = 'none';
+    document.body.appendChild(musicPlayer.value);
     musicPlayer.value.volume =
       (currentSettings.value?.musicVolume ?? 100) / 100 ?? 1;
     musicPlayerSource.value.src = getNextSongUrl();

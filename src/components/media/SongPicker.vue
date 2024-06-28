@@ -105,7 +105,7 @@ const addSong = async (
       addToAdditionMediaMap(additionalMedia);
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   } finally {
     dismissPopup();
   }
