@@ -1,7 +1,9 @@
 import { PathLike } from 'fs';
+import { storeToRefs } from 'pinia';
 import { LocalStorage, date } from 'quasar';
 import { isInPast } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
+import { useJwStore } from 'src/stores/jw';
 import { DynamicMediaObject } from 'src/types/media';
 
 import { getAdditionalMediaPath } from './fs';
@@ -81,14 +83,13 @@ function removeEmptyDirs(rootDir: string) {
 
 const cleanAdditionalMediaFolder = () => {
   try {
+    const jwStore = useJwStore();
+    const { additionalMediaMaps } = storeToRefs(jwStore);
     const additionalMediaPath = getAdditionalMediaPath();
     if (!fs.existsSync(additionalMediaPath)) {
-      LocalStorage.removeItem('additionalMediaMaps');
+      additionalMediaMaps.value = {};
       return;
     }
-    const additionalMediaMaps = LocalStorage.getItem(
-      'additionalMediaMaps',
-    ) as Record<string, Record<string, DynamicMediaObject[]>>;
     const flattenedFilePaths = (
       data: Record<string, Record<string, DynamicMediaObject[]>>,
     ) => {
@@ -98,18 +99,42 @@ const cleanAdditionalMediaFolder = () => {
         ),
       );
     };
-    const filePaths = flattenedFilePaths(additionalMediaMaps);
+
+    // Check for files present on the filesystem that are not present in the additional media maps
+    const filesReferencedInAdditionalMediaMaps = flattenedFilePaths(
+      additionalMediaMaps.value,
+    );
     const dirListing = klawSync(additionalMediaPath, { nodir: true });
     for (const file of dirListing) {
-      const additionalMediaFile = path.resolve(file.path);
-      if (!filePaths.includes(additionalMediaFile)) {
+      const additionalMediaFilePath = path.resolve(file.path);
+      if (
+        !filesReferencedInAdditionalMediaMaps.includes(additionalMediaFilePath)
+      ) {
         console.log(
-          'Removing orphan additional media file:',
-          additionalMediaFile,
+          'Removing orphaned file from filesystem:',
+          additionalMediaFilePath,
         );
-        fs.rmSync(additionalMediaFile);
+        fs.rmSync(additionalMediaFilePath);
       }
     }
+
+    //Check for files present in the additional media maps that are not present on the filesystem
+    for (const [congregation, additionalMediaMap] of Object.entries(
+      additionalMediaMaps.value,
+    )) {
+      for (const [dateKey, mediaObjects] of Object.entries(
+        additionalMediaMap,
+      )) {
+        for (const mediaObject of mediaObjects) {
+          const filePath = path.resolve(fileUrlToPath(mediaObject.fileUrl));
+          if (!fs.existsSync(filePath)) {
+            additionalMediaMaps.value[congregation][dateKey] =
+              mediaObjects.filter((obj) => obj.fileUrl !== mediaObject.fileUrl);
+          }
+        }
+      }
+    }
+
     removeEmptyDirs(additionalMediaPath);
   } catch (error) {
     console.error(error);
