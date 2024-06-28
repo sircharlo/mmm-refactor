@@ -78,19 +78,27 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
+        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v4
+        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
         with:
           node-version: 22
           cache: 'yarn'
 
       - uses: actions/setup-python@v5
+        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
         with:
           python-version: '3.9'
 
-      - run: pip install setuptools
-      - run: yarn install && yarn global add @quasar/cli
+      - run: |
+          pip install setuptools
+        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
+
+      - run: |
+          yarn install && yarn global add @quasar/cli
+        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - name: Build and Publish Electron App
         run: yarn quasar build -m electron --publish always
