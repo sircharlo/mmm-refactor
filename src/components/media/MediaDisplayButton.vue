@@ -174,7 +174,7 @@
               <q-img
                 :src="pathToFileURL(jwpubImage.FilePath)"
                 @click="setMediaBackground(jwpubImage.FilePath)"
-                class="rounded-borders shadow-10 cursor-pointer"
+                class="rounded-borders shadow-5 cursor-pointer"
                 fit="contain"
                 style="max-height: 50vh"
                 v-ripple
