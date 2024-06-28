@@ -536,19 +536,74 @@
     </q-dialog>
     <q-dialog persistent v-model="mediaDeletePending">
       <q-card>
-        <q-card-section class="row items-center">
-          <q-avatar color="negative" icon="mdi-alert" text-color="white" />
-          <span class="q-ml-sm"
-            >{{ $t('are-you-sure-you-want-to-delete') }}
-            <strong>{{
-              sortableMediaItems.find((m) => m.uniqueId === mediaToDelete)
-                ?.title
-            }}</strong
-            >{{ $t('question-mark') }}</span
-          >
+        <q-card-section>
+          <div class="row self-center">
+            <q-avatar
+              class="q-mr-md self-center"
+              color="negative"
+              icon="mdi-alert"
+              text-color="white"
+            />
+            <span class="text-h6 self-center">
+              {{ $t('are-you-sure') }}
+            </span>
+            <q-space />
+            <div class="text-h6 self-center">
+              <q-btn
+                @click="mediaToDelete = ''"
+                dense
+                flat
+                icon="close"
+                round
+                v-close-popup
+              />
+            </div>
+          </div>
+        </q-card-section>
+        <!-- <q-card-section class="row items-center">
+          <q-card-section>
+            <div class="row self-center">
+              <q-avatar
+                class="q-mr-md self-center"
+                color="negative"
+                icon="mdi-alert"
+                text-color="white"
+              />
+              <span class="text-h6 self-center">
+                {{ $t('are-you-sure') }}
+              </span>
+              <q-space />
+              <div class="text-h6 self-center">
+                <q-btn
+                  @click="mediaToDelete = ''"
+                  dense
+                  flat
+                  icon="close"
+                  round
+                  v-close-popup
+                />
+              </div>
+            </div>
+          </q-card-section> -->
+        <q-card-section>
+          <!-- <q-avatar color="negative" icon="mdi-alert" text-color="white" /> -->
+          <span class="q-ml-sm">
+            <!-- {{ $t('are-you-sure-you-want-to-delete') }} -->
+            <p>
+              <strong>
+                {{
+                  sortableMediaItems.find((m) => m.uniqueId === mediaToDelete)
+                    ?.title
+                }}
+              </strong>
+            </p>
+            <p>
+              {{ fileUrlToPath(sortableMediaItems.find((m) => m.uniqueId === mediaToDelete)?.fileUrl ?? '') }}
+            </p>
+            <!-- {{ $t('question-mark') }} -->
+          </span>
         </q-card-section>
         <q-card-actions align="right" class="text-primary">
-          <q-btn :label="$t('cancel')" @click="mediaToDelete = ''" flat />
           <q-btn
             :label="$t('delete')"
             @click="deleteMedia()"
@@ -731,6 +786,7 @@ const {
   convertPdfToImages,
   decompress,
   executeQuery,
+  fileUrlToPath,
   fs,
   openFileDialog,
   path,
