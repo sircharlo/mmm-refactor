@@ -889,6 +889,7 @@ const deleteCacheFiles = (type: '' | 'all' | 'smart') => {
     } catch (error) {
       console.error(error);
     }
+    additionalMediaMaps.value = {};
   }
   deletingCacheFiles.value = true;
   cancelDeleteCacheFiles();
