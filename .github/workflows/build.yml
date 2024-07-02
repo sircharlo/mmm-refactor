@@ -12,10 +12,10 @@ jobs:
     outputs:
       VERSION_MATCH: ${{ steps.compare-versions.outputs.VERSION_MATCH }}
 
-    permissions:
-      contents: write
-      pull-requests: write
-      repository-projects: write
+#    permissions:
+#      contents: write
+#      pull-requests: write
+#      repository-projects: write
 
     steps:
 
