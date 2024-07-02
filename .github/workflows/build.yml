@@ -110,9 +110,8 @@ jobs:
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - name: Build and Publish Electron App
-        run: yarn quasar build -m electron --publish always
+        run: yarn quasar build -m electron
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          PUBLISH_FOR_PULL_REQUEST: true
