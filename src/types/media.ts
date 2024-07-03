@@ -45,6 +45,7 @@ export interface FileDownloader {
 
 export interface CacheFile {
   orphaned: boolean;
+  parentPath: string;
   path: string;
   size: number;
 }

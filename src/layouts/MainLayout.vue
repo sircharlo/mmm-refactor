@@ -47,7 +47,7 @@
                   v-close-popup
                 >
                   <q-item-section avatar>
-                    <q-icon color="primary" name="mdi-movie-open-play" />
+                    <q-icon color="primary" name="mdi-movie-open" />
                   </q-item-section>
                   <q-item-section>{{ $t('video') }}</q-item-section>
                 </q-item>
@@ -57,9 +57,9 @@
                 <template
                   :key="name"
                   v-for="[icon, name] in [
-                    ['mdi-image', 'Images or videos'],
-                    ['mdi-folder-zip', 'JWPub File'],
-                    ['mdi-playlist-play', 'JW Playlist'],
+                    ['mdi-multimedia', 'images-videos'],
+                    ['mdi-folder-zip', 'jwpub-file'],
+                    ['mdi-playlist-play', 'jw-playlist'],
                   ]"
                 >
                   <q-item
@@ -70,7 +70,7 @@
                     <q-item-section avatar>
                       <q-icon :name="icon" color="primary" />
                     </q-item-section>
-                    <q-item-section>{{ name }}</q-item-section>
+                    <q-item-section>{{ $t(name) }}</q-item-section>
                   </q-item>
                 </template>
               </q-list>
@@ -288,7 +288,7 @@
                   </q-item-section>
                   <q-item-section
                     >{{ $t('remove-unused-cache') }}
-                    {{ unusedCacheFilesSize }}</q-item-section
+                    {{ unusedCacheFoldersSize }}</q-item-section
                   >
                 </q-item>
                 <q-item
@@ -454,17 +454,23 @@
           </p>
         </q-card-section>
         <q-card-section>
-          <!-- <q-scroll-area > -->
           <q-table
             :columns="[
               { name: 'path', label: $t('path'), field: 'path' },
               { name: 'size', label: $t('size'), field: 'size' },
             ]"
             :rows="
-              cacheFiles.map((file) => ({
-                path: file.path,
-                size: prettyBytes(file.size),
-              }))
+              cacheClearType === 'all'
+                ? cacheFiles.map((file) => ({
+                    path: file.path,
+                    size: prettyBytes(file.size),
+                  }))
+                : Object.entries(unusedParentDirectories).map(
+                    ([path, size]) => ({
+                      path,
+                      size: prettyBytes(size),
+                    }),
+                  )
             "
             :virtual-scroll-sticky-size-start="48"
             dense
@@ -472,7 +478,6 @@
             style="height: 200px"
             virtual-scroll
           />
-          <!-- </q-scroll-area> -->
         </q-card-section>
         <q-card-actions align="right">
           <q-btn
@@ -507,6 +512,7 @@ import { updateLookupPeriod } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import {
   getAdditionalMediaPath,
+  getParentDirectory,
   getPublicationDirectory,
   getPublicationsPath,
   getTempDirectory,
@@ -580,7 +586,7 @@ jwStore.$subscribe((_, state) => {
 // Ref and reactive initializations
 const chooseSong = ref(false);
 const mediaSortForDay = ref(true);
-const { fs, klawSync, openFileDialog, pathToFileURL, setAutoStartAtLogin } =
+const { klawSync, openFileDialog, pathToFileURL, setAutoStartAtLogin } =
   electronApi;
 
 const { locale, t } = useI18n({ useScope: 'global' });
@@ -797,13 +803,117 @@ const cancelDeleteCacheFiles = () => {
   cacheClearConfirmPopup.value = false;
 };
 
-const unusedCacheFilesSize = computed(() => {
+const frequentlyUsedDirectories = computed(() => {
+  const backgroundMusicFilesDirectory = getPublicationDirectory({
+    langwritten: currentSongbook.value.signLanguage
+      ? currentSettings.value.lang
+      : 'E',
+    pub: currentSongbook.value.pub,
+  });
+
+  const songbookDirectory = getPublicationDirectory({
+    langwritten: currentSettings.value.lang,
+    pub: currentSongbook.value.pub,
+  });
+
+  const insightDirectory = getPublicationDirectory({
+    issue: 0,
+    langwritten: currentSettings.value.lang,
+    pub: 'it',
+  });
+  const enjoyLifeForeverDirectory = getPublicationDirectory({
+    issue: 0,
+    langwritten: currentSettings.value.lang,
+    pub: 'lff',
+  });
+  const lovePeopleDirectory = getPublicationDirectory({
+    issue: 0,
+    langwritten: currentSettings.value.lang,
+    pub: 'lmd',
+  });
+  return new Set([
+    backgroundMusicFilesDirectory,
+    songbookDirectory,
+    insightDirectory,
+    lovePeopleDirectory,
+    enjoyLifeForeverDirectory,
+  ]);
+});
+
+const usedCacheFiles = computed(() => {
   try {
-    return prettyBytes(
-      cacheFiles.value
-        .filter((f) => f.orphaned)
-        .reduce((size, cacheFile) => size + cacheFile.size, 0),
+    const usedFiles = cacheFiles.value.filter((f) => !f.orphaned);
+    return usedFiles;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+});
+
+const usedParentDirectories = computed(() => {
+  try {
+    return usedCacheFiles.value.reduce(
+      (acc, file) => {
+        if (acc[file.parentPath]) {
+          acc[file.parentPath] += file.size;
+        } else {
+          acc[file.parentPath] = file.size;
+        }
+        return acc;
+      },
+      {} as { [parentPath: string]: number },
     );
+  } catch (error) {
+    console.error(error);
+    return {};
+  }
+});
+
+const untouchableDirectories = computed(() => {
+  try {
+    return new Set([
+      getAdditionalMediaPath(),
+      getPublicationsPath(),
+      getTempDirectory(),
+    ]);
+  } catch (error) {
+    console.error(error);
+    return new Set() as Set<string>;
+  }
+});
+
+const unusedParentDirectories = computed(() => {
+  try {
+    return cacheFiles.value.reduce(
+      (acc, file) => {
+        if (
+          !usedParentDirectories.value[file.parentPath] &&
+          !frequentlyUsedDirectories.value.has(file.parentPath) &&
+          !untouchableDirectories.value.has(file.parentPath)
+        ) {
+          if (acc[file.parentPath]) {
+            acc[file.parentPath] += file.size;
+          } else {
+            acc[file.parentPath] = file.size;
+          }
+        }
+        return acc;
+      },
+      {} as { [parentPath: string]: number },
+    );
+  } catch (error) {
+    console.error(error);
+    return {} as { [parentPath: string]: number };
+  }
+});
+
+const unusedCacheFoldersSize = computed(() => {
+  try {
+    const size = Object.values(unusedParentDirectories.value).reduce(
+      (a, b) => a + b,
+      0,
+    );
+    return prettyBytes(size);
   } catch (error) {
     console.error(error);
     return prettyBytes(0);
@@ -841,30 +951,28 @@ const calculateCacheSize = async () => {
     ).flatMap((congregationAdditionalMediaMap) =>
       Object.values(congregationAdditionalMediaMap).flat(),
     );
-    const mediaFileUrls = new Set([
-      ...lookupPeriodsCollections.map((media) => media.fileUrl),
-      ...additionalMediaCollections.map((media) => media.fileUrl),
+    const mediaFileParentDirectories = new Set([
+      ...lookupPeriodsCollections.map((media) =>
+        pathToFileURL(getParentDirectory(media.fileUrl)),
+      ),
+      ...additionalMediaCollections.map((media) =>
+        pathToFileURL(getParentDirectory(media.fileUrl)),
+      ),
     ]);
-    const backgroundMusicFilesDirectory = pathToFileURL(
-      getPublicationDirectory({
-        langwritten: currentSongbook.value.signLanguage
-          ? currentSettings.value.lang
-          : 'E',
-        pub: currentSongbook.value.pub,
-      }),
-    );
+    console.log('mediaFileParentDirectories', mediaFileParentDirectories);
     for (const cacheDir of cacheDirs) {
       cacheFiles.value.push(
         ...klawSync(cacheDir, {
           nodir: true,
+          nofile: false,
         }).map((file) => {
-          const fileUrl = pathToFileURL(file.path);
+          const fileParentDirectory = getParentDirectory(file.path);
+          const fileParentDirectoryUrl = pathToFileURL(fileParentDirectory);
+
           return {
-            orphaned:
-              !(
-                fileUrl.startsWith(backgroundMusicFilesDirectory) &&
-                fileUrl.endsWith(currentSongbook.value.fileformat)
-              ) && !mediaFileUrls.has(fileUrl),
+            directory: false,
+            orphaned: !mediaFileParentDirectories.has(fileParentDirectoryUrl), // Not referenced on any date
+            parentPath: fileParentDirectory,
             path: file.path,
             size: file.stats.size,
           };
@@ -878,21 +986,26 @@ const calculateCacheSize = async () => {
 };
 
 const deleteCacheFiles = (type: '' | 'all' | 'smart') => {
-  deletingCacheFiles.value = true;
-  let filesToDelete = cacheFiles.value;
-  if (type === 'smart') {
-    filesToDelete = cacheFiles.value.filter((f) => f.orphaned);
-  }
-  for (const file of filesToDelete) {
-    try {
-      fs.rmSync(file.path);
-    } catch (error) {
-      console.error(error);
+  try {
+    deletingCacheFiles.value = true;
+    const filepathsToDelete =
+      type === 'smart'
+        ? Object.keys(unusedParentDirectories.value)
+        : cacheFiles.value.map((f) => f.path);
+    for (const filepath of filepathsToDelete) {
+      try {
+        // fs.rmSync(filepath);
+        console.log('deleting', filepath);
+      } catch (error) {
+        console.error(error);
+      }
+      additionalMediaMaps.value = {};
     }
-    additionalMediaMaps.value = {};
+    deletingCacheFiles.value = true;
+    cancelDeleteCacheFiles();
+  } catch (error) {
+    console.error(error);
   }
-  deletingCacheFiles.value = true;
-  cancelDeleteCacheFiles();
 };
 
 if (!migrations.value.includes('firstRun')) {

@@ -30,7 +30,9 @@ const getPublicationDirectory = (publication: PublicationFetcher) => {
       publication.pub +
         '_' +
         publication.langwritten +
-        (publication.issue ? '_' + publication.issue.toString() : ''),
+        (publication.issue !== undefined
+          ? '_' + publication.issue.toString()
+          : ''),
     );
     fs.ensureDirSync(dir);
     return dir;
@@ -39,6 +41,13 @@ const getPublicationDirectory = (publication: PublicationFetcher) => {
     return path.resolve('./');
   }
 };
+
+const getParentDirectory = (filepath: string) => {
+  if (!filepath) return '';
+  if (isFileUrl(filepath)) filepath = fileUrlToPath(filepath);
+  return path.dirname(filepath);
+};
+
 const getPublicationDirectoryContents = (
   publication: PublicationFetcher,
   filter?: string,
@@ -240,6 +249,7 @@ export {
   getAdditionalMediaPath,
   getDurationFromMediaPath,
   getFileUrl,
+  getParentDirectory,
   getPublicationDirectory,
   getPublicationDirectoryContents,
   getPublicationsPath,
