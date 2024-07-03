@@ -50,7 +50,6 @@ const isImage = (filepath: string) => {
     '.gif',
     '.bmp',
     '.webp',
-    '.webm',
   ]);
 };
 
@@ -342,7 +341,6 @@ const convertImageIfNeeded = async (filepath: string) => {
     return filepath;
   }
 };
-
 
 const showMediaWindow = (state: boolean) => {
   try {
