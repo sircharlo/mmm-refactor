@@ -1,5 +1,5 @@
 <template>
-  <q-page @dragenter="dropActive" @dragover="dropActive" padding>
+  <q-page @dragenter="dropActive" @dragover="dropActive" @dragstart="dropActive" @drop="dropEnd" padding>
     <q-banner
       class="bg-orange-9 text-white"
       inline-actions
@@ -1294,7 +1294,7 @@ const addToFiles = async (
 
 const dropActive = (event: DragEvent) => {
   event.preventDefault();
-  event.stopPropagation();
+  // event.stopPropagation();
   if (!event?.relatedTarget && event?.dataTransfer?.effectAllowed === 'all') {
     dragging.value = true;
   }
@@ -1311,7 +1311,6 @@ const dropEnd = (event: DragEvent) => {
       let noLocalDroppedFiles =
         droppedStuff.filter((file) => file.path).length === 0;
       if (noLocalDroppedFiles && droppedStuff.length > 0) {
-        // maybe its a drag and drop from a web browser?
         let html = event.dataTransfer.getData('text/html');
         let sanitizedHtml = DOMPurify.sanitize(html);
         let src = new DOMParser()
