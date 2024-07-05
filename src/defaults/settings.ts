@@ -206,6 +206,11 @@ export const settingsDefinitions: SettingsItems = {
     group: 'advanced',
     type: 'toggle',
   },
+  enableExtraCache: {
+    depends: 'enableMediaDisplayButton',
+    group: 'advanced',
+    type: 'toggle',
+  },
   langSubtitles: {
     depends: 'enableSubtitles',
     group: 'advanced',
@@ -228,6 +233,7 @@ export const defaultSettings: SettingsValues = {
   coWeek: '',
   congregationName: '',
   darkMode: 'auto',
+  enableExtraCache: true,
   enableKeyboardShortcuts: false,
   enableMediaDisplayButton: false,
   enableMusicButton: true,

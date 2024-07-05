@@ -12,6 +12,7 @@ export interface SettingsValues {
   // disableAutoUpdate: boolean;
   darkMode: string;
   // enablePp: boolean;
+  enableExtraCache: boolean;
   enableKeyboardShortcuts: boolean;
   // disableHardwareAcceleration: boolean;
   enableMediaDisplayButton: boolean;

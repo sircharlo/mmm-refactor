@@ -1333,7 +1333,7 @@ const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
         if (bestItem) filteredMediaItemLinks.push(bestItem);
       }
     }
-    for (const mediaLink of mediaLinks) {
+    for (const mediaLink of filteredMediaItemLinks) {
       downloadFileIfNeeded({
         dir,
         lowPriority: true,
@@ -1354,7 +1354,7 @@ const downloadBackgroundMusic = () => {
     if (
       !currentSongbook.value ||
       !currentSettings.value?.lang ||
-      !currentSettings.value.enableMusicButton
+      !currentSettings.value?.enableMusicButton
     )
       return;
     downloadPubMediaFiles({
@@ -1367,6 +1367,28 @@ const downloadBackgroundMusic = () => {
     });
   } catch (e) {
     console.error('downloadBackgroundMusic', e);
+  }
+};
+
+const downloadSongbookVideos = () => {
+  try {
+    const { currentSettings, currentSongbook } = storeToRefs(
+      useCurrentStateStore(),
+    );
+    if (
+      !currentSongbook.value ||
+      !currentSettings.value?.lang ||
+      !currentSettings.value?.enableExtraCache
+    )
+      return;
+    downloadPubMediaFiles({
+      fileformat: 'MP4',
+      langwritten: currentSettings.value.lang,
+      maxTrack: MAX_SONGS,
+      pub: currentSongbook.value.pub,
+    });
+  } catch (e) {
+    console.error('downloadSongbookVideos', e);
   }
 };
 
@@ -1430,6 +1452,7 @@ export {
   downloadBackgroundMusic,
   downloadFileIfNeeded,
   downloadPubMediaFiles,
+  downloadSongbookVideos,
   dynamicMediaMapper,
   fetchMedia,
   getBestImageUrl,

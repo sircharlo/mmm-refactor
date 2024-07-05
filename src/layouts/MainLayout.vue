@@ -520,6 +520,7 @@ import {
 import {
   downloadAdditionalRemoteVideo,
   downloadBackgroundMusic,
+  downloadSongbookVideos,
   getBestImageUrl,
 } from 'src/helpers/jw-media';
 import {
@@ -609,6 +610,7 @@ watch(currentCongregation, (newCongregation, oldCongregation) => {
       updateLookupPeriod();
       registerAllCustomShortcuts();
       downloadBackgroundMusic();
+      downloadSongbookVideos();
       if (queues.meetings[newCongregation]) {
         queues.meetings[newCongregation].start();
       }
@@ -700,6 +702,17 @@ watch(
   () => currentSettings.value?.autoStartAtLogin,
   (newAutoStartAtLogin) => {
     setAutoStartAtLogin(!!newAutoStartAtLogin);
+  },
+);
+
+watch(
+  () => currentSettings.value?.enableExtraCache,
+  (newEnableExtraCache) => {
+    try {
+      if (newEnableExtraCache) downloadSongbookVideos();
+    } catch (error) {
+      console.error(error);
+    }
   },
 );
 

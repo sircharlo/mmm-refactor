@@ -109,7 +109,7 @@ function stopMusic() {
       musicPlayer.value.pause();
       musicPlaying.value = false;
       musicStopping.value = false;
-      document.getElementsByTagName('body')[0].removeChild(musicPlayer.value);
+      document.body.removeChild(musicPlayer.value);
     }
   } catch (error) {
     console.error(error);
