@@ -123,16 +123,32 @@ watch(currentCongregation, (newCongregation) => {
 });
 
 watch(
-  () => [mediaPlayer.value?.scale, mediaPlayer.value?.x, mediaPlayer.value?.y],
-  ([newScale, newX, newY]) => {
+  () => [
+    mediaPlayer.value?.url,
+    mediaPlayer.value?.scale,
+    mediaPlayer.value?.x,
+    mediaPlayer.value?.y,
+  ],
+  ([newUrl, newScale, newX, newY], [oldUrl, , ,]) => {
     try {
       if (!mediaElement.value) {
-        const imageElem = document.getElementById('mediaImage');
-        const width = imageElem?.clientWidth || 0;
-        const height = imageElem?.clientHeight || 0;
-        panzoom.value?.zoom(newScale, panzoomOptions);
-        if (width > 0 && height > 0)
-          panzoom.value?.pan(newX * width, newY * height, panzoomOptions);
+        if (newUrl !== oldUrl) {
+          mediaPlayer.value.scale = 1;
+          mediaPlayer.value.x = 0;
+          mediaPlayer.value.y = 0;
+          panzoom.value?.reset({ animate: false });
+        } else {
+          const imageElem = document.getElementById('mediaImage');
+          const width = imageElem?.clientWidth || 0;
+          const height = imageElem?.clientHeight || 0;
+          panzoom.value?.zoom(newScale as number, panzoomOptions);
+          if (width > 0 && height > 0)
+            panzoom.value?.pan(
+              (newX as number) * width,
+              (newY as number) * height,
+              panzoomOptions,
+            );
+        }
       }
     } catch (error) {
       console.error(error);

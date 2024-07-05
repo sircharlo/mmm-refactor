@@ -477,9 +477,7 @@
                 </div>
                 <q-btn
                   @click="
-                    media.isVideo
-                      ? (mediaToStop = media.uniqueId)
-                      : stopMedia(media.uniqueId)
+                    media.isVideo ? (mediaToStop = media.uniqueId) : stopMedia()
                   "
                   class="q-ml-sm"
                   color="negative"
@@ -560,7 +558,7 @@
         </q-card-section>
         <q-card-actions align="right" class="text-primary">
           <q-btn :label="$t('cancel')" @click="mediaToStop = ''" flat />
-          <q-btn :label="$t('stop')" @click="stopMedia(mediaToStop)" flat />
+          <q-btn :label="$t('stop')" @click="stopMedia()" flat />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -827,12 +825,12 @@ const {
   path,
 } = electronApi;
 
-const zoomReset = (elemId: string, forced = false) => {
-  if (panzooms[elemId]?.getScale() <= 1.25 || forced) panzooms[elemId]?.reset();
+const zoomReset = (elemId: string, forced = false, animate = true) => {
+  if (panzooms[elemId]?.getScale() <= 1.25 || forced)
+    panzooms[elemId]?.reset({ animate });
 };
 
-function stopMedia(elemId: string) {
-  zoomReset(elemId, true);
+function stopMedia() {
   mediaPlayer.value.action = 'stop';
   mediaPlayer.value.url = '';
   mediaPlayer.value.uniqueId = '';
@@ -840,6 +838,16 @@ function stopMedia(elemId: string) {
   mediaPlayer.value.currentPosition = 0;
   mediaToStop.value = '';
 }
+
+watch(
+  () => mediaPlayer.value?.uniqueId,
+  (newMediaUniqueId) => {
+    for (const key of Object.keys(panzooms)) {
+      console.log(key, newMediaUniqueId);
+      if (key !== newMediaUniqueId) zoomReset(key, true);
+    }
+  },
+);
 
 function zoomIn(elemId: string) {
   try {
