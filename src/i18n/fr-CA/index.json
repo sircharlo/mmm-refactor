@@ -44,6 +44,7 @@
   "darkMode": "Préférence de thème",
   "delete": "Supprimer",
   "depends-on": "Relié à :",
+  "disableMediaFetching": "Désactiver le téléchargement des médias (remarque : cette option doit être désactivée dans presque tous les cas!)",
   "does-your-kingdom-hall-use-a-program-called-obs-studio": "Un programme appelé OBS Studio est-il utilisé dans votre salle du Royaume ?",
   "doing-so-will-greatly-simplify-and-facilitate-sharing-media-during-hybrid-meetings": "Cela simplifiera et facilitera grandement le partage de médias lors de réunions hybrides.",
   "download-status": "État des téléchargements",

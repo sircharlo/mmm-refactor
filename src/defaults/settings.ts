@@ -225,6 +225,10 @@ export const settingsDefinitions: SettingsItems = {
     step: 1,
     type: 'slider',
   },
+  disableMediaFetching: {
+    group: 'advanced',
+    type: 'toggle',
+  },
 };
 
 export const defaultSettings: SettingsValues = {
@@ -233,6 +237,7 @@ export const defaultSettings: SettingsValues = {
   coWeek: '',
   congregationName: '',
   darkMode: 'auto',
+  disableMediaFetching: false,
   enableExtraCache: true,
   enableKeyboardShortcuts: false,
   enableMediaDisplayButton: false,

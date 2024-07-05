@@ -169,8 +169,14 @@ const downloadFile = async ({ dir, filename, url }: FileDownloader) => {
 };
 const fetchMedia = async () => {
   try {
-    const { currentCongregation } = storeToRefs(useCurrentStateStore());
-    if (!currentCongregation.value) return;
+    const { currentCongregation, currentSettings } = storeToRefs(
+      useCurrentStateStore(),
+    );
+    if (
+      !currentCongregation.value ||
+      !!currentSettings.value?.disableMediaFetching
+    )
+      return;
     const { lookupPeriod } = storeToRefs(useJwStore());
     const meetingsToFetch = lookupPeriod.value[
       currentCongregation.value

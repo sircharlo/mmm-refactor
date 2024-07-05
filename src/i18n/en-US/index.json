@@ -44,6 +44,7 @@
   "darkMode": "Theme preference",
   "delete": "Delete",
   "depends-on": "Linked to:",
+  "disableMediaFetching": "Disable media fetching (note: this should almost always be disabled)",
   "does-your-kingdom-hall-use-a-program-called-obs-studio": "Does your Kingdom Hall use a program called OBS Studio?",
   "doing-so-will-greatly-simplify-and-facilitate-sharing-media-during-hybrid-meetings": "Doing so will greatly simplify and facilitate sharing media during hybrid meetings.",
   "download-status": "Download status",

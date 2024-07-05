@@ -11,6 +11,7 @@ export interface SettingsValues {
   congregationName: string;
   // disableAutoUpdate: boolean;
   darkMode: string;
+  disableMediaFetching: boolean;
   // enablePp: boolean;
   enableExtraCache: boolean;
   enableKeyboardShortcuts: boolean;
