@@ -3,7 +3,7 @@ import messages from 'src/i18n';
 import { createI18n } from 'vue-i18n';
 
 export type MessageLanguages = keyof typeof messages;
-export type MessageSchema = (typeof messages)['en-US'];
+export type MessageSchema = (typeof messages)['en'];
 
 /* eslint-disable @typescript-eslint/no-empty-interface */
 declare module 'vue-i18n' {
