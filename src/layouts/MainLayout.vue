@@ -233,7 +233,10 @@
                     <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
                       <q-card
                         @click="
-                          downloadAdditionalRemoteVideo(video.files);
+                          downloadAdditionalRemoteVideo(
+                            video.files,
+                            getBestImageUrl(video.images, 'md'),
+                          );
                           remoteVideoPopup = false;
                         "
                         class="text-white cursor-pointer"
@@ -587,7 +590,7 @@ jwStore.$subscribe((_, state) => {
 // Ref and reactive initializations
 const chooseSong = ref(false);
 const mediaSortForDay = ref(true);
-const { klawSync, openFileDialog, pathToFileURL, setAutoStartAtLogin } =
+const { fs, klawSync, openFileDialog, pathToFileURL, setAutoStartAtLogin } =
   electronApi;
 
 const { locale, t } = useI18n({ useScope: 'global' });
@@ -972,7 +975,6 @@ const calculateCacheSize = async () => {
         pathToFileURL(getParentDirectory(media.fileUrl)),
       ),
     ]);
-    console.log('mediaFileParentDirectories', mediaFileParentDirectories);
     for (const cacheDir of cacheDirs) {
       cacheFiles.value.push(
         ...klawSync(cacheDir, {
@@ -1007,8 +1009,7 @@ const deleteCacheFiles = (type: '' | 'all' | 'smart') => {
         : cacheFiles.value.map((f) => f.path);
     for (const filepath of filepathsToDelete) {
       try {
-        // fs.rmSync(filepath);
-        console.log('deleting', filepath);
+        fs.rmSync(filepath);
       } catch (error) {
         console.error(error);
       }

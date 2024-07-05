@@ -1,5 +1,11 @@
 <template>
-  <q-page @dragenter="dropActive" @dragover="dropActive" @dragstart="dropActive" @drop="dropEnd" padding>
+  <q-page
+    @dragenter="dropActive"
+    @dragover="dropActive"
+    @dragstart="dropActive"
+    @drop="dropEnd"
+    padding
+  >
     <q-banner
       class="bg-orange-9 text-white"
       inline-actions
@@ -325,7 +331,10 @@
               }}
             </div>
           </q-item-section>
-          <q-item-section side v-if="media.isAdditional">
+          <q-item-section
+            side
+            v-if="media.isAdditional && mediaPlayer.url !== media.fileUrl"
+          >
             <q-btn
               @click="mediaToDelete = media.uniqueId"
               color="negative"
@@ -336,14 +345,26 @@
           </q-item-section>
           <q-item-section side>
             <div class="row">
-              <div class="col" v-if="mediaPlayer.url !== media.fileUrl">
+              <div
+                class="col"
+                v-if="
+                  !(
+                    mediaPlayer.url === media.fileUrl ||
+                    mediaPlayer.url === media.streamUrl
+                  )
+                "
+              >
                 <template v-if="!media.markers || media.markers.length === 0">
                   <q-btn
                     :disable="
                       mediaPlayer.url !== '' && isVideo(mediaPlayer.url)
                     "
                     @click="
-                      mediaPlayer.url = media.fileUrl;
+                      mediaPlayer.url = fs.existsSync(
+                        fileUrlToPath(media.fileUrl),
+                      )
+                        ? media.fileUrl
+                        : media.streamUrl ?? media.fileUrl;
                       mediaPlayer.uniqueId = media.uniqueId;
                       mediaPlayer.subtitlesUrl = media.subtitlesUrl ?? '';
                     "
@@ -377,7 +398,11 @@
                               max: media.duration,
                             };
                             mediaPlayer.action = 'play';
-                            mediaPlayer.url = media.fileUrl;
+                            mediaPlayer.url = fs.existsSync(
+                              fileUrlToPath(media.fileUrl),
+                            )
+                              ? media.fileUrl
+                              : media.streamUrl ?? media.fileUrl;
                             mediaPlayer.uniqueId = media.uniqueId;
                             mediaPlayer.subtitlesUrl = media.subtitlesUrl ?? '';
                           "
@@ -407,7 +432,11 @@
                               10000 /
                               1000;
                             mediaPlayer.action = 'play';
-                            mediaPlayer.url = media.fileUrl;
+                            mediaPlayer.url = fs.existsSync(
+                              fileUrlToPath(media.fileUrl),
+                            )
+                              ? media.fileUrl
+                              : media.streamUrl ?? media.fileUrl;
                             mediaPlayer.uniqueId = media.uniqueId;
                             mediaPlayer.subtitlesUrl = media.subtitlesUrl ?? '';
                           "
@@ -493,7 +522,8 @@
           <q-item
             class="q-pa-none"
             v-if="
-              mediaPlayer.url === media.fileUrl &&
+              (mediaPlayer.url === media.fileUrl ||
+                mediaPlayer.url === media.streamUrl) &&
               (media.isVideo || media.isAudio)
             "
           >
@@ -598,7 +628,12 @@
               </strong>
             </p>
             <p>
-              {{ fileUrlToPath(sortableMediaItems.find((m) => m.uniqueId === mediaToDelete)?.fileUrl ?? '') }}
+              {{
+                fileUrlToPath(
+                  sortableMediaItems.find((m) => m.uniqueId === mediaToDelete)
+                    ?.fileUrl ?? '',
+                )
+              }}
             </p>
             <!-- {{ $t('question-mark') }} -->
           </span>
@@ -744,7 +779,7 @@ import { createTemporaryNotification } from 'src/helpers/notifications';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { useObsStateStore } from 'src/stores/obs-state';
-import { DownloadedFile, DynamicMediaObject } from 'src/types/media';
+import { DynamicMediaObject } from 'src/types/media';
 import { DocumentItem, TableItem } from 'src/types/sqlite';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -1118,15 +1153,21 @@ const copyToDatedAdditionalMedia = async (files: string[]) => {
 const addToAdditionMediaMapFromPath = async (
   additionalFilePath: string,
   uniqueId?: string,
+  stream?: {
+    duration: number;
+    thumbnailUrl: string;
+    url: string;
+  },
 ) => {
   try {
     if (!additionalFilePath) return;
     const isVideoFile = isVideo(additionalFilePath);
     const isAudioFile = isAudio(additionalFilePath);
     let duration = 0;
-
     if (isVideoFile || isAudioFile) {
-      duration = await getDurationFromMediaPath(additionalFilePath);
+      duration =
+        stream?.duration ??
+        (await getDurationFromMediaPath(additionalFilePath));
     }
     if (!uniqueId) {
       uniqueId = sanitizeId(
@@ -1144,7 +1185,10 @@ const addToAdditionMediaMapFromPath = async (
         isImage: isImage(additionalFilePath),
         isVideo: isVideoFile,
         section: 'additional',
-        thumbnailUrl: await getThumbnailUrl(additionalFilePath, true),
+        streamUrl: stream?.url,
+        thumbnailUrl:
+          stream?.thumbnailUrl ??
+          (await getThumbnailUrl(additionalFilePath, true)),
         title: path.basename(additionalFilePath),
         uniqueId,
       },
@@ -1413,12 +1457,17 @@ const getLocalFiles = async () => {
     });
 };
 
-const remoteVideoLoading = () => {
+const remoteVideoLoading = (event: CustomEventInit) => {
   additionalLoading.value = true;
+  addToAdditionMediaMapFromPath(event.detail.path, undefined, {
+    duration: event.detail.duration,
+    thumbnailUrl: event.detail.thumbnailUrl,
+    url: event.detail.url,
+  });
 };
 
-const remoteVideoLoaded = (event: CustomEventInit) => {
-  addToAdditionMediaMapFromPath((event.detail as DownloadedFile).path);
+const remoteVideoLoaded = () => {
+  // addToAdditionMediaMapFromPath((event.detail as DownloadedFile).path);
   additionalLoading.value = false;
 };
 

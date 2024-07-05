@@ -1207,13 +1207,9 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
 
 const downloadAdditionalRemoteVideo = async (
   mediaItemLinks: MediaItemsMediatorFile[],
+  thumbnailUrl?: string,
 ) => {
   try {
-    window.dispatchEvent(
-      new CustomEvent('remoteVideo-loading', {
-        detail: true,
-      }),
-    );
     const currentState = useCurrentStateStore();
     const { getDatedAdditionalMediaDirectory } = storeToRefs(currentState);
     const bestItem = findBestResolution(
@@ -1221,6 +1217,19 @@ const downloadAdditionalRemoteVideo = async (
     ) as MediaItemsMediatorFile;
     let downloadedFile: DownloadedFile = { path: '' };
     if (bestItem) {
+      window.dispatchEvent(
+        new CustomEvent('remoteVideo-loading', {
+          detail: {
+            duration: bestItem.duration,
+            path: path.join(
+              getDatedAdditionalMediaDirectory.value,
+              path.basename(bestItem.progressiveDownloadURL),
+            ),
+            thumbnailUrl: thumbnailUrl || '',
+            url: bestItem.progressiveDownloadURL,
+          },
+        }),
+      );
       downloadedFile = (await downloadFileIfNeeded({
         dir: getDatedAdditionalMediaDirectory.value,
         size: bestItem.filesize,
