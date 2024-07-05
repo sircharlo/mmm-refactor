@@ -42,7 +42,7 @@ import fs from 'fs-extra';
 import convert from 'heic-convert';
 import klawSync from 'klaw-sync';
 import { RenderParameters } from 'pdfjs-dist/types/src/display/api';
-import { debounce } from 'quasar';
+import { throttle } from 'quasar';
 import { FULL_HD } from 'src/helpers/converters';
 import { ScreenPreferences } from 'src/types/settings';
 import path from 'upath';
@@ -119,10 +119,12 @@ const setWindowPosition = (
         targetWindow.setBounds(newBounds);
       }
     } else {
-      targetWindow.setPosition(
-        targetScreenBounds.x + 50,
-        targetScreenBounds.y + 50,
-      );
+      if (
+        targetScreenNumber === currentMediaScreenNumber &&
+        targetWindow.isAlwaysOnTop()
+      )
+        return;
+      targetWindow.setPosition(targetScreenBounds.x, targetScreenBounds.y);
       if (!targetWindow.isAlwaysOnTop()) targetWindow.setAlwaysOnTop(true);
       if (!targetWindow.isFullScreen()) targetWindow.setFullScreen(true);
     }
@@ -164,14 +166,11 @@ const moveMediaWindow = (
     if (otherScreens.length > 0) {
       if (windowedMode === undefined)
         windowedMode = !mediaWindow.isFullScreen();
-      if (targetScreenNumber === undefined) {
+      const currentMediaScreenNumber = getWindowScreen(mediaWindow);
+      if (targetScreenNumber === undefined || otherScreens.length === 1) {
         targetScreenNumber = allScreens.findIndex((s) => !s.mainWindow);
         if (otherScreens.length > 1) {
-          const currentMediaScreenNumber = getWindowScreen(mediaWindow);
-          targetScreenNumber =
-            getWindowScreen(mainWindow) === currentMediaScreenNumber
-              ? 0
-              : currentMediaScreenNumber;
+          targetScreenNumber = currentMediaScreenNumber;
         }
       }
     } else {
@@ -184,9 +183,9 @@ const moveMediaWindow = (
   }
 };
 
-const moveMediaWindowDebounced = debounce(moveMediaWindow, 100);
+const moveMediaWindowThrottled = throttle(() => moveMediaWindow(), 100);
 
-getMainWindow()?.on('move', moveMediaWindowDebounced);
+getMainWindow()?.on('move', moveMediaWindowThrottled);
 
 window.addEventListener('beforeunload', () => {
   getMainWindow()?.removeAllListeners('move');
