@@ -533,7 +533,12 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
         lang: extractLang,
         mepsId: extract.RefMepsDocumentId,
         ...(extract.RefBeginParagraphOrdinal
-          ? { BeginParagraphOrdinal: extract.RefBeginParagraphOrdinal }
+          ? {
+              BeginParagraphOrdinal:
+                symbol === 'lmd' && extract.RefBeginParagraphOrdinal < 8
+                  ? 1 // Hack to show intro picture from the lmd brochure when appropriate
+                  : extract.RefBeginParagraphOrdinal,
+            }
           : {}),
         ...(extract.RefEndParagraphOrdinal
           ? { EndParagraphOrdinal: extract.RefEndParagraphOrdinal }
@@ -641,6 +646,7 @@ const dynamicMediaMapper = async (
       .filter((m) => m.FilePath)
       .map(async (m) => {
         m.FilePath = await convertImageIfNeeded(m.FilePath);
+        const fileUrl = getFileUrl(m.FilePath);
         const mediaIsSong = isSong(m);
         const thumbnailUrl = await getThumbnailUrl(
           m.ThumbnailFilePath || m.FilePath,
@@ -668,7 +674,7 @@ const dynamicMediaMapper = async (
         }
         return {
           duration: duration,
-          fileUrl: getFileUrl(m.FilePath),
+          fileUrl,
           isAdditional: !!additional,
           isAudio: audio,
           isImage: isImage(m.FilePath),
@@ -681,9 +687,7 @@ const dynamicMediaMapper = async (
           thumbnailUrl,
           title: mediaIsSong ? m.Label.replace(/^\d+\.\s*/, '') : m.Label,
           uniqueId: sanitizeId(
-            date.formatDate(lookupDate, 'YYYYMMDD') +
-              '-' +
-              getFileUrl(m.FilePath),
+            date.formatDate(lookupDate, 'YYYYMMDD') + '-' + fileUrl,
           ),
         } as DynamicMediaObject;
       });
