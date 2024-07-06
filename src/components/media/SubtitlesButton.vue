@@ -3,7 +3,7 @@
     @click="mediaPlayer.subtitlesVisible = !mediaPlayer.subtitlesVisible"
     class="q-ml-sm"
     flat
-    icon="mdi-subtitles"
+    icon="mdi-closed-caption"
     rounded
     v-if="currentSettings.enableSubtitles"
   >
