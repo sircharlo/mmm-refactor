@@ -933,9 +933,20 @@ const generateMediaList = () => {
     if (!mediaSort.value[currentCongregation.value]) {
       mediaSort.value[currentCongregation.value] = {};
     }
-    sortableMediaItems.value = combinedMediaItems.sort(
-      mapOrder(mediaSort.value[currentCongregation.value][selectedDate.value]),
-    );
+    const seenFileUrls = new Set();
+    sortableMediaItems.value = combinedMediaItems
+      .sort(
+        mapOrder(
+          mediaSort.value[currentCongregation.value][selectedDate.value],
+        ),
+      )
+      .filter((m) => {
+        if (!m.fileUrl || seenFileUrls.has(m.fileUrl)) {
+          return false;
+        }
+        seenFileUrls.add(m.fileUrl);
+        return true;
+      });
   }
 };
 
