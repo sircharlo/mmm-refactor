@@ -1,4 +1,3 @@
-import { PathLike } from 'fs';
 import { storeToRefs } from 'pinia';
 import { LocalStorage, date } from 'quasar';
 import { isInPast } from 'src/helpers/date';
@@ -6,7 +5,7 @@ import { electronApi } from 'src/helpers/electron-api';
 import { useJwStore } from 'src/stores/jw';
 import { DynamicMediaObject } from 'src/types/media';
 
-import { getAdditionalMediaPath } from './fs';
+import { getAdditionalMediaPath, removeEmptyDirs } from './fs';
 
 const { fileUrlToPath, fs, klawSync, path } = electronApi;
 
@@ -52,34 +51,6 @@ const cleanLocalStorage = () => {
     console.error(error);
   }
 };
-
-function isEmptyDir(directory: PathLike) {
-  try {
-    return fs.readdirSync(directory).length === 0;
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
-}
-function removeEmptyDirs(rootDir: string) {
-  try {
-    const dirs = klawSync(rootDir, {
-      depthLimit: -1,
-      nodir: false,
-      nofile: true,
-    })
-      .map((item) => item.path)
-      .sort((a, b) => b.length - a.length);
-    dirs.forEach((dir) => {
-      if (isEmptyDir(dir)) {
-        console.log(`Removing empty directory: ${dir}`);
-        fs.rmdirSync(dir);
-      }
-    });
-  } catch (error) {
-    console.error(error);
-  }
-}
 
 const cleanAdditionalMediaFolder = () => {
   try {

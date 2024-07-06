@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer';
+import { PathLike } from 'fs-extra';
 import { Item } from 'klaw-sync';
 import { storeToRefs } from 'pinia';
 import { FULL_HD } from 'src/helpers/converters';
@@ -245,6 +246,34 @@ const getSubtitlesUrl = async (
   }
 };
 
+const isEmptyDir = (directory: PathLike) => {
+  try {
+    return fs.readdirSync(directory).length === 0;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+const removeEmptyDirs = (rootDir: string) => {
+  try {
+    const dirs = klawSync(rootDir, {
+      depthLimit: -1,
+      nodir: false,
+      nofile: true,
+    })
+      .map((item) => item.path)
+      .sort((a, b) => b.length - a.length);
+    dirs.forEach((dir) => {
+      if (isEmptyDir(dir)) {
+        console.log(`Removing empty directory: ${dir}`);
+        fs.rmdirSync(dir);
+      }
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export {
   getAdditionalMediaPath,
   getDurationFromMediaPath,
@@ -256,4 +285,5 @@ export {
   getSubtitlesUrl,
   getTempDirectory,
   getThumbnailUrl,
+  removeEmptyDirs,
 };

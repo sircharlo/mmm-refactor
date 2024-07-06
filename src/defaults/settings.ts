@@ -206,16 +206,16 @@ export const settingsDefinitions: SettingsItems = {
     group: 'advanced',
     type: 'toggle',
   },
-  enableExtraCache: {
-    depends: 'enableMediaDisplayButton',
-    group: 'advanced',
-    type: 'toggle',
-  },
   langSubtitles: {
     depends: 'enableSubtitles',
     group: 'advanced',
     list: 'jwLanguages',
     type: 'list',
+  },
+  enableExtraCache: {
+    depends: 'enableMediaDisplayButton',
+    group: 'advanced',
+    type: 'toggle',
   },
   musicVolume: {
     depends: 'enableMusicButton',

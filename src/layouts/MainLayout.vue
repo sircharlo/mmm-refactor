@@ -496,6 +496,7 @@
 </template>
 
 <script setup lang="ts">
+import PQueue from 'p-queue';
 import { storeToRefs } from 'pinia';
 import prettyBytes from 'pretty-bytes';
 import { Dark, LocalStorage, date } from 'quasar';
@@ -519,6 +520,7 @@ import {
   getPublicationDirectory,
   getPublicationsPath,
   getTempDirectory,
+  removeEmptyDirs,
 } from 'src/helpers/fs';
 import {
   downloadAdditionalRemoteVideo,
@@ -692,10 +694,14 @@ watch(
     currentSettings.value?.lang,
     currentSettings.value?.langFallback,
     currentSettings.value?.langSubtitles,
+    currentSettings.value?.enableSubtitles,
     currentSettings.value?.mwDay,
     currentSettings.value?.weDay,
   ],
-  ([newCurrentCongregation, , , , ,], [oldCurrentCongregation, , , , ,]) => {
+  (
+    [newCurrentCongregation, , , , , ,],
+    [oldCurrentCongregation, , , , , ,],
+  ) => {
     if (newCurrentCongregation === oldCurrentCongregation)
       updateLookupPeriod(true);
   },
@@ -817,6 +823,7 @@ const confirmDeleteCacheFiles = (type: 'all' | 'smart') => {
 const cancelDeleteCacheFiles = () => {
   cacheClearType.value = '';
   cacheClearConfirmPopup.value = false;
+  deletingCacheFiles.value = false;
 };
 
 const frequentlyUsedDirectories = computed(() => {
@@ -1015,7 +1022,13 @@ const deleteCacheFiles = (type: '' | 'all' | 'smart') => {
       }
       additionalMediaMaps.value = {};
     }
-    deletingCacheFiles.value = true;
+    for (const untouchableDirectory of untouchableDirectories.value) {
+      removeEmptyDirs(untouchableDirectory);
+    }
+    queues.downloads[currentCongregation.value]?.clear();
+    queues.downloads[currentCongregation.value] = new PQueue({
+      concurrency: 5,
+    });
     cancelDeleteCacheFiles();
   } catch (error) {
     console.error(error);
@@ -1143,9 +1156,9 @@ const getEventDayColor = (eventDate: string) => {
     if (!isLoaded) return 'warning';
   } catch (error) {
     console.error(error);
-  } finally {
-    return 'primary';
+    return 'warning';
   }
+  return 'primary';
 };
 
 onMounted(() => {
