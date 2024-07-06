@@ -41,6 +41,7 @@ function createMediaWindow() {
     // roundedCorners: windowOpts.fullscreen,
     fullscreen: false,
     height: 720,
+    icon: path.resolve(path.join(__dirname, 'icons', 'media-player.png')),
     minHeight: 110,
     minWidth: 195,
     show: false,
@@ -113,7 +114,6 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     backgroundColor: 'grey',
     height: 600,
-    // icon: path.resolve(__dirname, 'icons/icon.png'), // tray icon
     show: false,
     useContentSize: true,
     webPreferences: {
