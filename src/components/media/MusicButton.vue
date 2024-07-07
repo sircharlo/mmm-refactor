@@ -192,10 +192,13 @@ watch(
   ([newToday, newMeeting]) => {
     try {
       meetingDay.value = !!newToday && !!newMeeting;
+      const timeBeforeMeetingStart =
+        (remainingTimeBeforeMeetingStart() as number) ?? 0;
       if (
         currentSettings.value?.enableMusicButton &&
         currentSettings.value?.autoStartMusic &&
-        meetingDay.value
+        meetingDay.value &&
+        timeBeforeMeetingStart > 90
       ) {
         playMusic();
       }
