@@ -1,5 +1,6 @@
 <template>
   <q-btn
+    :disable="obsConnectionState !== 'connected'"
     @click="scenePicker = true"
     class="q-ml-sm"
     flat
