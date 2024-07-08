@@ -23,7 +23,7 @@
     "axios": "^1.7.2",
     "better-sqlite3": "^11.1.2",
     "decompress": "^4.2.1",
-    "dompurify": "^3.1.5",
+    "dompurify": "^3.1.6",
     "electron-updater": "^6.2.1",
     "fs-extra": "^11.2.0",
     "heic-convert": "^2.1.0",
