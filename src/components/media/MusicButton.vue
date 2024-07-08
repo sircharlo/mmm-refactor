@@ -134,6 +134,41 @@ const getNextSongUrl = () => {
   }
 };
 
+/**
+ * Calculates the remaining time before the meeting starts based on the selected meeting day and start time settings.
+ *
+ * @return {string|null} The remaining time in hours and minutes, optionally formatted, or null if there is no meeting day selected.
+ */
+ const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
+  try {
+    if (meetingDay.value) {
+      const now = new Date();
+      const weMeeting = selectedDateObject.value?.meeting === 'we';
+      const meetingStartTime = weMeeting
+        ? currentSettings.value?.weStartTime
+        : currentSettings.value?.mwStartTime;
+      const [hours, minutes] = meetingStartTime.split(':').map(Number);
+      const meetingStartDateTime = new Date(now);
+      meetingStartDateTime.setHours(hours, minutes, 0, 0);
+      const dateDiff = date.getDateDiff(meetingStartDateTime, now, 'seconds');
+      if (dateDiff < 0) {
+        return null;
+      } else {
+        if (formatted) {
+          return formatTime(dateDiff);
+        } else {
+          return dateDiff;
+        }
+      }
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
 function playMusic() {
   try {
     if (!currentSettings.value?.enableMusicButton || musicPlaying.value) return;
@@ -208,41 +243,6 @@ watch(
   },
   { immediate: true },
 );
-
-/**
- * Calculates the remaining time before the meeting starts based on the selected meeting day and start time settings.
- *
- * @return {string|null} The remaining time in hours and minutes, optionally formatted, or null if there is no meeting day selected.
- */
-const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
-  try {
-    if (meetingDay.value) {
-      const now = new Date();
-      const weMeeting = selectedDateObject.value?.meeting === 'we';
-      const meetingStartTime = weMeeting
-        ? currentSettings.value?.weStartTime
-        : currentSettings.value?.mwStartTime;
-      const [hours, minutes] = meetingStartTime.split(':').map(Number);
-      const meetingStartDateTime = new Date(now);
-      meetingStartDateTime.setHours(hours, minutes, 0, 0);
-      const dateDiff = date.getDateDiff(meetingStartDateTime, now, 'seconds');
-      if (dateDiff < 0) {
-        return null;
-      } else {
-        if (formatted) {
-          return formatTime(dateDiff);
-        } else {
-          return dateDiff;
-        }
-      }
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-};
 
 const musicRemainingTime = computed(() => {
   try {
