@@ -101,7 +101,7 @@ const handleKeyPress = (event: KeyboardEvent) => {
     if (shiftKey) keys.push('Shift');
     if (altKey) keys.push('Alt');
     if (metaKey) keys.push('Meta');
-    if (key.length < 3 && keys.length > 0) {
+    if (key?.length < 3 && keys.length > 0) {
       keys.push(key);
       localValue.value = keys.join('+');
     }
