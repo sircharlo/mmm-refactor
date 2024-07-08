@@ -34,6 +34,7 @@ const getScreens = () =>
 const getAllScreens = () => {
   const displays = getScreens();
   const mainWindow = getMainWindow();
+  const mediaWindow = getMediaWindow();
   if (mainWindow) {
     try {
       const mainWindowScreen = displays.find(
@@ -45,7 +46,21 @@ const getAllScreens = () => {
       console.error(err);
     }
   }
-  return displays as ({ mainWindow?: boolean } & Electron.Display)[];
+  if (mediaWindow) {
+    try {
+      const mediaWindowScreen = displays.find(
+        (display) =>
+          display.id === screen.getDisplayMatching(mediaWindow.getBounds()).id,
+      ) as { mediaWindow?: boolean } & Electron.Display;
+      if (mediaWindowScreen) mediaWindowScreen.mediaWindow = true;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  return displays as ({
+    mainWindow?: boolean;
+    mediaWindow?: boolean;
+  } & Electron.Display)[];
 };
 
 const getWindowScreen = (window: Electron.BrowserWindow) => {
@@ -70,15 +85,18 @@ const setWindowPosition = (
     const targetScreenBounds = targetScreen.bounds;
     if (!targetScreenBounds) return;
     if (windowedMode) {
-      if (targetWindow.isAlwaysOnTop()) targetWindow.setAlwaysOnTop(false);
-      if (targetWindow.isFullScreen()) targetWindow.setFullScreen(false);
-      if (targetScreenNumber === currentMediaScreenNumber) return;
       const newBounds = {
         height: 720,
         width: 1280,
         x: targetScreenBounds.x + 50,
         y: targetScreenBounds.y + 50,
       };
+      if (targetWindow.isAlwaysOnTop() || targetWindow.isFullScreen()) {
+        targetWindow.setAlwaysOnTop(false);
+        targetWindow.setFullScreen(false);
+        targetWindow.setBounds(newBounds);
+      }
+      if (targetScreenNumber === currentMediaScreenNumber) return;
       const currentBounds = targetWindow.getBounds();
       if (
         currentBounds.height !== newBounds.height ||
@@ -110,9 +128,9 @@ const setWindowPosition = (
 };
 
 const moveMediaWindow = (
-  targetScreenNumber = 0,
-  windowedMode = false,
-  noEvent = false,
+  targetScreenNumber?: number,
+  windowedMode?: boolean,
+  noEvent?: boolean,
 ) => {
   try {
     const allScreens = getAllScreens();
@@ -136,11 +154,15 @@ const moveMediaWindow = (
     if (otherScreens.length > 0) {
       if (windowedMode === undefined)
         windowedMode = !mediaWindow.isFullScreen();
-      const currentMediaScreenNumber = getWindowScreen(mediaWindow);
-      if (targetScreenNumber === undefined || otherScreens.length === 1) {
-        targetScreenNumber = allScreens.findIndex((s) => !s.mainWindow);
-        if (otherScreens.length > 1) {
-          targetScreenNumber = currentMediaScreenNumber;
+      if (targetScreenNumber === undefined || otherScreens.length >= 1) {
+        if (otherScreens.length === 1) {
+          targetScreenNumber = allScreens.findIndex((s) => !s.mainWindow);
+        } else {
+          const mainWindowScreen = allScreens.findIndex((s) => s.mainWindow);
+          targetScreenNumber =
+            targetScreenNumber !== mainWindowScreen
+              ? targetScreenNumber
+              : allScreens.findIndex((s) => !s.mainWindow);
         }
       }
     } else {
@@ -148,6 +170,7 @@ const moveMediaWindow = (
       windowedMode = true;
     }
     setWindowPosition(mediaWindow, targetScreenNumber, windowedMode, noEvent);
+    window.dispatchEvent(new CustomEvent('screen-trigger-update'));
   } catch (err) {
     console.error(err);
   }

@@ -40,66 +40,66 @@
             }}
           </div>
         </q-card-section>
-        <q-separator />
-        <q-card-section class="q-pb-none">
-          <template :key="screen.id" v-for="(screen, index) in screenList">
+        <template v-if="screenList.length > 1">
+          <q-separator />
+          <q-card-section>
             <q-btn
               :color="
-                screenList.length < 2 ||
-                screenPreferences.preferredScreenNumber === index
+                screenList.length >= 2 && !screenPreferences.preferWindowed
                   ? 'primary'
                   : ''
               "
-              :disable="screenList.length < 2 || screen.mainWindow"
-              :icon="
-                screen.mainWindow
-                  ? 'mdi-monitor-dashboard'
-                  : screenPreferences.preferredScreenNumber === index
-                    ? 'mdi-monitor-shimmer'
-                    : 'mdi-monitor'
-              "
+              :disable="screenList.length < 2"
               :text-color="
-                screenList.length < 2 ||
-                screenPreferences.preferredScreenNumber === index
+                screenList.length >= 2 && !screenPreferences.preferWindowed
                   ? ''
                   : 'primary'
               "
-              @click="screenPreferences.preferredScreenNumber = index"
-            />
+              @click="screenPreferences.preferWindowed = false"
+              icon="mdi-overscan"
+              ><q-tooltip>{{ $t('full-screen') }}</q-tooltip></q-btn
+            >
+            <q-btn
+              :color="
+                screenList.length < 2 || screenPreferences.preferWindowed
+                  ? 'primary'
+                  : ''
+              "
+              :disable="screenList.length < 2"
+              :text-color="
+                screenList.length < 2 || screenPreferences.preferWindowed
+                  ? ''
+                  : 'primary'
+              "
+              @click="screenPreferences.preferWindowed = true"
+              icon="mdi-window-restore"
+              ><q-tooltip>{{ $t('windowed') }}</q-tooltip></q-btn
+            >
+          </q-card-section>
+          <template
+            v-if="!screenPreferences.preferWindowed && screenList.length > 2"
+          >
+            <q-separator />
+            <q-card-section>
+              <template :key="screen.id" v-for="(screen, index) in screenList">
+                <q-btn
+                  :color="screen.mediaWindow ? 'primary' : ''"
+                  :disable="screen.mainWindow"
+                  :icon="
+                    screen.mainWindow
+                      ? 'mdi-desktop-tower-monitor'
+                      : screen.mediaWindow
+                        ? 'mdi-television-play'
+                        : 'mdi-television'
+                  "
+                  :text-color="screen.mediaWindow ? '' : 'primary'"
+                  @click="screenPreferences.preferredScreenNumber = index"
+                />
+              </template>
+            </q-card-section>
           </template>
-        </q-card-section>
-        <q-card-section>
-          <q-btn
-            :color="
-              screenList.length < 2 || screenPreferences.preferWindowed
-                ? 'primary'
-                : ''
-            "
-            :disable="screenList.length < 2"
-            :text-color="
-              screenList.length < 2 || screenPreferences.preferWindowed
-                ? ''
-                : 'primary'
-            "
-            @click="screenPreferences.preferWindowed = true"
-            icon="mdi-window-restore"
-          />
-          <q-btn
-            :color="
-              screenList.length >= 2 && !screenPreferences.preferWindowed
-                ? 'primary'
-                : ''
-            "
-            :disable="screenList.length < 2"
-            :text-color="
-              screenList.length >= 2 && !screenPreferences.preferWindowed
-                ? ''
-                : 'primary'
-            "
-            @click="screenPreferences.preferWindowed = false"
-            icon="mdi-overscan"
-          />
-        </q-card-section>
+        </template>
+        <q-separator />
         <q-card-section>
           <q-btn
             :color="mediaPlayer.customBackground ? 'negative' : 'primary'"
@@ -328,18 +328,12 @@ watch(
   () => screenPreferences.value,
   (newScreenPreferences) => {
     try {
-      console.log('newScreenPreferences', newScreenPreferences);
-      console.log(
-        'moveMediaWindow',
-        newScreenPreferences.preferredScreenNumber,
-        newScreenPreferences.preferWindowed,
-        true,
-      );
       moveMediaWindow(
         newScreenPreferences.preferredScreenNumber,
         newScreenPreferences.preferWindowed,
         true,
       );
+      screenList.value = getAllScreens();
     } catch (error) {
       console.error(error);
     }
@@ -357,11 +351,21 @@ const windowScreenListener = (event: CustomEventInit) => {
   }
 };
 
+const updateScreenMetrics = () => {
+  try {
+    screenList.value = getAllScreens();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 onMounted(() => {
   window.addEventListener('windowScreen-update', windowScreenListener);
+  window.addEventListener('screen-trigger-update', updateScreenMetrics);
 });
 
 onUnmounted(() => {
   window.removeEventListener('windowScreen-update', windowScreenListener);
+  window.removeEventListener('screen-trigger-update', updateScreenMetrics);
 });
 </script>

@@ -843,7 +843,6 @@ watch(
   () => mediaPlayer.value?.uniqueId,
   (newMediaUniqueId) => {
     for (const key of Object.keys(panzooms)) {
-      console.log(key, newMediaUniqueId);
       if (key !== newMediaUniqueId) zoomReset(key, true);
     }
   },
@@ -1045,7 +1044,7 @@ watch(
       ?.filter((d) => d.error)
       .map((d) => date.formatDate(d.date, 'YYYY/MM/DD')),
   (newVal) => {
-    console.log('RECALCULATING ERRORS', newVal);
+    console.error('RECALCULATING ERRORS', newVal);
     for (const date of newVal) {
       createTemporaryNotification({
         caption: !currentSettings.value?.langFallback

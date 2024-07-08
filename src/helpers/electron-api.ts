@@ -18,7 +18,7 @@ export interface ElectronApi {
   fs: typeof import('fs-extra');
   getAllScreens: (
     type?: string,
-  ) => ({ mainWindow?: boolean } & Electron.Display)[];
+  ) => ({ mainWindow?: boolean; mediaWindow?: boolean } & Electron.Display)[];
   getAppDataPath: () => string;
   getUserDataPath: () => string;
   klawSync: typeof import('klaw-sync');

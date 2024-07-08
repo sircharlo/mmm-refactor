@@ -7,10 +7,10 @@ const { registerShortcut, unregisterShortcut } = electronApi;
 
 const shortcutCallbacks: Partial<Record<keyof SettingsValues, () => void>> = {
   shortcutMediaNext: () => {
-    console.log('shortcutMediaNext');
+    console.debug('shortcutMediaNext');
   },
   shortcutMediaPrevious: () => {
-    console.log('shortcutMediaPrevious');
+    console.debug('shortcutMediaPrevious');
   },
   shortcutMediaWindow: () => {
     const currentState = useCurrentStateStore();
