@@ -57,7 +57,7 @@
                     : 'primary'
                 "
                 :label="mediaScene?.sceneName as string"
-                @click="setObsSceneByUuid(mediaScene?.sceneUuid as string)"
+                @click="setObsScene(undefined, mediaScene?.sceneUuid as string)"
                 class="q-py-md q-px-lg full-width"
                 size="1.5em"
               />
@@ -93,7 +93,7 @@
                         : 'primary'
                   "
                   :label="scene?.sceneName as string"
-                  @click="setObsSceneByUuid(scene?.sceneUuid as string)"
+                  @click="setObsScene(undefined, scene?.sceneUuid as string)"
                   class="q-py-md q-px-lg full-width"
                   size="1.5em"
                 />
@@ -188,27 +188,28 @@ const obsConnect = async (setup?: boolean) => {
   }
 };
 
-const setObsScene = async (scene: string) => {
+const setObsScene = async (scene: string | undefined, sceneUuid?: string) => {
   try {
     if (obsConnectionState.value !== 'connected') await obsConnect();
     if (obsConnectionState.value !== 'connected') return;
-    const mediaScene = currentSettings.value?.obsMediaScene as string;
-    const imageScene = currentSettings.value?.obsImageScene as string;
-    const cameraScene = currentSettings.value?.obsCameraScene as string;
-    let programScene = mediaScene;
-    if (isImage(mediaPlayer.value.url) && imageScene) programScene = imageScene;
-    currentScene.value = scene;
-    const sceneUuid = scene === 'camera' ? cameraScene : programScene;
-    if (sceneUuid) obsWebSocket?.call('SetCurrentProgramScene', { sceneUuid });
+    let newProgramScene: string | undefined = sceneUuid;
+    if (!sceneUuid && scene) {
+      const mediaScene = currentSettings.value?.obsMediaScene as string;
+      const imageScene = currentSettings.value?.obsImageScene as string;
+      const cameraScene = currentSettings.value?.obsCameraScene as string;
+      newProgramScene = mediaScene;
+      if (isImage(mediaPlayer.value.url) && imageScene)
+        newProgramScene = imageScene;
+      currentScene.value = scene;
+      if (scene === 'camera') newProgramScene = cameraScene;
+    }
+    if (newProgramScene) {
+      obsWebSocket?.call('SetCurrentProgramScene', {
+        sceneUuid: newProgramScene,
+      });
+    }
   } catch (error) {
     console.error(error);
-  }
-};
-
-const setObsSceneByUuid = async (sceneUuid: string) => {
-  if (obsConnectionState.value !== 'connected') await obsConnect();
-  if (sceneUuid) {
-    obsWebSocket?.call('SetCurrentProgramScene', { sceneUuid });
   }
 };
 
@@ -236,10 +237,14 @@ onMounted(() => {
     obsWebSocket.on('Identified', async () => {
       obsConnectionState.value = 'connected';
       obsMessage.value = 'obs.connected';
-      const sceneList = await obsWebSocket?.call('GetSceneList');
-      if (sceneList) {
-        scenes.value = sceneList.scenes.reverse();
-        currentSceneUuid.value = sceneList.currentProgramSceneUuid;
+      try {
+        const sceneList = await obsWebSocket?.call('GetSceneList');
+        if (sceneList) {
+          scenes.value = sceneList.scenes.reverse();
+          currentSceneUuid.value = sceneList.currentProgramSceneUuid;
+        }
+      } catch (error) {
+        console.error(error);
       }
     });
     obsWebSocket.on('SceneListChanged', (data) => {
