@@ -1353,6 +1353,12 @@ const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
       }
     }
     for (const mediaLink of filteredMediaItemLinks) {
+      if (
+        !path
+          ?.extname(mediaLink?.file?.url)
+          ?.includes(publication?.fileformat?.toLowerCase())
+      )
+        continue; // This file is not of the right format; API glitch!
       downloadFileIfNeeded({
         dir,
         lowPriority: true,
