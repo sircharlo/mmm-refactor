@@ -17,11 +17,7 @@
       </template>
       {{ $t('noDateSelected') }}
     </q-banner>
-    <q-list
-      class="shadow-5 rounded-borders"
-      ref="mediaList"
-      v-else-if="selectedDate && currentCongregation"
-    >
+    <q-list class="shadow-5 rounded-borders" ref="mediaList">
       <template v-if="additionalLoading">
         <q-item class="meeting-section meeting-section-skeleton">
           <q-item-section avatar class="q-pr-none">
@@ -44,14 +40,18 @@
         class="bg-orange-9 text-white"
         inline-actions
         rounded
-        v-if="sortableMediaItems.length === 0 && !selectedDateObject.loading"
+        v-if="
+          sortableMediaItems.length === 0 &&
+          selectedDate &&
+          !selectedDateObject?.loading
+        "
       >
         <template v-slot:avatar>
           <q-icon name="mdi-exclamation-thick" />
         </template>
         {{ $t('noMedia') }}
       </q-banner>
-      <template v-else-if="selectedDateObject.loading">
+      <template v-else-if="selectedDateObject?.loading">
         <template :key="i" v-for="i in 5">
           <q-item class="meeting-section meeting-section-skeleton">
             <q-item-section avatar class="q-pr-none">
@@ -97,7 +97,6 @@
               ? 'meeting-section-end meeting-section-end-' + media.section
               : '')
           "
-          draggable="false"
         >
           <q-item-section class="q-pr-none" side>
             <div
@@ -545,10 +544,6 @@
           </q-item>
         </transition>
       </template>
-      <!-- <q-inner-loading
-        :label="$t('please-wait-downloading-media-for-this-day')"
-        :showing="!selectedDateObject || selectedDateObject?.loading"
-      /> -->
     </q-list>
     <q-dialog persistent v-model="mediaStopPending">
       <q-card>
@@ -588,35 +583,8 @@
             </div>
           </div>
         </q-card-section>
-        <!-- <q-card-section class="row items-center">
-          <q-card-section>
-            <div class="row self-center">
-              <q-avatar
-                class="q-mr-md self-center"
-                color="negative"
-                icon="mdi-alert"
-                text-color="white"
-              />
-              <span class="text-h6 self-center">
-                {{ $t('are-you-sure') }}
-              </span>
-              <q-space />
-              <div class="text-h6 self-center">
-                <q-btn
-                  @click="mediaToDelete = ''"
-                  dense
-                  flat
-                  icon="close"
-                  round
-                  v-close-popup
-                />
-              </div>
-            </div>
-          </q-card-section> -->
         <q-card-section>
-          <!-- <q-avatar color="negative" icon="mdi-alert" text-color="white" /> -->
           <span class="q-ml-sm">
-            <!-- {{ $t('are-you-sure-you-want-to-delete') }} -->
             <p>
               <strong>
                 {{
@@ -633,7 +601,6 @@
                 )
               }}
             </p>
-            <!-- {{ $t('question-mark') }} -->
           </span>
         </q-card-section>
         <q-card-actions align="right" class="text-primary">
@@ -730,9 +697,8 @@ import {
   multiDrag,
   parents,
   selections,
-  updateConfig,
 } from '@formkit/drag-and-drop';
-import { dragAndDrop } from '@formkit/drag-and-drop/vue';
+import { useDragAndDrop } from '@formkit/drag-and-drop/vue';
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { Buffer } from 'buffer';
 import DOMPurify from 'dompurify';
@@ -895,8 +861,6 @@ const initiatePanzoom = (elemId: string) => {
   }
 };
 
-const mediaList = ref();
-const sortableMediaItems = ref([] as DynamicMediaObject[]);
 const datedAdditionalMediaMap = computed(() => {
   return (
     additionalMediaMaps.value[currentCongregation.value]?.[
@@ -923,6 +887,44 @@ const mapOrder =
       return 0;
     }
   };
+
+const updateMediaSortPlugin: DNDPlugin = (parent) => {
+  const parentData = parents.get(parent);
+  if (!parentData) return;
+
+  function dragend() {
+    if (!mediaSort.value[currentCongregation.value])
+      mediaSort.value[currentCongregation.value] = {};
+    mediaSort.value[currentCongregation.value][selectedDate.value] =
+      sortableMediaItems.value.map((item: DynamicMediaObject) => item.uniqueId);
+  }
+
+  return {
+    setupNode(data) {
+      data.node.addEventListener('dragend', dragend);
+    },
+    tearDownNode(data) {
+      data.node.removeEventListener('dragend', dragend);
+    },
+  };
+};
+
+const [mediaList, sortableMediaItems] = useDragAndDrop(
+  [] as DynamicMediaObject[],
+  {
+    plugins: [
+      updateMediaSortPlugin,
+      animations(),
+      multiDrag({
+        plugins: [
+          selections({
+            selectedClass: 'bg-blue-2 text-grey-10',
+          }),
+        ],
+      }),
+    ],
+  },
+);
 
 const generateMediaList = () => {
   const combinedMediaItems = datedAdditionalMediaMap.value.concat(
@@ -991,50 +993,12 @@ watch(
   { immediate: true },
 );
 
-const updateMediaSortPlugin: DNDPlugin = (parent) => {
-  const parentData = parents.get(parent);
-  if (!parentData) return;
-
-  function dragend() {
-    if (!mediaSort.value[currentCongregation.value])
-      mediaSort.value[currentCongregation.value] = {};
-    mediaSort.value[currentCongregation.value][selectedDate.value] =
-      sortableMediaItems.value.map((item: DynamicMediaObject) => item.uniqueId);
-  }
-
-  return {
-    setupNode(data) {
-      data.node.addEventListener('dragend', dragend);
-    },
-    tearDownNode(data) {
-      data.node.removeEventListener('dragend', dragend);
-    },
-  };
-};
-
-dragAndDrop({
-  parent: mediaList,
-  plugins: [
-    updateMediaSortPlugin,
-    animations(),
-    multiDrag({
-      plugins: [
-        selections({
-          selectedClass: 'bg-blue-2 text-grey-10',
-        }),
-      ],
-    }),
-  ],
-  values: sortableMediaItems,
-});
-
 watch(
   () => [mediaPlaying.value, mediaPaused.value],
   ([newMediaPlaying, newMediaPaused]) => {
     sendObsSceneEvent(
       newMediaPaused ? 'camera' : newMediaPlaying ? 'media' : 'camera',
     );
-    updateConfig(mediaList.value, { disabled: !!newMediaPlaying });
   },
 );
 
@@ -1065,7 +1029,10 @@ onMounted(async () => {
 
   watch(selectedDate, (newVal) => {
     try {
-      if (!currentCongregation.value || !newVal) return;
+      if (!currentCongregation.value || !newVal) {
+        sortableMediaItems.value = [];
+        return;
+      }
       const durations = (customDurations.value[currentCongregation.value] ||=
         {});
       durations[newVal] ||= {};
