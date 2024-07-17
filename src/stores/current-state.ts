@@ -120,11 +120,11 @@ export const useCurrentStateStore = defineStore('current-state', {
     },
     mediaPaused(state) {
       return (
-        state.mediaPlayer?.url !== '' && state.mediaPlayer?.action === 'pause'
+        state.mediaPlayingUrl !== '' && state.mediaPlayingAction === 'pause'
       );
     },
     mediaPlaying(state) {
-      return state.mediaPlayer?.url !== '';
+      return state.mediaPlayingUrl !== '';
     },
     selectedDateObject(state) {
       const jwStore = useJwStore();
@@ -146,20 +146,15 @@ export const useCurrentStateStore = defineStore('current-state', {
       extractedFiles: {} as {
         [key: string]: Promise<string>;
       },
-      mediaPlayer: {
-        action: '',
-        currentPosition: 0,
-        customBackground: '',
-        scale: 1,
-        seekTo: 0,
-        subtitlesUrl: '',
-        subtitlesVisible: false,
-        uniqueId: '',
-        url: '',
-        windowVisible: true,
-        x: 0,
-        y: 0,
-      },
+      mediaPlayingAction: '',
+      mediaPlayingCurrentPosition: 0,
+      mediaPlayingSeekTo: 0,
+      mediaPlayingSubtitlesUrl: '',
+      mediaPlayingSubtitlesVisible: false,
+      mediaPlayingUniqueId: '',
+      mediaPlayingUrl: '',
+      mediaWindowCustomBackground: '',
+      mediaWindowVisible: true,
       online: true,
       onlyShowInvalidSettings: false,
       selectedDate: date.formatDate(new Date(), 'YYYY/MM/DD') as string,

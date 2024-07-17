@@ -1,13 +1,12 @@
 <template>
-  <!-- :color="mediaPlayer.windowVisible ? '' : 'red-5'" -->
   <q-btn
+    :color="!mediaWindowVisible ? 'negative' : 'white-transparent'"
     :disable="!!disabled"
-    :flat="!disabled"
-    :icon="mediaPlayer.windowVisible ? 'mdi-television' : 'mdi-television-off'"
+    :icon="mediaWindowVisible ? 'mdi-television' : 'mdi-television-off'"
     :outline="!!disabled"
-    @click="mediaDisplayPopup = false"
-    class="q-ml-sm"
+    class="super-rounded"
     rounded
+    unelevated
     v-if="currentSettings?.enableMediaDisplayButton"
   >
     <q-tooltip
@@ -18,126 +17,179 @@
       {{ $t('media-display') }}
     </q-tooltip>
     <q-popup-proxy
-      anchor="bottom right"
-      self="top right"
+      :offset="[0, 28]"
+      @before-hide="mediaDisplayPopup = false"
+      @before-show="mediaDisplayPopup = true"
+      anchor="top middle"
+      class="round-card"
+      flat
+      self="bottom middle"
       v-if="!disabled"
-      v-model="mediaDisplayPopup"
     >
-      <q-card class="non-selectable">
+      <q-card class="non-selectable" flat style="min-width: 50vw">
         <q-card-section>
-          <div class="text-overline">{{ $t('media-display') }}</div>
-          <div class="text-h5 text-primary" v-if="mediaPlayer.windowVisible">
-            {{ $t('projecting') }}
+          <div class="card-title">
+            {{ $t('media-display-settings') }}
           </div>
-          <div class="text-h5 text-negative" v-else>{{ $t('inactive') }}</div>
-          <div class="text-caption text-grey">
-            {{
-              $t(
-                screenList.length < 2 || screenPreferences.preferWindowed
-                  ? 'windowed'
-                  : 'external-screen',
-              )
-            }}
-          </div>
-        </q-card-section>
-        <template v-if="screenList.length > 1">
-          <q-separator />
-          <q-card-section>
-            <q-btn
-              :color="
-                screenList.length >= 2 && !screenPreferences.preferWindowed
-                  ? 'primary'
-                  : ''
-              "
-              :disable="screenList.length < 2"
-              :text-color="
-                screenList.length >= 2 && !screenPreferences.preferWindowed
-                  ? ''
-                  : 'primary'
-              "
-              @click="screenPreferences.preferWindowed = false"
-              icon="mdi-overscan"
-              ><q-tooltip>{{ $t('full-screen') }}</q-tooltip></q-btn
+          <template v-if="screenList.length > 1">
+            <template
+              v-if="!screenPreferences.preferWindowed && screenList.length > 2"
             >
-            <q-btn
-              :color="
-                screenList.length < 2 || screenPreferences.preferWindowed
-                  ? 'primary'
-                  : ''
-              "
-              :disable="screenList.length < 2"
-              :text-color="
-                screenList.length < 2 || screenPreferences.preferWindowed
-                  ? ''
-                  : 'primary'
-              "
-              @click="screenPreferences.preferWindowed = true"
-              icon="mdi-window-restore"
-              ><q-tooltip>{{ $t('windowed') }}</q-tooltip></q-btn
-            >
-          </q-card-section>
-          <template
-            v-if="!screenPreferences.preferWindowed && screenList.length > 2"
-          >
-            <q-separator />
-            <q-card-section>
-              <template :key="screen.id" v-for="(screen, index) in screenList">
+              <div>
+                <p class="card-section-title text-dark-grey">
+                  {{ $t('display') }}
+                </p>
+              </div>
+              <div class="row items-center q-col-gutter-sm q-mb-md">
+                <template
+                  :key="screen.id"
+                  v-for="(screen, index) in screenList"
+                >
+                  <div class="col">
+                    <q-btn
+                      :disable="screen.mainWindow"
+                      :outline="screen.mainWindow || !screen.mediaWindow"
+                      @click="screenPreferences.preferredScreenNumber = index"
+                      class="full-width"
+                      color="primary"
+                    >
+                      <q-icon
+                        :name="
+                          screen.mainWindow
+                            ? 'fas fa-computer'
+                            : screen.mediaWindow
+                              ? 'mdi-television-play'
+                              : 'mdi-television'
+                        "
+                        class="q-mr-sm"
+                        size="xs"
+                      />
+                      {{
+                        screen.mainWindow
+                          ? $t('current')
+                          : $t('display') + ' ' + (index + 1)
+                      }}
+                    </q-btn>
+                  </div>
+                </template>
+              </div>
+              <q-separator class="bg-accent-200 q-mb-md" />
+            </template>
+            <div>
+              <p class="card-section-title text-dark-grey">
+                {{ $t('window-type') }}
+              </p>
+            </div>
+            <div class="row items-center q-col-gutter-sm q-mb-md">
+              <div class="col-6">
                 <q-btn
-                  :color="screen.mediaWindow ? 'primary' : ''"
-                  :disable="screen.mainWindow"
-                  :icon="
-                    screen.mainWindow
-                      ? 'mdi-desktop-tower-monitor'
-                      : screen.mediaWindow
-                        ? 'mdi-television-play'
-                        : 'mdi-television'
+                  :disable="screenList.length < 2"
+                  :outline="
+                    screenList.length < 2 || screenPreferences.preferWindowed
                   "
-                  :text-color="screen.mediaWindow ? '' : 'primary'"
-                  @click="screenPreferences.preferredScreenNumber = index"
-                />
-              </template>
-            </q-card-section>
+                  @click="screenPreferences.preferWindowed = false"
+                  class="full-width"
+                  color="primary"
+                  unelevated
+                >
+                  <q-icon class="q-mr-sm" name="fas fa-display" size="xs" />
+                  {{ $t('full-screen') }}
+                </q-btn>
+              </div>
+              <div class="col-6">
+                <q-btn
+                  :disable="screenList.length < 2"
+                  :outline="
+                    !(screenList.length < 2 || screenPreferences.preferWindowed)
+                  "
+                  :text-color="
+                    screenList.length < 2 || screenPreferences.preferWindowed
+                      ? ''
+                      : 'primary'
+                  "
+                  @click="screenPreferences.preferWindowed = true"
+                  class="full-width"
+                  color="primary"
+                  unelevated
+                >
+                  <q-icon
+                    class="q-mr-sm"
+                    name="fas fa-window-restore"
+                    size="xs"
+                  />
+                  {{ $t('windowed') }}
+                </q-btn>
+              </div>
+            </div>
+            <q-separator class="bg-accent-200 q-mb-md" />
           </template>
-        </template>
-        <q-separator />
-        <q-card-section>
-          <q-btn
-            :color="mediaPlayer.customBackground ? 'negative' : 'primary'"
-            :icon="
-              'mdi-image' + (mediaPlayer.customBackground ? '-remove' : '')
-            "
-            @click="chooseCustomBackground(!!mediaPlayer.customBackground)"
-          >
-            <q-tooltip
-              >{{
-                mediaPlayer.customBackground
+          <div>
+            <p class="card-section-title text-dark-grey">
+              {{ $t('custom-background') }}
+            </p>
+          </div>
+          <div class="col q-mb-md">
+            <q-btn
+              :outline="!mediaWindowCustomBackground"
+              @click="chooseCustomBackground(!!mediaWindowCustomBackground)"
+              class="full-width"
+              color="primary"
+              unelevated
+            >
+              <q-icon
+                :name="
+                  'mdi-image' + (mediaWindowCustomBackground ? '-remove' : '')
+                "
+                class="q-mr-sm"
+                size="xs"
+              />
+              {{
+                mediaWindowCustomBackground
                   ? $t('reset-custom-background')
                   : $t('set-custom-background')
               }}
-            </q-tooltip>
-          </q-btn>
+            </q-btn>
+          </div>
+          <q-separator class="bg-accent-200 q-mb-md" />
+          <div class="row items-center">
+            <div class="col-6">
+              <div class="row text-subtitle1 text-weight-bold">
+                {{ mediaWindowVisible ? $t('projecting') : $t('inactive') }}
+              </div>
+              <div class="row text-dark-grey">
+                {{
+                  $t(
+                    screenList.length < 2 || screenPreferences.preferWindowed
+                      ? 'windowed'
+                      : 'external-screen',
+                  )
+                }}
+              </div>
+            </div>
+            <div class="col-6">
+              <q-btn
+                @click="showMediaWindow(false)"
+                class="full-width"
+                color="primary"
+                unelevated
+                v-if="mediaWindowVisible"
+                >{{ $t('hide-media-display') }}</q-btn
+              >
+              <q-btn
+                @click="showMediaWindow(true)"
+                class="full-width"
+                color="primary"
+                unelevated
+                v-else
+                >{{ $t('show-media-display') }}</q-btn
+              >
+            </div>
+          </div>
         </q-card-section>
-        <q-separator />
-        <q-card-actions>
-          <q-btn
-            @click="showMediaWindow(false)"
-            flat
-            v-if="mediaPlayer.windowVisible"
-            >{{ $t('hide-media-display') }}</q-btn
-          >
-          <q-btn @click="showMediaWindow(true)" flat v-else>{{
-            $t('show-media-display')
-          }}</q-btn>
-        </q-card-actions>
       </q-card>
     </q-popup-proxy>
-    <q-badge
-      :color="mediaPlayer.windowVisible ? 'positive' : 'negative'"
-      floating
-      rounded
-      style="margin-top: 1.25em; margin-right: 0.25em"
-    />
   </q-btn>
+  <!-- todo: redo this modal -->
   <q-dialog v-model="jwpubImagesExist">
     <q-card style="width: 80vw; max-width: 80vw">
       <q-card-section>
@@ -221,7 +273,8 @@ defineProps<{
 }>();
 
 const currentState = useCurrentStateStore();
-const { currentSettings, mediaPlayer } = storeToRefs(currentState);
+const { currentSettings, mediaWindowCustomBackground, mediaWindowVisible } =
+  storeToRefs(currentState);
 const mediaDisplayPopup = ref();
 const appSettings = useAppSettingsStore();
 const { screenPreferences } = storeToRefs(appSettings);
@@ -230,6 +283,8 @@ const { t } = useI18n();
 const jwpubImportDb = ref('');
 const jwpubImages = ref([] as MultimediaItem[]);
 const jwpubImagesExist = computed(() => jwpubImages.value.length > 0);
+
+const bc = new BroadcastChannel('mediaPlayback');
 
 const notifyInvalidBackgroundFile = () => {
   createTemporaryNotification({
@@ -242,11 +297,11 @@ const setMediaBackground = (filepath?: string) => {
     if (!filepath) {
       throw new Error('Problem with image file');
     } else {
-      mediaPlayer.value.customBackground = pathToFileURL(filepath);
+      mediaWindowCustomBackground.value = pathToFileURL(filepath);
     }
   } catch (error) {
     if (filepath) notifyInvalidBackgroundFile();
-    mediaPlayer.value.customBackground = '';
+    mediaWindowCustomBackground.value = '';
   } finally {
     jwpubImages.value = [];
     jwpubImportDb.value = '';
@@ -256,7 +311,7 @@ const setMediaBackground = (filepath?: string) => {
 const chooseCustomBackground = async (reset?: boolean) => {
   try {
     if (reset) {
-      mediaPlayer.value.customBackground = '';
+      mediaWindowCustomBackground.value = '';
       return;
     } else {
       try {
@@ -307,7 +362,7 @@ const chooseCustomBackground = async (reset?: boolean) => {
       } catch (error) {
         console.error(error);
         notifyInvalidBackgroundFile();
-        mediaPlayer.value.customBackground = '';
+        mediaWindowCustomBackground.value = '';
         jwpubImportDb.value = '';
       }
     }
@@ -322,6 +377,13 @@ watch(
     showMediaWindow(newMediaDisplayEnabled);
   },
   { immediate: true },
+);
+
+watch(
+  () => mediaWindowCustomBackground.value,
+  (newMediaBackground) => {
+    bc.postMessage({ customBackground: newMediaBackground });
+  },
 );
 
 watch(

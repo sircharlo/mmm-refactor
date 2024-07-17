@@ -1,108 +1,119 @@
 <template>
   <q-btn
-    :icon="
-      !online
-        ? 'mdi-cloud-off'
-        : Object.values(downloadProgress).filter((item) => item.error)
-              .length === 0
-          ? 'mdi-cloud-check-variant'
-          : 'mdi-cloud-alert'
+    :color="
+      !online || Object.values(downloadProgress).find((item) => item.error)
+        ? 'negative'
+        : 'white-transparent'
     "
     :loading="
       Object.values(downloadProgress).filter((item) => item.loaded).length > 0
     "
-    flat
-    push
-    rounded
+    class="super-rounded"
+    unelevated
   >
     <template v-slot:loading>
-      <q-spinner-pie />
+      <span class="fa-stack" style="font-size: 0.75em">
+        <i class="fa-solid fa-cloud fa-stack-2x"></i>
+        <i class="text-primary fa-solid fa-sync fa-stack-1x fa-spin"></i>
+      </span>
     </template>
-    <q-tooltip anchor="bottom left" self="top left">
-      <!-- v-if="!disabled && !mediaDisplayPopup" -->
+    <span class="fa-stack" style="font-size: 0.75em">
+      <i class="fa-solid fa-cloud fa-stack-2x"></i>
+      <i
+        :class="
+          'text-primary fa-solid fa-stack-1x ' +
+          (online &&
+          Object.values(downloadProgress).filter((item) => item.error)
+            .length === 0
+            ? 'fa-check'
+            : 'fa-exclamation')
+        "
+      ></i>
+    </span>
+    <q-tooltip anchor="bottom left" self="top left" v-if="!downloadPopup">
       {{ $t('download-status') }}
     </q-tooltip>
-    <q-popup-proxy>
-      <div
-        :class="'rounded-borders bg-grey-' + $q.dark.isActive ? '2' : '9'"
-        style="width: 400px; height: 300px"
+    <q-popup-proxy
+      :offset="[0, 28]"
+      @before-hide="downloadPopup = false"
+      @before-show="downloadPopup = true"
+      anchor="top middle"
+      class="round-card"
+      flat
+      self="bottom middle"
+    >
+      <q-card
+        class="non-selectable"
+        flat
+        style="min-width: 50vw; max-height: 50vh"
       >
-        <q-list
-          :class="
-            'q-px-md non-selectable bg-grey-' + $q.dark.isActive ? '2' : '9'
-          "
-          dense
-          separator
-        >
-          <!-- <q-slide-transition> -->
-          <q-item
-            style="align-items: center"
-            v-if="Object.values(downloadProgress).length === 0"
-          >
-            <q-item-section class="q-pt-md">
-              {{ $t('noDownloadsInProgress') }}
-            </q-item-section>
-            <q-space />
-            <q-item-section
-              avatar
-              class="q-pt-md q-pl-md"
-              style="align-items: end"
-            >
-              <q-icon color="positive" name="mdi-check-circle" />
-            </q-item-section>
-          </q-item>
-          <template
-            :key="statusObject.status"
-            v-for="statusObject in statusConfig"
-          >
-            <q-item-label
-              class="q-pt-md q-pl-md text-weight-bold text-uppercase"
-              overline
-              v-if="hasStatus(downloadProgress, statusObject.status)"
-            >
-              {{ $t(statusObject.label) }}
-            </q-item-label>
-            <!-- <q-slide-transition> -->
-            <q-item
-              :key="url"
-              style="align-items: center"
-              v-for="(item, url) in filteredDownloads(
-                downloadProgress,
-                statusObject.status,
-              )"
-            >
-              <q-item-label caption lines="1">
-                {{ url && path.basename(url as string) }}
-              </q-item-label>
-              <q-space />
-              <q-item-section avatar class="q-pr-none" style="align-items: end">
-                <q-icon
-                  :color="statusColor(statusObject.status)"
-                  :name="statusObject.icon"
-                  v-if="statusObject.icon"
-                />
-                <q-circular-progress
-                  :thickness="0.3"
-                  :value="progressValue(item)"
-                  color="primary"
-                  size="18px"
-                  style="margin-right: 3px"
-                  v-else-if="showProgress(item)"
-                />
-              </q-item-section>
-            </q-item>
-            <!-- </q-slide-transition> -->
-          </template>
-          <!-- </q-slide-transition> -->
-        </q-list>
-      </div>
+        <q-card-section>
+          <div class="card-title">
+            {{ $t('media-sync') }}
+          </div>
+          <q-slide-transition>
+            <div>
+              <template v-if="Object.values(downloadProgress).length === 0">
+                <div class="row items-center">
+                  <div class="col text-weight-medium text-secondary">
+                    {{ $t('noDownloadsInProgress') }}
+                  </div>
+                  <div class="col-shrink">
+                    <q-icon
+                      color="positive"
+                      name="mdi-check-circle"
+                      size="sm"
+                    />
+                  </div>
+                </div>
+              </template>
+              <template v-else>
+                <template
+                  :key="statusObject.status"
+                  v-for="statusObject in statusConfig"
+                >
+                  <p
+                    class="card-section-title text-dark-grey"
+                    v-if="hasStatus(downloadProgress, statusObject.status)"
+                  >
+                    {{ $t(statusObject.label) }}
+                  </p>
+                  <template
+                    :key="url"
+                    v-for="(item, url) in filteredDownloads(
+                      downloadProgress,
+                      statusObject.status,
+                    )"
+                  >
+                    <div class="row items-center q-py-sm">
+                      <div class="col text-weight-medium text-dark-grey">
+                        {{ url && path.basename(url as string) }}
+                      </div>
+                      <div class="col-shrink">
+                        <q-icon
+                          :color="statusColor(statusObject.status)"
+                          :name="statusObject.icon"
+                          size="sm"
+                          v-if="statusObject.icon"
+                        />
+                        <q-circular-progress
+                          :thickness="0.3"
+                          :value="progressValue(item)"
+                          color="primary"
+                          size="sm"
+                          v-else-if="showProgress(item)"
+                        />
+                      </div>
+                    </div>
+                    <q-separator class="bg-accent-200" />
+                  </template>
+                </template>
+              </template>
+            </div>
+          </q-slide-transition>
+        </q-card-section>
+      </q-card>
     </q-popup-proxy>
-    <q-badge
-      :color="online ? 'positive' : 'negative'"
-      floating
-      rounded
-      style="margin-top: 1.25em; margin-right: 0.25em"
-    />
   </q-btn>
 </template>
 
@@ -112,11 +123,12 @@ import { storeToRefs } from 'pinia';
 import { electronApi } from 'src/helpers/electron-api';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { DownloadProgressItems } from 'src/types/media';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const currentState = useCurrentStateStore();
 const { downloadProgress, online } = storeToRefs(currentState);
 const { path } = electronApi;
+const downloadPopup = ref(false);
 
 const filteredDownloads = (
   obj: DownloadProgressItems,

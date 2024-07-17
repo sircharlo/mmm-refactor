@@ -1,4 +1,5 @@
 import { PathLike } from 'fs';
+import { IAudioMetadata, IOptions } from 'music-metadata';
 import { QueryResponseItem } from 'src/types/sqlite';
 
 export interface ElectronFileFilter {
@@ -29,6 +30,7 @@ export interface ElectronApi {
   ) => void;
   openFileDialog: (single?: boolean) => Promise<Electron.OpenDialogReturnValue>;
   openFolderDialog: () => string[];
+  parseFile: (filePath: string, options?: IOptions) => Promise<IAudioMetadata>;
   path: typeof import('path');
   pathToFileURL: (path: string) => string;
   registerShortcut: (shortcut: string, callback: () => void) => void;

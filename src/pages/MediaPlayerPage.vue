@@ -1,7 +1,4 @@
 <template>
-  <!-- <template v-if="mediaPlayer.customBackground">
-    {{ mediaPlayer.customBackground }}
-  </template> -->
   <q-page-container
     class="q-electron-drag vertical-middle overflow-hidden"
     padding
@@ -16,28 +13,28 @@
       name="fade"
     >
       <q-img
-        :src="mediaPlayer.url"
+        :src="mediaPlayingUrl"
         @load="initiatePanzoom()"
         class="fitSnugly"
         fit="contain"
         id="mediaImage"
         no-spinner
         ref="mediaImage"
-        v-if="isImage(mediaPlayer.url)"
+        v-if="isImage(mediaPlayingUrl)"
       />
       <video
         @animationstart="playMedia()"
         class="fitSnugly"
         preload="metadata"
         ref="mediaElement"
-        v-else-if="isVideo(mediaPlayer.url)"
+        v-else-if="isVideo(mediaPlayingUrl)"
       >
-        <source :src="mediaPlayer.url" ref="mediaElementSource" />
+        <source :src="mediaPlayingUrl" ref="mediaElementSource" />
         <track
-          :src="mediaPlayer.subtitlesUrl"
+          :src="mediaPlayerSubtitlesUrl"
           default
           kind="subtitles"
-          v-if="mediaPlayer.subtitlesUrl && mediaPlayer.subtitlesVisible"
+          v-if="mediaPlayerSubtitlesUrl && mediaPlayerSubtitlesVisible"
         />
       </video>
       <div v-else>
@@ -45,18 +42,16 @@
           @loadedmetadata="playMedia()"
           ref="mediaElement"
           style="display: none"
-          v-if="isAudio(mediaPlayer.url)"
+          v-if="isAudio(mediaPlayingUrl)"
         >
-          <source :src="mediaPlayer.url" ref="mediaElementSource" />
+          <source :src="mediaPlayingUrl" ref="mediaElementSource" />
         </audio>
-        <template v-if="mediaPlayer.customBackground">
+        <template v-if="mediaPlayerCustomBackground">
           <q-img
-            :src="mediaPlayer.customBackground"
+            :src="mediaPlayerCustomBackground"
             class="fitSnugly"
             fit="contain"
-            id="customBackground"
             no-spinner
-            ref="customBackground"
           />
         </template>
         <template v-else>
@@ -95,7 +90,7 @@ import { useJwStore } from 'src/stores/jw';
 import { Ref, ref, watch } from 'vue';
 
 const currentState = useCurrentStateStore();
-const { currentCongregation, currentSettings, mediaPlayer, selectedDate } =
+const { currentCongregation, currentSettings, selectedDate } =
   storeToRefs(currentState);
 
 const jwStore = useJwStore();
@@ -118,74 +113,70 @@ let mediaElement: Ref<HTMLVideoElement | undefined> = ref();
 const mediaImage: Ref<HTMLImageElement | undefined> = ref();
 const panzoomOptions = { animate: true, duration: 1000 };
 
-watch(currentCongregation, (newCongregation) => {
-  if (!newCongregation) showMediaWindow(false);
-});
+const bc = new BroadcastChannel('mediaPlayback');
+const mediaPlayingUrl = ref('');
+const mediaUniqueId = ref('');
+const mediaPlayerCustomBackground = ref('');
+const mediaPlayerSubtitlesUrl = ref('');
+const mediaPlayerSubtitlesVisible = ref(false);
 
-watch(
-  () => [
-    mediaPlayer.value?.url,
-    mediaPlayer.value?.scale,
-    mediaPlayer.value?.x,
-    mediaPlayer.value?.y,
-  ],
-  ([newUrl, newScale, newX, newY], [oldUrl, , ,]) => {
-    try {
-      if (!mediaElement.value) {
-        if (newUrl !== oldUrl) {
-          mediaPlayer.value.scale = 1;
-          mediaPlayer.value.x = 0;
-          mediaPlayer.value.y = 0;
-          panzoom.value?.reset({ animate: false });
-        } else {
-          const imageElem = document.getElementById('mediaImage');
-          const width = imageElem?.clientWidth || 0;
-          const height = imageElem?.clientHeight || 0;
-          panzoom.value?.zoom(newScale as number, panzoomOptions);
-          if (width > 0 && height > 0)
-            panzoom.value?.pan(
-              (newX as number) * width,
-              (newY as number) * height,
-              panzoomOptions,
-            );
-        }
-      }
-    } catch (error) {
-      console.error(error);
+bc.onmessage = (event) => {
+  try {
+    console.log(event.data, event.data.customBackground);
+    if ('seekTo' in event.data) {
+      if (mediaElement.value)
+        mediaElement.value.currentTime = event.data.seekTo;
     }
-  },
-);
-
-watch(
-  () => mediaPlayer.value?.action,
-  (newAction) => {
-    try {
+    if ('customBackground' in event.data)
+      mediaPlayerCustomBackground.value = event.data.customBackground;
+    if ('subtitlesUrl' in event.data)
+      mediaPlayerSubtitlesUrl.value = event.data.subtitlesUrl;
+    if ('subtitlesVisible' in event.data)
+      mediaPlayerSubtitlesVisible.value = event.data.subtitlesVisible;
+    if ('uniqueId' in event.data) mediaUniqueId.value = event.data.uniqueId;
+    if ('url' in event.data) mediaPlayingUrl.value = event.data.url;
+    if ('action' in event.data) {
       if (!mediaElement.value) return;
-      if (newAction.toLowerCase().includes('pause')) {
+      if (event.data.action === 'pause') {
         mediaElement.value.pause();
-        // mediaElement.value.currentTime = mediaPlayer.value.currentPosition;
-      } else if (newAction.toLowerCase().includes('play')) {
+      } else if (event.data.action === 'play') {
         mediaElement.value.play().catch((error) => {
           console.error(error);
         });
       }
-    } catch (error) {
-      console.error(error);
     }
-  },
-);
+    if ('scale' in event.data || 'x' in event.data || 'y' in event.data) {
+      try {
+        console.log('panzoom', event.data, panzoom);
+        if (!mediaElement.value) {
+          console.log(event.data?.url, mediaPlayingUrl.value);
+          const imageElem = document.getElementById('mediaImage');
+          const width = imageElem?.clientWidth || 0;
+          const height = imageElem?.clientHeight || 0;
+          console.log(width, height, event.data?.scale);
+          panzoom.value?.zoom(
+            (event.data?.scale ?? 1) as number,
+            panzoomOptions,
+          );
+          if (width > 0 && height > 0)
+            panzoom.value?.pan(
+              ((event.data?.x ?? 0) as number) * width,
+              ((event.data?.y ?? 0) as number) * height,
+              panzoomOptions,
+            );
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
-watch(
-  () => mediaPlayer.value?.seekTo,
-  (newPosition) => {
-    try {
-      if (!mediaElement.value) return;
-      mediaElement.value.currentTime = newPosition;
-    } catch (error) {
-      console.error(error);
-    }
-  },
-);
+watch(currentCongregation, (newCongregation) => {
+  if (!newCongregation) showMediaWindow(false);
+});
 
 const playMedia = () => {
   try {
@@ -193,37 +184,29 @@ const playMedia = () => {
       return;
     }
 
-    // mediaElement.value.onpause = () => {
-    //   mediaPlayer.value.seekTo = mediaElement.value?.currentTime || 0;
-    // };
-
     mediaElement.value.onended = () => {
-      mediaPlayer.value.currentPosition = 0;
-      mediaPlayer.value.seekTo = 0;
-      mediaPlayer.value.url = '';
-      mediaPlayer.value.uniqueId = '';
-      mediaPlayer.value.action =
-        mediaPlayer.value.action === 'backgroundMusicPlay'
-          ? 'backgroundMusicCurrentEnded'
-          : '';
+      bc.postMessage({ state: 'ended' });
+    };
+
+    mediaElement.value.onpause = () => {
+      const currentTime = mediaElement.value?.currentTime || 0;
+      bc.postMessage({ currentPosition: currentTime });
     };
 
     mediaElement.value.ontimeupdate = () => {
       try {
         const currentTime = mediaElement.value?.currentTime || 0;
-        mediaPlayer.value.currentPosition = currentTime;
-        // mediaPlayer.value.seekTo = currentTime;
+        bc.postMessage({ currentPosition: currentTime });
         if (
           customDurations?.value?.[currentCongregation.value]?.[
             selectedDate.value
-          ]?.[mediaPlayer.value.uniqueId]
+          ]?.[mediaUniqueId.value]
         ) {
           const customStartStop = customDurations?.value?.[
             currentCongregation.value
-          ]?.[selectedDate.value]?.[mediaPlayer.value.uniqueId] ?? { max: 0 };
+          ]?.[selectedDate.value]?.[mediaUniqueId.value] ?? { max: 0 };
           if (currentTime >= customStartStop.max) {
-            // updateMediaPlayer('currentPosition', customStartStop.min);
-            mediaPlayer.value.url = '';
+            bc.postMessage({ state: 'ended' });
           }
         }
       } catch (e) {
@@ -234,11 +217,11 @@ const playMedia = () => {
     if (
       customDurations?.value?.[currentCongregation.value]?.[
         selectedDate.value
-      ]?.[mediaPlayer.value.uniqueId]
+      ]?.[mediaUniqueId.value]
     ) {
       customStartStop = customDurations?.value?.[currentCongregation.value]?.[
         selectedDate.value
-      ]?.[mediaPlayer.value.uniqueId] ?? { min: 0 };
+      ]?.[mediaUniqueId.value] ?? { min: 0 };
     }
     mediaElement.value.currentTime = customStartStop.min;
     mediaElement.value.play().catch((error) => {

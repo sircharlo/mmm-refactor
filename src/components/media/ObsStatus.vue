@@ -1,10 +1,15 @@
 <template>
   <q-btn
+    :color="
+      obsConnectionState === 'connected'
+        ? 'white-transparent'
+        : obsConnectionState === 'disconnected'
+          ? 'negative'
+          : 'warning'
+    "
     :disable="obsConnectionState !== 'connected'"
-    @click="scenePicker = true"
-    class="q-ml-sm"
-    flat
-    rounded
+    class="super-rounded"
+    unelevated
     v-if="currentSettings.obsEnable"
   >
     <q-icon size="sm">
@@ -14,23 +19,102 @@
         />
       </svg>
     </q-icon>
-    <q-badge
-      :color="
-        obsConnectionState === 'connected'
-          ? 'positive'
-          : obsConnectionState === 'disconnected'
-            ? 'negative'
-            : 'warning'
-      "
-      floating
-      rounded
-      style="margin-top: 1.25em; margin-right: 0.25em"
-    />
     <q-tooltip v-if="!scenePicker">
       {{ $t(obsMessage ?? 'scene-selection') }}
     </q-tooltip>
-    <q-popup-proxy>
-      <div
+    <q-popup-proxy
+      :offset="[0, 28]"
+      @before-hide="scenePicker = false"
+      @before-show="scenePicker = true"
+      anchor="top middle"
+      class="round-card"
+      flat
+      self="bottom middle"
+    >
+      <q-card class="non-selectable" flat style="min-width: 50vw">
+        <q-card-section>
+          <div class="card-title">
+            {{ $t('scene-selection') }}
+          </div>
+          <div>
+            <p class="card-section-title text-dark-grey">
+              {{ $t('main-scenes') }}
+            </p>
+          </div>
+          <div class="row items-center q-col-gutter-sm">
+            <template
+              :key="scene"
+              v-for="scene in [cameraScene, mediaScene, pipScene].filter(
+                Boolean,
+              )"
+            >
+              <div class="col">
+                <q-btn
+                  :outline="scene?.sceneUuid !== currentSceneUuid"
+                  @click="setObsScene(undefined, scene?.sceneUuid as string)"
+                  class="full-width"
+                  color="primary"
+                  unelevated
+                >
+                  <q-icon
+                    :name="
+                      scene?.sceneUuid === cameraScene?.sceneUuid
+                        ? 'mdi-lectern'
+                        : scene?.sceneUuid === mediaScene?.sceneUuid
+                          ? 'mdi-multimedia'
+                          : 'mdi-picture-in-picture-bottom-right'
+                    "
+                    class="q-mr-sm"
+                    size="xs"
+                  />
+                  {{
+                    scene?.sceneUuid === cameraScene?.sceneUuid
+                      ? $t('speaker')
+                      : scene?.sceneUuid === mediaScene?.sceneUuid
+                        ? $t('media-only')
+                        : $t('picture-in-picture')
+                  }}
+                </q-btn>
+              </div>
+            </template>
+          </div>
+          <template v-if="additionalScenes.length > 0">
+            <q-separator class="bg-accent-200 q-my-md" />
+            <div>
+              <p class="card-section-title text-dark-grey">
+                {{ $t('additional-scenes') }}
+              </p>
+            </div>
+            <div class="row items-center q-col-gutter-sm q-mb-md">
+              <template :key="scene" v-for="scene in additionalScenes">
+                <div class="col-4">
+                  <q-btn
+                    :outline="scene?.sceneUuid !== currentSceneUuid"
+                    @click="setObsScene(undefined, scene?.sceneUuid as string)"
+                    class="full-width"
+                    color="primary"
+                    unelevated
+                  >
+                    <q-icon
+                      :name="
+                        scene?.sceneUuid === cameraScene?.sceneUuid
+                          ? 'mdi-lectern'
+                          : scene?.sceneUuid === mediaScene?.sceneUuid
+                            ? 'mdi-multimedia'
+                            : 'mdi-picture-in-picture-bottom-right'
+                      "
+                      class="q-mr-sm"
+                      size="xs"
+                    />
+                    {{ scene?.sceneName }}
+                  </q-btn>
+                </div>
+              </template>
+            </div>
+          </template>
+        </q-card-section>
+      </q-card>
+      <!--<div
         :class="'rounded-borders bg-grey-' + $q.dark.isActive ? '2' : '9'"
         style="width: 80vw"
       >
@@ -102,6 +186,7 @@
           </div>
         </q-card-section>
       </div>
+    -->
     </q-popup-proxy>
   </q-btn>
 </template>
@@ -116,16 +201,18 @@ import { useObsStateStore } from 'src/stores/obs-state';
 import { onMounted, onUnmounted, ref } from 'vue';
 
 const currentState = useCurrentStateStore();
-const { currentSettings, mediaPlayer } = storeToRefs(currentState);
+const { currentSettings, mediaPlayingUrl } = storeToRefs(currentState);
 
 const obsState = useObsStateStore();
 const {
+  additionalScenes,
+  cameraScene,
   currentScene,
   currentSceneUuid,
   mediaScene,
-  nonMediaScenes,
   obsConnectionState,
   obsMessage,
+  pipScene,
   scenes,
 } = storeToRefs(obsState);
 
@@ -198,7 +285,7 @@ const setObsScene = async (scene: string | undefined, sceneUuid?: string) => {
       const imageScene = currentSettings.value?.obsImageScene as string;
       const cameraScene = currentSettings.value?.obsCameraScene as string;
       newProgramScene = mediaScene;
-      if (isImage(mediaPlayer.value.url) && imageScene)
+      if (isImage(mediaPlayingUrl.value) && imageScene)
         newProgramScene = imageScene;
       currentScene.value = scene;
       if (scene === 'camera') newProgramScene = cameraScene;

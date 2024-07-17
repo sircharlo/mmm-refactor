@@ -4,6 +4,22 @@ import { useCurrentStateStore } from 'src/stores/current-state';
 
 export const useObsStateStore = defineStore('obs-state', {
   getters: {
+    additionalScenes: (state) => {
+      const currentState = useCurrentStateStore();
+      return state.scenes.filter(
+        (scene) =>
+          scene.sceneUuid !== currentState.currentSettings?.obsCameraScene &&
+          scene.sceneUuid !== currentState.currentSettings?.obsMediaScene &&
+          scene.sceneUuid !== currentState.currentSettings?.obsImageScene,
+      );
+    },
+    cameraScene: (state) => {
+      const currentState = useCurrentStateStore();
+      return state.scenes.find(
+        (scene) =>
+          scene.sceneUuid === currentState.currentSettings?.obsCameraScene,
+      );
+    },
     mediaScene: (state) => {
       const currentState = useCurrentStateStore();
       return state.scenes.find(
@@ -11,18 +27,11 @@ export const useObsStateStore = defineStore('obs-state', {
           scene.sceneUuid === currentState.currentSettings?.obsMediaScene,
       );
     },
-    nonMediaScenes: (state) => {
+    pipScene: (state) => {
       const currentState = useCurrentStateStore();
-      return state.scenes.filter(
+      return state.scenes.find(
         (scene) =>
-          scene.sceneUuid !== currentState.currentSettings?.obsMediaScene,
-      );
-    },
-    nonStageScenes: (state) => {
-      const currentState = useCurrentStateStore();
-      return state.scenes.filter(
-        (scene) =>
-          scene.sceneUuid !== currentState.currentSettings?.obsCameraScene,
+          scene.sceneUuid === currentState.currentSettings?.obsImageScene,
       );
     },
   },

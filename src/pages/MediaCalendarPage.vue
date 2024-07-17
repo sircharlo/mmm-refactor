@@ -17,7 +17,7 @@
       </template>
       {{ $t('noDateSelected') }}
     </q-banner>
-    <q-list class="shadow-5 rounded-borders" ref="mediaList">
+    <q-list ref="mediaList">
       <template v-if="additionalLoading">
         <q-item class="meeting-section meeting-section-skeleton">
           <q-item-section avatar class="q-pr-none">
@@ -82,467 +82,524 @@
         v-else
         v-for="(media, index) in sortableMediaItems"
       >
-        <q-item
+        <div
           :class="
-            'meeting-section meeting-section-' +
-            media.section +
-            ' ' +
+            'meeting-section ' +
             (index === 0 ||
             media.section !== sortableMediaItems[index - 1]?.section
-              ? 'meeting-section-begin meeting-section-begin-' + media.section
+              ? 'meeting-section-begin '
               : '') +
             ' ' +
             (index !== sortableMediaItems.length &&
             media.section !== sortableMediaItems[index + 1]?.section
-              ? 'meeting-section-end meeting-section-end-' + media.section
+              ? 'meeting-section-end '
               : '')
           "
         >
-          <q-item-section class="q-pr-none" side>
-            <div
-              class="rounded-borders bg-grey-9 text-white flex flex-center"
-              style="width: 150px; height: 84px"
-              v-if="media.isAudio"
-            >
-              <q-icon name="mdi-music-clef-treble" size="lg" />
-            </div>
-            <q-img
-              :id="media.uniqueId"
-              :ratio="16 / 9"
-              :src="media.thumbnailUrl"
-              @error="imageLoadingError(media)"
-              @load="media.isImage && initiatePanzoom(media.uniqueId)"
-              class="rounded-borders"
-              fit="contain"
-              v-else
-              width="150px"
-            >
-              <q-badge
-                :color="
-                  customDurations[currentCongregation]?.[selectedDate]?.[
-                    media.uniqueId
-                  ] &&
-                  (customDurations[currentCongregation][selectedDate][
-                    media.uniqueId
-                  ].min > 0 ||
-                    customDurations[currentCongregation][selectedDate][
-                      media.uniqueId
-                    ].max < media.duration)
-                    ? 'negative'
-                    : 'black'
-                "
-                @click="showMediaDurationPopup(media)"
-                style="padding: 5px !important"
-                v-if="media.isVideo"
-              >
-                <q-icon class="q-mr-xs" color="white" name="mdi-play" />
-                {{
-                  customDurations[currentCongregation]?.[selectedDate]?.[
-                    media.uniqueId
-                  ] &&
-                  (customDurations[currentCongregation][selectedDate][
-                    media.uniqueId
-                  ].min > 0 ||
-                    customDurations[currentCongregation][selectedDate][
-                      media.uniqueId
-                    ].max < media.duration)
-                    ? formatTime(
-                        customDurations[currentCongregation][selectedDate][
-                          media.uniqueId
-                        ].min,
-                      ) + ' - '
-                    : ''
-                }}
-                {{
-                  formatTime(
-                    customDurations[currentCongregation]?.[selectedDate]?.[
-                      media.uniqueId
-                    ]?.max ?? media.duration,
-                  )
-                }}
-              </q-badge>
-              <q-dialog
-                persistent
-                v-model="mediaDurationPopups[media.uniqueId]"
-              >
-                <q-card style="width: 300px">
-                  <q-card-section>
-                    <div class="text-h6">{{ media.title }}</div>
-                  </q-card-section>
-                  <q-card-section class="q-py-none" padding>
-                    <p class="q-my-none">
-                      {{
-                        $t(
-                          'use-the-slider-below-to-adjust-the-start-and-end-time-of-this-media-item',
-                        )
-                      }}
-                    </p>
-                  </q-card-section>
-                  <q-card-section class="q-pr-sm" horizontal>
-                    <q-card-section
-                      class="full-width q-pl-lg q-pt-none q-pb-lg"
-                    >
-                      <!-- {{ media.duration }} -->
-                      <q-range
-                        :left-label-value="
-                          formatTime(
-                            customDurations[currentCongregation]?.[
-                              selectedDate
-                            ]?.[media.uniqueId]?.min,
-                          )
-                        "
-                        :max="media.duration"
-                        :min="0"
-                        :right-label-value="
-                          formatTime(
-                            customDurations[currentCongregation]?.[
-                              selectedDate
-                            ]?.[media.uniqueId]?.max,
-                          )
-                        "
-                        :step="0"
-                        class="q-pt-lg"
-                        label
-                        label-always
-                        switch-label-side
-                        v-model="
-                          customDurations[currentCongregation][selectedDate][
-                            media.uniqueId
-                          ]
-                        "
-                      />
-                    </q-card-section>
-                    <q-card-section class="q-px-sm q-pt-lg">
-                      <q-btn
-                        :label="$t('videoTimeReset')"
-                        @click="resetMediaDuration(media)"
-                        color="negative"
-                        round
-                        size="sm"
-                      />
-                    </q-card-section>
-                  </q-card-section>
-                  <q-card-actions align="right">
-                    <q-btn
-                      :label="$t('videoTimeSave')"
-                      @click="mediaDurationPopups[media.uniqueId] = false"
-                      color="primary"
-                      flat
-                    />
-                  </q-card-actions>
-                </q-card>
-              </q-dialog>
-            </q-img>
-          </q-item-section>
-          <q-item-section
-            class="q-pl-xs"
-            side
-            v-if="mediaPlayer.url === media.fileUrl && media.isImage"
-          >
-            <div class="column">
-              <div class="col">
-                <q-btn
-                  @click="zoomIn(media.uniqueId)"
-                  color="primary"
-                  flat
-                  icon="mdi-magnify-plus"
-                  round
-                  size="xs"
-                >
-                  <q-tooltip>{{ $t('zoom-in') }}</q-tooltip>
-                </q-btn>
-              </div>
-              <div class="col">
-                <q-btn
-                  @click="zoomOut(media.uniqueId)"
-                  color="primary"
-                  flat
-                  icon="mdi-magnify-minus"
-                  round
-                  size="xs"
-                >
-                  <q-tooltip>{{ $t('zoom-out') }}</q-tooltip>
-                </q-btn>
-              </div>
-              <!-- <div class="col">
-                <q-btn size="xs" flat round color="primary" icon="mdi-refresh" @click="zoomReset(media.uniqueId, true)">
-                  <q-tooltip>Reset image zoom</q-tooltip>
-                </q-btn>
-              </div> -->
-              <div class="col" v-if="obsConnectionState === 'connected'">
-                <q-btn
-                  @click="sendObsSceneEvent('camera')"
-                  color="negative"
-                  flat
-                  icon="mdi-grid-off"
-                  round
-                  size="xs"
-                  v-if="currentScene === 'media'"
-                >
-                  <q-tooltip>{{
-                    $t('hide-image-for-zoom-participants')
-                  }}</q-tooltip>
-                </q-btn>
-                <q-btn
-                  @click="sendObsSceneEvent('media')"
-                  color="positive"
-                  flat
-                  icon="mdi-grid"
-                  round
-                  size="xs"
-                  v-else
-                >
-                  <q-tooltip>{{
-                    $t('show-image-for-zoom-participants')
-                  }}</q-tooltip>
-                </q-btn>
-              </div>
-            </div>
-          </q-item-section>
-          <q-item-section class="q-pl-lg q-pr-none" side v-if="media.paragraph">
-            <q-chip
-              :clickable="false"
-              :icon="
-                media.paragraph !== 9999
-                  ? 'fas fa-paragraph'
-                  : 'mdi-asterisk-circle-outline'
-              "
-              :label="
-                media.paragraph !== 9999 ? media.paragraph : $t('footnote')
-              "
-              square
-            />
-          </q-item-section>
-          <q-item-section class="q-pl-lg q-pr-none" side v-else-if="media.song">
-            <q-chip
-              :clickable="false"
-              :label="media.song.toString()"
-              color="secondary"
-              icon="mdi-music-clef-treble"
-              square
-            />
-          </q-item-section>
-          <q-item-section class="q-px-lg">
-            <div class="ellipsis-3-lines">
-              {{
-                media.title ||
-                (media.fileUrl ? path.basename(media.fileUrl) : '')
-              }}
-            </div>
-          </q-item-section>
-          <q-item-section
-            side
-            v-if="media.isAdditional && mediaPlayer.url !== media.fileUrl"
-          >
-            <q-btn
-              @click="mediaToDelete = media.uniqueId"
-              color="negative"
-              flat
-              icon="mdi-delete"
-              round
-            />
-          </q-item-section>
-          <q-item-section side>
-            <div class="row">
-              <div
-                class="col"
-                v-if="
-                  !(
-                    mediaPlayer.url === media.fileUrl ||
-                    mediaPlayer.url === media.streamUrl
-                  )
-                "
-              >
-                <template v-if="!media.markers || media.markers.length === 0">
-                  <q-btn
-                    :disable="
-                      mediaPlayer.url !== '' && isVideo(mediaPlayer.url)
-                    "
-                    @click="
-                      mediaPlayer.url = fs.existsSync(
-                        fileUrlToPath(media.fileUrl),
-                      )
-                        ? media.fileUrl
-                        : media.streamUrl ?? media.fileUrl;
-                      mediaPlayer.uniqueId = media.uniqueId;
-                      mediaPlayer.subtitlesUrl = media.subtitlesUrl ?? '';
-                    "
-                    color="primary"
-                    icon="mdi-play"
-                    round
-                  />
-                </template>
-                <template v-else>
-                  <q-btn
-                    :disable="
-                      mediaPlayer.url !== '' && isVideo(mediaPlayer.url)
-                    "
-                    color="primary"
-                    icon="mdi-play-box-multiple"
-                    push
-                    round
-                  >
-                    <q-menu>
-                      <q-list style="min-width: 100px">
-                        <q-item
-                          @click="
-                            customDurations[currentCongregation] ??= {};
-                            customDurations[currentCongregation][
-                              selectedDate
-                            ] ??= {};
-                            customDurations[currentCongregation][selectedDate][
-                              media.uniqueId
-                            ] = {
-                              min: 0,
-                              max: media.duration,
-                            };
-                            mediaPlayer.action = 'play';
-                            mediaPlayer.url = fs.existsSync(
-                              fileUrlToPath(media.fileUrl),
-                            )
-                              ? media.fileUrl
-                              : media.streamUrl ?? media.fileUrl;
-                            mediaPlayer.uniqueId = media.uniqueId;
-                            mediaPlayer.subtitlesUrl = media.subtitlesUrl ?? '';
-                          "
-                          clickable
-                        >
-                          <q-item-section>{{
-                            $t('entireFile')
-                          }}</q-item-section>
-                        </q-item>
-                        <q-separator />
-                        <q-item
-                          :key="marker.VideoMarkerId"
-                          @click="
-                            customDurations[currentCongregation] ??= {};
-                            customDurations[currentCongregation][
-                              selectedDate
-                            ] ??= {};
-                            customDurations[currentCongregation][selectedDate][
-                              media.uniqueId
-                            ].min = marker.StartTimeTicks / 10000 / 1000;
-                            customDurations[currentCongregation][selectedDate][
-                              media.uniqueId
-                            ].max =
-                              (marker.StartTimeTicks +
-                                marker.DurationTicks -
-                                marker.EndTransitionDurationTicks) /
-                              10000 /
-                              1000;
-                            mediaPlayer.action = 'play';
-                            mediaPlayer.url = fs.existsSync(
-                              fileUrlToPath(media.fileUrl),
-                            )
-                              ? media.fileUrl
-                              : media.streamUrl ?? media.fileUrl;
-                            mediaPlayer.uniqueId = media.uniqueId;
-                            mediaPlayer.subtitlesUrl = media.subtitlesUrl ?? '';
-                          "
-                          clickable
-                          v-for="marker in media.markers"
-                        >
-                          <q-item-section>{{ marker.Label }}</q-item-section>
-                        </q-item>
-                      </q-list>
-                    </q-menu>
-                  </q-btn>
-                </template>
-              </div>
-              <template v-else>
-                <div class="col">
-                  <!-- <transition name="fade" mode="out-in" appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut"> -->
-                  <q-btn
-                    @click="mediaPlayer.action = 'play'"
-                    color="warning"
-                    icon="mdi-play"
-                    round
-                    v-if="mediaPlayer.action === 'pause'"
-                  />
-                  <q-btn
-                    @click="
-                      mediaPlayer.action = 'pause';
-                      mediaPlayer.seekTo = mediaPlayer.currentPosition;
-                    "
-                    color="warning"
-                    icon="mdi-pause"
-                    round
-                    v-else-if="
-                      media.isVideo &&
-                      (mediaPlayer.action === 'play' || !mediaPlayer.action)
-                    "
-                  />
-                  <!-- </transition> -->
-                </div>
-                <q-btn
-                  @click="
-                    media.isVideo ? (mediaToStop = media.uniqueId) : stopMedia()
-                  "
-                  class="q-ml-sm"
-                  color="negative"
-                  icon="mdi-stop"
-                  round
-                  v-if="mediaPlayer.action !== '' || mediaPlayer.action === ''"
-                />
-              </template>
-            </div>
-          </q-item-section>
-        </q-item>
-        <!-- <q-item v-if="media.markers && media.markers.length > 0">
-          <q-markup-table>
-            <q-tr>
-              <q-th>Start</q-th>
-              <q-th>End</q-th>
-              <q-th>Duration</q-th>
-            </q-tr>
-            <q-tr :key="marker.VideoMarkerId" v-for="marker in media.markers">
-              <q-td>{{
-                formatTime(marker.StartTimeTicks / 10000 / 1000)
-              }}</q-td>
-              <q-td>{{
-                formatTime(
-                  (marker.StartTimeTicks + marker.DurationTicks) / 10000 / 1000,
-                )
-              }}</q-td>
-              <q-td>{{ formatTime(marker.DurationTicks / 10000 / 1000) }}</q-td>
-              <q-td>{{ marker.Label }}</q-td>
-            </q-tr>
-          </q-markup-table>
-        </q-item> -->
-        <transition
-          appear
-          enter-active-class="animated fadeIn"
-          leave-active-class="animated fadeOut"
-          mode="out-in"
-          name="fade"
-        >
           <q-item
-            class="q-pa-none"
+            :class="'jw-icon meeting-section-internal begin ' + media.section"
             v-if="
-              (mediaPlayer.url === media.fileUrl ||
-                mediaPlayer.url === media.streamUrl) &&
-              (media.isVideo || media.isAudio)
+              index === 0 ||
+              media.section !== sortableMediaItems[index - 1]?.section
             "
           >
-            <q-item-section>
-              <q-slider
-                :max="media.duration"
-                :min="0"
-                :step="0"
-                v-if="mediaPlayer.action === 'pause'"
-                v-model="mediaPlayer.seekTo"
-              />
-              <q-slider
-                :max="media.duration"
-                :min="0"
-                :step="0"
-                disabled
-                v-else
-                v-model="mediaPlayer.currentPosition"
-              />
-            </q-item-section>
+            <span class="text-h4">
+              {{
+                media.section === 'tgw'
+                  ? ''
+                  : media.section === 'ayfm'
+                    ? ''
+                    : media.section === 'lac'
+                      ? ''
+                      : media.section === 'wt'
+                        ? ''
+                        : media.section
+              }}
+            </span>
           </q-item>
-        </transition>
+          <q-item
+            :class="
+              'items-center justify-center meeting-section-internal ' +
+              media.section +
+              ' ' +
+              (index + 1 === sortableMediaItems.length ||
+              media.section !== sortableMediaItems[index + 1]?.section
+                ? 'end'
+                : '')
+            "
+          >
+            <div class="q-pr-none rounded-borders">
+              <div
+                class="bg-grey-9 rounded-borders text-white flex"
+                style="width: 150px; height: 84px"
+                v-if="media.isAudio"
+              >
+                <q-icon name="mdi-music-note" size="lg" />
+              </div>
+              <div class="q-pr-none rounded-borders relative-position" v-else>
+                <q-img
+                  :id="media.uniqueId"
+                  :ratio="16 / 9"
+                  :src="media.thumbnailUrl"
+                  @error="imageLoadingError(media)"
+                  @load="media.isImage"
+                  class="rounded-borders"
+                  fit="contain"
+                  width="150px"
+                >
+                  <q-badge
+                    :color="
+                      customDurations[currentCongregation]?.[selectedDate]?.[
+                        media.uniqueId
+                      ] &&
+                      (customDurations[currentCongregation][selectedDate][
+                        media.uniqueId
+                      ].min > 0 ||
+                        customDurations[currentCongregation][selectedDate][
+                          media.uniqueId
+                        ].max < media.duration)
+                        ? 'negative'
+                        : 'black'
+                    "
+                    @click="showMediaDurationPopup(media)"
+                    class="q-mt-xs q-ml-xs"
+                    style="padding: 5px !important"
+                    v-if="media.isVideo"
+                  >
+                    <q-icon class="q-mr-xs" color="white" name="mdi-play" />
+                    {{
+                      customDurations[currentCongregation]?.[selectedDate]?.[
+                        media.uniqueId
+                      ] &&
+                      (customDurations[currentCongregation][selectedDate][
+                        media.uniqueId
+                      ].min > 0 ||
+                        customDurations[currentCongregation][selectedDate][
+                          media.uniqueId
+                        ].max < media.duration)
+                        ? formatTime(
+                            customDurations[currentCongregation][selectedDate][
+                              media.uniqueId
+                            ].min,
+                          ) + ' - '
+                        : ''
+                    }}
+                    {{
+                      formatTime(
+                        customDurations[currentCongregation]?.[selectedDate]?.[
+                          media.uniqueId
+                        ]?.max ?? media.duration,
+                      )
+                    }}
+                  </q-badge>
+                  <q-dialog
+                    persistent
+                    v-model="mediaDurationPopups[media.uniqueId]"
+                  >
+                    <q-card style="width: 300px">
+                      <q-card-section>
+                        <div class="text-h6">{{ media.title }}</div>
+                      </q-card-section>
+                      <q-card-section class="q-py-none" padding>
+                        <p class="q-my-none">
+                          {{
+                            $t(
+                              'use-the-slider-below-to-adjust-the-start-and-end-time-of-this-media-item',
+                            )
+                          }}
+                        </p>
+                      </q-card-section>
+                      <q-card-section class="q-pr-sm" horizontal>
+                        <q-card-section
+                          class="full-width q-pl-lg q-pt-none q-pb-lg"
+                        >
+                          <!-- {{ media.duration }} -->
+                          <q-range
+                            :left-label-value="
+                              formatTime(
+                                customDurations[currentCongregation]?.[
+                                  selectedDate
+                                ]?.[media.uniqueId]?.min,
+                              )
+                            "
+                            :max="media.duration"
+                            :min="0"
+                            :right-label-value="
+                              formatTime(
+                                customDurations[currentCongregation]?.[
+                                  selectedDate
+                                ]?.[media.uniqueId]?.max,
+                              )
+                            "
+                            :step="0"
+                            class="q-pt-lg"
+                            label
+                            label-always
+                            switch-label-side
+                            v-model="
+                              customDurations[currentCongregation][
+                                selectedDate
+                              ][media.uniqueId]
+                            "
+                          />
+                        </q-card-section>
+                        <q-card-section class="q-px-sm q-pt-lg">
+                          <q-btn
+                            :label="$t('videoTimeReset')"
+                            @click="resetMediaDuration(media)"
+                            color="negative"
+                            rounded
+                            size="sm"
+                          />
+                        </q-card-section>
+                      </q-card-section>
+                      <q-card-actions align="right">
+                        <q-btn
+                          :label="$t('videoTimeSave')"
+                          @click="mediaDurationPopups[media.uniqueId] = false"
+                          color="primary"
+                          flat
+                        />
+                      </q-card-actions>
+                    </q-card>
+                  </q-dialog>
+                </q-img>
+                <template v-if="mediaPlayingUrl === media.fileUrl">
+                  <transition
+                    appear
+                    enter-active-class="animated fadeIn"
+                    leave-active-class="animated fadeOut"
+                    mode="out-in"
+                    name="fade"
+                  >
+                    <div
+                      class="absolute-bottom-right q-mr-xs q-mb-xs semi-black row rounded-borders"
+                    >
+                      <q-badge
+                        @click="zoomOut(media.uniqueId)"
+                        style="background: transparent; padding: 5px !important"
+                      >
+                        <q-icon color="white" name="mdi-minus" />
+                      </q-badge>
+                      <q-separator class="bg-grey-8 q-my-xs" vertical />
+                      <q-badge
+                        @click="zoomIn(media.uniqueId)"
+                        style="background: transparent; padding: 5px !important"
+                      >
+                        <q-icon color="white" name="mdi-plus" />
+                      </q-badge>
+                    </div>
+                  </transition>
+                  <transition
+                    appear
+                    enter-active-class="animated fadeIn"
+                    leave-active-class="animated fadeOut"
+                    mode="out-in"
+                    name="fade"
+                  >
+                    <div
+                      class="absolute-bottom-left q-mr-xs q-mt-xs row rounded-borders"
+                      v-if="obsConnectionState === 'connected'"
+                    >
+                      <q-badge
+                        :color="currentScene === 'media' ? 'primary' : 'negative'"
+                        @click="
+                          sendObsSceneEvent(
+                            currentScene === 'media' ? 'camera' : 'media',
+                          )
+                        "
+                        style="background: transparent; padding: 5px !important"
+                      >
+                        <q-icon :name="currentScene === 'media' ? 'mdi-broadcast' : 'mdi-broadcast-off'" color="white" />
+                      </q-badge>
+                    </div>
+                  </transition>
+                </template>
+              </div>
+            </div>
+            <!--
+                <div class="col" v-if="obsConnectionState === 'connected'">
+                  <q-btn
+                    @click="sendObsSceneEvent('camera')"
+                    color="negative"
+                    flat
+                    icon="mdi-grid-off"
+                    round
+                    size="xs"
+                    v-if="currentScene === 'media'"
+                  >
+                    <q-tooltip>{{
+                      $t('hide-image-for-zoom-participants')
+                    }}</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    @click="sendObsSceneEvent('media')"
+                    color="positive"
+                    flat
+                    icon="mdi-grid"
+                    round
+                    size="xs"
+                    v-else
+                  >
+                    <q-tooltip>{{
+                      $t('show-image-for-zoom-participants')
+                    }}</q-tooltip>
+                  </q-btn>
+                </div>
+-->
+            <div class="row" style="flex-grow: 1; align-content: center">
+              <div class="col-12">
+                <div class="row items-center">
+                  <div class="col">
+                    <div class="row items-center">
+                      <div
+                        class="q-pl-md q-pr-none col-shrink"
+                        side
+                        v-if="media.paragraph"
+                      >
+                        <q-chip
+                          :clickable="false"
+                          class="media-tag paragraph"
+                          square
+                        >
+                          <q-icon
+                            :name="
+                              media.paragraph !== 9999
+                                ? 'fas fa-paragraph'
+                                : 'mdi-asterisk-circle-outline'
+                            "
+                            class="q-mr-xs"
+                          />
+                          {{
+                            media.paragraph !== 9999
+                              ? media.paragraph
+                              : $t('footnote')
+                          }}
+                        </q-chip>
+                      </div>
+                      <div
+                        class="q-pl-md q-pr-none col-shrink"
+                        side
+                        v-else-if="media.song"
+                      >
+                        <q-chip
+                          :clickable="false"
+                          class="media-tag song"
+                          square
+                          text-color="white"
+                        >
+                          <q-icon
+                            class="q-mr-xs"
+                            color="white"
+                            name="mdi-music-note"
+                          />
+                          {{ media.song.toString() }}
+                        </q-chip>
+                      </div>
+                      <div class="q-px-md col">
+                        <div class="ellipsis-3-lines">
+                          {{
+                            media.title ||
+                            (media.fileUrl ? path.basename(media.fileUrl) : '')
+                          }}
+                        </div>
+                      </div>
+                      <div
+                        v-if="
+                          media.isAdditional &&
+                          mediaPlayingUrl !== media.fileUrl
+                        "
+                      >
+                        <q-btn
+                          @click="mediaToDelete = media.uniqueId"
+                          color="negative"
+                          flat
+                          icon="mdi-delete-forever"
+                          rounded
+                        />
+                      </div>
+                    </div>
+                    <transition
+                      appear
+                      enter-active-class="animated fadeIn"
+                      leave-active-class="animated fadeOut"
+                      mode="out-in"
+                      name="fade"
+                    >
+                      <div
+                        class="absolute duration-slider"
+                        v-if="
+                          mediaPlayingUrl === media.fileUrl && media.isVideo
+                        "
+                      >
+                        <q-slider
+                          :disable="mediaPlayingAction !== 'pause'"
+                          :max="media.duration"
+                          :min="0"
+                          :step="0"
+                          @update:model-value="seekTo"
+                          v-model="mediaPlayingCurrentPosition"
+                        />
+                      </div>
+                    </transition>
+                  </div>
+                  <div
+                    class="col-shrink"
+                    style="align-content: center"
+                    v-if="
+                      !(
+                        mediaPlayingUrl === media.fileUrl ||
+                        mediaPlayingUrl === media.streamUrl
+                      )
+                    "
+                  >
+                    <template
+                      v-if="!media.markers || media.markers.length === 0"
+                    >
+                      <q-btn
+                        :disable="
+                          mediaPlayingUrl !== '' && isVideo(mediaPlayingUrl)
+                        "
+                        @click="
+                          mediaPlayingUrl = fs.existsSync(
+                            fileUrlToPath(media.fileUrl),
+                          )
+                            ? media.fileUrl
+                            : media.streamUrl ?? media.fileUrl;
+                          mediaPlayingUniqueId = media.uniqueId;
+                          mediaPlayingSubtitlesUrl = media.subtitlesUrl ?? '';
+                          if (isImage(mediaPlayingUrl))
+                            initiatePanzoom(media.uniqueId);
+                        "
+                        color="primary"
+                        icon="mdi-play"
+                        rounded
+                      />
+                    </template>
+                    <template v-else>
+                      <q-btn
+                        :disable="
+                          mediaPlayingUrl !== '' && isVideo(mediaPlayingUrl)
+                        "
+                        color="primary"
+                        icon="mdi-play-box-multiple"
+                        push
+                        rounded
+                      >
+                        <q-menu>
+                          <q-list style="min-width: 100px">
+                            <q-item
+                              @click="
+                                customDurations[currentCongregation] ??= {};
+                                customDurations[currentCongregation][
+                                  selectedDate
+                                ] ??= {};
+                                customDurations[currentCongregation][
+                                  selectedDate
+                                ][media.uniqueId] = {
+                                  min: 0,
+                                  max: media.duration,
+                                };
+                                mediaPlayingUrl = fs.existsSync(
+                                  fileUrlToPath(media.fileUrl),
+                                )
+                                  ? media.fileUrl
+                                  : media.streamUrl ?? media.fileUrl;
+                                mediaPlayingUniqueId = media.uniqueId;
+                                mediaPlayingSubtitlesUrl =
+                                  media.subtitlesUrl ?? '';
+                                mediaPlayingAction = 'play';
+                              "
+                              clickable
+                            >
+                              <q-item-section>{{
+                                $t('entireFile')
+                              }}</q-item-section>
+                            </q-item>
+                            <q-separator />
+                            <q-item
+                              :key="marker.VideoMarkerId"
+                              @click="
+                                customDurations[currentCongregation] ??= {};
+                                customDurations[currentCongregation][
+                                  selectedDate
+                                ] ??= {};
+                                customDurations[currentCongregation][
+                                  selectedDate
+                                ][media.uniqueId].min =
+                                  marker.StartTimeTicks / 10000 / 1000;
+                                customDurations[currentCongregation][
+                                  selectedDate
+                                ][media.uniqueId].max =
+                                  (marker.StartTimeTicks +
+                                    marker.DurationTicks -
+                                    marker.EndTransitionDurationTicks) /
+                                  10000 /
+                                  1000;
+                                mediaPlayingUrl = fs.existsSync(
+                                  fileUrlToPath(media.fileUrl),
+                                )
+                                  ? media.fileUrl
+                                  : media.streamUrl ?? media.fileUrl;
+                                mediaPlayingUniqueId = media.uniqueId;
+                                mediaPlayingSubtitlesUrl =
+                                  media.subtitlesUrl ?? '';
+                                mediaPlayingAction = 'play';
+                              "
+                              clickable
+                              v-for="marker in media.markers"
+                            >
+                              <q-item-section>{{
+                                marker.Label
+                              }}</q-item-section>
+                            </q-item>
+                          </q-list>
+                        </q-menu>
+                      </q-btn>
+                    </template>
+                  </div>
+                  <template v-else>
+                    <div class="col-shrink items-center justify-center flex">
+                      <q-btn
+                        @click="mediaPlayingAction = 'play'"
+                        color="primary"
+                        icon="mdi-play"
+                        outline
+                        rounded
+                        v-if="mediaPlayingAction === 'pause'"
+                      />
+                      <q-btn
+                        @click="mediaPlayingAction = 'pause'"
+                        color="negative"
+                        icon="mdi-pause"
+                        outline
+                        rounded
+                        v-else-if="
+                          media.isVideo &&
+                          (mediaPlayingAction === 'play' || !mediaPlayingAction)
+                        "
+                      />
+                      <q-btn
+                        @click="
+                          media.isVideo
+                            ? (mediaToStop = media.uniqueId)
+                            : stopMedia()
+                        "
+                        class="q-ml-sm"
+                        color="negative"
+                        icon="mdi-stop"
+                        rounded
+                        v-if="
+                          mediaPlayingAction !== '' || mediaPlayingAction === ''
+                        "
+                      />
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </q-item>
+        </div>
       </template>
     </q-list>
     <q-dialog persistent v-model="mediaStopPending">
@@ -770,8 +827,13 @@ const {
   currentSettings,
   getDatedAdditionalMediaDirectory,
   mediaPaused,
-  mediaPlayer,
   mediaPlaying,
+  mediaPlayingAction,
+  mediaPlayingCurrentPosition,
+  // mediaPlayingSeekTo,
+  mediaPlayingSubtitlesUrl,
+  mediaPlayingUniqueId,
+  mediaPlayingUrl,
   selectedDate,
   selectedDateObject,
 } = storeToRefs(currentState);
@@ -797,20 +859,56 @@ const zoomReset = (elemId: string, forced = false, animate = true) => {
 };
 
 function stopMedia() {
-  mediaPlayer.value.action = 'stop';
-  mediaPlayer.value.url = '';
-  mediaPlayer.value.uniqueId = '';
-  mediaPlayer.value.action = '';
-  mediaPlayer.value.currentPosition = 0;
+  // mediaPlayingAction.value = 'stop';
+  console.log('destroyPanzoom', mediaPlayingUniqueId.value);
+  destroyPanzoom(mediaPlayingUniqueId.value);
+  mediaPlayingUrl.value = '';
+  mediaPlayingUniqueId.value = '';
+  mediaPlayingAction.value = '';
+  mediaPlayingCurrentPosition.value = 0;
   mediaToStop.value = '';
 }
 
 watch(
-  () => mediaPlayer.value?.uniqueId,
+  () => mediaPlayingUniqueId.value,
   (newMediaUniqueId) => {
+    bc.postMessage({ uniqueId: newMediaUniqueId });
     for (const key of Object.keys(panzooms)) {
       if (key !== newMediaUniqueId) zoomReset(key, true);
     }
+  },
+);
+
+// watch(
+//   () => mediaPlayingSeekTo.value,
+//   (newSeekTo) => {
+//     bc.postMessage({ seekTo: newSeekTo });
+//   },
+// );
+
+const seekTo = (newSeekTo: null | number) => {
+  if (newSeekTo !== null) bc.postMessage({ seekTo: newSeekTo });
+};
+
+watch(
+  () => mediaPlayingAction.value,
+  (newAction) => {
+    bc.postMessage({ action: newAction });
+  },
+);
+
+watch(
+  () => mediaPlayingSubtitlesUrl.value,
+  (newSubtitlesUrl) => {
+    bc.postMessage({ subtitlesUrl: newSubtitlesUrl });
+  },
+);
+
+watch(
+  () => mediaPlayingUrl.value,
+  (newUrl) => {
+    console.debug('mediaPlayingUrl', newUrl);
+    bc.postMessage({ url: newUrl });
   },
 );
 
@@ -830,6 +928,21 @@ function zoomOut(elemId: string) {
     console.error(error);
   }
 }
+
+const destroyPanzoom = (elemId: string) => {
+  try {
+    console.log(panzooms[elemId], elemId);
+    if (!panzooms[elemId] || !elemId) return;
+    panzooms[elemId].resetStyle();
+    panzooms[elemId].reset({ animate: false });
+    panzooms[elemId].destroy();
+    console.log(panzooms[elemId], elemId);
+    delete panzooms[elemId];
+    console.log(panzooms[elemId], elemId);
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 const initiatePanzoom = (elemId: string) => {
   try {
@@ -851,9 +964,14 @@ const initiatePanzoom = (elemId: string) => {
     elem.addEventListener(
       'panzoomchange',
       (e: HTMLElementEventMap['panzoomchange']) => {
-        mediaPlayer.value.scale = e.detail.scale;
-        if (width > 0) mediaPlayer.value.x = e.detail.x / width;
-        if (height > 0) mediaPlayer.value.y = e.detail.y / height;
+        bc.postMessage({
+          scale: e.detail.scale,
+          x: e.detail.x / (width ?? 1),
+          y: e.detail.y / (height ?? 1),
+        });
+        // bc.postMessage({ scale: e.detail.scale });
+        // if (width > 0) bc.postMessage({ x: e.detail.x / width });
+        // if (height > 0) bc.postMessage({ y: e.detail.y / width });
       },
     );
   } catch (error) {
@@ -868,6 +986,25 @@ const datedAdditionalMediaMap = computed(() => {
     ] ?? []
   );
 });
+
+const bc = new BroadcastChannel('mediaPlayback');
+bc.onmessage = (event) => {
+  console.debug('onmessage', event.data);
+  if (event.data?.state === 'ended') {
+    mediaPlayingCurrentPosition.value = 0;
+    // mediaPlayingSeekTo.value = 0;
+    mediaPlayingUrl.value = '';
+    mediaPlayingUniqueId.value = '';
+    mediaPlayingAction.value =
+      mediaPlayingAction.value === 'backgroundMusicPlay'
+        ? 'backgroundMusicCurrentEnded'
+        : '';
+  }
+  if (event.data?.resetPanzoom) zoomReset(event.data.resetPanzoom, true);
+  if ('currentPosition' in event.data) {
+    mediaPlayingCurrentPosition.value = event.data.currentPosition;
+  }
+};
 
 function deleteMedia() {
   if (!mediaToDelete.value) return;
@@ -1473,13 +1610,7 @@ onUnmounted(() => {
   window.removeEventListener('remoteVideo-loaded', remoteVideoLoaded);
 
   Object.keys(panzooms).forEach((key) => {
-    try {
-      if (!panzooms[key]) return;
-      panzooms[key].destroy();
-      delete panzooms[key];
-    } catch (e) {
-      console.error(e);
-    }
+    destroyPanzoom(key);
   });
 });
 </script>

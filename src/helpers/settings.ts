@@ -8,7 +8,7 @@ const filteredJwLanguages = ref(jwLanguages.value.list);
 
 import { useObsStateStore } from 'src/stores/obs-state';
 const obsState = useObsStateStore();
-const { nonMediaScenes, nonStageScenes, scenes } = storeToRefs(obsState);
+const { scenes } = storeToRefs(obsState);
 
 import { localeOptions } from 'src/i18n';
 
@@ -170,13 +170,7 @@ const getListOptions = (list: string | undefined) => {
         { label: 'sunday', value: '6' },
       ];
     } else if (list?.startsWith('obs')) {
-      let sceneArray = scenes.value;
-      if (list == 'obsNonMediaScenes') {
-        sceneArray = nonMediaScenes.value;
-      } else if (list == 'obsNonStageScenes') {
-        sceneArray = nonStageScenes.value;
-      }
-      return sceneArray.map((scene) => {
+      return scenes.value.map((scene) => {
         return { label: scene.sceneName, value: scene.sceneUuid };
       });
     } else {

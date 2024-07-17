@@ -13,9 +13,7 @@ const shortcutCallbacks: Partial<Record<keyof SettingsValues, () => void>> = {
     console.debug('shortcutMediaPrevious');
   },
   shortcutMediaWindow: () => {
-    const currentState = useCurrentStateStore();
-    const { mediaPlayer } = storeToRefs(currentState);
-    showMediaWindow(!mediaPlayer.value.windowVisible);
+    showMediaWindow();
   },
   shortcutMusic: () => {
     window.dispatchEvent(new CustomEvent('toggleMusic'));

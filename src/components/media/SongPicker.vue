@@ -6,7 +6,7 @@
           <q-avatar
             class="q-mr-md self-center"
             color="primary"
-            icon="mdi-music-clef-treble"
+            icon="mdi-music-note"
             text-color="white"
           />
           <span class="text-h6 self-center">

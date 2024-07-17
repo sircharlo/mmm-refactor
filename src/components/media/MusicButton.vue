@@ -1,65 +1,90 @@
 <template>
   <q-btn
+    :color="musicPlaying && musicStopping ? 'negative' : 'white-transparent'"
     :disable="disabled"
-    :flat="!disabled"
-    :label="musicPlaying ? musicRemainingTime : ''"
     :outline="disabled"
-    @click="musicPopup = false"
-    class="q-ml-sm"
-    icon="mdi-music-clef-treble"
+    class="super-rounded"
     no-caps
-    rounded
+    unelevated
     v-if="currentSettings?.enableMusicButton"
   >
+    <q-icon name="mdi-music-note" />
+    <div class="q-ml-sm" v-if="musicPlaying">
+      {{ musicRemainingTime }}
+    </div>
+
     <q-tooltip v-if="!disabled && !musicPopup">
       {{ $t('setupWizard.backgroundMusic') }}
     </q-tooltip>
     <q-popup-proxy
+      :offset="[0, 28]"
+      @before-hide="musicPopup = false"
+      @before-show="musicPopup = true"
       anchor="top middle"
+      class="round-card"
+      flat
       self="bottom middle"
-      v-model="musicPopup"
+      v-if="!disabled"
     >
-      <q-card class="non-selectable">
+      <q-card class="non-selectable" flat style="min-width: 50vw">
         <q-card-section>
-          <div class="text-overline">
+          <div class="card-title">
             {{ $t('setupWizard.backgroundMusic') }}
           </div>
-          <div class="text-h5">
-            {{ musicPlaying ? musicRemainingTime : 'Inactive' }}
-          </div>
-          <div class="text-caption text-grey-9" v-if="musicPlaying">
-            {{ $t('current-song-remaining') }} {{ currentSongRemainingTime }}
+          <q-slide-transition>
+            <div v-if="musicPlaying">
+              <div>
+                <p class="card-section-title text-dark-grey">
+                  {{ $t('current-song') }}
+                </p>
+                <p>
+                  <span class="text-weight-medium text-secondary">{{
+                    musicPlayingTitle
+                  }}</span>
+                  <span class="text-grey">
+                    – {{ currentSongRemainingTime }}</span
+                  >
+                </p>
+              </div>
+              <q-separator class="bg-accent-200 q-mb-md" />
+            </div>
+          </q-slide-transition>
+          <div class="row items-center">
+            <div class="col-6">
+              <div class="row text-subtitle1 text-weight-bold">
+                {{ musicPlaying ? musicRemainingTime : $t('not-playing') }}
+              </div>
+              <div
+                class="row text-dark-grey"
+                v-if="meetingDay && timeRemainingBeforeMusicStop > 0"
+              >
+                Time until start
+              </div>
+            </div>
+            <div class="col-6">
+              <q-btn
+                :disabled="mediaPlaying"
+                @click="playMusic"
+                class="full-width"
+                color="primary"
+                unelevated
+                v-if="!musicPlaying"
+                >{{ $t('play-music') }}</q-btn
+              >
+              <q-btn
+                :disable="musicStopping"
+                @click="stopMusic"
+                class="full-width"
+                color="primary"
+                unelevated
+                v-else
+                >{{ $t('stop-music') }}</q-btn
+              >
+            </div>
           </div>
         </q-card-section>
-        <q-separator />
-        <q-card-actions>
-          <q-btn
-            :disabled="mediaPlaying"
-            @click="playMusic"
-            flat
-            v-close-popup
-            v-if="!musicPlaying"
-            >{{ $t('play-music') }}</q-btn
-          >
-          <q-btn
-            :disable="musicStopping"
-            @click="stopMusic"
-            flat
-            v-close-popup
-            v-else
-            >{{ $t('stop-music') }}</q-btn
-          >
-        </q-card-actions>
       </q-card>
     </q-popup-proxy>
-    <q-badge
-      :color="
-        musicPlaying ? (musicStopping ? 'warning' : 'positive') : 'negative'
-      "
-      floating
-      rounded
-      style="margin-top: 1.25em; margin-right: 0.25em"
-    />
   </q-btn>
 </template>
 
@@ -67,12 +92,15 @@
 import klawSync from 'klaw-sync';
 import { storeToRefs } from 'pinia';
 import { date } from 'quasar';
+import { electronApi } from 'src/helpers/electron-api';
 import { getFileUrl, getPublicationDirectoryContents } from 'src/helpers/fs';
 import { formatTime } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+
 const { t } = useI18n();
+const { fileUrlToPath, parseFile, path } = electronApi;
 
 defineProps<{
   disabled?: boolean;
@@ -85,6 +113,7 @@ const musicPlayer = ref<HTMLAudioElement>(document.createElement('audio'));
 const musicPlayerSource = ref<HTMLSourceElement>(
   document.createElement('source'),
 );
+const musicPlayingTitle = ref('');
 const musicPlaying = ref(false);
 const fadeOutTimer = ref();
 const musicStopping = ref(false);
@@ -139,7 +168,7 @@ const getNextSongUrl = () => {
  *
  * @return {string|null} The remaining time in hours and minutes, optionally formatted, or null if there is no meeting day selected.
  */
- const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
+const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
   try {
     if (meetingDay.value) {
       const now = new Date();
@@ -178,6 +207,22 @@ function playMusic() {
     musicPlayer.value.volume =
       (currentSettings.value?.musicVolume ?? 100) / 100 ?? 1;
     musicPlayerSource.value.src = getNextSongUrl();
+
+    (async () => {
+      try {
+        const metadata = await parseFile(
+          fileUrlToPath(musicPlayerSource.value.src),
+        );
+        console.log(metadata);
+        musicPlayingTitle.value =
+          metadata.common.title ?? path.basename(musicPlayerSource.value?.src); // basename
+      } catch (error) {
+        console.error(error);
+        musicPlayingTitle.value =
+          path.basename(musicPlayerSource.value?.src) ?? '';
+      }
+    })();
+
     musicPlayer.value.load();
     musicPlayer.value
       .play()

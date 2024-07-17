@@ -11,6 +11,7 @@ import { contextBridge } from 'electron';
 import fs from 'fs-extra';
 import convert from 'heic-convert';
 import klawSync from 'klaw-sync';
+import { IOptions } from 'music-metadata';
 import { RenderParameters } from 'pdfjs-dist/types/src/display/api';
 import { throttle } from 'quasar';
 import { FULL_HD } from 'src/helpers/converters';
@@ -353,6 +354,12 @@ contextBridge.exposeInMainWorld('electronApi', {
     return dialog.showOpenDialogSync({
       properties: ['openDirectory'],
     });
+  },
+  parseFile: async (filePath: string, options?: IOptions) => {
+    const musicMetadata: typeof import('music-metadata') = await import(
+      'music-metadata'
+    );
+    return musicMetadata.parseFile(filePath, options);
   },
   path,
   pathToFileURL: (path: string) => {

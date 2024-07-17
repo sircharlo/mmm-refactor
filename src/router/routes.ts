@@ -22,7 +22,7 @@ const routes: RouteRecordRaw[] = [
       { component: () => import('pages/MediaCalendarPage.vue'), path: '' },
     ],
     component: () => import('layouts/MainLayout.vue'),
-    meta: { title: 'titles.mediaCalendar' },
+    meta: { title: 'titles.meetingMedia' },
     path: '/media-calendar',
   },
   {

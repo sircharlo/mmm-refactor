@@ -342,11 +342,15 @@ const convertImageIfNeeded = async (filepath: string) => {
   }
 };
 
-const showMediaWindow = (state: boolean) => {
+const showMediaWindow = (state?: boolean) => {
   try {
+    console.log('showMediaWindow', state);
     const currentState = useCurrentStateStore();
-    const { mediaPlayer } = storeToRefs(currentState);
-    mediaPlayer.value.windowVisible = state;
+    const { mediaWindowVisible } = storeToRefs(currentState);
+    if (!state) {
+      state = !mediaWindowVisible.value;
+    }
+    mediaWindowVisible.value = state;
     toggleMediaWindow(state ? 'show' : 'hide');
   } catch (error) {
     console.error(error);

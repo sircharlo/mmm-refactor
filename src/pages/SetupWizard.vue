@@ -273,7 +273,7 @@
         :done="step > 102"
         :name="102"
         :title="$t('setupWizard.backgroundMusic')"
-        icon="mdi-music-clef-treble"
+        icon="mdi-music-note"
       >
         <p>
           {{ $t('also-look-for-this-button-in-m-s-footer') }}
@@ -469,7 +469,7 @@
             <p>{{ $t('once-the-scene-has-been-created-select-it-here') }}</p>
             <SelectInput
               :label="$t('obsMediaScene')"
-              options="obsNonStageScenes"
+              options="obsAllScenes"
               v-model="currentSettings.obsMediaScene"
             />
             <q-stepper-navigation>

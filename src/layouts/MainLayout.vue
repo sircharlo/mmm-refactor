@@ -10,17 +10,30 @@
         </q-toolbar-title>
         <template v-if="route.fullPath === '/media-calendar'">
           <q-btn
+            :disable="mediaPlaying"
+            @click="resetSort"
             class="q-ml-sm"
-            color="purple-6"
-            icon="mdi-movie-plus"
-            rounded
-            text-color="white"
+            color="white-transparent"
+            unelevated
+            v-if="mediaSortForDay && selectedDate"
+          >
+            <q-icon class="q-mr-sm" name="mdi-restore" size="xs" />
+            {{ $t('reset-sort-order') }}
+          </q-btn>
+          <q-btn
+            class="q-ml-sm"
+            color="white-transparent"
+            unelevated
             v-if="selectedDate"
           >
-            <q-tooltip v-if="!importMediaMenuActive">{{
+            <!-- <q-tooltip v-if="!importMediaMenuActive">{{
               $t('import-media')
-            }}</q-tooltip>
+            }}</q-tooltip> -->
+            <q-icon class="q-mr-sm" name="mdi-plus-box-multiple" size="xs" />
+            {{ $t('import-media') }}
+
             <q-menu
+              :offset="[0, 8]"
               @before-hide="importMediaMenuActive = false"
               @before-show="importMediaMenuActive = true"
             >
@@ -33,9 +46,12 @@
                   v-close-popup
                 >
                   <q-item-section avatar>
-                    <q-icon color="primary" name="mdi-music-clef-treble" />
+                    <q-icon color="primary" name="mdi-music-note" />
                   </q-item-section>
-                  <q-item-section>{{ $t('song') }}</q-item-section>
+                  <q-item-section>
+                    <q-item-label>{{ $t('song') }}</q-item-label>
+                    <q-item-label caption>Caption</q-item-label>
+                  </q-item-section>
                 </q-item>
                 <q-item
                   :disable="!online"
@@ -47,19 +63,22 @@
                   v-close-popup
                 >
                   <q-item-section avatar>
-                    <q-icon color="primary" name="mdi-movie-open" />
+                    <q-icon color="primary" name="mdi-movie" />
                   </q-item-section>
-                  <q-item-section>{{ $t('video') }}</q-item-section>
+                  <q-item-section>
+                    <q-item-label>{{ $t('video') }}</q-item-label>
+                    <q-item-label caption>Caption</q-item-label>
+                  </q-item-section>
                 </q-item>
                 <q-item-label header>{{
                   $t('from-local-computer')
                 }}</q-item-label>
                 <template
                   :key="name"
-                  v-for="[icon, name] in [
-                    ['mdi-multimedia', 'images-videos'],
-                    ['mdi-folder-zip', 'jwpub-file'],
-                    ['mdi-playlist-play', 'jw-playlist'],
+                  v-for="[icon, name, caption] in [
+                    ['mdi-folder-multiple-image', 'images-videos', 'Caption'],
+                    ['mdi-folder-zip', 'jwpub-file', 'Caption'],
+                    ['mdi-playlist-play', 'jw-playlist', 'Caption'],
                   ]"
                 >
                   <q-item
@@ -70,7 +89,10 @@
                     <q-item-section avatar>
                       <q-icon :name="icon" color="primary" />
                     </q-item-section>
-                    <q-item-section>{{ $t(name) }}</q-item-section>
+                    <q-item-section>
+                      <q-item-label>{{ $t(name) }}</q-item-label>
+                      <q-item-label caption>{{ caption }}</q-item-label>
+                    </q-item-section>
                   </q-item>
                 </template>
               </q-list>
@@ -78,27 +100,15 @@
           </q-btn>
           <q-btn
             :disable="mediaPlaying"
-            @click="resetSort"
             class="q-ml-sm"
-            color="warning"
-            icon="mdi-sort-numeric-variant"
-            rounded
-            text-color="black"
-            v-if="mediaSortForDay && selectedDate"
+            color="white-transparent"
+            unelevated
           >
-            <q-tooltip>{{ $t('reset-sort-order') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            :disable="mediaPlaying"
-            :label="selectedDate"
-            class="q-ml-sm"
-            color="secondary"
-            icon="mdi-calendar"
-            rounded
-          >
-            <q-tooltip v-if="!datePickerActive">{{
+            <!-- <q-tooltip v-if="!datePickerActive">{{
               $t('select-a-date')
-            }}</q-tooltip>
+            }}</q-tooltip> -->
+            <q-icon class="q-mr-sm" name="mdi-calendar-month" size="xs" />
+            {{ selectedDate ?? $t('select-a-date') }}
             <q-popup-proxy breakpoint="1000" v-model="datePickerActive">
               <q-date
                 :event-color="getEventDayColor"
@@ -325,19 +335,39 @@
     </q-header>
 
     <q-footer
+      class="q-pb-sm"
+      style="background-color: transparent"
       v-if="
         currentSettings?.enableMediaDisplayButton ||
         currentSettings?.enableMusicButton
       "
     >
-      <q-toolbar class="bg-blue-9 text-white" style="min-height: initial">
+      <div class="flex" style="justify-content: center">
+        <q-chip
+          :ripple="false"
+          color="primary"
+          rounded
+          size="xl"
+          style="border-radius: 2em; padding: 32px 16px"
+        >
+          <div class="flex q-gutter-x-md">
+            <DownloadStatus />
+            <!-- <q-separator class="q-mx-none" vertical /> -->
+            <MusicButton />
+            <SubtitlesButton />
+            <ObsStatus />
+            <MediaDisplayButton />
+          </div>
+        </q-chip>
+      </div>
+      <!-- <q-toolbar class="bg-blue-9 text-white" style="min-height: initial">
         <DownloadStatus />
         <q-space />
         <MusicButton />
         <SubtitlesButton />
         <ObsStatus />
         <MediaDisplayButton />
-      </q-toolbar>
+      </q-toolbar> -->
     </q-footer>
 
     <SongPicker v-model="chooseSong" />
@@ -369,7 +399,7 @@
           <q-icon name="mdi-calendar-month" />
         </q-item-section>
 
-        <q-item-section>{{ $t('titles.mediaCalendar') }}</q-item-section>
+        <q-item-section>{{ $t('titles.meetingMedia') }}</q-item-section>
       </q-item>
 
       <q-space />
@@ -416,7 +446,7 @@
       </q-item>
     </q-drawer>
 
-    <q-page-container>
+    <q-page-container class="main-bg">
       <router-view />
     </q-page-container>
 

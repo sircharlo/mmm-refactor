@@ -145,7 +145,7 @@ export const settingsDefinitions: SettingsItems = {
   obsImageScene: {
     depends: 'obsEnable',
     group: 'integrations',
-    list: 'obsNonStageScenes',
+    list: 'obsAllScenes',
     type: 'list',
   },
 
