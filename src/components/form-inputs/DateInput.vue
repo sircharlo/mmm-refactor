@@ -6,6 +6,7 @@
     filled
     mask="date"
     readonly
+    style="width: 240px;"
     v-model="localValue"
     v-bind="{ label: label || undefined }"
   >

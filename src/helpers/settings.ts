@@ -160,15 +160,11 @@ const getListOptions = (list: string | undefined) => {
         { label: '720p', value: '720p' },
       ];
     } else if (list == 'days') {
-      return [
-        { label: 'monday', value: '0' },
-        { label: 'tuesday', value: '1' },
-        { label: 'wednesday', value: '2' },
-        { label: 'thursday', value: '3' },
-        { label: 'friday', value: '4' },
-        { label: 'saturday', value: '5' },
-        { label: 'sunday', value: '6' },
-      ];
+      const array = [];
+      for (let i = 0; i <= 6; i++) {
+        array.push({ label: String(i), value: String(i) });
+      }
+      return array;
     } else if (list?.startsWith('obs')) {
       return scenes.value.map((scene) => {
         return { label: scene.sceneName, value: scene.sceneUuid };

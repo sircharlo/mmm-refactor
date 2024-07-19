@@ -972,6 +972,18 @@ const getMwMedia = async (lookupDate: Date) => {
       },
     );
 
+    // To think about: Enabling InternalLink lookups: is this needed?
+    // const internalLinkMedia = getInternalLinkItems({ db, docId }).map(
+    //   (multimediaItem) => {
+    //     const videoMarkers = getMediaVideoMarkers(
+    //       { db, docId } as MultimediaItemsFetcher,
+    //       multimediaItem.MultimediaId,
+    //     );
+    //     if (videoMarkers) multimediaItem.VideoMarkers = videoMarkers;
+    //     return addFullFilePathToMultimediaItem(multimediaItem, publication);
+    //   },
+    // );
+
     const extracts = await getDocumentExtractItems(db, docId);
 
     const allMedia: MultimediaItem[] = mms

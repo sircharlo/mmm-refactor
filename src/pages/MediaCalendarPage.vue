@@ -102,7 +102,7 @@
               index === 0 ||
               media.section !== sortableMediaItems[index - 1]?.section
             "
-          >
+          ><q-avatar :class="'text-white bg-' + media.section" rounded>
             <span class="text-h4">
               {{
                 media.section === 'tgw'
@@ -115,7 +115,7 @@
                         ? ''
                         : media.section
               }}
-            </span>
+            </span></q-avatar>
           </q-item>
           <q-item
             :class="
@@ -302,7 +302,9 @@
                       v-if="obsConnectionState === 'connected'"
                     >
                       <q-badge
-                        :color="currentScene === 'media' ? 'primary' : 'negative'"
+                        :color="
+                          currentScene === 'media' ? 'primary' : 'negative'
+                        "
                         @click="
                           sendObsSceneEvent(
                             currentScene === 'media' ? 'camera' : 'media',
@@ -310,7 +312,21 @@
                         "
                         style="background: transparent; padding: 5px !important"
                       >
-                        <q-icon :name="currentScene === 'media' ? 'mdi-broadcast' : 'mdi-broadcast-off'" color="white" />
+                        <q-tooltip>{{
+                          $t(
+                            currentScene === 'media'
+                              ? 'hide-image-for-zoom-participants'
+                              : 'show-image-for-zoom-participants',
+                          )
+                        }}</q-tooltip>
+                        <q-icon
+                          :name="
+                            currentScene === 'media'
+                              ? 'mdi-broadcast'
+                              : 'mdi-broadcast-off'
+                          "
+                          color="white"
+                        />
                       </q-badge>
                     </div>
                   </transition>
@@ -359,7 +375,7 @@
                       >
                         <q-chip
                           :clickable="false"
-                          class="media-tag paragraph"
+                          class="media-tag bg-accent-200"
                           square
                         >
                           <q-icon
@@ -384,7 +400,7 @@
                       >
                         <q-chip
                           :clickable="false"
-                          class="media-tag song"
+                          class="media-tag bg-accent-400"
                           square
                           text-color="white"
                         >
@@ -465,7 +481,7 @@
                             fileUrlToPath(media.fileUrl),
                           )
                             ? media.fileUrl
-                            : media.streamUrl ?? media.fileUrl;
+                            : (media.streamUrl ?? media.fileUrl);
                           mediaPlayingUniqueId = media.uniqueId;
                           mediaPlayingSubtitlesUrl = media.subtitlesUrl ?? '';
                           if (isImage(mediaPlayingUrl))
@@ -504,7 +520,7 @@
                                   fileUrlToPath(media.fileUrl),
                                 )
                                   ? media.fileUrl
-                                  : media.streamUrl ?? media.fileUrl;
+                                  : (media.streamUrl ?? media.fileUrl);
                                 mediaPlayingUniqueId = media.uniqueId;
                                 mediaPlayingSubtitlesUrl =
                                   media.subtitlesUrl ?? '';
@@ -540,7 +556,7 @@
                                   fileUrlToPath(media.fileUrl),
                                 )
                                   ? media.fileUrl
-                                  : media.streamUrl ?? media.fileUrl;
+                                  : (media.streamUrl ?? media.fileUrl);
                                 mediaPlayingUniqueId = media.uniqueId;
                                 mediaPlayingSubtitlesUrl =
                                   media.subtitlesUrl ?? '';

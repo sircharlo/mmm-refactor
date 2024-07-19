@@ -1,11 +1,12 @@
 <template>
   <q-input
     :rules="getRules(rules)"
-    class="q-pb-none"
+    class="q-pb-none bg-accent-100"
     dense
-    filled
+    outlined
     v-model="localValue"
     v-bind="{ label: label || undefined }"
+    style="width: 240px;"
   />
 </template>
 

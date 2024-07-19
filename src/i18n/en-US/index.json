@@ -150,7 +150,7 @@
   "scene-selection": "OBS Scene selection",
   "select-a-date": "Select a date",
   "set-custom-background": "Select a custom background",
-  "setup-wizard": "Setup Wizard",
+  "setup-wizard": "Initial configuration",
   "setupWizard.backgroundMusic": "Background music",
   "setupWizard.intro": "M³ is an app designed to make your playing media at congregation meetings easy and stress-free. Let's configure a few things, and then we'll get on our way.",
   "setupWizard.meetingDaysTimes": "Meeting days and times",
@@ -173,7 +173,7 @@
   "themePreference": "App theme",
   "this-will-speed-up-media-retrieval-for-meetings": "This will speed up media retrieval for meeting media, but is not mandatory.",
   "titles.meetingMedia": "Meeting media",
-  "titles.profileSelection": "Profile selection",
+  "titles.profileSelection": "Congregation profiles",
   "titles.settings": "Settings",
   "to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window": "To add files from your computer, drag-and-drop them directly into this window.",
   "to-quickly-show-and-hide-zoom-participants-on-the-tv-screens-when-needed-make-sure-that-the-setting-to-use-dual-monitors-in-zoom-is-enabled": "Tip: To ensure you're able to quickly show and hide Zoom participants on the TV screens when needed, make sure that the setting to \"use dual monitors\" in Zoom is enabled.",
@@ -210,5 +210,10 @@
   "speaker": "Speaker",
   "media-only": "Media only",
   "picture-in-picture": "Media and speaker (PIP)",
-  "additional-scenes": "Additional scenes"
+  "additional-scenes": "Additional scenes",
+  "no-regular-meetings": "No regular meetings",
+  "until-meeting-starts": "Until meeting starts",
+  "incomplete-configuration": "Incomplete configuration",
+  "collapse-sidebar": "Collapse sidebar",
+  "expand-sidebar": "Expand sidebar"
 }

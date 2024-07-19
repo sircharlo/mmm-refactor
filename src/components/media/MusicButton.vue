@@ -5,6 +5,7 @@
     :outline="disabled"
     class="super-rounded"
     no-caps
+    rounded
     unelevated
     v-if="currentSettings?.enableMusicButton"
   >
@@ -38,7 +39,7 @@
                   {{ $t('current-song') }}
                 </p>
                 <p>
-                  <span class="text-weight-medium text-secondary">{{
+                  <span class="text-weight-medium">{{
                     musicPlayingTitle
                   }}</span>
                   <span class="text-grey">
@@ -51,14 +52,19 @@
           </q-slide-transition>
           <div class="row items-center">
             <div class="col-6">
-              <div class="row text-subtitle1 text-weight-bold">
+              <div class="row text-subtitle1 text-weight-medium">
                 {{ musicPlaying ? musicRemainingTime : $t('not-playing') }}
               </div>
               <div
                 class="row text-dark-grey"
-                v-if="meetingDay && timeRemainingBeforeMusicStop > 0"
+                v-if="
+                  musicPlaying &&
+                  !musicStopping &&
+                  meetingDay &&
+                  timeRemainingBeforeMusicStop > 0
+                "
               >
-                Time until start
+                {{ t('until-meeting-starts') }}
               </div>
             </div>
             <div class="col-6">

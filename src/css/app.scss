@@ -66,27 +66,81 @@
 
 body.body--light {
   background: $primary-bg;
+
+  .q-drawer--left.q-drawer--bordered {
+    border-color: $accent-300;
+  }
+
+  .bg-accent-100 {
+    background-color: $accent-100;
+  }
+
+  .bg-accent-200 {
+    background-color: $accent-200;
+  }
+
+  .bg-accent-300 {
+    background-color: $accent-300;
+  }
+
+  .bg-accent-400 {
+    background-color: $accent-400;
+  }
+
+  .text-dark-grey {
+    color: $dark-grey;
+  }
+
+  .meeting-section {
+    background: white;
+    border-color: $accent-300;
+  }
+
+  .bg-secondary-contrast {
+    background-color: $secondary-contrast;
+  }
 }
+
 body.body--dark {
-  background: #363c49;
+  background: $primary-bg-dark;
+
+  .bg-accent-100 {
+    background-color: $accent-100-dark;
+  }
+
+  .bg-accent-200 {
+    background-color: $accent-100-dark;
+  }
+
+  .bg-accent-300 {
+    background-color: $accent-200-dark;
+  }
+
+  .bg-accent-400 {
+    background-color: $accent-200-dark;
+  }
+
+  .text-dark-grey {
+    color: $dark-grey-dark;
+  }
 
   .meeting-section {
     background: $dark;
+    border-color: $accent-100-dark;
+  }
+
+  .bg-secondary-contrast {
+    background-color: $secondary-contrast-dark;
+    color: $dark;
   }
 }
 
 .meeting-section {
-  background: white;
   border-left-width: 1px;
   border-right-width: 1px;
   border-bottom-width: 0px;
   border-top-width: 0px;
   border-style: solid;
-  border-color: $accent-300;
-
-  &.meeting-section.meeting-section-skeleton {
-    border-color: $accent-300;
-  }
 
   &.meeting-section-begin {
     margin-top: 1em;
@@ -155,33 +209,38 @@ body.body--dark {
     border-color: rgb(91, 60, 136);
     // todo: change this like others
   }
+
+  &.congregation:before {
+    background: $accent-200;
+  }
+
+  &.error:before {
+    background: $negative;
+  }
+
+  &.active:before {
+    background: $primary;
+  }
 }
 
 .jw-icon {
   font-family: 'JW-Icons';
-  &.tgw {
-    color: $treasures;
-  }
-
-  &.ayfm {
-    color: $apply;
-  }
-
-  &.lac {
-    color: $living;
-  }
-
-  &.wt {
-    color: $apply;
-  }
 }
 
-.media-tag.paragraph {
-  background: $accent-200;
+.text-tgw {
+  color: $treasures;
 }
 
-.media-tag.song {
-  background: $accent-400;
+.text-ayfm {
+  color: $apply;
+}
+
+.text-lac {
+  color: $living;
+}
+
+.text-wt {
+  color: $apply;
 }
 
 .text-white-transparent {
@@ -193,7 +252,6 @@ body.body--dark {
 }
 
 .q-btn {
-  border-radius: 6px;
   letter-spacing: 0.02em;
   font-weight: 400;
   // font-size: 14px;
@@ -211,10 +269,6 @@ body.body--dark {
 
 .round-card {
   border-radius: 1em;
-}
-
-.text-dark-grey {
-  color: $dark-grey;
 }
 
 .card-title {
@@ -241,10 +295,54 @@ body.body--dark {
   background-color: $semi-black;
 }
 
-.bg-accent-200 {
-  background-color: $accent-200;
+.blue-bar::before {
+  background-color: $primary;
+  content: '';
+  display: block;
+  width: 6px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
 }
 
-.bg-accent-300 {
-  background-color: $accent-300;
+.bg-semi-white-24 {
+  background: $semi-white-24;
+}
+
+.bg-tgw {
+  background: $treasures;
+}
+
+.bg-ayfm {
+  background: $apply;
+}
+
+.bg-lac {
+  background: $living;
+}
+
+.bg-wt {
+  background: $apply;
+}
+
+.text-bigger {
+  font-size: 135%;
+}
+
+.q-expansion-item .q-focus-helper, .q-expansion-item .q-focus-helper::after, .q-expansion-item .q-focus-helper::before {
+  border-radius: 0.75em !important;
+}
+
+.q-expansion-item--expanded .q-expansion-item__content::before {
+  content: '';
+  height: 1px;
+  width: auto;
+  display: block;
+  background: $accent-200;
+  margin: 0 1em;
+}
+
+.q-field {
+  border-radius: $generic-border-radius;
 }

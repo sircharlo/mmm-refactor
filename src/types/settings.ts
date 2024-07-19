@@ -89,6 +89,7 @@ export interface ScreenPreferences {
 export interface SettingsGroup {
   description: string;
   hidden?: boolean;
+  icon: string;
   name: string;
   order?: number;
 }

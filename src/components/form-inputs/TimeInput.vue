@@ -1,11 +1,12 @@
 <template>
   <q-input
     :rules="getRules(rules)"
-    class="q-pb-none"
+    class="q-pb-none bg-accent-100"
     dense
-    filled
     mask="time"
+    outlined
     readonly
+    style="width: 240px;"
     v-model="localValue"
     v-bind="{ label: label || undefined }"
   >

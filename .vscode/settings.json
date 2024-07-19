@@ -8,6 +8,7 @@
     "booknum",
     "cctv",
     "Datetime",
+    "dayjs",
     "Descr",
     "docid",
     "dompurify",

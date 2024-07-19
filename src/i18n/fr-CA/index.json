@@ -107,7 +107,7 @@
   "mwDay": "Jour de réunion de semaine",
   "mwMeeting": "Réunion de semaine",
   "mwStartTime": "Heure de début de la réunion de semaine",
-  "new-profile": "Nouveau profile",
+  "new-profile": "Nouveau profil",
   "no": "Non",
   "no-key-combination": "Entrez une combinaison de touches à l'aide de votre clavier maintenant.",
   "noDateSelected": "Aucune date n'est actuellement sélectionnée. Veuillez sélectionner une date avant de continuer.",
@@ -145,7 +145,7 @@
   "remove-all-cache": "Supprimer tous les fichiers du cache",
   "remove-unused-cache": "Supprimer les éléments inutilisés du cache",
   "reset-custom-background": "Enlever l'arrière-plan personnalisé",
-  "reset-sort-order": "Réinitialiser l'ordre de tri",
+  "reset-sort-order": "Réinitialiser le tri",
   "scene-selection": "Sélection de scène OBS",
   "select-a-date": "Sélectionnez une date",
   "set-custom-background": "Choisir un arrière-plan",
@@ -172,7 +172,7 @@
   "themePreference": "Préférence de thème",
   "this-will-speed-up-media-retrieval-for-meetings": "Cela accélérera le téléchargement des médias pour les réunions, mais ce n'est pas obligatoire.",
   "titles.meetingMedia": "Médias pour les réunions",
-  "titles.profileSelection": "Sélection de profil",
+  "titles.profileSelection": "Profils d'assemblées locales",
   "titles.settings": "Paramètres",
   "to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window": "Pour ajouter des fichiers depuis votre ordinateur, glissez-les glisser directement dans cette fenêtre.",
   "to-quickly-show-and-hide-zoom-participants-on-the-tv-screens-when-needed-make-sure-that-the-setting-to-use-dual-monitors-in-zoom-is-enabled": "Astuce : Pour s'assurer de pouvoir afficher et masquer rapidement les participants Zoom sur les écrans en cas de besoin, assurez-vous que le paramètre « Utiliser deux écrans » dans Zoom est activé.",
@@ -210,5 +210,10 @@
   "speaker": "Orateur",
   "media-only": "Médias uniquement",
   "picture-in-picture": "Médias et orateur (PIP)",
-  "additional-scenes": "Scènes supplémentaires"
+  "additional-scenes": "Scènes supplémentaires",
+  "no-regular-meetings": "Sans réunions régulières",
+  "until-meeting-starts": "Avant le début de la réunion",
+  "incomplete-configuration": "Configuration incomplète",
+  "collapse-sidebar": "Réduire la barre latérale",
+  "expand-sidebar": "Agrandir la barre latérale"
 }

@@ -9,6 +9,7 @@
     "
     :disable="obsConnectionState !== 'connected'"
     class="super-rounded"
+    rounded
     unelevated
     v-if="currentSettings.obsEnable"
   >
@@ -114,79 +115,6 @@
           </template>
         </q-card-section>
       </q-card>
-      <!--<div
-        :class="'rounded-borders bg-grey-' + $q.dark.isActive ? '2' : '9'"
-        style="width: 80vw"
-      >
-        <q-card-section>
-          <div class="text-h6">{{ $t('scene-selection') }}</div>
-        </q-card-section>
-        <q-card-section>
-          <div class="row q-col-gutter-md">
-            <div
-              :class="
-                'col-' +
-                ([mediaScene].concat(nonMediaScenes).filter(Boolean).length < 4
-                  ? (
-                      12 /
-                      [mediaScene].concat(nonMediaScenes).filter(Boolean).length
-                    ).toString()
-                  : '3')
-              "
-            >
-              <q-btn
-                :color="
-                  currentSceneUuid === mediaScene?.sceneUuid
-                    ? 'warning'
-                    : 'primary'
-                "
-                :label="mediaScene?.sceneName as string"
-                @click="setObsScene(undefined, mediaScene?.sceneUuid as string)"
-                class="q-py-md q-px-lg full-width"
-                size="1.5em"
-              />
-            </div>
-          </div>
-        </q-card-section>
-        <q-separator />
-        <q-card-section>
-          <div class="row q-col-gutter-md">
-            <template
-              :key="scene.sceneUuid"
-              v-for="scene in nonMediaScenes.filter(Boolean)"
-            >
-              <div
-                :class="
-                  'col-' +
-                  ([mediaScene].concat(nonMediaScenes).filter(Boolean).length <
-                  4
-                    ? (
-                        12 /
-                        [mediaScene].concat(nonMediaScenes).filter(Boolean)
-                          .length
-                      ).toString()
-                    : '3')
-                "
-              >
-                <q-btn
-                  :color="
-                    currentSceneUuid === scene?.sceneUuid
-                      ? 'warning'
-                      : scene?.sceneUuid === mediaScene?.sceneUuid
-                        ? 'primary'
-                        : 'primary'
-                  "
-                  :label="scene?.sceneName as string"
-                  @click="setObsScene(undefined, scene?.sceneUuid as string)"
-                  class="q-py-md q-px-lg full-width"
-                  size="1.5em"
-                />
-              </div>
-            </template>
-          </div>
-        </q-card-section>
-      </div>
-    -->
     </q-popup-proxy>
   </q-btn>
 </template>

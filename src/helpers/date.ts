@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { storeToRefs } from 'pinia';
 import { date } from 'quasar';
 import { useCurrentStateStore } from 'src/stores/current-state';
@@ -206,10 +207,17 @@ function updateLookupPeriod(reset = false) {
   }
 }
 
+const getLocaleDayName = (lang: string, day: number) => {
+  day++;
+  const dayName = dayjs().locale(lang).day(day).format('dddd');
+  return dayName;
+};
+
 export {
   dateFromString,
   datesAreSame,
   daysInFuture,
+  getLocaleDayName,
   getSpecificWeekday,
   isCoWeek,
   isInPast,

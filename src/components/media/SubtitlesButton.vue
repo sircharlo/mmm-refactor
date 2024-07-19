@@ -4,6 +4,8 @@
     @click="mediaPlayingSubtitlesVisible = !mediaPlayingSubtitlesVisible"
     class="super-rounded"
     icon="mdi-closed-caption"
+    rounded
+    unelevated
     v-if="currentSettings.enableSubtitles"
   >
     <q-tooltip>{{ $t('subtitles') }}</q-tooltip>

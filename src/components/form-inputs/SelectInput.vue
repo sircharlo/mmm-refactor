@@ -2,29 +2,49 @@
   <q-select
     :fill-input="useInput"
     :hide-selected="useInput"
-    :options="(getListOptions(options) as Array<{ value: string, label: string }>)?.map(option => {
-    return {
-      value: option.value,
-      label: (options === 'jwLanguages' || options?.startsWith('obs')) ? option.label : $t(option.label)
-    }
-    }) "
+    :options="
+      (getListOptions(options) as Array<{ value: string; label: string }>)?.map(
+        (option) => {
+          return {
+            value: option.value,
+            label:
+              options === 'jwLanguages' || options?.startsWith('obs')
+                ? option.label
+                : options === 'days'
+                  ? getLocaleDayName(
+                      currentSettings?.localAppLang,
+                      parseInt(option.label),
+                    )
+                  : $t(option.label),
+          };
+        },
+      )
+    "
     :use-input="useInput"
     @filter="filterFn"
+    class="bg-accent-100"
     dense
     emit-value
-    filled
     input-debounce="0"
     map-options
+    outlined
     v-model="localValue"
     v-bind="{ label: label || undefined }"
-    spellcheck=false
+    spellcheck="false"
+    style="width: 240px"
   >
   </q-select>
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { getLocaleDayName } from 'src/helpers/date';
 import { filterFn, getListOptions } from 'src/helpers/settings';
+import { useCurrentStateStore } from 'src/stores/current-state';
 import { ref, watch } from 'vue';
+
+const currentState = useCurrentStateStore();
+const { currentSettings } = storeToRefs(currentState);
 
 const emit = defineEmits(['update:modelValue']);
 

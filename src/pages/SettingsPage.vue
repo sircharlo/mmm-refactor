@@ -1,172 +1,159 @@
 <template>
   <q-page padding>
-    <div class="shadow-5">
-      <q-form
-        greedy
-        no-error-focus
-        novalidate
-        ref="settingsFormDynamic"
-        v-if="currentSettings"
+    <q-form
+      greedy
+      no-error-focus
+      novalidate
+      ref="settingsFormDynamic"
+      v-if="currentSettings"
+    >
+      <template
+        :key="groupId"
+        v-for="[groupId, { name, description, icon }] in Object.entries(
+          settingsGroups,
+        )"
       >
-        <template
-          :key="groupId"
-          v-for="[groupId, { name, description }] in Object.entries(
-            settingsGroups,
-          )"
+        <q-expansion-item
+          :caption="$t(description)"
+          :class="{
+            'meeting-section': true,
+            'meeting-section-begin': true,
+            'meeting-section-end':
+              !expansionState[groupId as keyof SettingsItems],
+            'text-subtitle2': true,
+            'text-weight-medium': true,
+            }"
+          :icon="icon"
+          :label="$t(name)"
+          v-if="
+            !invalidSettingsLength ||
+            !onlyShowInvalidSettings ||
+            Object.entries(settingsDefinitions)
+              .filter(([settingId, item]) => item.group === groupId)
+              .map(([settingId, _]) => settingId)
+              .some((settingId) =>
+                invalidSettings.includes(settingId as keyof SettingsItems),
+              )
+          "
+          v-model="expansionState[groupId as keyof SettingsItems]"
         >
-          <q-expansion-item
-            :caption="$t(description)"
-            :label="$t(name)"
-            expand-separator
-            icon="mdi-home-account"
-            v-if="
-              !invalidSettingsLength ||
-              !onlyShowInvalidSettings ||
-              Object.entries(settingsDefinitions)
-                .filter(([settingId, item]) => item.group === groupId)
-                .map(([settingId, _]) => settingId)
-                .some((settingId) =>
-                  invalidSettings.includes(settingId as keyof SettingsItems),
-                )
-            "
-            v-model="expansionState[groupId as keyof SettingsItems]"
+          <template
+            :key="settingId"
+            v-for="[settingId, item] in Object.entries(
+              settingsDefinitions,
+            ).filter(([settingId, item]) => item.group === groupId)"
           >
-            <template
-              :key="settingId"
-              v-for="[settingId, item] in Object.entries(
-                settingsDefinitions,
-              ).filter(([settingId, item]) => item.group === groupId)"
+            <q-item
+              :class="{
+                'q-py-lg': invalidSettings.includes(
+                  settingId as keyof SettingsItems,
+                ),
+              }"
+              :inset-level="1"
+              tag="label"
+              v-if="
+                (!item.depends ||
+                  currentSettings[item.depends as keyof SettingsItems]) &&
+                (!onlyShowInvalidSettings ||
+                  !invalidSettingsLength ||
+                  invalidSettings.includes(settingId as keyof SettingsItems))
+              "
             >
-              <q-item
-                :class="{
-                  'q-py-lg': invalidSettings.includes(
-                    settingId as keyof SettingsItems,
-                  ),
-                  // 'bg-grey-8': item.depends && $q.dark.isActive,
-                  // 'bg-grey-3': item.depends && !$q.dark.isActive,
-                  'q-mx-xl': true,
-                }"
-                tag="label"
-                v-if="
-                  (!item.depends ||
-                    currentSettings[item.depends as keyof SettingsItems]) &&
-                  (!onlyShowInvalidSettings ||
-                    !invalidSettingsLength ||
-                    invalidSettings.includes(settingId as keyof SettingsItems))
-                "
-              >
-                <q-item-section>
-                  {{ $t(settingId) }}
-                </q-item-section>
-                <q-item-section side>
-                  <q-icon
-                    color="info"
-                    name="mdi-link-variant"
-                    size="sm"
-                    v-if="item.depends"
-                  >
-                    <q-tooltip>
-                      {{ $t('depends-on') }}
-                      <strong>{{ $t(item.depends) }}</strong>
-                    </q-tooltip>
-                  </q-icon>
-                  <q-icon
-                    :name="item.icon"
-                    color="info"
-                    size="sm"
-                    v-else-if="item.icon"
-                  />
-                </q-item-section>
-                <q-item-section side style="align-items: end">
-                  <ToggleInput
-                    :actions="item.actions"
-                    v-if="item.type === 'toggle'"
-                    v-model="
-                      currentSettings[
-                        settingId as keyof SettingsItems
-                      ] as boolean
-                    "
-                  />
-                  <TextInput
-                    :actions="item.actions"
-                    :rules="item.rules"
-                    v-else-if="item.type === 'text'"
-                    v-model="
-                      currentSettings[
-                        settingId as keyof SettingsItems
-                      ] as string
-                    "
-                  />
-                  <SliderInput
-                    :max="item.max"
-                    :min="item.min"
-                    :step="item.step"
-                    v-else-if="item.type === 'slider'"
-                    v-model="
-                      currentSettings[
-                        settingId as keyof SettingsItems
-                      ] as number
-                    "
-                  />
-                  <DateInput
-                    :options="item.options"
-                    :rules="item.rules"
-                    v-else-if="item.type === 'date'"
-                    v-model="
-                      currentSettings[
-                        settingId as keyof SettingsItems
-                      ] as string
-                    "
-                  />
-                  <TimeInput
-                    :options="item.options"
-                    :rules="item.rules"
-                    v-else-if="item.type === 'time'"
-                    v-model="
-                      currentSettings[
-                        settingId as keyof SettingsItems
-                      ] as string
-                    "
-                  />
-                  <PathInput
-                    v-else-if="item.type === 'path'"
-                    v-model="
-                      currentSettings[
-                        settingId as keyof SettingsItems
-                      ] as string
-                    "
-                  />
-                  <SelectInput
-                    :options="item.list"
-                    :use-input="
-                      settingId === 'lang' ||
-                      settingId === 'langFallback' ||
-                      settingId === 'langSubtitles'
-                    "
-                    v-else-if="item.type === 'list'"
-                    v-model="
-                      currentSettings[
-                        settingId as keyof SettingsItems
-                      ] as string
-                    "
-                  />
-                  <ShortcutInput
-                    :shortcutName="settingId as keyof SettingsItems"
-                    v-else-if="item.type === 'shortcut'"
-                    v-model="
-                      currentSettings[
-                        settingId as keyof SettingsItems
-                      ] as string
-                    "
-                  />
-                  <pre v-else>{{ item }}</pre>
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-expansion-item>
-        </template>
-      </q-form>
-    </div>
+              <q-item-section>
+                {{ $t(settingId) }}
+              </q-item-section>
+              <q-item-section side>
+                <q-icon
+                  color="info"
+                  name="mdi-link-variant"
+                  size="sm"
+                  v-if="item.depends"
+                >
+                  <q-tooltip>
+                    {{ $t('depends-on') }}
+                    <strong>{{ $t(item.depends) }}</strong>
+                  </q-tooltip>
+                </q-icon>
+                <q-icon
+                  :name="item.icon"
+                  color="info"
+                  size="sm"
+                  v-else-if="item.icon"
+                />
+              </q-item-section>
+              <q-item-section side style="align-items: end">
+                <ToggleInput
+                  :actions="item.actions"
+                  v-if="item.type === 'toggle'"
+                  v-model="
+                    currentSettings[settingId as keyof SettingsItems] as boolean
+                  "
+                />
+                <TextInput
+                  :actions="item.actions"
+                  :rules="item.rules"
+                  v-else-if="item.type === 'text'"
+                  v-model="
+                    currentSettings[settingId as keyof SettingsItems] as string
+                  "
+                />
+                <SliderInput
+                  :max="item.max"
+                  :min="item.min"
+                  :step="item.step"
+                  v-else-if="item.type === 'slider'"
+                  v-model="
+                    currentSettings[settingId as keyof SettingsItems] as number
+                  "
+                />
+                <DateInput
+                  :options="item.options"
+                  :rules="item.rules"
+                  v-else-if="item.type === 'date'"
+                  v-model="
+                    currentSettings[settingId as keyof SettingsItems] as string
+                  "
+                />
+                <TimeInput
+                  :options="item.options"
+                  :rules="item.rules"
+                  v-else-if="item.type === 'time'"
+                  v-model="
+                    currentSettings[settingId as keyof SettingsItems] as string
+                  "
+                />
+                <PathInput
+                  v-else-if="item.type === 'path'"
+                  v-model="
+                    currentSettings[settingId as keyof SettingsItems] as string
+                  "
+                />
+                <SelectInput
+                  :options="item.list"
+                  :use-input="
+                    settingId === 'lang' ||
+                    settingId === 'langFallback' ||
+                    settingId === 'langSubtitles'
+                  "
+                  v-else-if="item.type === 'list'"
+                  v-model="
+                    currentSettings[settingId as keyof SettingsItems] as string
+                  "
+                />
+                <ShortcutInput
+                  :shortcutName="settingId as keyof SettingsItems"
+                  v-else-if="item.type === 'shortcut'"
+                  v-model="
+                    currentSettings[settingId as keyof SettingsItems] as string
+                  "
+                />
+                <pre v-else>{{ item }}</pre>
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-expansion-item>
+      </template>
+    </q-form>
   </q-page>
 </template>
 

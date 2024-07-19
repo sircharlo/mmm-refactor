@@ -9,6 +9,7 @@
       Object.values(downloadProgress).filter((item) => item.loaded).length > 0
     "
     class="super-rounded"
+    rounded
     unelevated
   >
     <template v-slot:loading>
@@ -55,7 +56,7 @@
             <div>
               <template v-if="Object.values(downloadProgress).length === 0">
                 <div class="row items-center">
-                  <div class="col text-weight-medium text-secondary">
+                  <div class="col text-weight-medium text-dark-grey">
                     {{ $t('noDownloadsInProgress') }}
                   </div>
                   <div class="col-shrink">

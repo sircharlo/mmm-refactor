@@ -1,7 +1,7 @@
 <template>
   <q-toggle
     checked-icon="check"
-    color="green"
+    color="primary"
     unchecked-icon="clear"
     v-model="localValue"
   />

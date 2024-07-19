@@ -153,7 +153,7 @@
           <q-separator class="bg-accent-200 q-mb-md" />
           <div class="row items-center">
             <div class="col-6">
-              <div class="row text-subtitle1 text-weight-bold">
+              <div class="row text-subtitle1 text-weight-medium">
                 {{ mediaWindowVisible ? $t('projecting') : $t('inactive') }}
               </div>
               <div class="row text-dark-grey">
@@ -189,7 +189,7 @@
       </q-card>
     </q-popup-proxy>
   </q-btn>
-  <!-- todo: redo this modal -->
+  <!-- todo: restyle all dialogs -->
   <q-dialog v-model="jwpubImagesExist">
     <q-card style="width: 80vw; max-width: 80vw">
       <q-card-section>
