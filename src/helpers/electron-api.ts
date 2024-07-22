@@ -21,6 +21,7 @@ export interface ElectronApi {
     type?: string,
   ) => ({ mainWindow?: boolean; mediaWindow?: boolean } & Electron.Display)[];
   getAppDataPath: () => string;
+  getAppVersion: () => string;
   getUserDataPath: () => string;
   klawSync: typeof import('klaw-sync');
   moveMediaWindow: (
@@ -28,6 +29,7 @@ export interface ElectronApi {
     windowedMode?: boolean,
     noEvent?: boolean,
   ) => void;
+  openExternalWebsite: (url: string) => void;
   openFileDialog: (single?: boolean) => Promise<Electron.OpenDialogReturnValue>;
   openFolderDialog: () => string[];
   parseFile: (filePath: string, options?: IOptions) => Promise<IAudioMetadata>;

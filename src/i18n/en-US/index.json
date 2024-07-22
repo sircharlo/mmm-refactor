@@ -155,7 +155,7 @@
   "setupWizard.intro": "M³ is an app designed to make your playing media at congregation meetings easy and stress-free. Let's configure a few things, and then we'll get on our way.",
   "setupWizard.meetingDaysTimes": "Meeting days and times",
   "setupWizard.welcome": "Welcome to M³",
-  "shortcutMediaWindow": "Shortcut to show/hide the media winodw",
+  "shortcutMediaWindow": "Shortcut to show/hide the media window",
   "shortcutMusic": "Shortcut to play/stop background music",
   "show-image-for-zoom-participants": "Show image for Zoom participants",
   "show-media-display": "Show media display",
@@ -215,5 +215,11 @@
   "until-meeting-starts": "Until meeting starts",
   "incomplete-configuration": "Incomplete configuration",
   "collapse-sidebar": "Collapse sidebar",
-  "expand-sidebar": "Expand sidebar"
+  "expand-sidebar": "Expand sidebar",
+  "titles.about": "About this app",
+  "meeting-media-manager": "Meeting Media Manager",
+  "app-description": "Meeting Media Manager is a cross-platform app for displaying media at congregation meetings of Jehovah's Witnesses. It integrates with OBS Studio for one-click media display in both the Kingdom Hall and on Zoom. With its rich functionality and intuitive interface, M³ reduces the workload of audio/video servants. It supports all theocratic file formats, as well as PDF files and common media files. It can complement or even replace JW Library, as per your congregation needs.",
+  "github-repo": "GitHub repo",
+  "user-guide": "User guide",
+  "app-issues": "If you're facing any issues or have found a bug, please create an Issue on our GitHub repository page or contact us via GitHub Discussions, describing the problem in detail. We will get back to you as soon as possible."
 }

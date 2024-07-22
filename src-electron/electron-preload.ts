@@ -7,7 +7,7 @@ import {
 } from '@electron/remote';
 import * as sqlite3 from 'better-sqlite3';
 import decompress from 'decompress';
-import { contextBridge } from 'electron';
+import { contextBridge, shell } from 'electron';
 import fs from 'fs-extra';
 import convert from 'heic-convert';
 import klawSync from 'klaw-sync';
@@ -339,17 +339,22 @@ contextBridge.exposeInMainWorld('electronApi', {
   getAppDataPath: () => {
     return app.getPath('appData');
   },
+  getAppVersion: () => {
+    return app.getVersion();
+  },
   getUserDataPath: () => {
     return app.getPath('userData');
   },
   klawSync,
   moveMediaWindow,
+  openExternalWebsite: (url: string) => {
+    shell.openExternal(url);
+  },
   openFileDialog: (single?: boolean) => {
     return dialog.showOpenDialog({
       properties: single ? ['openFile'] : ['openFile', 'multiSelections'],
     });
   },
-
   openFolderDialog: () => {
     return dialog.showOpenDialogSync({
       properties: ['openDirectory'],

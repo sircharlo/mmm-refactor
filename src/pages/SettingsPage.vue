@@ -15,16 +15,9 @@
       >
         <q-expansion-item
           :caption="$t(description)"
-          :class="{
-            'meeting-section': true,
-            'meeting-section-begin': true,
-            'meeting-section-end':
-              !expansionState[groupId as keyof SettingsItems],
-            'text-subtitle2': true,
-            'text-weight-medium': true,
-            }"
           :icon="icon"
           :label="$t(name)"
+          class="meeting-section meeting-section-begin meeting-section-end text-subtitle2 text-weight-medium"
           v-if="
             !invalidSettingsLength ||
             !onlyShowInvalidSettings ||

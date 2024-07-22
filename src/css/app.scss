@@ -330,7 +330,9 @@ body.body--dark {
   font-size: 135%;
 }
 
-.q-expansion-item .q-focus-helper, .q-expansion-item .q-focus-helper::after, .q-expansion-item .q-focus-helper::before {
+.q-expansion-item .q-focus-helper,
+.q-expansion-item .q-focus-helper::after,
+.q-expansion-item .q-focus-helper::before {
   border-radius: 0.75em !important;
 }
 
