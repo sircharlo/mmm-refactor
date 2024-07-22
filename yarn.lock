@@ -4910,10 +4910,10 @@ muggle-string@^0.4.1:
   resolved "https://registry.yarnpkg.com/muggle-string/-/muggle-string-0.4.1.tgz#3b366bd43b32f809dc20659534dd30e7c8a0d328"
   integrity sha512-VNTrAak/KhO2i8dqqnqnAHOa3cYBwXEZe9h+D5h/1ZqFSTEFHdM65lR7RoIqq3tBBYavsOXV84NoHXZ0AkPyqQ==
 
-music-metadata@^9.0.3:
-  version "9.0.3"
-  resolved "https://registry.yarnpkg.com/music-metadata/-/music-metadata-9.0.3.tgz#9da3d25235f44ac5018261ce3a5d4fad23f5e817"
-  integrity sha512-AiBqSKiAl/vb4j/fPpwk4hmUix9iGEGmW4tgJa4Wb5WwBeZfERICp2y1LuyM9Ve7jXVhbDWMwZsl6KED8bLFxA==
+music-metadata@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/music-metadata/-/music-metadata-10.0.0.tgz#10ea1d6998e5cc5463d2024c7d40ecb19869567e"
+  integrity sha512-/JJ9nubnGdZY/teJR4KgPsDCMd4DejnGTvRRWGmyfTly8aGHqmpFa5q3j/xV5I/vE+n1aXA8Q/JqCq7J79vJFg==
   dependencies:
     "@tokenizer/token" "^0.3.0"
     content-type "^1.0.5"
