@@ -3,9 +3,10 @@
     :max="max"
     :min="min"
     :step="step"
-    class="q-pb-none"
+    class="q-pb-none q-mr-md"
     dense
     filled
+    style="width: 240px"
     v-model="localValue"
   />
 </template>

@@ -5,7 +5,11 @@
       class="bg-primary text-white text-bigger text-weight-medium"
     >
       <div class="row items-center q-my-sm q-mr-md">
-        <div class="row justify-center" style="width: 56px">
+        <div
+          @click="aboutModal = true"
+          class="row justify-center"
+          style="width: 56px"
+        >
           <img src="logo-no-background.svg" />
         </div>
         <q-separator class="bg-semi-white-24 q-ml-none" inset vertical />
@@ -518,6 +522,72 @@
         <q-inner-loading :showing="deletingCacheFiles" />
       </q-card>
     </q-dialog>
+
+    <q-dialog v-model="aboutModal">
+      <div
+        class="items-center col q-pb-lg q-px-lg q-gutter-y-lg bg-secondary-contrast"
+        style="width: 60vw; max-width: 60vw"
+      >
+        <div class="text-h6 row">{{ $t('titles.about') }}</div>
+        <div class="row items-center">
+          <div class="col-shrink q-mr-md">
+            <img
+              col
+              src="favicon.ico"
+              style="max-height: 10vh; display: flex"
+            />
+          </div>
+          <div class="col">
+            <div class="row text-subtitle1">
+              {{ $t('meeting-media-manager') }}
+            </div>
+            <div class="row">v{{ appVersion }}</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            {{ $t('app-description') }}
+          </div>
+        </div>
+        <div class="row q-gutter-x-md">
+          <div class="col">
+            <q-btn
+              @click="openExternalWebsite(githubLink)"
+              class="full-width row"
+              color="primary"
+              no-caps
+              outline
+              target="_blank"
+            >
+              <div class="col-shrink">
+                <q-icon name="fa-brands fa-square-github" />
+              </div>
+              <div class="col col-grow">{{ $t('github-repo') }}</div>
+              <div class="col-shrink"><q-icon name="mdi-open-in-new" /></div>
+            </q-btn>
+          </div>
+          <div class="col">
+            <q-btn
+              @click="openExternalWebsite(docsLink)"
+              class="full-width row"
+              color="primary"
+              no-caps
+              outline
+              target="_blank"
+            >
+              <div class="col-shrink"><q-icon name="mdi-bookmark-box" /></div>
+              <div class="col col-grow">{{ $t('user-guide') }}</div>
+              <div class="col-shrink"><q-icon name="mdi-open-in-new" /></div>
+            </q-btn>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            {{ $t('app-issues') }}
+          </div>
+        </div>
+      </div>
+    </q-dialog>
   </q-layout>
 </template>
 
@@ -618,8 +688,15 @@ jwStore.$subscribe((_, state) => {
 // Ref and reactive initializations
 const chooseSong = ref(false);
 const mediaSortForDay = ref(true);
-const { fs, klawSync, openFileDialog, pathToFileURL, setAutoStartAtLogin } =
-  electronApi;
+const {
+  fs,
+  getAppVersion,
+  klawSync,
+  openExternalWebsite,
+  openFileDialog,
+  pathToFileURL,
+  setAutoStartAtLogin,
+} = electronApi;
 
 const { locale, t } = useI18n({ useScope: 'global' });
 const drawer = ref(true);
@@ -1181,6 +1258,11 @@ const getEventDayColor = (eventDate: string) => {
 const createNewCongregation = () => {
   window.dispatchEvent(new CustomEvent('createNewCongregation'));
 };
+
+const aboutModal = ref(false);
+const appVersion = getAppVersion();
+const githubLink = 'https://github.com/sircharlo/mmm-refactor';
+const docsLink = 'https://sircharlo.github.io/mmm-refactor/';
 
 onMounted(() => {
   document.title = 'Meeting Media Manager';
