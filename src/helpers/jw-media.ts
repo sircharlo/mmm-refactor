@@ -48,6 +48,7 @@ import {
 } from 'src/types/publications';
 import {
   DatedTextItem,
+  DocumentItem,
   MultimediaExtractItem,
   MultimediaItem,
   MultimediaItemsFetcher,
@@ -59,6 +60,42 @@ import {
 const { executeQuery, fileUrlToPath, fs, klawSync, path } = electronApi;
 const FEB_2023 = 20230200;
 const FOOTNOTE_TAR_PAR = 9999;
+
+const addJwpubDocumentMediaToFiles = async (
+  dbPath: string,
+  document: DocumentItem,
+) => {
+  console.log('addJwpubDocumentMediaToFiles', dbPath, document);
+  const jwStore = useJwStore();
+  const { addToAdditionMediaMap } = jwStore;
+  const currentStateStore = useCurrentStateStore();
+  const { selectedDateObject } = storeToRefs(currentStateStore);
+  try {
+    // additionalLoading.value = true;
+    // jwpubImportDocuments.value = [];
+    // jwpubLoading.value = true;
+    if (!dbPath) return;
+    const publication = getPublicationInfoFromDb(dbPath);
+    const multimediaItems = getDocumentMultimediaItems({
+      db: dbPath,
+      docId: document.DocumentId,
+    }).map((multimediaItem) =>
+      addFullFilePathToMultimediaItem(multimediaItem, publication),
+    );
+    await processMissingMediaInfo(multimediaItems);
+    const dynamicMediaItems = await dynamicMediaMapper(
+      multimediaItems,
+      selectedDateObject.value?.date,
+      true,
+    );
+    addToAdditionMediaMap(dynamicMediaItems);
+    // localJwpubDb.value = '';
+    // jwpubImportLoading.value = false;
+    // additionalLoading.value = false;
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 const downloadFileIfNeeded = async ({
   dir,
@@ -1231,7 +1268,7 @@ const downloadAdditionalRemoteVideo = async (
     const bestItem = findBestResolution(
       mediaItemLinks,
     ) as MediaItemsMediatorFile;
-    let downloadedFile: DownloadedFile = { path: '' };
+    // const downloadedFile: DownloadedFile = { path: '' };
     if (bestItem) {
       window.dispatchEvent(
         new CustomEvent('remoteVideo-loading', {
@@ -1246,17 +1283,22 @@ const downloadAdditionalRemoteVideo = async (
           },
         }),
       );
-      downloadedFile = (await downloadFileIfNeeded({
+      // downloadedFile = (await downloadFileIfNeeded({
+      //   dir: getDatedAdditionalMediaDirectory.value,
+      //   size: bestItem.filesize,
+      //   url: bestItem.progressiveDownloadURL,
+      // })) as DownloadedFile;
+      await downloadFileIfNeeded({
         dir: getDatedAdditionalMediaDirectory.value,
         size: bestItem.filesize,
         url: bestItem.progressiveDownloadURL,
-      })) as DownloadedFile;
+      });
     }
-    window.dispatchEvent(
-      new CustomEvent('remoteVideo-loaded', {
-        detail: downloadedFile,
-      }),
-    );
+    // window.dispatchEvent(
+    //   new CustomEvent('remoteVideo-loaded', {
+    //     detail: downloadedFile,
+    //   }),
+    // );
   } catch (e) {
     console.error('downloadAdditionalRemoteVideo', e);
   }
@@ -1485,6 +1527,7 @@ const downloadJwpub = async (
 
 export {
   addFullFilePathToMultimediaItem,
+  addJwpubDocumentMediaToFiles,
   downloadAdditionalRemoteVideo,
   downloadBackgroundMusic,
   downloadFileIfNeeded,

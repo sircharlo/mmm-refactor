@@ -44,7 +44,6 @@
       self="bottom middle"
     >
       <q-card
-        class="non-selectable"
         flat
         style="min-width: 50vw; max-height: 50vh"
       >

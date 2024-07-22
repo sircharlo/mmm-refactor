@@ -41,7 +41,7 @@
               <q-icon class="q-mr-sm" name="mdi-plus-box-multiple" size="xs" />
               {{ $t('import-media') }}
               <q-menu
-                :offset="[0, 8]"
+                :offset="[0, 11]"
                 @before-hide="importMediaMenuActive = false"
                 @before-show="importMediaMenuActive = true"
               >
@@ -58,7 +58,9 @@
                     </q-item-section>
                     <q-item-section>
                       <q-item-label>{{ $t('song') }}</q-item-label>
-                      <q-item-label caption>Caption</q-item-label>
+                      <q-item-label caption>{{
+                        $t('from-songbook')
+                      }}</q-item-label>
                     </q-item-section>
                   </q-item>
                   <q-item
@@ -75,7 +77,9 @@
                     </q-item-section>
                     <q-item-section>
                       <q-item-label>{{ $t('video') }}</q-item-label>
-                      <q-item-label caption>Caption</q-item-label>
+                      <q-item-label caption>{{
+                        $t('latest-videos-from-jw-org')
+                      }}</q-item-label>
                     </q-item-section>
                   </q-item>
                   <q-item-label header>{{
@@ -83,23 +87,21 @@
                   }}</q-item-label>
                   <template
                     :key="name"
-                    v-for="[icon, name, caption] in [
-                      ['mdi-folder-multiple-image', 'images-videos', 'Caption'],
-                      ['mdi-folder-zip', 'jwpub-file', 'Caption'],
-                      ['mdi-playlist-play', 'jw-playlist', 'Caption'],
+                    v-for="[icon, name] in [
+                      ['mdi-folder-multiple-image', 'images-videos'],
+                      ['mdi-folder-zip', 'jwpub-file'],
+                      ['mdi-playlist-play', 'jw-playlist'],
                     ]"
                   >
-                    <q-item
-                      @click="localUploadPopup = true"
-                      clickable
-                      v-close-popup
-                    >
+                    <q-item @click="dragging" clickable v-close-popup>
                       <q-item-section avatar>
                         <q-icon :name="icon" color="primary" />
                       </q-item-section>
                       <q-item-section>
                         <q-item-label>{{ $t(name) }}</q-item-label>
-                        <q-item-label caption>{{ caption }}</q-item-label>
+                        <q-item-label caption>{{
+                          $t(name + '-explain')
+                        }}</q-item-label>
                       </q-item-section>
                     </q-item>
                   </template>
@@ -108,15 +110,20 @@
             </q-btn>
             <q-btn :disable="mediaPlaying" color="white-transparent" unelevated>
               <q-icon class="q-mr-sm" name="mdi-calendar-month" size="xs" />
-              {{ selectedDate ?? $t('select-a-date') }}
-              <q-popup-proxy breakpoint="1000" v-model="datePickerActive">
+              {{
+                getDateLocaleFormatted(
+                  currentSettings?.localAppLang,
+                  selectedDate,
+                ) ?? $t('select-a-date')
+              }}
+              <!--dayjs-->
+              <q-popup-proxy :offset="[0, 11]" v-model="datePickerActive">
                 <q-date
                   :event-color="getEventDayColor"
                   :events="getEventDates()"
                   :navigation-max-year-month="maxDate()"
                   :navigation-min-year-month="minDate()"
                   :options="dateOptions"
-                  class="non-selectable"
                   landscape
                   v-model="selectedDate"
                 >
@@ -131,102 +138,36 @@
                 </q-date>
               </q-popup-proxy>
             </q-btn>
-            <q-dialog
-              @dragenter="localUploadPopup = false"
-              v-model="localUploadPopup"
-            >
-              <q-card>
-                <q-card-section>
-                  <div class="row self-center">
-                    <q-avatar
-                      class="q-mr-md self-center"
-                      color="primary"
-                      icon="mdi-cursor-default"
-                      text-color="white"
-                    />
-                    <span class="text-h6 self-center">
-                      {{ $t('add-media-files') }}
-                    </span>
-                    <q-space />
-                    <div class="text-h6 self-center">
-                      <q-btn dense flat icon="close" round v-close-popup />
-                    </div>
-                  </div>
-                </q-card-section>
-                <q-card-section>
-                  <p>
-                    {{
-                      $t(
-                        'to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window',
-                      )
-                    }}
-                  </p>
-                  <p>
-                    {{
-                      $t(
-                        'you-can-also-use-the-button-below-to-browse-for-files',
-                      )
-                    }}
-                  </p>
-                </q-card-section>
-                <q-card-actions align="right">
-                  <q-btn
-                    :label="$t('browse')"
-                    @click="getLocalFiles()"
-                    color="primary"
-                    flat
-                  />
-                </q-card-actions>
-              </q-card>
-            </q-dialog>
             <q-dialog v-model="remoteVideoPopup">
-              <q-card
-                class="non-selectable"
-                style="width: 80vw; max-width: 80vw; min-width: 3"
+              <div
+                class="items-center col q-pb-lg q-px-lg q-gutter-y-lg bg-secondary-contrast"
+                style="width: 80vw; max-width: 80vw"
               >
-                <q-card-section>
-                  <div class="row self-center">
-                    <q-avatar
-                      class="q-mr-md self-center"
-                      color="primary"
-                      icon="mdi-movie"
-                      text-color="white"
-                    />
-                    <span class="text-h6 self-center">
-                      {{ $t('add-video-jw-org') }}
-                    </span>
-                    <q-space />
-                    <div class="text-h6 self-center">
-                      <q-btn dense flat icon="close" round v-close-popup />
-                    </div>
-                  </div>
-                </q-card-section>
-                <q-linear-progress
-                  :value="remoteVideosLoadingProgress"
-                  class="q-mt-md"
-                />
-                <div class="row q-px-sm">
+                <div class="text-h6 row">{{ $t('add-video-jw-org') }}</div>
+                <div class="row">{{ $t('add-a-video-explain') }}</div>
+                <!-- <div class="row">
+                  <q-linear-progress
+                    :value="remoteVideosLoadingProgress"
+                    class="q-mt-md"
+                  />
+                </div> -->
+                <div class="row">
                   <div class="col-grow">
                     <q-input
-                      :label="$t('filter')"
+                      :label="$t('search')"
                       clearable
                       dense
+                      outlined
                       v-model="remoteVideoFilter"
                     >
-                      <template v-slot:append>
+                      <template v-slot:prepend>
                         <q-icon name="mdi-magnify" />
                       </template>
                     </q-input>
                   </div>
-                  <q-toggle
-                    :label="$t('include-audio-description')"
-                    left-label
-                    v-model="remoteVideosIncludeAudioDescription"
-                  />
                 </div>
-                <q-separator />
-                <q-card-section
-                  class="text-center"
+                <div
+                  class="text-center row items-center justify-center"
                   v-if="
                     !!(
                       remoteVideosLoadingProgress < 1 &&
@@ -235,47 +176,94 @@
                   "
                 >
                   <q-spinner-pie :thickness="2" color="primary" size="4em" />
-                </q-card-section>
-                <q-card-section>
-                  <div class="row q-col-gutter-lg" style="min-height: 200px">
-                    <template
-                      :key="video.guid"
-                      v-for="video in remoteVideosFiltered"
-                    >
-                      <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
-                        <q-card
-                          @click="
-                            downloadAdditionalRemoteVideo(
-                              video.files,
-                              getBestImageUrl(video.images, 'md'),
-                            );
-                            remoteVideoPopup = false;
-                          "
-                          class="text-white cursor-pointer"
-                          style="
-                            background-color: rgb(91, 60, 136);
-                            border-radius: 0.75em;
-                          "
-                          v-ripple
+                </div>
+                <div class="row">
+                  <q-scroll-area
+                    :bar-style="barStyle"
+                    :thumb-style="thumbStyle"
+                    style="height: 40vh; width: -webkit-fill-available"
+                  >
+                    <div class="row q-col-gutter-lg">
+                      <template
+                        :key="video.guid"
+                        v-for="video in remoteVideosFiltered"
+                      >
+                        <div
+                          class="col-xs-6 col-sm-4 col-md-3 col-lg-3 col-xl-2"
                         >
-                          <q-img :src="getBestImageUrl(video.images, 'md')" />
-                          <q-card-section>
-                            <div class="text-subtitle1 q-mb-xs">
-                              {{ video.title }}
-                            </div>
-                            <div>
-                              <span class="text-caption text-grey-2">{{
-                                video.naturalKey
-                              }}</span>
-                            </div>
-                          </q-card-section>
-                        </q-card>
-                      </div>
-                    </template>
+                          <q-card
+                            :class="{
+                              'cursor-pointer': true,
+                              'rounded-borders': true,
+                              'full-height': true,
+                              'bg-accent-100':
+                                hoveredRemoteVideo === video.guid,
+                            }"
+                            @click="
+                              downloadAdditionalRemoteVideo(
+                                video.files,
+                                getBestImageUrl(video.images, 'md'),
+                              );
+                              remoteVideoPopup = false;
+                            "
+                            @mouseout="hoveredRemoteVideo = ''"
+                            @mouseover="hoveredRemoteVideo = video.guid"
+                            flat
+                            v-ripple
+                          >
+                            <q-card-section class="q-pa-sm">
+                              <q-img
+                                :src="getBestImageUrl(video.images, 'md')"
+                                class="rounded-borders"
+                              >
+                                <q-badge
+                                  class="q-mt-xs q-ml-xs"
+                                  color="black"
+                                  style="padding: 5px !important"
+                                >
+                                  <q-icon
+                                    class="q-mr-xs"
+                                    color="white"
+                                    name="mdi-play"
+                                  />
+                                  {{ formatTime(video.duration) }}
+                                </q-badge>
+                              </q-img>
+                            </q-card-section>
+                            <q-card-section class="q-pa-sm">
+                              <div class="text-subtitle2 q-mb-xs">
+                                {{ video.title }}
+                              </div>
+                              <div>
+                                <span class="text-caption text-dark-grey">{{
+                                  video.naturalKey
+                                }}</span>
+                              </div>
+                            </q-card-section>
+                          </q-card>
+                        </div>
+                      </template>
+                    </div>
+                  </q-scroll-area>
+                </div>
+                <div class="row items-center">
+                  <div class="col">
+                    <q-toggle
+                      :label="$t('include-audio-description')"
+                      checked-icon="check"
+                      color="primary"
+                      unchecked-icon="clear"
+                      v-model="remoteVideosIncludeAudioDescription"
+                    />
                   </div>
-                </q-card-section>
+                  <div class="col text-right">
+                    <q-btn color="negative" flat v-close-popup>{{
+                      $t('cancel')
+                    }}</q-btn>
+                  </div>
+                </div>
                 <q-inner-loading :showing="remoteVideoLoading" />
-              </q-card>
+              </div>
             </q-dialog>
           </template>
           <template v-else-if="route.fullPath === '/settings'">
@@ -449,7 +437,7 @@
     <q-page-container class="main-bg">
       <router-view />
     </q-page-container>
-
+    <!-- todo: restyle this dialog -->
     <q-dialog v-model="cacheClearConfirmPopup">
       <q-card style="width: 80vw; max-width: 80vw">
         <q-card-section>
@@ -522,13 +510,12 @@
         <q-inner-loading :showing="deletingCacheFiles" />
       </q-card>
     </q-dialog>
-
     <q-dialog v-model="aboutModal">
       <div
         class="items-center col q-pb-lg q-px-lg q-gutter-y-lg bg-secondary-contrast"
         style="width: 60vw; max-width: 60vw"
       >
-        <div class="text-h6 row">{{ $t('titles.about') }}</div>
+        <!-- <div class="text-h6 row">{{ $t('titles.about') }}</div> -->
         <div class="row items-center">
           <div class="col-shrink q-mr-md">
             <img
@@ -538,7 +525,7 @@
             />
           </div>
           <div class="col">
-            <div class="row text-subtitle1">
+            <div class="row text-h6">
               {{ $t('meeting-media-manager') }}
             </div>
             <div class="row">v{{ appVersion }}</div>
@@ -586,6 +573,9 @@
             {{ $t('app-issues') }}
           </div>
         </div>
+        <div class="row justify-end">
+          <q-btn flat v-close-popup>{{ $t('close') }}</q-btn>
+        </div>
       </div>
     </q-dialog>
   </q-layout>
@@ -598,6 +588,7 @@ import prettyBytes from 'pretty-bytes';
 import { Dark, LocalStorage, date } from 'quasar';
 import { get } from 'src/boot/axios';
 import { queues } from 'src/boot/globals';
+import { barStyle, thumbStyle } from 'src/boot/globals';
 import { refreshDateLocale } from 'src/boot/i18n';
 import DownloadStatus from 'src/components/media/DownloadStatus.vue';
 import MediaDisplayButton from 'src/components/media/MediaDisplayButton.vue';
@@ -609,7 +600,7 @@ import {
   cleanAdditionalMediaFolder,
   cleanLocalStorage,
 } from 'src/helpers/cleanup';
-import { updateLookupPeriod } from 'src/helpers/date';
+import { getDateLocaleFormatted, updateLookupPeriod } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import {
   getAdditionalMediaPath,
@@ -629,6 +620,7 @@ import {
   registerAllCustomShortcuts,
   unregisterAllCustomShortcuts,
 } from 'src/helpers/keyboardShortcuts';
+import { formatTime } from 'src/helpers/mediaPlayback';
 import { createTemporaryNotification } from 'src/helpers/notifications';
 import { useAppSettingsStore } from 'src/stores/app-settings';
 import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
@@ -693,7 +685,6 @@ const {
   getAppVersion,
   klawSync,
   openExternalWebsite,
-  openFileDialog,
   pathToFileURL,
   setAutoStartAtLogin,
 } = electronApi;
@@ -893,7 +884,6 @@ const getEventDates = () => {
 };
 
 // Ref for UI states
-const localUploadPopup = ref(false);
 const importMediaMenuActive = ref(false);
 const datePickerActive = ref(false);
 const remoteVideoPopup = ref(false);
@@ -902,12 +892,17 @@ const remoteVideos: Ref<MediaItemsMediatorItem[]> = ref([]);
 const remoteVideoFilter = ref('');
 const remoteVideosIncludeAudioDescription = ref(false);
 const remoteVideoLoading = ref(false);
+const hoveredRemoteVideo = ref('');
 const moreOptionsMenuActive = ref(false);
 const cacheFiles: Ref<CacheFile[]> = ref([]);
 const calculatingCacheSize = ref(false);
 const cacheClearConfirmPopup = ref(false);
 const cacheClearType = ref<'' | 'all' | 'smart'>('');
 const deletingCacheFiles = ref(false);
+
+const dragging = () => {
+  window.dispatchEvent(new Event('draggingSomething'));
+};
 
 const confirmDeleteCacheFiles = (type: 'all' | 'smart') => {
   cacheClearType.value = type;
@@ -1144,28 +1139,6 @@ if (!migrations.value.includes('firstRun')) {
 
 cleanLocalStorage();
 cleanAdditionalMediaFolder();
-
-const getLocalFiles = async () => {
-  openFileDialog()
-    .then((result) => {
-      if (result.filePaths.length > 0) {
-        window.dispatchEvent(
-          new CustomEvent('localFiles-browsed', {
-            detail: result.filePaths.map((path) => {
-              return {
-                path,
-              };
-            }),
-          }),
-        );
-      }
-      localUploadPopup.value = false;
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-};
-
 const getJwVideos = async () => {
   try {
     if (!currentSettings.value) return;

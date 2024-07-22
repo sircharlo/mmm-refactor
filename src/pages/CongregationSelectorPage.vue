@@ -76,6 +76,7 @@
       </div>
     </q-list>
   </q-page>
+  <!-- todo: restyle this dialog -->
   <q-dialog persistent v-model="deletePending">
     <q-card>
       <q-card-section class="row items-center">

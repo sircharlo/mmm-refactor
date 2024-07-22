@@ -245,8 +245,8 @@ const getMediaFromJwPlaylist = async (
 };
 
 const findDb = (publicationDirectory: string) => {
-  if (!fs.existsSync(publicationDirectory)) return '';
   try {
+    if (!fs.existsSync(publicationDirectory)) return '';
     return fs
       .readdirSync(publicationDirectory)
       .map((filename) => path.join(publicationDirectory, filename))

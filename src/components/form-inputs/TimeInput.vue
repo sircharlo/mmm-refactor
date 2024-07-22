@@ -17,7 +17,6 @@
     >
       <q-time
         :options="getTimeOptions(options)"
-        class="non-selectable"
         format24h
         v-model="localValue"
       >

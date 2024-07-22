@@ -205,9 +205,8 @@ body.body--dark {
     background: $apply;
   }
 
-  &.additional {
-    border-color: rgb(91, 60, 136);
-    // todo: change this like others
+  &.additional:before {
+    background: $additional;
   }
 
   &.congregation:before {
@@ -326,6 +325,10 @@ body.body--dark {
   background: $apply;
 }
 
+.bg-additional {
+  background: $additional;
+}
+
 .text-bigger {
   font-size: 135%;
 }
@@ -347,4 +350,17 @@ body.body--dark {
 
 .q-field {
   border-radius: $generic-border-radius;
+}
+
+.q-dialog, .q-card, .q-time, .q-date {
+  user-select: none;
+}
+
+.dashed-border {
+  border: 2px dashed $primary;
+}
+
+a {
+  color: $primary;
+  cursor: pointer;
 }

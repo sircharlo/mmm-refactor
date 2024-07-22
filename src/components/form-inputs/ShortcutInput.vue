@@ -15,6 +15,7 @@
     outline
     v-else
   />
+  <!-- todo: restyle this dialog -->
   <q-dialog
     @hide="stopListening()"
     @show="startListening()"

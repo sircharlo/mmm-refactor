@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { storeToRefs } from 'pinia';
 import { date } from 'quasar';
 import { useCurrentStateStore } from 'src/stores/current-state';
@@ -213,10 +214,17 @@ const getLocaleDayName = (lang: string, day: number) => {
   return dayName;
 };
 
+const getDateLocaleFormatted = (lang: string, date: Date | string) => {
+  dayjs.extend(localizedFormat);
+  if (!date || !lang) return '';
+  return dayjs(date).locale(lang).format('LL');
+};
+
 export {
   dateFromString,
   datesAreSame,
   daysInFuture,
+  getDateLocaleFormatted,
   getLocaleDayName,
   getSpecificWeekday,
   isCoWeek,

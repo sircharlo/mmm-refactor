@@ -1,65 +1,66 @@
 <template>
   <q-dialog v-model="localValue">
-    <q-card class="non-selectable" style="min-width: 500px">
-      <q-card-section>
-        <div class="row self-center">
-          <q-avatar
-            class="q-mr-md self-center"
-            color="primary"
-            icon="mdi-music-note"
-            text-color="white"
-          />
-          <span class="text-h6 self-center">
-            {{ $t('choose-a-song') }}
-          </span>
-          <q-space />
-          <div class="text-h6 self-center">
-            <q-btn @click="dismissPopup" dense flat icon="close" round v-close-popup />
-          </div>
-        </div>
-      </q-card-section>
-      <q-card-section class="q-pt-none">
-        <q-select
-          :label="$t('song')"
-          :options="
-            songOptions.map((song) => {
-              return { value: song.track, label: song.title };
-            })
-          "
-          @change="selectedSong = $event"
-          @filter="filterFn"
-          fill-input
-          hide-selected
-          input-debounce="10"
-          map-options
-          spellcheck="false"
-          use-input
-          v-model="selectedSong"
-        />
-      </q-card-section>
-      <q-card-actions align="right">
-        <q-btn
-          :label="$t('add-song')"
-          @click="addSong(selectedSong)"
-          color="primary"
-          flat
-        />
-      </q-card-actions>
+    <div
+      class="items-center col q-pb-lg q-px-lg q-gutter-y-lg bg-secondary-contrast"
+      style="width: 60vw; max-width: 60vw"
+    >
+      <div class="text-h6 row">{{ $t('choose-a-song') }}</div>
+      <div class="row">{{ $t('add-a-song') }}</div>
+      <div class="row">
+        <q-input
+          :label="$t('search')"
+          class="col"
+          clearable
+          debounce="100"
+          dense
+          outlined
+          v-model="filter"
+        >
+          <template v-slot:prepend>
+            <q-icon name="mdi-magnify" />
+          </template>
+        </q-input>
+      </div>
+      <div class="row">
+        <q-scroll-area
+          :bar-style="barStyle"
+          :thumb-style="thumbStyle"
+          style="height: 40vh; width: -webkit-fill-available"
+        >
+          <template :key="song.url" v-for="song in filteredSongs">
+            <q-item
+              @click="addSong(song.track)"
+              class="items-center"
+              clickable
+              v-ripple
+            >
+              {{ song.title }}
+            </q-item>
+          </template>
+        </q-scroll-area>
+      </div>
+      <div class="row justify-end">
+        <q-btn @click="dismissPopup" color="negative" flat>{{
+          $t('cancel')
+        }}</q-btn>
+      </div>
       <q-inner-loading :showing="loading" />
-    </q-card>
+    </div>
   </q-dialog>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
+import { barStyle, thumbStyle } from 'src/boot/globals';
 import {
   dynamicMediaMapper,
   processMissingMediaInfo,
 } from 'src/helpers/jw-media';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
+import { MediaLink } from 'src/types/publications';
 import { MultimediaItem } from 'src/types/sqlite';
-import { ref, watch } from 'vue';
+import { ComputedRef, computed, ref, watch } from 'vue';
 
 // Define props and emits
 const props = defineProps<{
@@ -77,24 +78,28 @@ const { addToAdditionMediaMap } = jwStore;
 
 const localValue = ref(props.modelValue);
 const loading = ref(false);
-const songOptions = ref(currentSongs.value);
-const selectedSong = ref<{ label: string; value: number } | null>(null);
+
+const filter = ref('');
+const filteredSongs: ComputedRef<MediaLink[]> = computed(() => {
+  return filter.value
+    ? currentSongs.value.filter((s) =>
+        s.title.toLowerCase().includes(filter.value.toLowerCase()),
+      )
+    : currentSongs.value;
+});
 
 const dismissPopup = () => {
   localValue.value = false;
   loading.value = false;
-  selectedSong.value = null;
 };
 
-const addSong = async (
-  selectedSong: { label: string; value: number } | null,
-) => {
+const addSong = async (songTrack: number) => {
   try {
     loading.value = true;
-    if (selectedSong?.value) {
+    if (songTrack) {
       const multimediaItem = {
         KeySymbol: currentSongbook.value.pub,
-        Track: selectedSong.value,
+        Track: songTrack,
       } as MultimediaItem;
       await processMissingMediaInfo([multimediaItem]);
       const additionalMedia = await dynamicMediaMapper(
@@ -109,14 +114,6 @@ const addSong = async (
   } finally {
     dismissPopup();
   }
-};
-
-const filterFn = (val: string, update: (callback: () => void) => void) => {
-  update(() => {
-    songOptions.value = currentSongs.value.filter((v) =>
-      val ? v.title.toLowerCase().includes(val.toLowerCase()) : true,
-    );
-  });
 };
 
 watch(localValue, (newValue) => {

@@ -32,7 +32,7 @@
       flat
       self="bottom middle"
     >
-      <q-card class="non-selectable" flat style="min-width: 50vw">
+      <q-card flat style="min-width: 50vw">
         <q-card-section>
           <div class="card-title">
             {{ $t('scene-selection') }}

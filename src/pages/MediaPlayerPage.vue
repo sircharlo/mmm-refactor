@@ -6,7 +6,8 @@
   >
     <q-resize-observer @resize="onResize" debounce="50" />
     <transition
-      appear
+      @before-leave="console.log('before-leave')"
+      appearc.on
       enter-active-class="animated fadeIn"
       leave-active-class="animated fadeOut"
       mode="out-in"
@@ -122,7 +123,6 @@ const mediaPlayerSubtitlesVisible = ref(false);
 
 bc.onmessage = (event) => {
   try {
-    console.log(event.data, event.data.customBackground);
     if ('seekTo' in event.data) {
       if (mediaElement.value)
         mediaElement.value.currentTime = event.data.seekTo;

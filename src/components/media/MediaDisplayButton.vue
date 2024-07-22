@@ -26,7 +26,7 @@
       self="bottom middle"
       v-if="!disabled"
     >
-      <q-card class="non-selectable" flat style="min-width: 50vw">
+      <q-card flat style="min-width: 50vw">
         <q-card-section>
           <div class="card-title">
             {{ $t('media-display-settings') }}

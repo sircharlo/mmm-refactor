@@ -18,24 +18,6 @@
       {{ $t('noDateSelected') }}
     </q-banner>
     <q-list ref="mediaList">
-      <template v-if="additionalLoading">
-        <q-item class="meeting-section meeting-section-skeleton">
-          <q-item-section avatar class="q-pr-none">
-            <q-skeleton style="width: 150px; height: 84px" />
-          </q-item-section>
-          <q-item-section class="q-pl-md">
-            <q-item-label>
-              <q-skeleton type="text" />
-            </q-item-label>
-            <q-item-label caption>
-              <q-skeleton type="text" />
-            </q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-skeleton type="circle" />
-          </q-item-section>
-        </q-item>
-      </template>
       <q-banner
         class="bg-orange-9 text-white"
         inline-actions
@@ -102,20 +84,23 @@
               index === 0 ||
               media.section !== sortableMediaItems[index - 1]?.section
             "
-          ><q-avatar :class="'text-white bg-' + media.section" rounded>
-            <span class="text-h4">
-              {{
-                media.section === 'tgw'
-                  ? ''
-                  : media.section === 'ayfm'
-                    ? ''
-                    : media.section === 'lac'
-                      ? ''
-                      : media.section === 'wt'
-                        ? ''
-                        : media.section
-              }}
-            </span></q-avatar>
+            ><q-avatar :class="'text-white bg-' + media.section" rounded>
+              <span class="text-h4">
+                {{
+                  media.section === 'tgw'
+                    ? ''
+                    : media.section === 'ayfm'
+                      ? ''
+                      : media.section === 'lac'
+                        ? ''
+                        : media.section === 'wt'
+                          ? ''
+                          : media.section === 'additional'
+                            ? ''
+                            : media.section
+                }}
+              </span></q-avatar
+            >
           </q-item>
           <q-item
             :class="
@@ -142,11 +127,11 @@
                   :ratio="16 / 9"
                   :src="media.thumbnailUrl"
                   @error="imageLoadingError(media)"
-                  @load="media.isImage"
                   class="rounded-borders"
                   fit="contain"
                   width="150px"
                 >
+                  <!-- @load="media.isImage" -->
                   <q-badge
                     :color="
                       customDurations[currentCongregation]?.[selectedDate]?.[
@@ -192,6 +177,7 @@
                       )
                     }}
                   </q-badge>
+                  <!-- todo: restyle this dialog -->
                   <q-dialog
                     persistent
                     v-model="mediaDurationPopups[media.uniqueId]"
@@ -445,7 +431,9 @@
                       <div
                         class="absolute duration-slider"
                         v-if="
-                          mediaPlayingUrl === media.fileUrl && media.isVideo
+                          [media.fileUrl, media.streamUrl].includes(
+                            mediaPlayingUrl,
+                          ) && media.isVideo
                         "
                       >
                         <q-slider
@@ -618,6 +606,7 @@
         </div>
       </template>
     </q-list>
+    <!-- todo: restyle this dialog -->
     <q-dialog persistent v-model="mediaStopPending">
       <q-card>
         <q-card-section class="row items-center">
@@ -630,6 +619,7 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <!-- todo: restyle this dialog -->
     <q-dialog persistent v-model="mediaDeletePending">
       <q-card>
         <q-card-section>
@@ -687,79 +677,12 @@
       </q-card>
     </q-dialog>
   </q-page>
-  <q-dialog v-model="jwpubImportInProgress">
-    <q-spinner-hourglass color="white" size="10vh" v-if="jwpubImportLoading" />
-    <template v-if="!jwpubImportLoading">
-      <q-card>
-        <q-card-section>
-          <div class="row self-center">
-            <q-avatar
-              class="q-mr-md self-center"
-              color="primary"
-              icon="mdi-image-multiple"
-              text-color="white"
-            />
-            <span class="text-h6 self-center">
-              {{ $t('choose-a-document-for-import') }}
-            </span>
-            <q-space />
-            <div class="text-h6 self-center">
-              <q-btn
-                @click="jwpubImportDb = ''"
-                dense
-                flat
-                icon="close"
-                round
-                v-close-popup
-              />
-            </div>
-          </div>
-        </q-card-section>
-        <q-card-section class="row items-center">
-          <q-list>
-            <q-item
-              :key="jwpubImportDocument.DocumentId"
-              @click="addJwpubDocumentMediaToFiles(jwpubImportDocument)"
-              clickable
-              v-for="jwpubImportDocument in jwpubImportDocuments"
-            >
-              <q-item-section>
-                {{ jwpubImportDocument.Title }}
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-card-section>
-      </q-card>
-    </template>
-  </q-dialog>
-  <q-dialog @drop="dropEnd" v-model="dragging">
-    <q-card @drop="dropEnd">
-      <q-card-section horizontal>
-        <q-card-section>
-          <q-icon
-            color="primary"
-            name="mdi-cursor-default"
-            size="lg"
-            text-color="white"
-        /></q-card-section>
-        <q-card-section>
-          <div class="text-h6">{{ $t('add-media-files') }}</div>
-          <p>
-            {{
-              $t(
-                'to-add-files-from-your-computer-drag-and-drop-them-directly-into-this-window',
-              )
-            }}
-            {{ $t('you-can-also-use-the-button-below-to-browse-for-files') }}
-          </p>
-        </q-card-section>
-      </q-card-section>
-      <q-card-actions align="right">
-        <q-btn :label="$t('cancel')" color="negative" flat v-close-popup />
-        <q-btn :label="$t('browse')" @click="getLocalFiles()" color="primary" />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
+  <DragAndDropper
+    :jwpub-db="jwpubImportDb"
+    :jwpub-documents="jwpubImportDocuments"
+    @drop="dropEnd"
+    v-model="dragging"
+  />
 </template>
 
 <script setup lang="ts">
@@ -777,6 +700,7 @@ import { Buffer } from 'buffer';
 import DOMPurify from 'dompurify';
 import { storeToRefs } from 'pinia';
 import { date, uid } from 'quasar';
+import DragAndDropper from 'src/components/media/DragAndDropper.vue';
 import { electronApi } from 'src/helpers/electron-api';
 import {
   getDurationFromMediaPath,
@@ -786,13 +710,14 @@ import {
   getThumbnailUrl,
 } from 'src/helpers/fs';
 import {
-  addFullFilePathToMultimediaItem,
+  addJwpubDocumentMediaToFiles,
+  // addFullFilePathToMultimediaItem,
   downloadFileIfNeeded,
-  dynamicMediaMapper,
+  // dynamicMediaMapper,
   fetchMedia,
-  getDocumentMultimediaItems,
+  // getDocumentMultimediaItems,
   getPublicationInfoFromDb,
-  processMissingMediaInfo,
+  // processMissingMediaInfo,
   sanitizeId,
 } from 'src/helpers/jw-media';
 import {
@@ -822,11 +747,28 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const dragging = ref(false);
-const additionalLoading = ref(false);
 const jwpubImportDb = ref('');
-const jwpubImportInProgress = computed(() => !!jwpubImportDb.value);
 const jwpubImportLoading = ref(false);
 const jwpubImportDocuments = ref([] as DocumentItem[]);
+
+watch(
+  () => jwpubImportDb.value,
+  (newVal) => {
+    if (!!newVal) {
+      dragging.value = true;
+    }
+  },
+);
+
+watch(
+  () => dragging.value,
+  (newVal) => {
+    if (!newVal) {
+      jwpubImportDb.value = '';
+      jwpubImportDocuments.value = [];
+    }
+  },
+);
 
 const { t } = useI18n();
 
@@ -847,6 +789,7 @@ const {
   mediaPlayingAction,
   mediaPlayingCurrentPosition,
   // mediaPlayingSeekTo,
+  mediaPlayingPanzoom,
   mediaPlayingSubtitlesUrl,
   mediaPlayingUniqueId,
   mediaPlayingUrl,
@@ -865,7 +808,6 @@ const {
   executeQuery,
   fileUrlToPath,
   fs,
-  openFileDialog,
   path,
 } = electronApi;
 
@@ -895,36 +837,46 @@ watch(
   },
 );
 
-// watch(
-//   () => mediaPlayingSeekTo.value,
-//   (newSeekTo) => {
-//     bc.postMessage({ seekTo: newSeekTo });
-//   },
-// );
-
 const seekTo = (newSeekTo: null | number) => {
   if (newSeekTo !== null) bc.postMessage({ seekTo: newSeekTo });
 };
 
 watch(
   () => mediaPlayingAction.value,
-  (newAction) => {
-    bc.postMessage({ action: newAction });
+  (newAction, oldAction) => {
+    if (newAction !== oldAction) bc.postMessage({ action: newAction });
   },
 );
 
 watch(
   () => mediaPlayingSubtitlesUrl.value,
-  (newSubtitlesUrl) => {
-    bc.postMessage({ subtitlesUrl: newSubtitlesUrl });
+  (newSubtitlesUrl, oldSubtitlesUrl) => {
+    if (newSubtitlesUrl !== oldSubtitlesUrl)
+      bc.postMessage({ subtitlesUrl: newSubtitlesUrl });
   },
 );
 
 watch(
+  () => mediaPlayingPanzoom.value,
+  (newPanzoom, oldPanzoom) => {
+    try {
+      if (JSON.stringify(newPanzoom) !== JSON.stringify(oldPanzoom))
+        bc.postMessage({
+          scale: newPanzoom.scale,
+          x: newPanzoom.x,
+          y: newPanzoom.y,
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  { deep: true },
+);
+
+watch(
   () => mediaPlayingUrl.value,
-  (newUrl) => {
-    console.debug('mediaPlayingUrl', newUrl);
-    bc.postMessage({ url: newUrl });
+  (newUrl, oldUrl) => {
+    if (newUrl !== oldUrl) bc.postMessage({ url: newUrl });
   },
 );
 
@@ -980,14 +932,11 @@ const initiatePanzoom = (elemId: string) => {
     elem.addEventListener(
       'panzoomchange',
       (e: HTMLElementEventMap['panzoomchange']) => {
-        bc.postMessage({
+        mediaPlayingPanzoom.value = {
           scale: e.detail.scale,
           x: e.detail.x / (width ?? 1),
           y: e.detail.y / (height ?? 1),
-        });
-        // bc.postMessage({ scale: e.detail.scale });
-        // if (width > 0) bc.postMessage({ x: e.detail.x / width });
-        // if (height > 0) bc.postMessage({ y: e.detail.y / width });
+        };
       },
     );
   } catch (error) {
@@ -1175,10 +1124,16 @@ watch(
   },
 );
 
+const startDragging = () => {
+  resetDragging();
+  dragging.value = true;
+};
+
 onMounted(async () => {
+  window.addEventListener('draggingSomething', startDragging);
   window.addEventListener('localFiles-browsed', localFilesBrowsedListener);
   window.addEventListener('remoteVideo-loading', remoteVideoLoading);
-  window.addEventListener('remoteVideo-loaded', remoteVideoLoaded);
+  // window.addEventListener('remoteVideo-loaded', remoteVideoLoaded);
 
   watch(selectedDate, (newVal) => {
     try {
@@ -1212,33 +1167,6 @@ onMounted(async () => {
   sendObsSceneEvent('camera');
   fetchMedia();
 });
-
-const addJwpubDocumentMediaToFiles = async (document: DocumentItem) => {
-  try {
-    additionalLoading.value = true;
-    jwpubImportDocuments.value = [];
-    jwpubImportLoading.value = true;
-    const publication = getPublicationInfoFromDb(jwpubImportDb.value);
-    let multimediaItems = getDocumentMultimediaItems({
-      db: jwpubImportDb.value,
-      docId: document.DocumentId,
-    }).map((multimediaItem) =>
-      addFullFilePathToMultimediaItem(multimediaItem, publication),
-    );
-    await processMissingMediaInfo(multimediaItems);
-    const dynamicMediaItems = await dynamicMediaMapper(
-      multimediaItems,
-      selectedDateObject.value?.date,
-      true,
-    );
-    addToAdditionMediaMap(dynamicMediaItems);
-    jwpubImportDb.value = '';
-    jwpubImportLoading.value = false;
-    additionalLoading.value = false;
-  } catch (e) {
-    console.error(e);
-  }
-};
 
 const copyToDatedAdditionalMedia = async (files: string[]) => {
   const datedAdditionalMediaDir = getDatedAdditionalMediaDirectory.value;
@@ -1340,7 +1268,6 @@ const addToFiles = async (
   files: { filetype?: string; path: string }[] | FileList,
 ) => {
   if (!files) return;
-  additionalLoading.value = true;
   for (let i = 0; i < files.length; i++) {
     let filepath = files[i]?.path;
     try {
@@ -1415,7 +1342,10 @@ const addToFiles = async (
           if (possibleJwpubImportDocuments.length > 1) {
             jwpubImportDocuments.value = possibleJwpubImportDocuments;
           } else if (possibleJwpubImportDocuments.length === 1) {
-            await addJwpubDocumentMediaToFiles(possibleJwpubImportDocuments[0]);
+            await addJwpubDocumentMediaToFiles(
+              jwpubImportDb.value,
+              possibleJwpubImportDocuments[0],
+            );
           }
         }
         jwpubImportLoading.value = false;
@@ -1469,9 +1399,9 @@ const addToFiles = async (
         message: t('fileProcessError'),
         type: 'error',
       });
+      console.error(error);
     }
   }
-  additionalLoading.value = false;
 };
 
 const dropActive = (event: DragEvent) => {
@@ -1503,14 +1433,17 @@ const dropEnd = (event: DragEvent) => {
         )?.type;
         if (src) droppedStuff[0] = { filetype, path: src };
       }
-      addToFiles(droppedStuff).catch((error) => {
-        console.error(error);
-      });
+      addToFiles(droppedStuff)
+        .catch((error) => {
+          console.error(error);
+        })
+        .then(() => {
+          resetDragging();
+        });
     }
   } catch (error) {
     console.error(error);
   }
-  dragging.value = false;
 };
 // const dropIgnore = (event: DragEvent) => {
 //   event.preventDefault();
@@ -1518,6 +1451,12 @@ const dropEnd = (event: DragEvent) => {
 // };
 
 const mediaDurationPopups = ref({} as { [key: string]: boolean });
+
+const resetDragging = () => {
+  dragging.value = false;
+  jwpubImportDb.value = '';
+  jwpubImportDocuments.value = [];
+};
 
 const showMediaDurationPopup = (media: DynamicMediaObject) => {
   try {
@@ -1569,44 +1508,21 @@ const imageLoadingError = (media: DynamicMediaObject) => {
 };
 
 const localFilesBrowsedListener = (event: CustomEventInit) => {
-  addToFiles(event.detail).catch((error) => {
-    console.error(error);
-  });
-};
-
-const getLocalFiles = async () => {
-  openFileDialog()
-    .then((result) => {
-      if (result.filePaths.length > 0) {
-        addToFiles(
-          result.filePaths.map((path) => {
-            return {
-              path,
-            };
-          }),
-        ).catch((error) => {
-          console.error(error);
-        });
-      }
-      dragging.value = false;
-    })
+  addToFiles(event.detail)
     .catch((error) => {
       console.error(error);
+    })
+    .then(() => {
+      resetDragging();
     });
 };
 
 const remoteVideoLoading = (event: CustomEventInit) => {
-  additionalLoading.value = true;
   addToAdditionMediaMapFromPath(event.detail.path, undefined, {
     duration: event.detail.duration,
     thumbnailUrl: event.detail.thumbnailUrl,
     url: event.detail.url,
   });
-};
-
-const remoteVideoLoaded = () => {
-  // addToAdditionMediaMapFromPath((event.detail as DownloadedFile).path);
-  additionalLoading.value = false;
 };
 
 const sendObsSceneEvent = (scene: string) => {
@@ -1621,9 +1537,10 @@ const sendObsSceneEvent = (scene: string) => {
 };
 
 onUnmounted(() => {
+  window.removeEventListener('draggingSomething', startDragging);
   window.removeEventListener('localFiles-browsed', localFilesBrowsedListener);
   window.removeEventListener('remoteVideo-loading', remoteVideoLoading);
-  window.removeEventListener('remoteVideo-loaded', remoteVideoLoaded);
+  // window.removeEventListener('remoteVideo-loaded', remoteVideoLoaded);
 
   Object.keys(panzooms).forEach((key) => {
     destroyPanzoom(key);

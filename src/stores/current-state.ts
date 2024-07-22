@@ -95,6 +95,7 @@ export const useCurrentStateStore = defineStore('current-state', {
       const jwStore = useJwStore();
       const { jwSongs } = storeToRefs(jwStore);
       const currentLanguage = this.currentSettings?.lang as string;
+      console.log(currentLanguage, jwSongs.value[currentLanguage]);
       if (!currentLanguage) return [];
       return jwSongs.value[currentLanguage]?.list || [];
     },
@@ -148,6 +149,7 @@ export const useCurrentStateStore = defineStore('current-state', {
       },
       mediaPlayingAction: '',
       mediaPlayingCurrentPosition: 0,
+      mediaPlayingPanzoom: { scale: 1, x: 0, y: 0 },
       mediaPlayingSeekTo: 0,
       mediaPlayingSubtitlesUrl: '',
       mediaPlayingSubtitlesVisible: false,
