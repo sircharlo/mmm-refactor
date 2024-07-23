@@ -73,7 +73,7 @@
     "process": "^0.11.10",
     "typescript": "~5.5.4",
     "vite-plugin-checker": "^0.7.2",
-    "vue-tsc": "^2.0.26"
+    "vue-tsc": "^2.0.28"
   },
   "engines": {
     "node": "^22 || ^20 || ^18 || ^16",
