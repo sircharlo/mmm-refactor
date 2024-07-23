@@ -91,6 +91,10 @@ body.body--light {
     color: $dark-grey;
   }
 
+  .text-accent-400 {
+    color: $accent-400;
+  }
+
   .meeting-section {
     background: white;
     border-color: $accent-300;
@@ -345,7 +349,7 @@ body.body--dark {
   width: auto;
   display: block;
   background: $accent-200;
-  margin: 0 1em;
+  // margin: 0 1em;
 }
 
 .q-field {

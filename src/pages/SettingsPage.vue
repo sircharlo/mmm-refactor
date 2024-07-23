@@ -32,10 +32,25 @@
         >
           <template
             :key="settingId"
-            v-for="[settingId, item] in Object.entries(
+            v-for="([settingId, item], index) in Object.entries(
               settingsDefinitions,
             ).filter(([settingId, item]) => item.group === groupId)"
           >
+            <template
+              v-if="
+                item.subgroup &&
+                (index === 0 ||
+                  item.subgroup !==
+                    Object.entries(settingsDefinitions).filter(
+                      ([settingId, item]) => item.group === groupId,
+                    )[index - 1]?.[1].subgroup)
+              "
+            >
+              <q-separator class="bg-accent-200" spaced v-if="index > 0" />
+              <q-item-label class="q-pl-xl q-ml-lg text-accent-400 text-uppercase" header>{{
+                $t(item.subgroup)
+              }}</q-item-label>
+            </template>
             <q-item
               :class="{
                 'q-py-lg': invalidSettings.includes(
@@ -53,9 +68,12 @@
               "
             >
               <q-item-section>
-                {{ $t(settingId) }}
+                <q-item-label>{{ $t(settingId) }}</q-item-label>
+                <q-item-label caption>{{
+                  $t(settingId + '-explain')
+                }}</q-item-label>
               </q-item-section>
-              <q-item-section side>
+              <!-- <q-item-section side>
                 <q-icon
                   color="info"
                   name="mdi-link-variant"
@@ -73,7 +91,7 @@
                   size="sm"
                   v-else-if="item.icon"
                 />
-              </q-item-section>
+              </q-item-section> -->
               <q-item-section side style="align-items: end">
                 <ToggleInput
                   :actions="item.actions"

@@ -2,11 +2,11 @@ import enUS from 'src/i18n/en-US/index.json';
 import frCA from 'src/i18n/fr-CA/index.json';
 
 export const localeOptions = [
-  { label: 'English', value: 'en' },
-  { label: 'Français', value: 'fr' },
+  { label: 'English', value: 'en-US' },
+  { label: 'Français', value: 'fr-CA' },
 ];
 
 export default {
-  en: enUS,
-  fr: frCA,
+  'en-US': enUS,
+  'fr-CA': frCA,
 };

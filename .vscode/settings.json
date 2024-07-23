@@ -124,7 +124,6 @@
     "enableMusicButton",
     "autoStartAtLogin",
     "excludeFootnotes",
-    "excludeLffImages",
     "obs.disconnected",
     "obs.connecting",
     "obs.connected",
