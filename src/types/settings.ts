@@ -34,11 +34,9 @@ export interface SettingsValues {
   langSubtitles: string;
   localAppLang: string;
   maxRes: string;
-  // musicFadeOutType: string;
   musicVolume: number;
   // mediaWinShortcut: string;
   mwDay: string;
-  // specialCong: boolean;
   mwStartTime: string;
   obsCameraScene: string;
   obsEnable: boolean;
@@ -49,8 +47,8 @@ export interface SettingsValues {
   obsMediaScene: string;
   obsPassword: string;
   obsPort: string;
-  shortcutMediaNext: string;
-  shortcutMediaPrevious: string;
+  // shortcutMediaNext: string;
+  // shortcutMediaPrevious: string;
   shortcutMediaWindow: string;
   shortcutMusic: string;
   // [key: string]: unknown;
@@ -70,6 +68,7 @@ export interface SettingsItem {
   order?: number;
   rules?: string[];
   step?: number;
+  subgroup?: string;
   type: string;
 }
 

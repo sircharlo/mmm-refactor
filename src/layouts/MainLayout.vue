@@ -7,7 +7,7 @@
       <div class="row items-center q-my-sm q-mr-md">
         <div
           @click="aboutModal = true"
-          class="row justify-center"
+          class="row justify-center cursor-pointer"
           style="width: 56px"
         >
           <img src="logo-no-background.svg" />

@@ -6,12 +6,12 @@ import { SettingsValues } from 'src/types/settings';
 const { registerShortcut, unregisterShortcut } = electronApi;
 
 const shortcutCallbacks: Partial<Record<keyof SettingsValues, () => void>> = {
-  shortcutMediaNext: () => {
-    console.debug('shortcutMediaNext');
-  },
-  shortcutMediaPrevious: () => {
-    console.debug('shortcutMediaPrevious');
-  },
+  // shortcutMediaNext: () => {
+  //   console.debug('shortcutMediaNext');
+  // },
+  // shortcutMediaPrevious: () => {
+  //   console.debug('shortcutMediaPrevious');
+  // },
   shortcutMediaWindow: () => {
     showMediaWindow();
   },
