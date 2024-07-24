@@ -6,7 +6,7 @@ import { getAdditionalMediaPath } from 'src/helpers/fs';
 import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
 import { useJwStore } from 'src/stores/jw';
 import { DateInfo } from 'src/types/dates';
-import { DownloadProgressItems, DownloadedFile } from 'src/types/media';
+import { DownloadedFile, DownloadProgressItems } from 'src/types/media';
 import { SettingsValues } from 'src/types/settings';
 
 const { fs, path } = electronApi;
@@ -140,10 +140,10 @@ export const useCurrentStateStore = defineStore('current-state', {
   state: () => {
     return {
       currentCongregation: '' as string,
-      downloadProgress: {} as DownloadProgressItems,
       downloadedFiles: {} as {
         [key: string]: DownloadedFile | Promise<DownloadedFile>;
       },
+      downloadProgress: {} as DownloadProgressItems,
       extractedFiles: {} as {
         [key: string]: Promise<string>;
       },

@@ -292,12 +292,12 @@ const convertSvgToJpg = async (filepath: string): Promise<string> => {
 
     return new Promise((resolve, reject) => {
       img.onload = function () {
-        const canvasW = canvas.width,
-          canvasH = canvas.height;
-        const imgW = img.naturalWidth || canvasW,
-          imgH = img.naturalHeight || canvasH;
-        const wRatio = canvasW / imgW,
-          hRatio = canvasH / imgH;
+        const canvasH = canvas.height,
+          canvasW = canvas.width;
+        const imgH = img.naturalHeight || canvasH,
+          imgW = img.naturalWidth || canvasW;
+        const hRatio = canvasH / imgH,
+          wRatio = canvasW / imgW;
         if (wRatio < hRatio) {
           canvas.height = canvasW * (imgH / imgW);
         } else {

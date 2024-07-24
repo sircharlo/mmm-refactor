@@ -60,7 +60,7 @@ import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { MediaLink } from 'src/types/publications';
 import { MultimediaItem } from 'src/types/sqlite';
-import { ComputedRef, computed, ref, watch } from 'vue';
+import { computed, ComputedRef, ref, watch } from 'vue';
 
 // Define props and emits
 const props = defineProps<{
