@@ -19,9 +19,9 @@ export interface DocumentItem {
 
 export interface MultimediaItemsFetcher {
   BeginParagraphOrdinal?: number;
-  EndParagraphOrdinal?: number;
   db: string;
   docId?: number;
+  EndParagraphOrdinal?: number;
   lang?: string;
   mepsId?: number;
 }
@@ -86,12 +86,12 @@ export interface MultimediaItem {
   NextParagraphOrdinal?: number;
   SizeConstraint?: null | number;
   SuppressZoom?: number;
+  tableQuestionIsUsed?: boolean;
   TargetParagraphNumberLabel: number;
   ThumbnailFilePath?: string;
   Track?: null | number;
   VideoMarkers?: VideoMarker[];
   Width?: null | number;
-  tableQuestionIsUsed?: boolean;
 }
 
 export interface VideoMarker {

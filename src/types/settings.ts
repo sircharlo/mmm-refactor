@@ -5,10 +5,10 @@ export interface SettingsValues {
   // autoQuitWhenDone: boolean;
   autoStartAtLogin: boolean;
   autoStartMusic: boolean;
-  // autoStartSync: boolean;
-  coWeek: string;
   // betaUpdates: boolean;
   congregationName: string;
+  // autoStartSync: boolean;
+  coWeek: string;
   // disableAutoUpdate: boolean;
   darkMode: string;
   disableMediaFetching: boolean;
@@ -81,8 +81,8 @@ export interface SettingsGroups {
 }
 
 export interface ScreenPreferences {
-  preferWindowed: boolean;
   preferredScreenNumber: number;
+  preferWindowed: boolean;
 }
 
 export interface SettingsGroup {

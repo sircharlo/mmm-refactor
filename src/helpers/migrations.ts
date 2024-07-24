@@ -52,8 +52,8 @@ const buildNewPrefsObject = (oldPrefs: OldAppConfig) => {
     const newPrefsObject: SettingsValues = {
       autoStartAtLogin: oldPrefs.app.autoRunAtBoot || false,
       autoStartMusic: oldPrefs.meeting.autoStartMusic || true,
-      coWeek: oldPrefs.meeting.coWeek || '',
       congregationName: oldPrefs.app.congregationName || '',
+      coWeek: oldPrefs.meeting.coWeek || '',
       darkMode: 'auto',
       disableMediaFetching: oldPrefs.meeting.specialCong || false,
       enableExtraCache: true,

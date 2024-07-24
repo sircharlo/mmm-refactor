@@ -8,19 +8,19 @@ const queues = {
 };
 
 const thumbStyle = {
-  backgroundColor: '#027be3',
+  backgroundColor: 'rgba(0, 0, 0, 0.9)',
   borderRadius: '5px',
   opacity: '0.75',
   right: '4px',
-  width: '5px',
+  width: '6px',
 };
 
 const barStyle = {
-  backgroundColor: '#027be3',
+  backgroundColor: 'rgba(0, 0, 0, 0.75)',
   borderRadius: '9px',
   opacity: '0.2',
   right: '2px',
-  width: '9px',
+  width: '10px',
 };
 
 export { barStyle, obsWebSocket, queues, thumbStyle };

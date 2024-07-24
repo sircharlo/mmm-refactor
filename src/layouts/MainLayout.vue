@@ -1,5 +1,5 @@
 <template>
-  <q-layout class="non-selectable" view="hHh Lpr lFf">
+  <q-layout class="non-selectable column no-wrap" view="hHh LpR lFr">
     <q-header
       bordered
       class="bg-primary text-white text-bigger text-weight-medium"
@@ -434,9 +434,15 @@
         </q-item-section>
       </q-item>
     </q-drawer>
-    <q-page-container class="main-bg">
-      <router-view />
-    </q-page-container>
+    <q-scroll-area
+      :bar-style="barStyle"
+      :thumb-style="thumbStyle"
+      style="flex: 1 1 1px;"
+    >
+      <q-page-container class="main-bg">
+        <router-view />
+      </q-page-container>
+    </q-scroll-area>
     <!-- todo: restyle this dialog -->
     <q-dialog v-model="cacheClearConfirmPopup">
       <q-card style="width: 80vw; max-width: 80vw">
@@ -585,7 +591,7 @@
 import PQueue from 'p-queue';
 import { storeToRefs } from 'pinia';
 import prettyBytes from 'pretty-bytes';
-import { Dark, LocalStorage, date } from 'quasar';
+import { Dark, date, LocalStorage } from 'quasar';
 import { get } from 'src/boot/axios';
 import { queues } from 'src/boot/globals';
 import { barStyle, thumbStyle } from 'src/boot/globals';
@@ -631,7 +637,7 @@ import {
   JwVideoCategory,
   MediaItemsMediatorItem,
 } from 'src/types/publications';
-import { Ref, computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 

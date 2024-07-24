@@ -18,24 +18,39 @@ declare module 'vue-i18n' {
 }
 /* eslint-enable @typescript-eslint/no-empty-interface */
 
-const refreshDateLocale = (locale: string) => {
+const refreshDateLocale = async (locale: string) => {
   const langList = import.meta.glob('../../node_modules/quasar/lang/*.js');
   console.log('refreshDateLocale', locale);
   dayjs.extend(localeData);
   dayjs.locale(locale);
   dayjs.localeData();
   console.log(dayjs.weekdays());
-  try {
-    langList[`../../node_modules/quasar/lang/${locale}.js`]().then((lang) => {
-      Lang.set(lang.default);
-    });
-  } catch (err) {
-    console.error(err);
-    // Requested Quasar Language Pack does not exist,
-    // let's not break the app, so catching error
+
+  const loadLang = async (locale: string) => {
+    try {
+      await langList[`../../node_modules/quasar/lang/${locale}.js`]().then(
+        (lang) => {
+          Lang.set(lang.default);
+        },
+      );
+      console.log(`Loaded language pack for locale ${locale}`);
+      return true; // Successfully loaded the language pack
+    } catch (err) {
+      console.error(`Failed to load language pack for locale ${locale}:`, err);
+      return false; // Failed to load the language pack
+    }
+  };
+
+  // Try loading the specific locale
+  const loaded = await loadLang(locale);
+  if (!loaded) {
+    // Fallback to a more general locale if specific one doesn't exist
+    const generalLocale = locale.split('-')[0];
+    if (generalLocale !== locale) {
+      await loadLang(generalLocale);
+    }
   }
 };
-
 let i18n: ReturnType<typeof createI18n> = createI18n({});
 
 export default boot(({ app }) => {

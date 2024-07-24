@@ -1,5 +1,5 @@
 import { storeToRefs } from 'pinia';
-import { LocalStorage, date } from 'quasar';
+import { date, LocalStorage } from 'quasar';
 import { isInPast } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import { useJwStore } from 'src/stores/jw';

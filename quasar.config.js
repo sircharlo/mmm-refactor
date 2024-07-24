@@ -7,14 +7,11 @@
 
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
-const { sentryVitePlugin } = require('@sentry/vite-plugin');
 const { sentryEsbuildPlugin } = require('@sentry/esbuild-plugin');
-// use mergeConfig helper to avoid overwriting the default config
-const { mergeConfig } = require('vite');
-
-const { configure } = require('quasar/wrappers');
+const { sentryVitePlugin } = require('@sentry/vite-plugin');
 const path = require('path');
-// const inject  = require('@rollup/plugin-inject')
+const { configure } = require('quasar/wrappers');
+const { mergeConfig } = require('vite'); // use mergeConfig helper to avoid overwriting the default config
 const { version } = require('./package.json');
 const devMode = process.env.NODE_ENV === 'development';
 

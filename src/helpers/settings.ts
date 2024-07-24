@@ -1,5 +1,5 @@
 import { storeToRefs } from 'pinia';
-import { ValidationRule, date } from 'quasar';
+import { date, ValidationRule } from 'quasar';
 import { useJwStore } from 'src/stores/jw';
 import { ref } from 'vue';
 const jwStore = useJwStore();
