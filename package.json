@@ -19,7 +19,7 @@
     "@panzoom/panzoom": "^4.5.1",
     "@quasar/cli": "^2.4.1",
     "@quasar/extras": "^1.16.12",
-    "@sentry/vue": "^8.19.0",
+    "@sentry/vue": "^8.20.0",
     "axios": "^1.7.2",
     "better-sqlite3": "^11.1.2",
     "dayjs": "^1.11.12",
