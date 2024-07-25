@@ -5,8 +5,8 @@ import {
   globalShortcut,
   screen,
 } from '@electron/remote';
+import AdmZip from 'adm-zip';
 import * as sqlite3 from 'better-sqlite3';
-import decompress from 'decompress';
 import { contextBridge, shell } from 'electron';
 import fs from 'fs-extra';
 import convert from 'heic-convert';
@@ -308,7 +308,21 @@ const convertPdfToImages = async (pdfPath: string, outputFolder: string) => {
 contextBridge.exposeInMainWorld('electronApi', {
   convert,
   convertPdfToImages,
-  decompress,
+  decompress: async (inputZip: string, outputFolder: string) => {
+    const zip = new AdmZip(inputZip);
+    return new Promise<void>((resolve, reject) => {
+      zip.extractAllToAsync(outputFolder, true, true, (error) => {
+        if (error) {
+          console.error(error);
+          reject(error);
+        } else {
+          console.log(`Extracted to "${outputFolder}" successfully`);
+          resolve();
+        }
+      });
+    });
+    // unzip(inputZip, { target: outputFolder });
+  },
   executeQuery: (dbPath: string, query: string) => {
     try {
       let attempts = 0;
