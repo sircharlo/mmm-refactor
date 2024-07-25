@@ -13,7 +13,7 @@ export interface ElectronApi {
     pdfPath: string,
     outputFolder: string,
   ) => Promise<string[]>;
-  decompress: typeof import('decompress');
+  decompress: (inputZip: string, outputFolder: string) => Promise<void>;
   executeQuery: (dbPath: string, query: string) => QueryResponseItem[];
   fileUrlToPath: (url: PathLike) => string;
   fs: typeof import('fs-extra');
