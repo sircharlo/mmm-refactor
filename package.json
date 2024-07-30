@@ -60,7 +60,7 @@
     "@types/klaw-sync": "^6.0.5",
     "@types/pretty-bytes": "^5.2.0",
     "@typescript-eslint/eslint-plugin": "^7.17.0",
-    "@typescript-eslint/parser": "^7.17.0",
+    "@typescript-eslint/parser": "^7.18.0",
     "autoprefixer": "^10.4.19",
     "electron": "^31.3.1",
     "electron-builder": "^24.13.3",
