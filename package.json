@@ -56,7 +56,7 @@
     "@types/better-sqlite3": "^7.6.11",
     "@types/dompurify": "^3.0.5",
     "@types/fs-extra": "^11.0.4",
-    "@types/heic-convert": "^1.2.3",
+    "@types/heic-convert": "^2.1.0",
     "@types/klaw-sync": "^6.0.5",
     "@types/pretty-bytes": "^5.2.0",
     "@typescript-eslint/eslint-plugin": "^7.17.0",

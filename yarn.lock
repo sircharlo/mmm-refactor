@@ -1019,10 +1019,10 @@
   resolved "https://registry.yarnpkg.com/@types/har-format/-/har-format-1.2.15.tgz#f352493638c2f89d706438a19a9eb300b493b506"
   integrity sha512-RpQH4rXLuvTXKR0zqHq3go0RVXYv/YVqv4TnPH95VbwUxZdQlK1EtcMvQvMpDngHbt13Csh9Z4qT9AbkiQH5BA==
 
-"@types/heic-convert@^1.2.3":
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/@types/heic-convert/-/heic-convert-1.2.3.tgz#0705f36e467e7b6180806edd0b3f1e673514ff8c"
-  integrity sha512-5LJ2fGuVk/gnOLihoT56xJwrXxfnNepGvrHwlW5ZtT3HS4jO1AqBaAHCxXUpnY9UaD3zYcyxXMRM2fNN1AFF/Q==
+"@types/heic-convert@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@types/heic-convert/-/heic-convert-2.1.0.tgz#d19c7c655abb46321d7a0bc24387d47ac1d1661b"
+  integrity sha512-Cf5Sdc2Gm2pfZ0uN1zjj35wcf3mF1lJCMIzws5OdJynrdMJRTIRUGa5LegbVg0hatzOPkH2uAf2JRjPYgl9apg==
 
 "@types/http-cache-semantics@*", "@types/http-cache-semantics@^4.0.2":
   version "4.0.4"
