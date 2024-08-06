@@ -36,7 +36,7 @@ const refreshDateLocale = async (locale: string) => {
       console.log(`Loaded language pack for locale ${locale}`);
       return true; // Successfully loaded the language pack
     } catch (err) {
-      console.warn(`Failed to load language pack for locale ${locale}:`, err);
+      console.error(`Failed to load language pack for locale ${locale}:`, err);
       return false; // Failed to load the language pack
     }
   };

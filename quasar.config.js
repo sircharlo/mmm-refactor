@@ -113,7 +113,7 @@ module.exports = configure(function (/* ctx */) {
 
     // animations: 'all', // --- includes all animations
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
-    css: ['app.scss'],
+    css: ['app.scss', 'mmm-icons.css'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#sourcefiles
     // sourceFiles: {
@@ -210,7 +210,7 @@ module.exports = configure(function (/* ctx */) {
     },
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
-    extras: ['fontawesome-v6', 'material-icons', 'mdi-v7'],
+    // extras: ['fontawesome-v6', 'material-icons', 'mdi-v7'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {

@@ -14,7 +14,7 @@ const routes: RouteRecordRaw[] = [
       },
     ],
     component: () => import('layouts/MainLayout.vue'),
-    meta: { title: 'titles.profileSelection' },
+    meta: { icon: 'mmm-groups', title: 'titles.profileSelection' },
     path: '/congregation-selector',
   },
   {
@@ -22,8 +22,16 @@ const routes: RouteRecordRaw[] = [
       { component: () => import('pages/MediaCalendarPage.vue'), path: '' },
     ],
     component: () => import('layouts/MainLayout.vue'),
-    meta: { title: 'titles.meetingMedia' },
+    meta: { icon: 'mmm-media', title: 'titles.meetingMedia' },
     path: '/media-calendar',
+  },
+  {
+    children: [
+      { component: () => import('pages/PresentWebsite.vue'), path: '' },
+    ],
+    component: () => import('layouts/MainLayout.vue'),
+    meta: { icon: 'mmm-open-web', title: 'titles.presentWebsite' },
+    path: '/present-website',
   },
   {
     children: [
@@ -42,7 +50,7 @@ const routes: RouteRecordRaw[] = [
   {
     children: [{ component: () => import('pages/SettingsPage.vue'), path: '' }],
     component: () => import('layouts/MainLayout.vue'),
-    meta: { title: 'titles.settings' },
+    meta: { icon: 'mmm-settings', title: 'titles.settings' },
     path: '/settings',
   },
 

@@ -3,22 +3,24 @@
     :color="musicPlaying && musicStopping ? 'negative' : 'white-transparent'"
     :disable="disabled"
     :outline="disabled"
+    :style="musicPlaying ? 'min-width: 110px;' : ''"
+    @click="musicPopup = true"
     class="super-rounded"
     no-caps
     rounded
     unelevated
     v-if="currentSettings?.enableMusicButton"
   >
-    <q-icon name="mdi-music-note" />
+    <q-icon name="mmm-music-note" />
     <div class="q-ml-sm" v-if="musicPlaying">
       {{ musicRemainingTime }}
     </div>
 
-    <q-tooltip v-if="!disabled && !musicPopup">
+    <q-tooltip :delay="2000" v-if="!disabled && !musicPopup">
       {{ $t('setupWizard.backgroundMusic') }}
     </q-tooltip>
-    <q-popup-proxy
-      :offset="[0, 28]"
+    <!-- <q-popup-proxy
+      :offset="[0, 8]"
       @before-hide="musicPopup = false"
       @before-show="musicPopup = true"
       anchor="top middle"
@@ -26,8 +28,9 @@
       flat
       self="bottom middle"
       v-if="!disabled"
-    >
-      <q-card flat style="min-width: 50vw">
+    > -->
+    <q-dialog position="bottom" v-model="musicPopup">
+      <q-card flat>
         <q-card-section>
           <div class="card-title">
             {{ $t('setupWizard.backgroundMusic') }}
@@ -90,7 +93,8 @@
           </div>
         </q-card-section>
       </q-card>
-    </q-popup-proxy>
+    </q-dialog>
+    <!-- </q-popup-proxy> -->
   </q-btn>
 </template>
 

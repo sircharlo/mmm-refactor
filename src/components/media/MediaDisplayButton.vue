@@ -2,22 +2,28 @@
   <q-btn
     :color="!mediaWindowVisible ? 'negative' : 'white-transparent'"
     :disable="!!disabled"
-    :icon="mediaWindowVisible ? 'mdi-television' : 'mdi-television-off'"
+    :icon="
+      mediaWindowVisible
+        ? 'mmm-media-display-active'
+        : 'mmm-media-display-inactive'
+    "
     :outline="!!disabled"
+    @click="mediaDisplayPopup = true"
     class="super-rounded"
     rounded
     unelevated
     v-if="currentSettings?.enableMediaDisplayButton"
   >
     <q-tooltip
+      :delay="2000"
       anchor="bottom left"
       self="top left"
       v-if="!disabled && !mediaDisplayPopup"
     >
       {{ $t('media-display') }}
     </q-tooltip>
-    <q-popup-proxy
-      :offset="[0, 28]"
+    <!-- <q-popup-proxy
+      :offset="[0, 8]"
       @before-hide="mediaDisplayPopup = false"
       @before-show="mediaDisplayPopup = true"
       anchor="top middle"
@@ -25,8 +31,9 @@
       flat
       self="bottom middle"
       v-if="!disabled"
-    >
-      <q-card flat style="min-width: 50vw">
+    > -->
+    <q-dialog position="bottom" v-model="mediaDisplayPopup">
+      <q-card flat>
         <q-card-section>
           <div class="card-title">
             {{ $t('media-display-settings') }}
@@ -56,10 +63,8 @@
                       <q-icon
                         :name="
                           screen.mainWindow
-                            ? 'fas fa-computer'
-                            : screen.mediaWindow
-                              ? 'mdi-television-play'
-                              : 'mdi-television'
+                            ? 'mmm-display-current'
+                            : 'mmm-media-display-active'
                         "
                         class="q-mr-sm"
                         size="xs"
@@ -92,7 +97,7 @@
                   color="primary"
                   unelevated
                 >
-                  <q-icon class="q-mr-sm" name="fas fa-display" size="xs" />
+                  <q-icon class="q-mr-sm" name="mmm-fullscreen" size="xs" />
                   {{ $t('full-screen') }}
                 </q-btn>
               </div>
@@ -112,11 +117,7 @@
                   color="primary"
                   unelevated
                 >
-                  <q-icon
-                    class="q-mr-sm"
-                    name="fas fa-window-restore"
-                    size="xs"
-                  />
+                  <q-icon class="q-mr-sm" name="mmm-window" size="xs" />
                   {{ $t('windowed') }}
                 </q-btn>
               </div>
@@ -138,7 +139,8 @@
             >
               <q-icon
                 :name="
-                  'mdi-image' + (mediaWindowCustomBackground ? '-remove' : '')
+                  'mmm-background' +
+                  (mediaWindowCustomBackground ? '-remove' : '')
                 "
                 class="q-mr-sm"
                 size="xs"
@@ -187,60 +189,74 @@
           </div>
         </q-card-section>
       </q-card>
-    </q-popup-proxy>
+    </q-dialog>
+    <!-- </q-popup-proxy> -->
   </q-btn>
-  <!-- todo: restyle all dialogs -->
-  <q-dialog v-model="jwpubImagesExist">
-    <q-card style="width: 80vw; max-width: 80vw">
-      <q-card-section>
-        <div class="row self-center">
-          <q-avatar
-            class="q-mr-md self-center"
-            color="primary"
-            icon="mdi-image"
-            text-color="white"
-          />
-          <span class="text-h6 self-center">
-            {{ $t('choose-an-image') }}
-          </span>
-          <q-space />
-          <div class="text-h6 self-center">
-            <q-btn
-              @click="setMediaBackground()"
-              dense
-              flat
-              icon="close"
-              round
-              v-close-popup
+  <q-dialog v-model="showCustomBackgroundPicker">
+    <div
+      class="items-center col q-pb-lg q-px-lg q-gutter-y-md bg-secondary-contrast"
+    >
+      <div class="text-h6 row">{{ $t('choose-an-image') }}</div>
+      <div class="row">
+        {{ $t('select-a-custom-background') }}
+      </div>
+      <q-scroll-area
+        :bar-style="barStyle"
+        :thumb-style="thumbStyle"
+        style="height: 40vh; width: -webkit-fill-available"
+      >
+        <template
+          :key="jwpubImage.FilePath"
+          v-for="(jwpubImage, index) in jwpubImages"
+        >
+          <div class="col items-center q-pb-md">
+            <div
+              @click="setMediaBackground(jwpubImage.FilePath)"
+              class="row cursor-pointer items-center q-gutter-x-md"
+            >
+              <div class="col-shrink">
+                <q-img
+                  :src="pathToFileURL(jwpubImage.FilePath)"
+                  class="rounded-borders"
+                  fit="contain"
+                  style="width: 150px"
+                  v-ripple
+                />
+              </div>
+              <div class="col">
+                <div class="row">{{ path.basename(jwpubImage.FilePath) }}</div>
+              </div>
+            </div>
+            <q-separator
+              class="bg-accent-200 q-mt-md"
+              v-if="index < jwpubImages.length - 1"
             />
           </div>
-        </div>
-      </q-card-section>
-      <q-card-section class="row items-center">
-        <div class="row full-width q-col-gutter-lg">
-          <template
-            :key="jwpubImage.FilePath"
-            v-for="jwpubImage in jwpubImages"
-          >
-            <div class="col-4">
-              <q-img
-                :src="pathToFileURL(jwpubImage.FilePath)"
-                @click="setMediaBackground(jwpubImage.FilePath)"
-                class="rounded-borders shadow-5 cursor-pointer"
-                fit="contain"
-                style="max-height: 50vh"
-                v-ripple
-              />
-            </div>
-          </template>
-        </div>
-      </q-card-section>
-    </q-card>
+        </template>
+        <q-inner-loading
+          :showing="!!jwpubImportFilePath && !jwpubImages.length"
+        />
+      </q-scroll-area>
+      <!-- </q-card-section>
+    </q-card> -->
+      <div class="row justify-end">
+        <q-btn
+          @click="
+            jwpubImportFilePath = '';
+            jwpubImages = [];
+          "
+          color="negative"
+          flat
+          >{{ $t('cancel') }}</q-btn
+        >
+      </div>
+    </div>
   </q-dialog>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
+import { barStyle, thumbStyle } from 'src/boot/globals';
 import { electronApi } from 'src/helpers/electron-api';
 import { getTempDirectory } from 'src/helpers/fs';
 import {
@@ -280,9 +296,11 @@ const appSettings = useAppSettingsStore();
 const { screenPreferences } = storeToRefs(appSettings);
 const screenList = ref(getAllScreens());
 const { t } = useI18n();
-const jwpubImportDb = ref('');
+const jwpubImportFilePath = ref('');
 const jwpubImages = ref([] as MultimediaItem[]);
-const jwpubImagesExist = computed(() => jwpubImages.value.length > 0);
+const showCustomBackgroundPicker = computed(
+  () => !!jwpubImportFilePath.value || jwpubImages.value.length > 0,
+);
 
 const bc = new BroadcastChannel('mediaPlayback');
 
@@ -304,7 +322,7 @@ const setMediaBackground = (filepath?: string) => {
     mediaWindowCustomBackground.value = '';
   } finally {
     jwpubImages.value = [];
-    jwpubImportDb.value = '';
+    jwpubImportFilePath.value = '';
   }
 };
 
@@ -325,10 +343,13 @@ const chooseCustomBackground = async (reset?: boolean) => {
           const filepath = backgroundPicker.filePaths[0];
           filepath;
           if (isJwpub(filepath)) {
+            jwpubImportFilePath.value = filepath;
+            console.log('jwpubImportFilePath', jwpubImportFilePath.value);
             const unzipDir = await decompressJwpub(filepath);
+            console.log('unzipDir', unzipDir);
             const db = findDb(unzipDir);
+            console.log('db', db);
             if (!db) throw new Error('No db file found: ' + filepath);
-            jwpubImportDb.value = db;
             jwpubImages.value = (
               executeQuery(
                 db,
@@ -363,7 +384,7 @@ const chooseCustomBackground = async (reset?: boolean) => {
         console.error(error);
         notifyInvalidBackgroundFile();
         mediaWindowCustomBackground.value = '';
-        jwpubImportDb.value = '';
+        jwpubImportFilePath.value = '';
       }
     }
   } catch (error) {

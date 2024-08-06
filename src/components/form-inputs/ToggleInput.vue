@@ -1,10 +1,10 @@
 <template>
   <q-toggle
-    checked-icon="check"
+    checked-icon="mmm-check"
     color="primary"
-    unchecked-icon="clear"
     v-model="localValue"
-  />
+    />
+    <!-- unchecked-icon="clear" -->
 </template>
 
 <script setup lang="ts">

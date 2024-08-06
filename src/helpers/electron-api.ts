@@ -8,6 +8,7 @@ export interface ElectronFileFilter {
 }
 
 export interface ElectronApi {
+  closeWebsiteWindow: () => void;
   convert: typeof import('heic-convert');
   convertPdfToImages: (
     pdfPath: string,
@@ -31,7 +32,7 @@ export interface ElectronApi {
   ) => void;
   openExternalWebsite: (url: string) => void;
   openFileDialog: (single?: boolean) => Promise<Electron.OpenDialogReturnValue>;
-  openFolderDialog: () => string[];
+  openWebsiteWindow: () => void;
   parseFile: (filePath: string, options?: IOptions) => Promise<IAudioMetadata>;
   path: typeof import('path');
   pathToFileURL: (path: string) => string;

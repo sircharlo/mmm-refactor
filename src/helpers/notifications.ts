@@ -13,7 +13,7 @@ const createTemporaryNotification = ({
       actions: [
         {
           color: 'white',
-          icon: 'mdi-close',
+          icon: 'mmm-minus',
           round: true,
         },
       ],

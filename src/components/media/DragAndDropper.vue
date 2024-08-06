@@ -1,15 +1,15 @@
 <template>
-  <q-dialog persistent v-model="localValue">
+  <q-dialog v-model="localValue">
     <div
-      class="items-center col q-pb-lg q-px-lg q-gutter-y-lg bg-secondary-contrast"
-      style="width: 60vw; max-width: 60vw"
+      class="items-center q-pb-lg q-px-lg q-gutter-y-lg bg-secondary-contrast"
     >
       <div class="text-h6 row">{{ $t('import-local-media') }}</div>
       <template
         v-if="
-          jwpubDocuments.length === 0 ||
-          filesLoading ||
-          (localJwpubDb && jwpubLoading)
+          localJwpubDocuments?.length === 0 ||
+          localFilesLoading ||
+          (!!localJwpubDb && jwpubLoading) ||
+          !localJwpubDb
         "
       >
         <div class="row">
@@ -22,11 +22,13 @@
             style="height: 20vh"
           >
             <div class="col-6">
-              <template v-if="filesLoading || (localJwpubDb && jwpubLoading)">
+              <template
+                v-if="localFilesLoading || (!!localJwpubDb && jwpubLoading)"
+              >
                 <q-spinner color="primary" size="lg" />
               </template>
               <template v-else>
-                <q-icon name="mdi-cursor-default-click" size="lg" />
+                <q-icon class="q-mr-sm" name="mmm-drag-n-drop" size="lg" />
                 {{ $t('drag-and-drop-or ') }}
                 <a @click="getLocalFiles()">{{ $t('browse for files') }}</a
                 >.
@@ -59,7 +61,7 @@
                   });
                 "
                 clickable
-                v-for="jwpubImportDocument in jwpubDocuments"
+                v-for="jwpubImportDocument in localJwpubDocuments"
               >
                 <q-item-section>
                   {{ jwpubImportDocument.Title }}
@@ -100,15 +102,21 @@ const { openFileDialog } = electronApi;
 // const currentStateStore = useCurrentStateStore();
 // const { selectedDateObject } = storeToRefs(currentStateStore);
 const props = defineProps<{
+  filesLoading: boolean;
   jwpubDb: string;
-  jwpubDocuments: DocumentItem[];
+  jwpubDocuments: DocumentItem[] | null;
   modelValue: boolean;
 }>();
-const emit = defineEmits(['update:modelValue', 'update:jwpubDb']);
+const emit = defineEmits([
+  'update:modelValue',
+  'update:jwpubDb',
+  'update:jwpubDocuments',
+]);
 const localValue = ref(props.modelValue);
 const localJwpubDb = ref(props.jwpubDb);
+const localJwpubDocuments = ref(props.jwpubDocuments);
+const localFilesLoading = ref(props.filesLoading);
 const jwpubLoading = ref(false);
-const filesLoading = ref(false);
 
 watch(localValue, (newValue) => {
   emit('update:modelValue', newValue);
@@ -116,6 +124,10 @@ watch(localValue, (newValue) => {
 
 watch(localJwpubDb, (newValue) => {
   emit('update:jwpubDb', newValue);
+});
+
+watch(localJwpubDocuments, (newValue) => {
+  emit('update:jwpubDocuments', newValue);
 });
 
 watch(
@@ -129,6 +141,20 @@ watch(
   () => props.jwpubDb,
   (newValue) => {
     localJwpubDb.value = newValue;
+  },
+);
+
+watch(
+  () => props.jwpubDocuments,
+  (newValue) => {
+    localJwpubDocuments.value = newValue;
+  },
+);
+
+watch(
+  () => props.filesLoading,
+  (newValue) => {
+    localFilesLoading.value = newValue;
   },
 );
 

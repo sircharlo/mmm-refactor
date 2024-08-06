@@ -77,10 +77,12 @@ const getWeekDay = (lookupDate: Date) => {
     const currentState = useCurrentStateStore();
     const { selectedDateObject } = storeToRefs(currentState);
     if (!lookupDate) lookupDate = selectedDateObject.value?.date || new Date();
-    const dayNumber =
-      lookupDate.getDay() === 0
-        ? lookupDate.getDay() + 6
-        : lookupDate.getDay() - 1;
+      console.log(lookupDate);
+      const dayNumber =
+        lookupDate.getDay() === 0
+          ? lookupDate.getDay() + 6
+          : lookupDate.getDay() - 1;
+      console.log(dayNumber);
     return dayNumber.toString();
   } catch (error) {
     console.error(error);
@@ -230,5 +232,6 @@ export {
   isCoWeek,
   isInPast,
   isMwMeetingDay,
+  isWeMeetingDay,
   updateLookupPeriod,
 };

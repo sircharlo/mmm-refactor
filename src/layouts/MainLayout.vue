@@ -13,7 +13,8 @@
           <img src="logo-no-background.svg" />
         </div>
         <q-separator class="bg-semi-white-24 q-ml-none" inset vertical />
-        <div class="col q-ml-md">
+        <div class="col q-ml-md flex items-center">
+          <q-icon :name="route.meta.icon as string" class="q-mr-md" size="md" />
           {{ $t(route.meta.title as string) }}
         </div>
         <div class="col-shrink q-gutter-x-sm">
@@ -22,7 +23,7 @@
               :label="$t('new-profile')"
               @click="createNewCongregation"
               color="white-transparent"
-              icon="mdi-plus"
+              icon="mmm-plus"
               unelevated
             />
           </template>
@@ -34,16 +35,17 @@
               unelevated
               v-if="mediaSortForDay && selectedDate"
             >
-              <q-icon class="q-mr-sm" name="mdi-restore" size="xs" />
+              <q-icon class="q-mr-sm" name="mmm-reset" size="xs" />
               {{ $t('reset-sort-order') }}
             </q-btn>
             <q-btn color="white-transparent" unelevated v-if="selectedDate">
-              <q-icon class="q-mr-sm" name="mdi-plus-box-multiple" size="xs" />
+              <q-icon class="q-mr-sm" name="mmm-import-media" size="xs" />
               {{ $t('import-media') }}
               <q-menu
                 :offset="[0, 11]"
                 @before-hide="importMediaMenuActive = false"
                 @before-show="importMediaMenuActive = true"
+                class="top-menu"
               >
                 <q-list style="min-width: 100px">
                   <q-item-label header>{{ $t('from-jw-org') }}</q-item-label>
@@ -54,7 +56,7 @@
                     v-close-popup
                   >
                     <q-item-section avatar>
-                      <q-icon color="primary" name="mdi-music-note" />
+                      <q-icon color="primary" name="mmm-music-note" />
                     </q-item-section>
                     <q-item-section>
                       <q-item-label>{{ $t('song') }}</q-item-label>
@@ -73,7 +75,7 @@
                     v-close-popup
                   >
                     <q-item-section avatar>
-                      <q-icon color="primary" name="mdi-movie" />
+                      <q-icon color="primary" name="mmm-movie" />
                     </q-item-section>
                     <q-item-section>
                       <q-item-label>{{ $t('video') }}</q-item-label>
@@ -88,9 +90,9 @@
                   <template
                     :key="name"
                     v-for="[icon, name] in [
-                      ['mdi-folder-multiple-image', 'images-videos'],
-                      ['mdi-folder-zip', 'jwpub-file'],
-                      ['mdi-playlist-play', 'jw-playlist'],
+                      ['mmm-local-media', 'images-videos'],
+                      ['mmm-jwpub', 'jwpub-file'],
+                      ['mmm-jwlplaylist', 'jw-playlist'],
                     ]"
                   >
                     <q-item @click="dragging" clickable v-close-popup>
@@ -109,12 +111,12 @@
               </q-menu>
             </q-btn>
             <q-btn :disable="mediaPlaying" color="white-transparent" unelevated>
-              <q-icon class="q-mr-sm" name="mdi-calendar-month" size="xs" />
+              <q-icon class="q-mr-sm" name="mmm-calendar-month" size="xs" />
               {{
                 getDateLocaleFormatted(
                   currentSettings?.localAppLang,
                   selectedDate,
-                ) ?? $t('select-a-date')
+                ) || $t('select-a-date')
               }}
               <!--dayjs-->
               <q-popup-proxy :offset="[0, 11]" v-model="datePickerActive">
@@ -129,8 +131,8 @@
                 >
                   <div class="row items-center justify-end q-gutter-sm">
                     <q-btn
+                      :label="$t('close')"
                       color="primary"
-                      icon="mdi-check"
                       outline
                       v-close-popup
                     />
@@ -140,8 +142,7 @@
             </q-btn>
             <q-dialog v-model="remoteVideoPopup">
               <div
-                class="items-center col q-pb-lg q-px-lg q-gutter-y-lg bg-secondary-contrast"
-                style="width: 80vw; max-width: 80vw"
+                class="items-center q-pb-lg q-px-lg q-gutter-y-lg bg-secondary-contrast large-overlay"
               >
                 <div class="text-h6 row">{{ $t('add-video-jw-org') }}</div>
                 <div class="row">{{ $t('add-a-video-explain') }}</div>
@@ -161,7 +162,7 @@
                       v-model="remoteVideoFilter"
                     >
                       <template v-slot:prepend>
-                        <q-icon name="mdi-magnify" />
+                        <q-icon name="mmm-search" />
                       </template>
                     </q-input>
                   </div>
@@ -217,14 +218,13 @@
                                 class="rounded-borders"
                               >
                                 <q-badge
-                                  class="q-mt-xs q-ml-xs"
-                                  color="black"
+                                  class="q-mt-xs q-ml-xs bg-semi-black"
                                   style="padding: 5px !important"
                                 >
                                   <q-icon
                                     class="q-mr-xs"
                                     color="white"
-                                    name="mdi-play"
+                                    name="mmm-play"
                                   />
                                   {{ formatTime(video.duration) }}
                                 </q-badge>
@@ -250,9 +250,8 @@
                   <div class="col">
                     <q-toggle
                       :label="$t('include-audio-description')"
-                      checked-icon="check"
+                      checked-icon="mmm-check"
                       color="primary"
-                      unchecked-icon="clear"
                       v-model="remoteVideosIncludeAudioDescription"
                     />
                   </div>
@@ -267,8 +266,11 @@
             </q-dialog>
           </template>
           <template v-else-if="route.fullPath === '/settings'">
-            <q-btn flat icon="mdi-dots-vertical" round v-if="selectedDate">
-              <q-tooltip v-if="!moreOptionsMenuActive">
+            <q-btn color="white-transparent" unelevated v-if="selectedDate">
+              <q-icon class="q-mr-sm" name="mdi-dots-vertical" size="xs" />
+              {{ $t('tools') }}
+
+              <q-tooltip :delay="2000" v-if="!moreOptionsMenuActive">
                 {{ $t('tools') }}
               </q-tooltip>
               <q-menu
@@ -287,12 +289,16 @@
                     v-close-popup
                   >
                     <q-item-section avatar>
-                      <q-icon color="primary" name="mdi-vacuum  " />
+                      <q-icon color="primary" name="mdi-vacuum" />
                     </q-item-section>
-                    <q-item-section
-                      >{{ $t('remove-unused-cache') }}
-                      {{ unusedCacheFoldersSize }}</q-item-section
-                    >
+                    <q-item-section>
+                      <q-item-label
+                        >{{ $t('remove-unused-cache') }}
+                      </q-item-label>
+                      <q-item-label caption>{{
+                        unusedCacheFoldersSize
+                      }}</q-item-label>
+                    </q-item-section>
                   </q-item>
                   <q-item
                     :disable="calculatingCacheSize"
@@ -303,10 +309,12 @@
                     <q-item-section avatar>
                       <q-icon color="primary" name="mdi-bomb" />
                     </q-item-section>
-                    <q-item-section
-                      >{{ $t('remove-all-cache') }}
-                      {{ allCacheFilesSize }}</q-item-section
-                    >
+                    <q-item-section>
+                      <q-item-label>{{ $t('remove-all-cache') }} </q-item-label>
+                      <q-item-label caption>{{
+                        allCacheFilesSize
+                      }}</q-item-label>
+                    </q-item-section>
                   </q-item>
                 </q-list>
               </q-menu>
@@ -321,6 +329,33 @@
             >
             </q-toggle>
           </template>
+          <template v-else-if="route.fullPath === '/present-website'">
+            <q-btn
+              :disable="mediaPlaying"
+              @click="
+                openWebsiteWindow();
+                mediaPlayingAction = 'website';
+              "
+              color="white-transparent"
+              unelevated
+              v-if="mediaPlayingAction !== 'website'"
+            >
+              <q-icon class="q-mr-sm" name="mmm-mirror" size="xs" />
+              {{ $t('start-mirroring') }}
+            </q-btn>
+            <q-btn
+              @click="
+                closeWebsiteWindow();
+                mediaPlayingAction = '';
+              "
+              color="white-transparent"
+              unelevated
+              v-else
+            >
+              <q-icon class="q-mr-sm" name="mmm-mirror" size="xs" />
+              {{ $t('stop-mirroring') }}
+            </q-btn>
+          </template>
         </div>
       </div>
     </q-header>
@@ -333,27 +368,7 @@
         currentSettings?.enableMusicButton
       "
     >
-      <div class="flex" style="justify-content: center">
-        <q-chip
-          :ripple="false"
-          color="primary"
-          rounded
-          size="xl"
-          style="
-            border-radius: 2em;
-            padding: 32px 16px;
-            transition: width 0.5s ease;
-          "
-        >
-          <div class="flex q-gutter-x-md">
-            <DownloadStatus />
-            <MusicButton />
-            <SubtitlesButton />
-            <ObsStatus />
-            <MediaDisplayButton />
-          </div>
-        </q-chip>
-      </div>
+      <ActionIsland />
     </q-footer>
 
     <SongPicker v-model="chooseSong" />
@@ -361,15 +376,21 @@
       :breakpoint="5"
       :mini="miniState"
       bordered
-      class="column justify-between no-wrap bg-secondary-contrast text-weight-medium"
+      class="column justify-between no-wrap bg-secondary-contrast text-weight-medium text-dark-grey"
       v-model="drawer"
     >
       <q-item @click="miniState = !miniState" clickable v-ripple>
-        <q-tooltip anchor="center right" self="center left" v-if="miniState">
+        <q-tooltip
+          :delay="2000"
+          anchor="center right"
+          self="center left"
+          v-if="miniState"
+        >
           {{ $t('expand-sidebar') }}
         </q-tooltip>
         <q-item-section avatar>
-          <q-icon :name="'mdi-menu' + (miniState ? '' : '-open')" />
+          <!-- <q-icon :name="'mmm-menu' + (miniState ? '' : '-open')" /> -->
+          <q-icon name="mmm-menu" />
         </q-item-section>
         <q-item-section>{{ $t('collapse-sidebar') }}</q-item-section>
       </q-item>
@@ -385,13 +406,38 @@
         clickable
         v-ripple
       >
-        <q-tooltip anchor="center right" self="center left" v-if="miniState">
+        <q-tooltip
+          :delay="2000"
+          anchor="center right"
+          self="center left"
+          v-if="miniState"
+        >
           {{ $t('titles.meetingMedia') }}
         </q-tooltip>
         <q-item-section avatar>
-          <q-icon name="mdi-calendar-month" />
+          <q-icon name="mmm-media" />
         </q-item-section>
         <q-item-section>{{ $t('titles.meetingMedia') }}</q-item-section>
+      </q-item>
+      <q-item
+        :disable="!currentSettings || invalidSettings() || mediaPlaying"
+        :to="{ path: '/present-website', exact: true }"
+        active-class="bg-accent-100 text-primary blue-bar"
+        clickable
+        v-ripple
+      >
+        <q-tooltip
+          :delay="2000"
+          anchor="center right"
+          self="center left"
+          v-if="miniState"
+        >
+          {{ $t('titles.presentWebsite') }}
+        </q-tooltip>
+        <q-item-section avatar>
+          <q-icon name="mmm-open-web" />
+        </q-item-section>
+        <q-item-section>{{ $t('titles.presentWebsite') }}</q-item-section>
       </q-item>
       <q-item
         :disable="mediaPlaying"
@@ -400,11 +446,16 @@
         clickable
         v-ripple
       >
-        <q-tooltip anchor="center right" self="center left" v-if="miniState">
+        <q-tooltip
+          :delay="2000"
+          anchor="center right"
+          self="center left"
+          v-if="miniState"
+        >
           {{ $t('titles.profileSelection') }}
         </q-tooltip>
         <q-item-section avatar>
-          <q-icon name="mdi-account-group-outline" />
+          <q-icon name="mmm-groups" />
         </q-item-section>
         <q-item-section>
           {{ $t('titles.profileSelection') }}
@@ -420,13 +471,18 @@
         clickable
         v-ripple
       >
-        <q-tooltip anchor="center right" self="center left" v-if="miniState">
+        <q-tooltip
+          :delay="2000"
+          anchor="center right"
+          self="center left"
+          v-if="miniState"
+        >
           {{ $t('titles.settings') }}
         </q-tooltip>
         <q-item-section avatar>
           <q-icon
             :color="invalidSettings() ? 'negative' : ''"
-            name="settings"
+            name="mmm-settings"
           />
         </q-item-section>
         <q-item-section :class="invalidSettings() ? 'text-negative' : ''">
@@ -437,89 +493,41 @@
     <q-scroll-area
       :bar-style="barStyle"
       :thumb-style="thumbStyle"
-      style="flex: 1 1 1px;"
+      style="flex: 1 1 1px"
     >
       <q-page-container class="main-bg">
         <router-view />
       </q-page-container>
     </q-scroll-area>
-    <!-- todo: restyle this dialog -->
     <q-dialog v-model="cacheClearConfirmPopup">
-      <q-card style="width: 80vw; max-width: 80vw">
-        <q-card-section>
-          <div class="row self-center">
-            <q-avatar
-              class="q-mr-md self-center"
-              color="negative"
-              icon="mdi-alert"
-              text-color="white"
-            />
-            <span class="text-h6 self-center">
-              {{ $t('are-you-sure') }}
-            </span>
-            <q-space />
-            <div class="text-h6 self-center">
-              <q-btn
-                @click="cancelDeleteCacheFiles()"
-                dense
-                flat
-                icon="close"
-                round
-                v-close-popup
-              />
-            </div>
-          </div>
+      <q-card class="modal-confirm">
+        <q-card-section
+          class="row items-center text-bigger text-semibold text-negative q-pb-none"
+        >
+          <q-icon class="q-mr-sm" name="mmm-delete" />
+          {{ $t('clear-cache') }}
         </q-card-section>
-        <q-card-section>
-          <p>
-            {{
-              cacheClearType === 'all'
-                ? $t('are-you-sure-delete-cache')
-                : $t('are-you-sure-delete-unused-cache')
-            }}
-            {{ $t('files-listed-below') }}
-          </p>
+        <q-card-section class="row items-center">
+          {{ $t('are-you-sure-you-want-to-clear-the-cache') }}
         </q-card-section>
-        <q-card-section>
-          <q-table
-            :columns="[
-              { name: 'path', label: $t('path'), field: 'path' },
-              { name: 'size', label: $t('size'), field: 'size' },
-            ]"
-            :rows="
-              cacheClearType === 'all'
-                ? cacheFiles.map((file) => ({
-                    path: file.path,
-                    size: prettyBytes(file.size),
-                  }))
-                : Object.entries(unusedParentDirectories).map(
-                    ([path, size]) => ({
-                      path,
-                      size: prettyBytes(size),
-                    }),
-                  )
-            "
-            :virtual-scroll-sticky-size-start="48"
-            dense
-            row-key="path"
-            style="height: 200px"
-            virtual-scroll
+        <q-card-actions align="right" class="text-primary">
+          <q-btn
+            :label="$t('cancel')"
+            @click="cacheClearConfirmPopup = false"
+            flat
           />
-        </q-card-section>
-        <q-card-actions align="right">
           <q-btn
             :label="$t('delete')"
             @click="deleteCacheFiles(cacheClearType)"
             color="negative"
+            flat
           />
         </q-card-actions>
-        <q-inner-loading :showing="deletingCacheFiles" />
       </q-card>
     </q-dialog>
     <q-dialog v-model="aboutModal">
       <div
-        class="items-center col q-pb-lg q-px-lg q-gutter-y-lg bg-secondary-contrast"
-        style="width: 60vw; max-width: 60vw"
+        class="items-center q-pb-lg q-px-lg q-gutter-y-lg bg-secondary-contrast"
       >
         <!-- <div class="text-h6 row">{{ $t('titles.about') }}</div> -->
         <div class="row items-center">
@@ -553,10 +561,10 @@
               target="_blank"
             >
               <div class="col-shrink">
-                <q-icon name="fa-brands fa-square-github" />
+                <q-icon name="mmm-github" />
               </div>
               <div class="col col-grow">{{ $t('github-repo') }}</div>
-              <div class="col-shrink"><q-icon name="mdi-open-in-new" /></div>
+              <div class="col-shrink"><q-icon name="mmm-arrow-outward" /></div>
             </q-btn>
           </div>
           <div class="col">
@@ -568,9 +576,9 @@
               outline
               target="_blank"
             >
-              <div class="col-shrink"><q-icon name="mdi-bookmark-box" /></div>
+              <div class="col-shrink"><q-icon name="mmm-guide" /></div>
               <div class="col col-grow">{{ $t('user-guide') }}</div>
-              <div class="col-shrink"><q-icon name="mdi-open-in-new" /></div>
+              <div class="col-shrink"><q-icon name="mmm-arrow-outward" /></div>
             </q-btn>
           </div>
         </div>
@@ -592,16 +600,13 @@ import PQueue from 'p-queue';
 import { storeToRefs } from 'pinia';
 import prettyBytes from 'pretty-bytes';
 import { Dark, date, LocalStorage } from 'quasar';
+import { useQuasar } from 'quasar';
 import { get } from 'src/boot/axios';
 import { queues } from 'src/boot/globals';
 import { barStyle, thumbStyle } from 'src/boot/globals';
 import { refreshDateLocale } from 'src/boot/i18n';
-import DownloadStatus from 'src/components/media/DownloadStatus.vue';
-import MediaDisplayButton from 'src/components/media/MediaDisplayButton.vue';
-import MusicButton from 'src/components/media/MusicButton.vue';
-import ObsStatus from 'src/components/media/ObsStatus.vue';
 import SongPicker from 'src/components/media/SongPicker.vue';
-import SubtitlesButton from 'src/components/media/SubtitlesButton.vue';
+import ActionIsland from 'src/components/ui/ActionIsland.vue';
 import {
   cleanAdditionalMediaFolder,
   cleanLocalStorage,
@@ -641,6 +646,34 @@ import { computed, onMounted, Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 
+const $q = useQuasar();
+
+$q.iconMapFn = (iconName) => {
+  if (iconName.startsWith('chevron_')) {
+    return {
+      cls: iconName.replace('chevron_', 'mmm-'),
+    };
+  }
+  if (iconName.startsWith('keyboard_arrow_')) {
+    return {
+      cls: iconName.replace('keyboard_arrow_', 'mmm-'),
+    };
+  }
+  if (iconName.startsWith('arrow_drop_')) {
+    return {
+      cls: 'mmm-dropdown-arrow',
+    };
+  }
+  if (iconName.startsWith('mmm-') === true) {
+    // we strip the "app:" part
+    // const name = iconName.substring(4)
+
+    return {
+      cls: iconName,
+    };
+  }
+};
+
 // Store and router initializations
 
 const appSettings = useAppSettingsStore();
@@ -660,6 +693,7 @@ const {
   currentSongbook,
   downloadProgress,
   mediaPlaying,
+  mediaPlayingAction,
   online,
   onlyShowInvalidSettings,
   selectedDate,
@@ -687,10 +721,12 @@ jwStore.$subscribe((_, state) => {
 const chooseSong = ref(false);
 const mediaSortForDay = ref(true);
 const {
+  closeWebsiteWindow,
   fs,
   getAppVersion,
   klawSync,
   openExternalWebsite,
+  openWebsiteWindow,
   pathToFileURL,
   setAutoStartAtLogin,
 } = electronApi;
@@ -1111,7 +1147,7 @@ const deleteCacheFiles = (type: '' | 'all' | 'smart') => {
         : cacheFiles.value.map((f) => f.path);
     for (const filepath of filepathsToDelete) {
       try {
-        fs.rmSync(filepath);
+        fs.rmSync(filepath, { recursive: true });
       } catch (error) {
         console.error(error);
       }
@@ -1135,7 +1171,7 @@ if (!migrations.value.includes('firstRun')) {
   if (migrationResult) {
     createTemporaryNotification({
       caption: t('successfully-migrated-from-the-previous-version'),
-      icon: 'mdi-check-circle',
+      icon: 'mmm-info',
       message: t('welcome-to-mmm'),
       timeout: 10000,
       type: 'positive',

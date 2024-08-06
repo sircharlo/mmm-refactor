@@ -12,12 +12,19 @@ const platform = process.platform || os.platform();
 let mainWindow: BrowserWindow | null | undefined;
 let mediaWindow: BrowserWindow | null | undefined;
 
+const getWebsiteWindow = () =>
+  BrowserWindow.getAllWindows().find((w) =>
+    w.webContents.getTitle().includes('Website Stream'),
+  );
+
 const allowedHostnames = [
   'jw.org',
   'jw-cdn.org',
   'akamaihd.net',
   'cloudfront.net',
 ];
+
+const jwHostnames = ['jw.org'];
 
 const isValidHostname = (hostname: string) => {
   // Check if the hostname is exactly one of the allowed hostnames
@@ -30,6 +37,18 @@ const isValidHostname = (hostname: string) => {
     return (
       hostname === allowedHostname || hostname.endsWith(`.${allowedHostname}`)
     );
+  });
+};
+
+const isJwHostname = (hostname: string) => {
+  // Check if the hostname is exactly one of the allowed hostnames
+  if (jwHostnames.includes(hostname)) {
+    return true;
+  }
+
+  // Check for subdomain matches
+  return jwHostnames.some((jwHostname) => {
+    return hostname === jwHostname || hostname.endsWith(`.${jwHostname}`);
   });
 };
 
@@ -93,7 +112,16 @@ function createWindow() {
   });
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     const parsedUrl = new URL(details.url);
-    if (isValidHostname(parsedUrl.hostname)) {
+    let passthroughReferrer = false;
+    if (details.referrer) {
+      const referrerUrl = new URL(details.referrer);
+      if (
+        isJwHostname(referrerUrl.hostname) ||
+        referrerUrl.hostname === parsedUrl.hostname
+      )
+        passthroughReferrer = true;
+    }
+    if (isValidHostname(parsedUrl.hostname) && !passthroughReferrer) {
       if (details.responseHeaders) {
         if (
           !details.responseHeaders['access-control-allow-origin'] ||
@@ -104,6 +132,8 @@ function createWindow() {
             'true',
           ];
         }
+        if (details.responseHeaders['x-frame-options'])
+          delete details.responseHeaders['x-frame-options'];
       }
     }
     callback({ responseHeaders: details.responseHeaders });
@@ -152,6 +182,7 @@ function createWindow() {
 
   mainWindow.on('close', () => {
     mediaWindow?.close();
+    getWebsiteWindow()?.close();
   });
 
   mainWindow?.once('ready-to-show', () => {

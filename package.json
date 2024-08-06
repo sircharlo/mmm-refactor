@@ -11,9 +11,11 @@
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
     "build": "quasar build",
-    "rebuild": ".\\node_modules\\.bin\\electron-rebuild.cmd -f -m ./node_modules/better-sqlite3"
+    "rebuild": ".\\node_modules\\.bin\\electron-rebuild.cmd -f -m ./node_modules/better-sqlite3",
+    "icons": "node .\\build\\svg2font.js"
   },
   "dependencies": {
+    "@daipeng7/rollup-plugin-iconfont": "^3.0.6",
     "@electron/remote": "^2.1.2",
     "@formkit/drag-and-drop": "^0.1.6",
     "@panzoom/panzoom": "^4.5.1",

@@ -20,12 +20,97 @@ import path from 'upath';
 
 const getMainWindow = () =>
   BrowserWindow.getAllWindows().find(
-    (w) => !w.webContents.getURL().includes('media-player'),
+    (w) =>
+      !w.webContents.getURL().includes('media-player') &&
+      !w.webContents.getURL().includes('https://'),
   );
 const getMediaWindow = () =>
-  BrowserWindow.getAllWindows().find((w) =>
-    w.webContents.getURL().includes('media-player'),
+  BrowserWindow.getAllWindows().find(
+    (w) =>
+      w.webContents.getURL().includes('media-player') &&
+      !w.webContents.getURL().includes('https://'),
   );
+
+const getWebsiteWindow = () =>
+  BrowserWindow.getAllWindows().find((w) =>
+    w.webContents.getURL().includes('https://'),
+  );
+
+const bc = new BroadcastChannel('mediaPlayback');
+
+const closeWebsiteWindow = () => {
+  const websiteWindow = getWebsiteWindow();
+  console.log(websiteWindow, BrowserWindow.getAllWindows());
+  if (!websiteWindow) return;
+  websiteWindow.close();
+};
+
+const openWebsiteWindow = () => {
+  const mainWindow = getMainWindow();
+  if (!mainWindow) return;
+
+  const websiteWindow = new BrowserWindow({
+    alwaysOnTop: true,
+    height: 720,
+    title: 'Website Stream',
+    useContentSize: true,
+    width: 1280,
+  });
+
+  websiteWindow.webContents.setVisualZoomLevelLimits(1, 5);
+  websiteWindow.webContents.on('zoom-changed', (event, zoomDirection) => {
+    const currentZoom = websiteWindow.webContents.getZoomFactor();
+    if (zoomDirection === 'in') {
+      websiteWindow.webContents.setZoomFactor(currentZoom + 0.2);
+    } else if (zoomDirection === 'out') {
+      websiteWindow.webContents.zoomFactor = currentZoom - 0.2;
+    }
+  });
+  websiteWindow.webContents.setWindowOpenHandler((details) => {
+    // Prevent popups from opening new windows; open them in the main browser window instead
+    websiteWindow.webContents.loadURL(details.url);
+    return { action: 'deny' };
+  });
+
+  const setAspectRatio = () => {
+    // Compute the new aspect ratio that, when the frame is removed, results in a 16:9 aspect ratio for the content
+    const size = websiteWindow.getSize();
+    const contentSize = websiteWindow.getContentSize();
+    const frameSize = [size[0] - contentSize[0], size[1] - contentSize[1]];
+    const aspectRatio = 16 / 9;
+    const newAspectRatio =
+      (contentSize[0] + frameSize[0]) /
+      (contentSize[0] / aspectRatio + frameSize[1]);
+    websiteWindow.setAspectRatio(newAspectRatio);
+  };
+  setAspectRatio();
+  websiteWindow.on('resize', setAspectRatio);
+
+  websiteWindow.loadURL('https://www.jw.org');
+  websiteWindow.on('close', () => stopStream());
+
+  const source = {
+    id: websiteWindow.getMediaSourceId(), // for testing
+    name: websiteWindow.getTitle(),
+  };
+
+  mainWindow.webContents.session.setDisplayMediaRequestHandler(
+    (request, callback) => {
+      // const frames = mainWindow.webContents.mainFrame.framesInSubtree;
+      // const lastFrame = frames[frames.length - 1];
+      callback({
+        audio: 'loopback',
+        // video: lastFrame,
+        video: source as Electron.Video,
+      } as Electron.Streams);
+    },
+  );
+  bc.postMessage({ webStream: true });
+};
+
+const stopStream = () => {
+  bc.postMessage({ webStream: false });
+};
 
 const getScreens = () =>
   screen
@@ -306,6 +391,7 @@ const convertPdfToImages = async (pdfPath: string, outputFolder: string) => {
 };
 
 contextBridge.exposeInMainWorld('electronApi', {
+  closeWebsiteWindow,
   convert,
   convertPdfToImages,
   decompress: async (inputZip: string, outputFolder: string) => {
@@ -369,11 +455,7 @@ contextBridge.exposeInMainWorld('electronApi', {
       properties: single ? ['openFile'] : ['openFile', 'multiSelections'],
     });
   },
-  openFolderDialog: () => {
-    return dialog.showOpenDialogSync({
-      properties: ['openDirectory'],
-    });
-  },
+  openWebsiteWindow,
   parseFile: async (filePath: string, options?: IOptions) => {
     const musicMetadata: typeof import('music-metadata') = await import(
       'music-metadata'

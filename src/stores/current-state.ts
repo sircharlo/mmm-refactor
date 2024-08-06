@@ -125,7 +125,9 @@ export const useCurrentStateStore = defineStore('current-state', {
       );
     },
     mediaPlaying(state) {
-      return state.mediaPlayingUrl !== '';
+      return (
+        state.mediaPlayingUrl !== '' || state.mediaPlayingAction === 'website'
+      );
     },
     selectedDateObject(state) {
       const jwStore = useJwStore();

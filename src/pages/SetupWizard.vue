@@ -102,7 +102,7 @@
         :done="step > 4"
         :name="4"
         :title="$t('setupWizard.meetingDaysTimes')"
-        icon="mdi-calendar-range"
+        icon="mmm-calendar-month"
       >
         {{
           $t(
@@ -174,48 +174,12 @@
           <!-- <q-btn flat @click="step--" color="primary" :label="$t('back')" class="q-ml-sm" />-->
         </q-stepper-navigation>
       </q-step>
-      <!-- <q-step
-        :done="step > 5"
-        :name="6"
-        :title="$t('kingdom-hall')"
-        icon="mdi-office-building"
-      >
-        {{
-          $t(
-            'are-you-using-this-app-at-a-kingdom-hall-if-so-well-configure-a-few-things-for-you-right-off-the-bat',
-          )
-        }}
-        <q-stepper-navigation>
-          <q-btn
-            :label="$t('yes')"
-            @click="
-              usingAtKh = true;
-              step = 100;
-            "
-            color="primary"
-          />
-          <q-btn
-            :label="$t('no')"
-            @click="
-              usingAtKh = false;
-              step = 300;
-            "
-            class="q-ml-sm"
-            color="primary"
-            flat
-          />
-        </q-stepper-navigation>
-      </q-step> -->
-      <!-- FIRST STAGE END -->
-
-      <!-- KH STAGE START -->
-      <!-- <template v-if="usingAtKh"> -->
       <q-step
         :caption="$t('good-start')"
         :done="step > 100"
         :name="100"
         :title="$t('excellent')"
-        icon="mdi-check"
+        icon="mmm-check"
       >
         {{
           $t(
@@ -238,7 +202,7 @@
         :done="step > 101"
         :name="101"
         :title="$t('media-display')"
-        icon="mdi-television"
+        icon="mmm-stream-now"
       >
         <p>
           {{ $t('look-for-this-button-in-m-s-footer') }}
@@ -273,7 +237,7 @@
         :done="step > 102"
         :name="102"
         :title="$t('setupWizard.backgroundMusic')"
-        icon="mdi-music-note"
+        icon="mmm-music-note"
       >
         <p>
           {{ $t('also-look-for-this-button-in-m-s-footer') }}
@@ -301,7 +265,7 @@
         :done="step > 103"
         :name="103"
         :title="$t('obsEnable')"
-        icon="mdi-cctv"
+        icon="mmm-obs-studio"
       >
         <p class="text-subtitle1">
           {{ $t('does-your-kingdom-hall-use-a-program-called-obs-studio') }}
@@ -331,7 +295,7 @@
           :done="step > 104"
           :name="104"
           :title="$t('obs-studio-integration')"
-          icon="mdi-cctv"
+          icon="mmm-obs-studio"
         >
           <p class="text-subtitle1">
             {{ $t('would-you-like-to-integrate-m-with-obs-studio') }}
@@ -362,7 +326,7 @@
             :done="step > 105"
             :name="105"
             :title="$t('obs-studio-configuration')"
-            icon="mdi-cogs"
+            icon="mmm-settings"
           >
             <p class="text-subtitle1">
               {{ $t('is-obs-studio-configured-correctly') }}
@@ -429,7 +393,7 @@
             :done="step > 107"
             :name="107"
             :title="$t('obs-studio-stage-scene')"
-            icon="mdi-lectern"
+            icon="mmm-lectern"
           >
             <p class="text-subtitle1">
               {{
@@ -457,7 +421,7 @@
             :done="step > 108"
             :name="108"
             :title="$t('obs-studio-media-scene')"
-            icon="mdi-lectern"
+            icon="mmm-lectern"
           >
             <p class="text-subtitle1">
               {{
@@ -557,7 +521,11 @@ import TextInput from 'src/components/form-inputs/TextInput.vue';
 import TimeInput from 'src/components/form-inputs/TimeInput.vue';
 import MediaDisplayButton from 'src/components/media/MediaDisplayButton.vue';
 import MusicButton from 'src/components/media/MusicButton.vue';
-import { downloadBackgroundMusic, downloadSongbookVideos, fetchMedia } from 'src/helpers/jw-media';
+import {
+  downloadBackgroundMusic,
+  downloadSongbookVideos,
+  fetchMedia,
+} from 'src/helpers/jw-media';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { ref, watch } from 'vue';

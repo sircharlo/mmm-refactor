@@ -6,7 +6,7 @@
     mask="time"
     outlined
     readonly
-    style="width: 240px;"
+    style="width: 240px"
     v-model="localValue"
     v-bind="{ label: label || undefined }"
   >
@@ -15,20 +15,16 @@
       transition-hide="scale"
       transition-show="scale"
     >
-      <q-time
-        :options="getTimeOptions(options)"
-        format24h
-        v-model="localValue"
-      >
+      <q-time :options="getTimeOptions(options)" format24h v-model="localValue">
         <div class="row items-center justify-end">
           <q-btn
+            :label="$t('clear')"
             @click="clearTime"
             color="negative"
             flat
-            icon="mdi-close"
             v-close-popup
           />
-          <q-btn color="positive" flat icon="mdi-check" v-close-popup />
+          <q-btn :label="$t('save')" color="primary" flat v-close-popup />
         </div>
       </q-time>
     </q-popup-proxy>

@@ -95,9 +95,10 @@ body.body--light {
     color: $accent-400;
   }
 
-  .meeting-section {
+  .media-section {
     background: white;
     border-color: $accent-300;
+    border: 1px solid $accent-300;
   }
 
   .bg-secondary-contrast {
@@ -128,7 +129,7 @@ body.body--dark {
     color: $dark-grey-dark;
   }
 
-  .meeting-section {
+  .media-section {
     background: $dark;
     border-color: $accent-100-dark;
   }
@@ -139,58 +140,30 @@ body.body--dark {
   }
 }
 
-.meeting-section {
-  border-left-width: 1px;
-  border-right-width: 1px;
-  border-bottom-width: 0px;
-  border-top-width: 0px;
-  border-style: solid;
-
-  &.meeting-section-begin {
-    margin-top: 1em;
-    border-top-right-radius: 0.75em;
-    border-top-left-radius: 0.75em;
-    border-top-width: 1px;
-  }
-
-  &.meeting-section-end {
-    margin-bottom: 1em;
-    border-bottom-right-radius: 0.75em;
-    border-bottom-left-radius: 0.75em;
-    border-bottom-width: 1px;
-  }
+.list-droppable {
+  min-height: 3em;
 }
 
-.meeting-section-internal {
-  margin-left: 0.5em;
-  margin-right: 0.5em;
-  padding-left: 1.5em;
-
-  &.begin {
-    margin-top: 0.5em;
-  }
-
-  &.end {
-    margin-bottom: 0.5em;
-  }
+.media-section {
+  padding-left: 1em;
+  border-radius: 0.5em;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  position: relative;
+  border-radius: 0.75em;
+  margin-bottom: 1.5em;
 
   &:before {
     bottom: 0;
     content: '';
+    margin-left: 0.6em;
     left: 0;
     position: absolute;
     top: 0;
-    width: 0.75em;
-  }
-
-  &.end:before {
-    border-bottom-left-radius: 5em;
-    border-bottom-right-radius: 5em;
-  }
-
-  &.begin:before {
-    border-top-left-radius: 5em;
-    border-top-right-radius: 5em;
+    width: 0.6em;
+    border-radius: 5em;
+    margin-top: 0.6em;
+    margin-bottom: 0.6em;
   }
 
   &.tgw:before {
@@ -209,7 +182,8 @@ body.body--dark {
     background: $apply;
   }
 
-  &.additional:before {
+  &.additional:before,
+  &.website:before {
     background: $additional;
   }
 
@@ -226,8 +200,19 @@ body.body--dark {
   }
 }
 
+.media-section .q-avatar {
+  height: 32px;
+  width: 32px;
+  margin-right: 12px;
+}
+
 .jw-icon {
   font-family: 'JW-Icons';
+
+  .q-avatar__content {
+    font-size: 22px;
+    line-height: 22px;
+  }
 }
 
 .text-tgw {
@@ -260,7 +245,7 @@ body.body--dark {
   // font-size: 14px;
 }
 
-.q-menu {
+.q-menu, .round-card {
   border: 1px solid $accent-300;
   box-shadow: 0px 8px 24px 0px $shadow;
   font-size: 0.9em;
@@ -294,8 +279,16 @@ body.body--dark {
   right: 16px;
 }
 
-.semi-black {
+.bg-semi-black {
   background-color: $semi-black;
+}
+
+.text-spaced {
+  letter-spacing: 0.02em;
+}
+
+.text-semibold {
+  font-weight: 600;
 }
 
 .blue-bar::before {
@@ -317,20 +310,42 @@ body.body--dark {
   background: $treasures;
 }
 
+.text-tgw {
+  color: $treasures;
+}
+
 .bg-ayfm {
   background: $apply;
+}
+
+.text-ayfm {
+  color: $apply;
 }
 
 .bg-lac {
   background: $living;
 }
 
+.text-lac {
+  color: $living;
+}
+
 .bg-wt {
   background: $apply;
 }
 
-.bg-additional {
+.text-wt {
+  color: $apply;
+}
+
+.bg-additional,
+.bg-website {
   background: $additional;
+}
+
+.text-additional,
+.text-website {
+  color: $additional;
 }
 
 .text-bigger {
@@ -356,8 +371,28 @@ body.body--dark {
   border-radius: $generic-border-radius;
 }
 
-.q-dialog, .q-card, .q-time, .q-date {
+.q-dialog,
+.q-card,
+.q-time,
+.q-date {
   user-select: none;
+}
+
+.q-dialog .q-card,
+.q-menu .q-card {
+  width: 400px;
+  max-height: 75vh;
+}
+
+.q-dialog > .q-list,
+.q-menu > .q-list {
+  width: 300px;
+}
+
+.q-dialog .large-overlay,
+.q-menu .large-overlay {
+  width: 80vw;
+  max-width: 80vw;
 }
 
 .dashed-border {
@@ -367,4 +402,40 @@ body.body--dark {
 a {
   color: $primary;
   cursor: pointer;
+}
+
+.action-island {
+  border-radius: 2em;
+  padding: 32px 16px;
+  transition: width 0.5s ease;
+  box-shadow: 0px 4px 24px 0px rgba(48, 117, 242, 0.4);
+}
+
+.media-tag {
+  min-width: 70px;
+}
+
+.media-tag .q-chip__content {
+  justify-content: center;
+}
+
+.q-menu .q-item__section--avatar,
+.q-drawer .q-item__section--avatar {
+  min-width: 40px;
+}
+
+.modal-confirm {
+  // font-size: 1.1em;
+  & .text-bigger {
+    font-size: 1.4em;
+  }
+}
+
+.time-duration {
+  font-size: 0.9em;
+  color: $accent-300;
+}
+
+.text-smaller {
+  font-size: 0.8em;
 }

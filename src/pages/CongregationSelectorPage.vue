@@ -3,25 +3,18 @@
     <q-list v-if="Object.keys(congregations).length">
       <!-- @vue-ignore-->
       <div
+        :class="
+          'media-section cursor-pointer congregation ' +
+          (currentCongregation === id ? 'active' : '')
+        "
         :key="id"
         @click="chooseCongregation(id)"
         @mouseleave="hoveredCongregation = null"
         @mouseover="hoveredCongregation = id"
-        class="meeting-section meeting-section-begin meeting-section-end cursor-pointer"
         v-for="(prefs, id) in congregations"
         v-ripple
       >
-        <q-item
-          :class="
-            'meeting-section-internal begin end congregation items-center ' +
-            (invalidSettings(id)
-              ? 'error'
-              : currentCongregation === id
-                ? 'active'
-                : '')
-          "
-        >
-          <!-- <q-item-section > -->
+        <q-item class="items-center">
           <div class="col">
             <div
               :class="
@@ -68,7 +61,7 @@
               @click.stop="congToDelete = id"
               color="negative"
               flat
-              icon="mdi-delete-forever"
+              icon="mmm-delete"
               size="md"
             />
           </div>
@@ -76,14 +69,17 @@
       </div>
     </q-list>
   </q-page>
-  <!-- todo: restyle this dialog -->
-  <q-dialog persistent v-model="deletePending">
-    <q-card>
+  <q-dialog v-model="deletePending">
+    <q-card class="modal-confirm">
+      <q-card-section class="row items-center text-bigger text-semibold text-negative q-pb-none">
+        <q-icon class="q-mr-sm" name="mmm-delete" />
+        {{ $t('profile-deletion') }}
+      </q-card-section>
       <q-card-section class="row items-center">
-        <q-avatar color="negative" icon="mdi-alert" text-color="white" />
-        <span class="q-ml-sm">{{
-          $t('are-you-sure-you-want-to-delete-this-profile')
-        }}</span>
+        {{
+          $t('are-you-sure-you-want-to-delete-this-profile',
+          { profileName: congregations[congToDelete]?.congregationName })
+        }}
       </q-card-section>
       <q-card-actions align="right" class="text-primary">
         <q-btn :label="$t('cancel')" @click="congToDelete = ''" flat />
@@ -93,6 +89,7 @@
             deleteCongregation(congToDelete);
             congToDelete = '';
           "
+          color="negative"
           flat
         />
       </q-card-actions>

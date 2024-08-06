@@ -1,0 +1,236 @@
+@font-face {
+    font-family: mmm-icons;
+    src: url("mmm-icons.eot");src: url("mmm-icons.eot?ad91a5e0#iefix") format("embedded-opentype"),
+             url("mmm-icons.woff2?ad91a5e0") format("woff2"),
+             url("mmm-icons.woff?ad91a5e0") format("woff"),
+             url("mmm-icons.ttf?ad91a5e0") format("truetype"),
+             url("mmm-icons.svg?ad91a5e0#mmm-icons") format("svg");
+    font-weight: normal;
+    font-style: normal;
+}
+
+[class^="mmm"], [class*=" mmm"] {
+    font-family: 'mmm-icons';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-style: normal;
+}
+
+
+.mmm-additional-media, .mmm-advanced-settings, .mmm-arrow-outward, .mmm-background-remove, .mmm-background, .mmm-calendar-month, .mmm-check, .mmm-cloud-done, .mmm-cloud-error, .mmm-configuration, .mmm-congregation, .mmm-delete, .mmm-display-current, .mmm-down, .mmm-drag-n-drop, .mmm-dropdown-arrow, .mmm-error, .mmm-fullscreen, .mmm-github, .mmm-groups, .mmm-guide, .mmm-import-media, .mmm-info, .mmm-integrations, .mmm-jwlplaylist, .mmm-jwpub, .mmm-lectern, .mmm-left, .mmm-local-media, .mmm-media-display-active, .mmm-media-display-inactive, .mmm-media-settings, .mmm-media, .mmm-menu, .mmm-minus, .mmm-mirror, .mmm-movie, .mmm-music-note, .mmm-obs-studio, .mmm-open-web, .mmm-paragraph, .mmm-pause, .mmm-picture_in_picture, .mmm-play, .mmm-plus, .mmm-reset, .mmm-right, .mmm-search, .mmm-settings, .mmm-stop, .mmm-stream-now, .mmm-window {
+    font-family: 'mmm-icons';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-style: normal;
+}
+
+
+
+.mmm-additional-media::before {
+    content: "\ea01";
+}
+
+.mmm-advanced-settings::before {
+    content: "\ea02";
+}
+
+.mmm-arrow-outward::before {
+    content: "\ea03";
+}
+
+.mmm-background-remove::before {
+    content: "\ea04";
+}
+
+.mmm-background::before {
+    content: "\ea05";
+}
+
+.mmm-calendar-month::before {
+    content: "\ea06";
+}
+
+.mmm-check::before {
+    content: "\ea07";
+}
+
+.mmm-cloud-done::before {
+    content: "\ea08";
+}
+
+.mmm-cloud-error::before {
+    content: "\ea09";
+}
+
+.mmm-configuration::before {
+    content: "\ea0a";
+}
+
+.mmm-congregation::before {
+    content: "\ea0b";
+}
+
+.mmm-delete::before {
+    content: "\ea0c";
+}
+
+.mmm-display-current::before {
+    content: "\ea0d";
+}
+
+.mmm-down::before {
+    content: "\ea0e";
+}
+
+.mmm-drag-n-drop::before {
+    content: "\ea0f";
+}
+
+.mmm-dropdown-arrow::before {
+    content: "\ea10";
+}
+
+.mmm-error::before {
+    content: "\ea11";
+}
+
+.mmm-fullscreen::before {
+    content: "\ea12";
+}
+
+.mmm-github::before {
+    content: "\ea13";
+}
+
+.mmm-groups::before {
+    content: "\ea14";
+}
+
+.mmm-guide::before {
+    content: "\ea15";
+}
+
+.mmm-import-media::before {
+    content: "\ea16";
+}
+
+.mmm-info::before {
+    content: "\ea17";
+}
+
+.mmm-integrations::before {
+    content: "\ea18";
+}
+
+.mmm-jwlplaylist::before {
+    content: "\ea19";
+}
+
+.mmm-jwpub::before {
+    content: "\ea1a";
+}
+
+.mmm-lectern::before {
+    content: "\ea1b";
+}
+
+.mmm-left::before {
+    content: "\ea1c";
+}
+
+.mmm-local-media::before {
+    content: "\ea1d";
+}
+
+.mmm-media-display-active::before {
+    content: "\ea1e";
+}
+
+.mmm-media-display-inactive::before {
+    content: "\ea1f";
+}
+
+.mmm-media-settings::before {
+    content: "\ea20";
+}
+
+.mmm-media::before {
+    content: "\ea21";
+}
+
+.mmm-menu::before {
+    content: "\ea22";
+}
+
+.mmm-minus::before {
+    content: "\ea23";
+}
+
+.mmm-mirror::before {
+    content: "\ea24";
+}
+
+.mmm-movie::before {
+    content: "\ea25";
+}
+
+.mmm-music-note::before {
+    content: "\ea26";
+}
+
+.mmm-obs-studio::before {
+    content: "\ea27";
+}
+
+.mmm-open-web::before {
+    content: "\ea28";
+}
+
+.mmm-paragraph::before {
+    content: "\ea29";
+}
+
+.mmm-pause::before {
+    content: "\ea2a";
+}
+
+.mmm-picture_in_picture::before {
+    content: "\ea2b";
+}
+
+.mmm-play::before {
+    content: "\ea2c";
+}
+
+.mmm-plus::before {
+    content: "\ea2d";
+}
+
+.mmm-reset::before {
+    content: "\ea2e";
+}
+
+.mmm-right::before {
+    content: "\ea2f";
+}
+
+.mmm-search::before {
+    content: "\ea30";
+}
+
+.mmm-settings::before {
+    content: "\ea31";
+}
+
+.mmm-stop::before {
+    content: "\ea32";
+}
+
+.mmm-stream-now::before {
+    content: "\ea33";
+}
+
+.mmm-window::before {
+    content: "\ea34";
+}
+

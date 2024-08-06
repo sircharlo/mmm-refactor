@@ -8,6 +8,7 @@
           : 'warning'
     "
     :disable="obsConnectionState !== 'connected'"
+    @click="scenePicker = true"
     class="super-rounded"
     rounded
     unelevated
@@ -20,18 +21,19 @@
         />
       </svg>
     </q-icon>
-    <q-tooltip v-if="!scenePicker">
+    <q-tooltip :delay="2000" v-if="!scenePicker">
       {{ $t(obsMessage ?? 'scene-selection') }}
     </q-tooltip>
-    <q-popup-proxy
-      :offset="[0, 28]"
+    <!-- <q-popup-proxy
+      :offset="[0, 8]"
       @before-hide="scenePicker = false"
       @before-show="scenePicker = true"
       anchor="top middle"
       class="round-card"
       flat
       self="bottom middle"
-    >
+    > -->
+    <q-dialog position="bottom" v-model="scenePicker">
       <q-card flat style="min-width: 50vw">
         <q-card-section>
           <div class="card-title">
@@ -60,10 +62,10 @@
                   <q-icon
                     :name="
                       scene?.sceneUuid === cameraScene?.sceneUuid
-                        ? 'mdi-lectern'
+                        ? 'mmm-lectern'
                         : scene?.sceneUuid === mediaScene?.sceneUuid
-                          ? 'mdi-multimedia'
-                          : 'mdi-picture-in-picture-bottom-right'
+                          ? 'mmm-stream-now'
+                          : 'mmm-picture-in-picture'
                     "
                     class="q-mr-sm"
                     size="xs"
@@ -99,10 +101,10 @@
                     <q-icon
                       :name="
                         scene?.sceneUuid === cameraScene?.sceneUuid
-                          ? 'mdi-lectern'
+                          ? 'mmm-lectern'
                           : scene?.sceneUuid === mediaScene?.sceneUuid
-                            ? 'mdi-multimedia'
-                            : 'mdi-picture-in-picture-bottom-right'
+                            ? 'mmm-stream-now'
+                            : 'mmm-picture-in-picture'
                       "
                       class="q-mr-sm"
                       size="xs"
@@ -115,7 +117,8 @@
           </template>
         </q-card-section>
       </q-card>
-    </q-popup-proxy>
+    </q-dialog>
+    <!-- </q-popup-proxy> -->
   </q-btn>
 </template>
 

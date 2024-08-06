@@ -6,7 +6,7 @@
     filled
     mask="date"
     readonly
-    style="width: 240px;"
+    style="width: 240px"
     v-model="localValue"
     v-bind="{ label: label || undefined }"
   >
@@ -23,13 +23,13 @@
       >
         <div class="row items-center justify-end q-gutter-sm">
           <q-btn
+            :label="$t('clear')"
             @click="clearDate"
             color="negative"
             flat
-            icon="mdi-close"
             v-close-popup
           />
-          <q-btn color="positive" flat icon="mdi-check" v-close-popup />
+          <q-btn :label="$t('save')" color="primary" flat v-close-popup />
         </div>
       </q-date>
     </q-popup-proxy>

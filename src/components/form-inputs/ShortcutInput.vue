@@ -1,48 +1,62 @@
 <template>
-  <q-btn-group push v-if="localValue">
+  <div @click="shortcutPicker = true" class="row" style="width: 240px">
+    <template v-if="localValue">
+      <template
+        :key="keyboardKey"
+        v-for="(keyboardKey, index) in localValue.split('+')"
+      >
+        <div :class="'col ' + (index > 0 ? 'q-ml-sm' : '')">
+          <q-btn
+            :key="keyboardKey"
+            :label="keyboardKey"
+            class="full-width text-smaller"
+            color="primary"
+            unelevated
+          />
+        </div>
+      </template>
+    </template>
     <q-btn
-      :color="'blue-' + (8 + index)"
-      :key="keyboardKey"
-      :label="keyboardKey"
+      :label="$t('enter-key-combination')"
       @click="shortcutPicker = true"
-      v-for="(keyboardKey, index) in localValue.split('+')"
+      class="full-width col-12 text-smaller"
+      color="primary"
+      outline
+      v-else
     />
-  </q-btn-group>
-  <q-btn
-    :label="$t('enter-key-combination')"
-    @click="shortcutPicker = true"
-    color="primary"
-    outline
-    v-else
-  />
-  <!-- todo: restyle this dialog -->
+  </div>
   <q-dialog
     @hide="stopListening()"
     @show="startListening()"
-    persistent
     v-model="shortcutPicker"
   >
-    <q-card style="min-width: 350px">
-      <q-card-section>
-        <div class="text-h6">Enter a key combination</div>
-      </q-card-section>
-
+    <q-card class="modal-confirm">
       <q-card-section
-        :class="'q-pt-none ' + (localValue.length > 0 ? 'text-center' : '')"
+        class="row items-center text-bigger text-semibold q-pb-none"
       >
+        {{ $t('enter-a-key-combination') }}
+      </q-card-section>
+      <q-card-section class="row items-center">
+        {{ $t('enter-a-key-combination-now-using-your-keyboard') }}
+      </q-card-section>
+      <q-card-section class="q-pt-none text-center row">
         <template v-if="localValue.length > 0">
-          <q-chip
-            :key="key"
-            class="glossy text-center text-uppercase"
-            color="primary"
-            size="lg"
-            square
-            text-color="white"
-            v-for="key in localValue.split('+')"
-            >{{ key }}</q-chip
-          >
+          <template :key="key" v-for="(key, index) in localValue.split('+')">
+            <div
+              :class="
+                'col text-uppercase bg-primary text-white q-pa-sm rounded-borders ' +
+                (index > 0 ? 'q-ml-sm' : '')
+              "
+            >
+              {{ key }}
+            </div>
+          </template>
         </template>
-        <p v-else>{{ $t('no-key-combination') }}</p>
+        <!-- <template v-else>
+          <div
+            class="col text-uppercase bg-primary q-px-sm q-py-md rounded-borders"
+          ></div>
+        </template> -->
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary">

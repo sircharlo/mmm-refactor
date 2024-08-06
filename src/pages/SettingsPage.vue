@@ -17,7 +17,7 @@
           :caption="$t(description)"
           :icon="icon"
           :label="$t(name)"
-          class="meeting-section meeting-section-begin meeting-section-end text-subtitle2 text-weight-medium"
+          class="media-section text-subtitle2 text-weight-medium"
           v-if="
             !invalidSettingsLength ||
             !onlyShowInvalidSettings ||
@@ -73,25 +73,6 @@
                   $t(settingId + '-explain')
                 }}</q-item-label>
               </q-item-section>
-              <!-- <q-item-section side>
-                <q-icon
-                  color="info"
-                  name="mdi-link-variant"
-                  size="sm"
-                  v-if="item.depends"
-                >
-                  <q-tooltip>
-                    {{ $t('depends-on') }}
-                    <strong>{{ $t(item.depends) }}</strong>
-                  </q-tooltip>
-                </q-icon>
-                <q-icon
-                  :name="item.icon"
-                  color="info"
-                  size="sm"
-                  v-else-if="item.icon"
-                />
-              </q-item-section> -->
               <q-item-section side style="align-items: end">
                 <ToggleInput
                   :actions="item.actions"
@@ -133,12 +114,6 @@
                     currentSettings[settingId as keyof SettingsItems] as string
                   "
                 />
-                <PathInput
-                  v-else-if="item.type === 'path'"
-                  v-model="
-                    currentSettings[settingId as keyof SettingsItems] as string
-                  "
-                />
                 <SelectInput
                   :options="item.list"
                   :use-input="
@@ -171,7 +146,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import DateInput from 'src/components/form-inputs/DateInput.vue';
-import PathInput from 'src/components/form-inputs/PathInput.vue';
 import SelectInput from 'src/components/form-inputs/SelectInput.vue';
 import ShortcutInput from 'src/components/form-inputs/ShortcutInput.vue';
 import SliderInput from 'src/components/form-inputs/SliderInput.vue';

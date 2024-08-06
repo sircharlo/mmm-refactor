@@ -1,8 +1,7 @@
 <template>
   <q-dialog v-model="localValue">
     <div
-      class="items-center col q-pb-lg q-px-lg q-gutter-y-lg bg-secondary-contrast"
-      style="width: 60vw; max-width: 60vw"
+      class="items-center q-pb-lg q-px-lg q-gutter-y-lg bg-secondary-contrast"
     >
       <div class="text-h6 row">{{ $t('choose-a-song') }}</div>
       <div class="row">{{ $t('add-a-song') }}</div>
@@ -17,7 +16,7 @@
           v-model="filter"
         >
           <template v-slot:prepend>
-            <q-icon name="mdi-magnify" />
+            <q-icon name="mmm-search" />
           </template>
         </q-input>
       </div>

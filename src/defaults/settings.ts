@@ -10,27 +10,27 @@ export const settingsGroups: SettingsGroups = {
   app: {
     description: 'applicationConfigurationDescription',
     name: 'applicationConfiguration',
-    icon: 'mdi-tune-vertical',
+    icon: 'mmm-configuration',
   },
   congregationMeetings: {
     description: 'congregationMeetingsDescription',
     name: 'congregationMeetings',
-    icon: 'mdi-lectern',
+    icon: 'mmm-lectern',
   },
   mediaRetrievalPlayback: {
     description: 'mediaRetrievalAndPlaybackDescription',
     name: 'mediaRetrievalAndPlayback',
-    icon: 'mdi-television-play',
+    icon: 'mmm-media-settings',
   },
   integrations: {
     description: 'integrationsDescription',
     name: 'integrations',
-    icon: 'mdi-puzzle',
+    icon: 'mmm-integrations',
   },
   advanced: {
     name: 'advanced',
     description: 'advancedDescription',
-    icon: 'mdi-cube',
+    icon: 'mmm-advanced-settings',
   },
 };
 

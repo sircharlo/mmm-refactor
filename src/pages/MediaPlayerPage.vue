@@ -6,8 +6,7 @@
   >
     <q-resize-observer @resize="onResize" debounce="50" />
     <transition
-      @before-leave="console.log('before-leave')"
-      appearc.on
+      appear
       enter-active-class="animated fadeIn"
       leave-active-class="animated fadeOut"
       mode="out-in"
@@ -28,7 +27,7 @@
         class="fitSnugly"
         preload="metadata"
         ref="mediaElement"
-        v-else-if="isVideo(mediaPlayingUrl)"
+        v-else-if="isVideo(mediaPlayingUrl) || videoStreaming"
       >
         <source :src="mediaPlayingUrl" ref="mediaElementSource" />
         <track
@@ -91,7 +90,7 @@ import { useJwStore } from 'src/stores/jw';
 import { Ref, ref, watch } from 'vue';
 
 const currentState = useCurrentStateStore();
-const { currentCongregation, currentSettings, selectedDate } =
+const { currentCongregation, currentSettings, mediaPlayingAction, selectedDate } =
   storeToRefs(currentState);
 
 const jwStore = useJwStore();
@@ -121,8 +120,43 @@ const mediaPlayerCustomBackground = ref('');
 const mediaPlayerSubtitlesUrl = ref('');
 const mediaPlayerSubtitlesVisible = ref(false);
 
+const videoStreaming = ref(false);
+
 bc.onmessage = (event) => {
   try {
+    if ('webStream' in event.data) {
+      console.log('webStream', event.data.webStream);
+      videoStreaming.value = !!event.data.webStream;
+      if (event.data.webStream) {
+        navigator.mediaDevices
+          .getDisplayMedia({
+            audio: false,
+            video: true,
+          })
+          .then(async (stream) => {
+            console.log(stream, stream.getTracks(), mediaElement.value);
+            let timeouts = 0;
+            while (!mediaElement.value) {
+              console.log('waiting for mediaElement', mediaElement.value);
+              await new Promise((resolve) => setTimeout(resolve, 100));
+              if (++timeouts > 10) break;
+            }
+            if (!mediaElement.value) return;
+            console.log('got mediaElement', mediaElement.value);
+            mediaElement.value.srcObject = stream;
+            mediaElement.value.play();
+          })
+          .catch((e) => console.log(e));
+      } else {
+        console.log('webStream Stop');
+        if (!mediaElement.value) return;
+        mediaElement.value.pause();
+        // .then(() => {
+        mediaElement.value.srcObject = null;
+        mediaPlayingAction.value = '';
+        // })
+      }
+    }
     if ('seekTo' in event.data) {
       if (mediaElement.value)
         mediaElement.value.currentTime = event.data.seekTo;
