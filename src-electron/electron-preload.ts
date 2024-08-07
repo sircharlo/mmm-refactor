@@ -57,6 +57,8 @@ const openWebsiteWindow = () => {
     width: 1280,
   });
 
+  // websiteWindow.webContents.openDevTools();
+
   websiteWindow.webContents.setVisualZoomLevelLimits(1, 5);
   websiteWindow.webContents.on('zoom-changed', (event, zoomDirection) => {
     const currentZoom = websiteWindow.webContents.getZoomFactor();

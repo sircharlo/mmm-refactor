@@ -116,7 +116,8 @@ function createWindow() {
     if (details.referrer) {
       const referrerUrl = new URL(details.referrer);
       if (
-        isJwHostname(referrerUrl.hostname) ||
+        (isJwHostname(referrerUrl.hostname) &&
+          parsedUrl.hostname !== 'b.jw-cdn.org') ||
         referrerUrl.hostname === parsedUrl.hostname
       )
         passthroughReferrer = true;
@@ -127,6 +128,9 @@ function createWindow() {
           !details.responseHeaders['access-control-allow-origin'] ||
           !details.responseHeaders['access-control-allow-origin'].includes('*')
         ) {
+          details.responseHeaders['access-control-allow-headers'] = [
+            'Content-Type,Authorization,X-Client-ID',
+          ];
           details.responseHeaders['access-control-allow-origin'] = ['*'];
           details.responseHeaders['access-control-allow-credentials'] = [
             'true',
