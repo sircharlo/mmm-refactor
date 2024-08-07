@@ -85,13 +85,18 @@ import {
   isVideo,
   showMediaWindow,
 } from 'src/helpers/mediaPlayback';
+import { createTemporaryNotification } from 'src/helpers/notifications';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { Ref, ref, watch } from 'vue';
 
 const currentState = useCurrentStateStore();
-const { currentCongregation, currentSettings, mediaPlayingAction, selectedDate } =
-  storeToRefs(currentState);
+const {
+  currentCongregation,
+  currentSettings,
+  mediaPlayingAction,
+  selectedDate,
+} = storeToRefs(currentState);
 
 const jwStore = useJwStore();
 const { customDurations, yeartexts } = storeToRefs(jwStore);
@@ -108,7 +113,6 @@ const initiatePanzoom = () => {
   }
 };
 
-const $q = useQuasar();
 let mediaElement: Ref<HTMLVideoElement | undefined> = ref();
 const mediaImage: Ref<HTMLImageElement | undefined> = ref();
 const panzoomOptions = { animate: true, duration: 1000 };
@@ -267,12 +271,48 @@ const playMedia = () => {
 };
 
 function onResize(size: { height: number; width: number }) {
-  $q.notify({
+  // $q.notify({
+  //   badgeStyle: 'display: none',
+  //   group: 'resize',
+  //   icon: 'mmm-info',
+  //   message: size.width + 'x' + size.height,
+  //   timeout: 500,
+  //   type: 'info',
+  // });
+  createTemporaryNotification({
     badgeStyle: 'display: none',
     group: 'resize',
+    icon: 'mmm-info',
     message: size.width + 'x' + size.height,
-    timeout: 500,
     type: 'info',
   });
 }
+
+const $q = useQuasar();
+
+$q.iconMapFn = (iconName) => {
+  if (iconName.startsWith('chevron_')) {
+    return {
+      cls: iconName.replace('chevron_', 'mmm-'),
+    };
+  }
+  if (iconName.startsWith('keyboard_arrow_')) {
+    return {
+      cls: iconName.replace('keyboard_arrow_', 'mmm-'),
+    };
+  }
+  if (iconName.startsWith('arrow_drop_')) {
+    return {
+      cls: 'mmm-dropdown-arrow',
+    };
+  }
+  if (iconName.startsWith('mmm-') === true) {
+    // we strip the "app:" part
+    // const name = iconName.substring(4)
+
+    return {
+      cls: iconName,
+    };
+  }
+};
 </script>

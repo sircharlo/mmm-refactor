@@ -1,6 +1,7 @@
 import { Notify, QNotifyCreateOptions } from 'quasar';
 
 const createTemporaryNotification = ({
+  badgeStyle,
   caption,
   group,
   icon,
@@ -10,13 +11,13 @@ const createTemporaryNotification = ({
 }: QNotifyCreateOptions) => {
   try {
     return Notify.create({
-      actions: [
-        {
-          color: 'white',
-          icon: 'mmm-minus',
-          round: true,
-        },
-      ],
+      // actions: [
+      //   {
+      //     color: 'white',
+      //     icon: 'mmm-minus',
+      //     round: true,
+      //   },
+      // ],
       group: false,
       message,
       timeout,
@@ -24,6 +25,7 @@ const createTemporaryNotification = ({
       ...(type && { type }),
       ...(icon && { icon }),
       ...(group && { group }),
+      ...(badgeStyle && { badgeStyle }),
     });
   } catch (error) {
     console.error(error);
