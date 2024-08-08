@@ -12,7 +12,7 @@
         <q-img
           :id="media.uniqueId"
           :ratio="16 / 9"
-          :src="media.thumbnailUrl"
+          :src="media.isImage ? media.fileUrl : (media.thumbnailUrl || thumbnailFromMetadata)"
           @error="imageLoadingError(media)"
           class="rounded-borders"
           fit="contain"
@@ -541,6 +541,12 @@ const imageLoadingError = (media: DynamicMediaObject) => {
     });
 };
 
+const thumbnailFromMetadata = ref('')
+if (props.media.isVideo && !props.media.thumbnailUrl) getThumbnailUrl(props.media.fileUrl).then((thumbnailUrl) => {
+  thumbnailFromMetadata.value = thumbnailUrl
+})
+
+
 const showMediaDurationPopup = (media: DynamicMediaObject) => {
   try {
     if (!currentCongregation.value) return;
@@ -601,7 +607,6 @@ const zoomReset = (elemId: string, forced = false, animate = true) => {
 
 function stopMedia() {
   // mediaPlayingAction.value = 'stop';
-  console.log('destroyPanzoom', mediaPlayingUniqueId.value);
   destroyPanzoom(mediaPlayingUniqueId.value);
   mediaPlayingUrl.value = '';
   mediaPlayingUniqueId.value = '';
@@ -612,14 +617,11 @@ function stopMedia() {
 
 const destroyPanzoom = (elemId: string) => {
   try {
-    console.log(panzooms[elemId], elemId);
     if (!panzooms[elemId] || !elemId) return;
     panzooms[elemId].resetStyle();
     panzooms[elemId].reset({ animate: false });
     panzooms[elemId].destroy();
-    console.log(panzooms[elemId], elemId);
     delete panzooms[elemId];
-    console.log(panzooms[elemId], elemId);
   } catch (e) {
     console.error(e);
   }

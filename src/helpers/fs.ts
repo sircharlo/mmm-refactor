@@ -10,8 +10,15 @@ import { useCurrentStateStore } from 'src/stores/current-state';
 import { PublicationFetcher } from 'src/types/publications';
 import { MultimediaItem } from 'src/types/sqlite';
 
-const { fileUrlToPath, fs, getUserDataPath, klawSync, path, pathToFileURL } =
-  electronApi;
+const {
+  fileUrlToPath,
+  fs,
+  getUserDataPath,
+  klawSync,
+  parseFile,
+  path,
+  pathToFileURL,
+} = electronApi;
 
 const getPublicationsPath = () => path.join(getUserDataPath(), 'Publications');
 
@@ -109,6 +116,24 @@ const convertFileUrl = (path: string): string => {
   return isFileUrl(path) ? fileUrlToPath(path) : path;
 };
 
+const getThumbnailFromMetadata = async (mediaPath: string) => {
+  try {
+    const metadata = await parseFile(fileUrlToPath(mediaPath));
+    if (metadata?.common?.picture?.length) {
+      return URL.createObjectURL(
+        new Blob([metadata.common.picture[0].data], {
+          type: metadata.common.picture[0].format,
+        }),
+      );
+    } else {
+      return '';
+    }
+  } catch (error) {
+    console.error(error);
+    return '';
+  }
+};
+
 const getThumbnailFromVideoPath: (
   videoPath: string,
   thumbnailPath: string,
@@ -118,6 +143,7 @@ const getThumbnailFromVideoPath: (
       reject(new Error('No video path provided'));
       return;
     }
+    const videoFileUrl = videoPath;
     videoPath = convertFileUrl(videoPath);
     thumbnailPath = convertFileUrl(thumbnailPath);
     if (!fs.existsSync(videoPath)) {
@@ -125,51 +151,57 @@ const getThumbnailFromVideoPath: (
       return;
     }
 
-    const videoRef = document.createElement('video');
-    videoRef.src = getFileUrl(videoPath);
-    videoRef.load();
+    getThumbnailFromMetadata(videoFileUrl).then((url) => {
+      if (url) {
+        resolve(url);
+      } else {
+        const videoRef = document.createElement('video');
+        videoRef.src = getFileUrl(videoPath);
+        videoRef.load();
 
-    videoRef.addEventListener('loadeddata', () => {
-      videoRef.addEventListener(
-        'seeked',
-        () => {
-          const canvas = document.createElement('canvas');
-          canvas.width = FULL_HD.width;
-          canvas.height = FULL_HD.height;
+        videoRef.addEventListener('loadeddata', () => {
+          videoRef.addEventListener(
+            'seeked',
+            () => {
+              const canvas = document.createElement('canvas');
+              canvas.width = FULL_HD.width;
+              canvas.height = FULL_HD.height;
 
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            ctx.drawImage(videoRef, 0, 0, canvas.width, canvas.height);
-            const imageUrl = canvas.toDataURL('image/jpeg');
-            // save to file
-            fs.writeFileSync(
-              thumbnailPath,
-              Buffer.from(imageUrl.split(',')[1], 'base64'),
-            );
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                ctx.drawImage(videoRef, 0, 0, canvas.width, canvas.height);
+                const imageUrl = canvas.toDataURL('image/jpeg');
+                // save to file
+                fs.writeFileSync(
+                  thumbnailPath,
+                  Buffer.from(imageUrl.split(',')[1], 'base64'),
+                );
 
-            // Cleanup
-            canvas.remove();
-            videoRef.remove();
+                // Cleanup
+                canvas.remove();
+                videoRef.remove();
 
-            resolve(thumbnailPath);
-          } else {
-            // Cleanup in case of error
-            canvas.remove();
-            videoRef.remove();
-            reject(new Error('Failed to get canvas context'));
-          }
-        },
-        { once: true },
-      );
-      videoRef.currentTime = 5;
-    });
+                resolve(thumbnailPath);
+              } else {
+                // Cleanup in case of error
+                canvas.remove();
+                videoRef.remove();
+                reject(new Error('Failed to get canvas context'));
+              }
+            },
+            { once: true },
+          );
+          videoRef.currentTime = 5;
+        });
 
-    videoRef.addEventListener('error', (err) => {
-      // Cleanup in case of error
-      videoRef.remove();
-      reject(
-        new Error('Error loading video: ' + err.message + ' ' + videoPath),
-      );
+        videoRef.addEventListener('error', (err) => {
+          // Cleanup in case of error
+          videoRef.remove();
+          reject(
+            new Error('Error loading video: ' + err.message + ' ' + videoPath),
+          );
+        });
+      }
     });
   });
 };
@@ -180,6 +212,7 @@ const getThumbnailUrl = async (filepath: string, forceRefresh?: boolean) => {
     if (isImage(filepath)) {
       thumbnailUrl = getFileUrl(filepath);
     } else if (isVideo(filepath)) {
+      console.log('Getting thumbnail for video: ' + filepath);
       const thumbnailPath = filepath.split('.')[0] + '.jpg';
       if (fs.existsSync(thumbnailPath)) {
         thumbnailUrl = getFileUrl(thumbnailPath);
