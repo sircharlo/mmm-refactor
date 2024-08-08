@@ -1160,6 +1160,10 @@ const deleteCacheFiles = (type: '' | 'all' | 'smart') => {
     queues.downloads[currentCongregation.value] = new PQueue({
       concurrency: 5,
     });
+    if (type === 'all') {
+      lookupPeriod.value[currentCongregation.value] = [];
+      updateLookupPeriod();
+    }
     cancelDeleteCacheFiles();
   } catch (error) {
     console.error(error);
