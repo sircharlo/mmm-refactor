@@ -1093,7 +1093,7 @@ const calculateCacheSize = async () => {
       getAdditionalMediaPath(),
       getTempDirectory(),
       getPublicationsPath(),
-    ];
+    ].filter((dir) => fs.existsSync(dir));
     const lookupPeriodsCollections = Object.values(lookupPeriod.value).flatMap(
       (congregationLookupPeriods) =>
         congregationLookupPeriods.flatMap(
