@@ -31,18 +31,15 @@ const getMediaWindow = () =>
       !w.webContents.getURL().includes('https://'),
   );
 
-const getWebsiteWindow = () =>
-  BrowserWindow.getAllWindows().find((w) =>
-    w.webContents.getURL().includes('https://'),
-  );
-
 const bc = new BroadcastChannel('mediaPlayback');
 
 const closeWebsiteWindow = () => {
-  const websiteWindow = getWebsiteWindow();
-  console.log(websiteWindow, BrowserWindow.getAllWindows());
-  if (!websiteWindow) return;
-  websiteWindow.close();
+  const websiteWindow = BrowserWindow.getAllWindows().find((w) =>
+    w.webContents.getURL().includes('https://'),
+  );
+  if (websiteWindow && !websiteWindow.isDestroyed()) {
+    websiteWindow.close();
+  }
 };
 
 const openWebsiteWindow = () => {

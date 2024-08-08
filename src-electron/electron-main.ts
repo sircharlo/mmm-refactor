@@ -9,13 +9,8 @@ autoUpdater.checkForUpdatesAndNotify();
 
 // needed in case process is undefined under Linux
 const platform = process.platform || os.platform();
-let mainWindow: BrowserWindow | null | undefined;
-let mediaWindow: BrowserWindow | null | undefined;
-
-const getWebsiteWindow = () =>
-  BrowserWindow.getAllWindows().find((w) =>
-    w.webContents.getTitle().includes('Website Stream'),
-  );
+let mainWindow: BrowserWindow | null;
+let mediaWindow: BrowserWindow | null;
 
 const allowedHostnames = [
   'jw.org',
@@ -85,12 +80,13 @@ function createMediaWindow() {
   }
   if (process.env.DEBUGGING) {
     window.webContents.openDevTools();
-    // } else {
-    // window.webContents.on('devtools-opened', () => {
-    //   mainWindow?.webContents.closeDevTools();
-    // });
-    // window.webContents.openDevTools();
   }
+
+  enable(window.webContents);
+
+  window.on('closed', () => {
+    mediaWindow = null;
+  });
 
   return window;
 }
@@ -169,37 +165,26 @@ function createWindow() {
 
   if (process.env.DEBUGGING) {
     mainWindow.webContents.openDevTools();
-    // } else {
-    // mainWindow.webContents.on('devtools-opened', () => {
-    //   mainWindow?.webContents.closeDevTools();
-    // });
-    // mainWindow.webContents.openDevTools();
   }
 
-  mainWindow.on('closed', () => {
-    mainWindow = undefined;
-  });
-
-  mediaWindow?.on('closed', () => {
-    mediaWindow = undefined;
-  });
-
   mainWindow.on('close', () => {
-    mediaWindow?.close();
-    getWebsiteWindow()?.close();
+    if (mediaWindow && !mediaWindow.isDestroyed()) mediaWindow.close();
+    const websiteWindow = BrowserWindow.getAllWindows().find((w) =>
+      w.webContents.getURL().includes('https://'),
+    );
+    if (websiteWindow && !websiteWindow.isDestroyed()) websiteWindow.close();
   });
 
-  mainWindow?.once('ready-to-show', () => {
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
+
+  mainWindow.once('ready-to-show', () => {
     mainWindow?.show();
   });
 
-  if (!mediaWindow) {
+  if (!mediaWindow || mediaWindow.isDestroyed()) {
     mediaWindow = createMediaWindow();
-    mediaWindow.on('close', (/* e */) => {
-      // if (!authorizedCloseMediaWin) e.preventDefault();
-      // e.preventDefault();
-    });
-    enable(mediaWindow.webContents);
   }
   mainWindow.loadURL(
     process.env.APP_URL + '?page=initial-congregation-selector',
@@ -219,7 +204,9 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-  if (mainWindow === undefined) {
+  if (!mainWindow || (mainWindow && mainWindow.isDestroyed())) {
     createWindow();
+  } else {
+    mainWindow?.show();
   }
 });
