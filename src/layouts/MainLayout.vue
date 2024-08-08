@@ -664,10 +664,12 @@ $q.iconMapFn = (iconName) => {
       cls: 'mmm-dropdown-arrow',
     };
   }
-  if (iconName.startsWith('mmm-') === true) {
-    // we strip the "app:" part
-    // const name = iconName.substring(4)
-
+  if (iconName === 'cancel') {
+    return {
+      cls: 'mmm-delete',
+    };
+  }
+  if (iconName.startsWith('mmm-')) {
     return {
       cls: iconName,
     };
