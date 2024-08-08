@@ -182,9 +182,9 @@
                   <q-scroll-area
                     :bar-style="barStyle"
                     :thumb-style="thumbStyle"
-                    style="height: 40vh; width: -webkit-fill-available"
+                    style="width: 100vw; height: 40vh"
                   >
-                    <div class="row q-col-gutter-lg">
+                    <div class="row q-col-gutter-md">
                       <template
                         :key="video.guid"
                         v-for="video in remoteVideosFiltered"
@@ -192,7 +192,7 @@
                         <div
                           class="col-xs-6 col-sm-4 col-md-3 col-lg-3 col-xl-2"
                         >
-                          <q-card
+                          <div
                             :class="{
                               'cursor-pointer': true,
                               'rounded-borders': true,
@@ -240,7 +240,7 @@
                                 }}</span>
                               </div>
                             </q-card-section>
-                          </q-card>
+                          </div>
                         </div>
                       </template>
                     </div>
