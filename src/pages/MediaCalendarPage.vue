@@ -17,20 +17,10 @@
     @drop="dropEnd"
     padding
   >
-    <!-- <q-banner
-      class="bg-orange-9 text-white"
-      inline-actions
-      rounded
-      v-if="!selectedDate"
-    >
-      <template v-slot:avatar>
-        <q-icon name="mmm-error" />
-      </template>
-      {{ $t('noDateSelected') }}
-    </q-banner> -->
     <div
       class="col content-center"
       v-if="
+        !selectedDateObject?.complete ||
         !(
           sortableAdditionalMediaItems?.length ||
           sortableWtMediaItems.length ||
@@ -48,16 +38,20 @@
             {{
               !selectedDate
                 ? $t('noDateSelected')
-                : $t('there-are-no-media-items-for-the-selected-date')
+                : !selectedDateObject?.complete
+                  ? $t('please-wait')
+                  : $t('there-are-no-media-items-for-the-selected-date')
             }}
           </div>
           <div class="row items-center justify-center">
             {{
               !selectedDate
                 ? $t('select-a-date-to-begin')
-                : $t(
-                    'use-the-import-button-to-add-media-for-this-date-or-select-another-date-to-view-the-corresponding-meeting-media',
-                  )
+                : !selectedDateObject?.complete
+                  ? $t('currently-loading')
+                  : $t(
+                      'use-the-import-button-to-add-media-for-this-date-or-select-another-date-to-view-the-corresponding-meeting-media',
+                    )
             }}
           </div>
         </div>
@@ -66,7 +60,8 @@
     <q-list
       class="media-section additional"
       v-show="
-        sortableAdditionalMediaItems?.length || sortableWtMediaItems.length
+        selectedDateObject?.complete &&
+        (sortableAdditionalMediaItems?.length || sortableWtMediaItems.length)
       "
     >
       <q-item class="text-additional items-center">
@@ -89,9 +84,10 @@
     <q-list
       class="media-section tgw"
       v-show="
-        sortableTgwMediaItems.length ||
-        sortableAyfmMediaItems.length ||
-        sortableLacMediaItems.length
+        selectedDateObject?.complete &&
+        (sortableTgwMediaItems.length ||
+          sortableAyfmMediaItems.length ||
+          sortableLacMediaItems.length)
       "
     >
       <q-item class="text-tgw items-center">
@@ -114,9 +110,10 @@
     <q-list
       class="media-section ayfm"
       v-show="
-        sortableTgwMediaItems.length ||
-        sortableAyfmMediaItems.length ||
-        sortableLacMediaItems.length
+        selectedDateObject?.complete &&
+        (sortableTgwMediaItems.length ||
+          sortableAyfmMediaItems.length ||
+          sortableLacMediaItems.length)
       "
     >
       <q-item class="text-ayfm items-center">
@@ -139,9 +136,10 @@
     <q-list
       class="media-section lac"
       v-show="
-        sortableTgwMediaItems.length ||
-        sortableAyfmMediaItems.length ||
-        sortableLacMediaItems.length
+        selectedDateObject?.complete &&
+        (sortableTgwMediaItems.length ||
+          sortableAyfmMediaItems.length ||
+          sortableLacMediaItems.length)
       "
     >
       <q-item class="text-lac items-center">
@@ -161,7 +159,10 @@
         />
       </q-list>
     </q-list>
-    <q-list class="media-section wt" v-show="sortableWtMediaItems.length">
+    <q-list
+      class="media-section wt"
+      v-show="selectedDateObject?.complete && sortableWtMediaItems.length"
+    >
       <q-item class="text-lac items-center">
         <q-avatar class="text-white bg-wt jw-icon" rounded size="lg"
           ></q-avatar
@@ -252,28 +253,16 @@ import { useI18n } from 'vue-i18n';
 
 const dragging = ref(false);
 const jwpubImportDb = ref('');
-// const jwpubImportLoading = ref(false);
 const jwpubImportDocuments: Ref<DocumentItem[]> = ref([] as DocumentItem[]);
 
 watch(
   () => [jwpubImportDb.value, jwpubImportDocuments.value],
   ([newJwpubImportDb, newJwpubImportDocuments]) => {
-    console.log(newJwpubImportDb, newJwpubImportDocuments);
     if (!!newJwpubImportDb || newJwpubImportDocuments?.length) {
       dragging.value = true;
     }
   },
 );
-
-// watch(
-//   () => dragging.value,
-//   (newVal) => {
-//     if (!newVal) {
-//       jwpubImportDb.value = '';
-//       jwpubImportDocuments.value = [];
-//     }
-//   },
-// );
 
 const { t } = useI18n();
 

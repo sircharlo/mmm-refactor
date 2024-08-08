@@ -65,15 +65,11 @@ const addJwpubDocumentMediaToFiles = async (
   dbPath: string,
   document: DocumentItem,
 ) => {
-  console.log('addJwpubDocumentMediaToFiles', dbPath, document);
   const jwStore = useJwStore();
   const { addToAdditionMediaMap } = jwStore;
   const currentStateStore = useCurrentStateStore();
   const { selectedDateObject } = storeToRefs(currentStateStore);
   try {
-    // additionalLoading.value = true;
-    // jwpubImportDocuments.value = [];
-    // jwpubLoading.value = true;
     if (!dbPath) return;
     const publication = getPublicationInfoFromDb(dbPath);
     const multimediaItems = getDocumentMultimediaItems({
@@ -89,9 +85,6 @@ const addJwpubDocumentMediaToFiles = async (
       true,
     );
     addToAdditionMediaMap(dynamicMediaItems);
-    // localJwpubDb.value = '';
-    // jwpubImportLoading.value = false;
-    // additionalLoading.value = false;
   } catch (e) {
     console.error(e);
   }
@@ -226,9 +219,6 @@ const fetchMedia = async () => {
       );
     });
     if (meetingsToFetch.length === 0) return;
-    meetingsToFetch.forEach((day) => {
-      day.loading = true;
-    });
     if (!queues.meetings[currentCongregation.value]) {
       queues.meetings[currentCongregation.value] = new PQueue({
         concurrency: 2,
@@ -244,7 +234,6 @@ const fetchMedia = async () => {
             if (!day) return;
             const dayDate = day.date;
             if (!dayDate) {
-              day.loading = false;
               day.complete = false;
               day.error = true;
               return;
@@ -259,19 +248,17 @@ const fetchMedia = async () => {
               day.dynamicMedia = fetchResult.media;
               day.error = fetchResult.error;
               day.complete = !fetchResult.error;
+            } else {
+              day.error = true;
+              day.complete = false;
             }
-            day.loading = false;
           })
           .catch((error) => {
-            console.error(error);
-            day.loading = false;
-            day.complete = false;
             day.error = true;
+            throw new Error(error);
           });
       } catch (error) {
         console.error(error);
-        day.loading = false;
-        day.complete = false;
         day.error = true;
       }
     }
@@ -1462,6 +1449,7 @@ const downloadSongbookVideos = () => {
       return;
     downloadPubMediaFiles({
       fileformat: 'MP4',
+      issue: 0,
       langwritten: currentSettings.value.lang,
       maxTrack: MAX_SONGS,
       pub: currentSongbook.value.pub,

@@ -344,7 +344,6 @@ const convertImageIfNeeded = async (filepath: string) => {
 
 const showMediaWindow = (state?: boolean) => {
   try {
-    console.log('showMediaWindow', state);
     const currentState = useCurrentStateStore();
     const { mediaWindowVisible } = storeToRefs(currentState);
     if (!state) {
