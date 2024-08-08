@@ -216,14 +216,14 @@ function playMusic() {
     document.body.appendChild(musicPlayer.value);
     musicPlayer.value.volume =
       (currentSettings.value?.musicVolume ?? 100) / 100 ?? 1;
-    musicPlayerSource.value.src = getNextSongUrl();
-
+    const nextSongUrl = getNextSongUrl();
+    if (!nextSongUrl) return;
+    musicPlayerSource.value.src = nextSongUrl;
     (async () => {
       try {
         const metadata = await parseFile(
-          fileUrlToPath(musicPlayerSource.value.src),
+          fileUrlToPath(musicPlayerSource.value?.src),
         );
-        console.log(metadata);
         musicPlayingTitle.value =
           metadata.common.title ?? path.basename(musicPlayerSource.value?.src); // basename
       } catch (error) {
@@ -244,7 +244,9 @@ function playMusic() {
       });
     musicPlayer.value.onended = () => {
       if (!musicPlayer.value || !musicPlayerSource.value) return;
-      musicPlayerSource.value.src = getNextSongUrl();
+      const nextSongUrl = getNextSongUrl();
+      if (!nextSongUrl) return;
+      musicPlayerSource.value.src = nextSongUrl;
       musicPlayer.value.load();
       musicPlayer.value.play().catch((error) => {
         console.error(error);
