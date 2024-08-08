@@ -163,7 +163,7 @@
       class="media-section wt"
       v-show="selectedDateObject?.complete && sortableWtMediaItems.length"
     >
-      <q-item class="text-lac items-center">
+      <q-item class="text-wt items-center">
         <q-avatar class="text-white bg-wt jw-icon" rounded size="lg"
           ></q-avatar
         >
