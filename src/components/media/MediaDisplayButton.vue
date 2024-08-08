@@ -344,11 +344,8 @@ const chooseCustomBackground = async (reset?: boolean) => {
           filepath;
           if (isJwpub(filepath)) {
             jwpubImportFilePath.value = filepath;
-            console.log('jwpubImportFilePath', jwpubImportFilePath.value);
             const unzipDir = await decompressJwpub(filepath);
-            console.log('unzipDir', unzipDir);
             const db = findDb(unzipDir);
-            console.log('db', db);
             if (!db) throw new Error('No db file found: ' + filepath);
             jwpubImages.value = (
               executeQuery(

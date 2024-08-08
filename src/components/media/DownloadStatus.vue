@@ -5,26 +5,30 @@
         ? 'negative'
         : 'white-transparent'
     "
-    :loading="
-      Object.values(downloadProgress).filter((item) => item.loaded).length > 0
-    "
     @click="localDownloadPopup = true"
-    class="super-rounded"
+    class="super-rounded position-relative"
     rounded
     unelevated
   >
-    <template v-slot:loading>
-      <span class="fa-stack" style="font-size: 0.75em">
-        <i class="fa-solid fa-cloud fa-stack-2x"></i>
-        <i class="text-primary fa-solid fa-sync fa-stack-1x fa-spin"></i>
-      </span>
-    </template>
     <q-icon
       :name="
         Object.values(downloadProgress).filter((item) => item.error).length ===
         0
-          ? 'mmm-cloud-done'
+          ? Object.values(downloadProgress).filter((item) => item.loaded)
+              .length > 0
+            ? 'mmm-cloud'
+            : 'mmm-cloud-done'
           : 'mmm-cloud-error'
+      "
+    >
+    </q-icon>
+    <q-spinner
+      class="absolute"
+      color="primary"
+      size="8px"
+      style="top: 14"
+      v-if="
+        Object.values(downloadProgress).filter((item) => item.loaded).length > 0
       "
     />
     <q-tooltip

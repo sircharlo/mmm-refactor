@@ -401,7 +401,6 @@ contextBridge.exposeInMainWorld('electronApi', {
           console.error(error);
           reject(error);
         } else {
-          console.log(`Extracted to "${outputFolder}" successfully`);
           resolve();
         }
       });

@@ -77,12 +77,10 @@ const getWeekDay = (lookupDate: Date) => {
     const currentState = useCurrentStateStore();
     const { selectedDateObject } = storeToRefs(currentState);
     if (!lookupDate) lookupDate = selectedDateObject.value?.date || new Date();
-      console.log(lookupDate);
-      const dayNumber =
-        lookupDate.getDay() === 0
-          ? lookupDate.getDay() + 6
-          : lookupDate.getDay() - 1;
-      console.log(dayNumber);
+    const dayNumber =
+      lookupDate.getDay() === 0
+        ? lookupDate.getDay() + 6
+        : lookupDate.getDay() - 1;
     return dayNumber.toString();
   } catch (error) {
     console.error(error);
@@ -185,7 +183,6 @@ function updateLookupPeriod(reset = false) {
       return {
         date: dayDate as Date,
         dynamicMedia: [] as DynamicMediaObject[],
-        loading: false,
         meeting: isMwMeetingDay(dayDate)
           ? 'mw'
           : isWeMeetingDay(dayDate)

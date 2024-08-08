@@ -129,7 +129,6 @@ const videoStreaming = ref(false);
 bc.onmessage = (event) => {
   try {
     if ('webStream' in event.data) {
-      console.log('webStream', event.data.webStream);
       videoStreaming.value = !!event.data.webStream;
       if (event.data.webStream) {
         navigator.mediaDevices
@@ -138,21 +137,17 @@ bc.onmessage = (event) => {
             video: true,
           })
           .then(async (stream) => {
-            console.log(stream, stream.getTracks(), mediaElement.value);
             let timeouts = 0;
             while (!mediaElement.value) {
-              console.log('waiting for mediaElement', mediaElement.value);
               await new Promise((resolve) => setTimeout(resolve, 100));
               if (++timeouts > 10) break;
             }
             if (!mediaElement.value) return;
-            console.log('got mediaElement', mediaElement.value);
             mediaElement.value.srcObject = stream;
             mediaElement.value.play();
           })
-          .catch((e) => console.log(e));
+          .catch((e) => console.error(e));
       } else {
-        console.log('webStream Stop');
         if (!mediaElement.value) return;
         mediaElement.value.pause();
         // .then(() => {
@@ -185,13 +180,10 @@ bc.onmessage = (event) => {
     }
     if ('scale' in event.data || 'x' in event.data || 'y' in event.data) {
       try {
-        console.log('panzoom', event.data, panzoom);
         if (!mediaElement.value) {
-          console.log(event.data?.url, mediaPlayingUrl.value);
           const imageElem = document.getElementById('mediaImage');
           const width = imageElem?.clientWidth || 0;
           const height = imageElem?.clientHeight || 0;
-          console.log(width, height, event.data?.scale);
           panzoom.value?.zoom(
             (event.data?.scale ?? 1) as number,
             panzoomOptions,

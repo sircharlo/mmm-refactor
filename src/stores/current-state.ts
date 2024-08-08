@@ -95,7 +95,6 @@ export const useCurrentStateStore = defineStore('current-state', {
       const jwStore = useJwStore();
       const { jwSongs } = storeToRefs(jwStore);
       const currentLanguage = this.currentSettings?.lang as string;
-      console.log(currentLanguage, jwSongs.value[currentLanguage]);
       if (!currentLanguage) return [];
       return jwSongs.value[currentLanguage]?.list || [];
     },

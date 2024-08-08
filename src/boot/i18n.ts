@@ -20,11 +20,9 @@ declare module 'vue-i18n' {
 
 const refreshDateLocale = async (locale: string) => {
   const langList = import.meta.glob('../../node_modules/quasar/lang/*.js');
-  console.log('refreshDateLocale', locale);
   dayjs.extend(localeData);
   dayjs.locale(locale);
   dayjs.localeData();
-  console.log(dayjs.weekdays());
 
   const loadLang = async (locale: string) => {
     try {
