@@ -1262,16 +1262,16 @@ const getEventDayColor = (eventDate: string) => {
   try {
     if (!lookupPeriod.value || !currentCongregation.value)
       throw new Error('No congregation or lookup period');
-    const isLoaded =
+    const isComplete =
       lookupPeriod.value[currentCongregation.value]?.find(
         (d) => date.getDateDiff(eventDate, d.date, 'days') === 0,
-      )?.loading === false;
-    if (!isLoaded) return 'warning';
+      )?.complete === true;
+    if (isComplete) return 'primary';
   } catch (error) {
     console.error(error);
-    return 'warning';
+    return 'negative';
   }
-  return 'primary';
+  return 'warning';
 };
 
 const createNewCongregation = () => {
