@@ -726,11 +726,6 @@
     "@sentry/types" "8.24.0"
     "@sentry/utils" "8.24.0"
 
-"@sentry/babel-plugin-component-annotate@2.21.1":
-  version "2.21.1"
-  resolved "https://registry.yarnpkg.com/@sentry/babel-plugin-component-annotate/-/babel-plugin-component-annotate-2.21.1.tgz#1fbf7ceca62fdc44957e37b60312808588c87350"
-  integrity sha512-u1L8gZ4He0WdyiIsohYkA/YOY1b6Oa5yIMRtfZZ9U5TiWYLgOfMWyb88X0GotZeghSbgxrse/yI4WeHnhAUQDQ==
-
 "@sentry/babel-plugin-component-annotate@2.22.0":
   version "2.22.0"
   resolved "https://registry.yarnpkg.com/@sentry/babel-plugin-component-annotate/-/babel-plugin-component-annotate-2.22.0.tgz#a7e1cc99d1a738d1eb17757341dff4db3a93c2dc"
@@ -748,20 +743,6 @@
     "@sentry/core" "8.24.0"
     "@sentry/types" "8.24.0"
     "@sentry/utils" "8.24.0"
-
-"@sentry/bundler-plugin-core@2.21.1":
-  version "2.21.1"
-  resolved "https://registry.yarnpkg.com/@sentry/bundler-plugin-core/-/bundler-plugin-core-2.21.1.tgz#fa50e83742d23962dd647d2dc8faeb2a86799751"
-  integrity sha512-F8FdL/bS8cy1SY1Gw0Mfo3ROTqlrq9Lvt5QGvhXi22dpVcDkWmoTWE2k+sMEnXOa8SdThMc/gyC8lMwHGd3kFQ==
-  dependencies:
-    "@babel/core" "^7.18.5"
-    "@sentry/babel-plugin-component-annotate" "2.21.1"
-    "@sentry/cli" "^2.22.3"
-    dotenv "^16.3.1"
-    find-up "^5.0.0"
-    glob "^9.3.2"
-    magic-string "0.30.8"
-    unplugin "1.0.1"
 
 "@sentry/bundler-plugin-core@2.22.0":
   version "2.22.0"
@@ -812,7 +793,7 @@
   resolved "https://registry.yarnpkg.com/@sentry/cli-win32-x64/-/cli-win32-x64-2.33.1.tgz#2d00b38a2dd9f3355df91825582ada3ea0034e86"
   integrity sha512-8VyRoJqtb2uQ8/bFRKNuACYZt7r+Xx0k2wXRGTyH05lCjAiVIXn7DiS2BxHFty7M1QEWUCMNsb/UC/x/Cu2wuA==
 
-"@sentry/cli@^2.22.3", "@sentry/cli@^2.33.1":
+"@sentry/cli@^2.33.1":
   version "2.33.1"
   resolved "https://registry.yarnpkg.com/@sentry/cli/-/cli-2.33.1.tgz#cfbdffdd896b05b92a659baf435b5607037af928"
   integrity sha512-dUlZ4EFh98VFRPJ+f6OW3JEYQ7VvqGNMa0AMcmvk07ePNeK/GicAWmSQE4ZfJTTl80ul6HZw1kY01fGQOQlVRA==
@@ -839,12 +820,12 @@
     "@sentry/types" "8.24.0"
     "@sentry/utils" "8.24.0"
 
-"@sentry/esbuild-plugin@^2.21.1":
-  version "2.21.1"
-  resolved "https://registry.yarnpkg.com/@sentry/esbuild-plugin/-/esbuild-plugin-2.21.1.tgz#b043613fae076287d6f4e13a4b2958fc0c3d8680"
-  integrity sha512-abrK/45MY51pG9fj81PuMAcl3t9DcpKwSsDPdgbcCHSJciJlz6v2B4Xgx0612IfnoxM9eEj8WF7Ta+qUVwEgAg==
+"@sentry/esbuild-plugin@^2.22.0":
+  version "2.22.0"
+  resolved "https://registry.yarnpkg.com/@sentry/esbuild-plugin/-/esbuild-plugin-2.22.0.tgz#ec00a05efe306dbbd7fd03f136cebc19a85a30b4"
+  integrity sha512-z456EALozxPzZm+kbWuxeWnGClKHnPTqq/KQ3yiGiaSMxh4ak0n5jEOWgKk14uPNQiVUHAQ4e9D6tlogZFLcWg==
   dependencies:
-    "@sentry/bundler-plugin-core" "2.21.1"
+    "@sentry/bundler-plugin-core" "2.22.0"
     unplugin "1.0.1"
     uuid "^9.0.0"
 
