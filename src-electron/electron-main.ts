@@ -144,6 +144,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     backgroundColor: 'grey',
     height: 600,
+    icon: path.resolve(path.join(__dirname, 'icons', 'icon.png')),
     show: false,
     useContentSize: true,
     webPreferences: {
