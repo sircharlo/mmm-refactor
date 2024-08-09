@@ -172,7 +172,7 @@
         "npm:vue-i18n@^9.13.1",
         "npm:vue-router@^4.4.2",
         "npm:vue-tsc@^2.0.29",
-        "npm:vue@^3.4.35"
+        "npm:vue@^3.4.37"
       ]
     }
   }
