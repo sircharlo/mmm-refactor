@@ -125,31 +125,44 @@ const musicPlayerSource = ref<HTMLSourceElement>(
 );
 const musicPlayingTitle = ref('');
 const musicPlaying = ref(false);
-const fadeOutTimer = ref();
 const musicStopping = ref(false);
 const musicStoppedAutomatically = ref(false);
 const songList = ref([] as klawSync.Item[]);
 const currentSongRemainingTime = ref('..:..');
 const timeRemainingBeforeMusicStop = ref();
 
+const fadeToVolumeLevel = (targetVolume: number, fadeOutSeconds: number) => {
+  if (!musicPlayer.value) return;
+  targetVolume = Math.min(Math.max(targetVolume, 0), 1);
+  const initialVolume = musicPlayer.value.volume;
+  const volumeChange = targetVolume - initialVolume;
+  const startTime = performance.now();
+
+  function updateVolume(currentTime: number) {
+    const elapsedTime = currentTime - startTime;
+    const progress = Math.min(elapsedTime / fadeOutSeconds / 1000, 1);
+    musicPlayer.value.volume = initialVolume + volumeChange * progress;
+
+    if (progress < 1) {
+      requestAnimationFrame(updateVolume);
+    } else {
+      if (musicPlayer.value.volume === 0) {
+        musicPlayer.value.pause();
+        musicPlaying.value = false;
+        musicStopping.value = false;
+        document.body.removeChild(musicPlayer.value);
+      }
+    }
+  }
+
+  requestAnimationFrame(updateVolume);
+};
+
 function stopMusic() {
   try {
     if (!musicPlayer.value) return;
     musicStopping.value = true;
-    if (musicPlayer.value.volume > 0) {
-      const fadeOutTime = 7500; // 7.5 seconds
-      const fadeInterval = 50;
-      musicPlayer.value.volume -= Math.min(
-        musicPlayer.value.volume,
-        100 / (fadeOutTime / fadeInterval) / 100,
-      );
-      fadeOutTimer.value = setTimeout(stopMusic, fadeInterval);
-    } else {
-      musicPlayer.value.pause();
-      musicPlaying.value = false;
-      musicStopping.value = false;
-      document.body.removeChild(musicPlayer.value);
-    }
+    fadeToVolumeLevel(0, 7.5);
   } catch (error) {
     console.error(error);
   }
@@ -341,12 +354,20 @@ const toggleMusicListener = () => {
   }
 };
 
+const muteBackgroundMusic = () => fadeToVolumeLevel(0.001, 1);
+const unmuteBackgroundMusic = () => fadeToVolumeLevel(1, 1);
+
 onMounted(() => {
   window.addEventListener('toggleMusic', toggleMusicListener);
+  window.addEventListener('muteBackgroundMusic', muteBackgroundMusic);
+  window.addEventListener('unmuteBackgroundMusic', unmuteBackgroundMusic);
 });
 
 onUnmounted(() => {
   window.removeEventListener('toggleMusic', toggleMusicListener);
+  window.removeEventListener('muteBackgroundMusic', muteBackgroundMusic);
+  window.removeEventListener('unmuteBackgroundMusic', unmuteBackgroundMusic);
+
   if (musicPlayer.value?.parentElement)
     document.body.removeChild(musicPlayer.value);
 });

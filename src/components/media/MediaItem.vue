@@ -12,7 +12,11 @@
         <q-img
           :id="media.uniqueId"
           :ratio="16 / 9"
-          :src="media.isImage ? media.fileUrl : (media.thumbnailUrl || thumbnailFromMetadata)"
+          :src="
+            media.isImage
+              ? media.fileUrl
+              : media.thumbnailUrl || thumbnailFromMetadata
+          "
           @error="imageLoadingError(media)"
           class="rounded-borders"
           fit="contain"
@@ -314,7 +318,11 @@
                     : (media.streamUrl ?? media.fileUrl);
                   mediaPlayingUniqueId = media.uniqueId;
                   mediaPlayingSubtitlesUrl = media.subtitlesUrl ?? '';
-                  if (isImage(mediaPlayingUrl)) initiatePanzoom(media.uniqueId);
+                  if (isImage(mediaPlayingUrl)) {
+                    initiatePanzoom(media.uniqueId);
+                  } else {
+                    muteBackgroundMusic();
+                  }
                 "
                 color="primary"
                 icon="mmm-play"
@@ -396,7 +404,10 @@
           <template v-else>
             <div class="col-shrink items-center justify-center flex">
               <q-btn
-                @click="mediaPlayingAction = 'play'"
+                @click="
+                  mediaPlayingAction = 'play';
+                  muteBackgroundMusic();
+                "
                 color="primary"
                 icon="mmm-play"
                 outline
@@ -404,7 +415,10 @@
                 v-if="mediaPlayingAction === 'pause'"
               />
               <q-btn
-                @click="mediaPlayingAction = 'pause'"
+                @click="
+                  mediaPlayingAction = 'pause';
+                  unmuteBackgroundMusic();
+                "
                 color="negative"
                 icon="mmm-pause"
                 outline
@@ -541,11 +555,11 @@ const imageLoadingError = (media: DynamicMediaObject) => {
     });
 };
 
-const thumbnailFromMetadata = ref('')
-if (props.media.isVideo && !props.media.thumbnailUrl) getThumbnailUrl(props.media.fileUrl).then((thumbnailUrl) => {
-  thumbnailFromMetadata.value = thumbnailUrl
-})
-
+const thumbnailFromMetadata = ref('');
+if (props.media.isVideo && !props.media.thumbnailUrl)
+  getThumbnailUrl(props.media.fileUrl).then((thumbnailUrl) => {
+    thumbnailFromMetadata.value = thumbnailUrl;
+  });
 
 const showMediaDurationPopup = (media: DynamicMediaObject) => {
   try {
@@ -608,12 +622,22 @@ const zoomReset = (elemId: string, forced = false, animate = true) => {
 function stopMedia() {
   // mediaPlayingAction.value = 'stop';
   destroyPanzoom(mediaPlayingUniqueId.value);
+  unmuteBackgroundMusic();
+  mediaPlayingAction.value = 'pause';
   mediaPlayingUrl.value = '';
   mediaPlayingUniqueId.value = '';
-  mediaPlayingAction.value = '';
   mediaPlayingCurrentPosition.value = 0;
+  mediaPlayingAction.value = '';
   mediaToStop.value = '';
 }
+
+const muteBackgroundMusic = () => {
+  window.dispatchEvent(new Event('muteBackgroundMusic'));
+};
+
+const unmuteBackgroundMusic = () => {
+  window.dispatchEvent(new Event('unmuteBackgroundMusic'));
+};
 
 const destroyPanzoom = (elemId: string) => {
   try {
