@@ -112,7 +112,7 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 const { fileUrlToPath, parseFile, path } = electronApi;
 
-defineProps<{
+const props = defineProps<{
   disabled?: boolean;
 }>();
 
@@ -210,7 +210,12 @@ const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
 
 function playMusic() {
   try {
-    if (!currentSettings.value?.enableMusicButton || musicPlaying.value) return;
+    if (
+      !currentSettings.value?.enableMusicButton ||
+      musicPlaying.value ||
+      props.disabled
+    )
+      return;
     musicPlayer.value.appendChild(musicPlayerSource.value);
     musicPlayer.value.style.display = 'none';
     document.body.appendChild(musicPlayer.value);
@@ -342,5 +347,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('toggleMusic', toggleMusicListener);
+  if (musicPlayer.value?.parentElement)
+    document.body.removeChild(musicPlayer.value);
 });
 </script>
