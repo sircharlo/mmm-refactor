@@ -34,7 +34,7 @@
     "jszip": "^3.10.1",
     "klaw-sync": "^6.0.0",
     "music-metadata": "^10.0.1",
-    "obs-websocket-js": "^5.0.5",
+    "obs-websocket-js": "^5.0.6",
     "p-queue": "^8.0.1",
     "pdfjs-dist": "^4.5.136",
     "pinia": "^2.2.0",
