@@ -23,6 +23,7 @@
     :use-input="useInput"
     @filter="filterFn"
     class="bg-accent-100"
+    clearable
     dense
     emit-value
     input-debounce="0"
