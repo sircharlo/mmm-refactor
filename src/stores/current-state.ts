@@ -153,7 +153,6 @@ export const useCurrentStateStore = defineStore('current-state', {
       mediaPlayingPanzoom: { scale: 1, x: 0, y: 0 },
       mediaPlayingSeekTo: 0,
       mediaPlayingSubtitlesUrl: '',
-      mediaPlayingSubtitlesVisible: false,
       mediaPlayingUniqueId: '',
       mediaPlayingUrl: '',
       mediaWindowCustomBackground: '',

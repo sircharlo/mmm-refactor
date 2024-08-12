@@ -34,7 +34,7 @@
           :src="mediaPlayerSubtitlesUrl"
           default
           kind="subtitles"
-          v-if="mediaPlayerSubtitlesUrl && mediaPlayerSubtitlesVisible"
+          v-if="mediaPlayerSubtitlesUrl && subtitlesVisible"
         />
       </video>
       <div v-else>
@@ -122,7 +122,7 @@ const mediaPlayingUrl = ref('');
 const mediaUniqueId = ref('');
 const mediaPlayerCustomBackground = ref('');
 const mediaPlayerSubtitlesUrl = ref('');
-const mediaPlayerSubtitlesVisible = ref(false);
+const subtitlesVisible = ref(false);
 
 const videoStreaming = ref(false);
 
@@ -165,7 +165,7 @@ bc.onmessage = (event) => {
     if ('subtitlesUrl' in event.data)
       mediaPlayerSubtitlesUrl.value = event.data.subtitlesUrl;
     if ('subtitlesVisible' in event.data)
-      mediaPlayerSubtitlesVisible.value = event.data.subtitlesVisible;
+      subtitlesVisible.value = event.data.subtitlesVisible;
     if ('uniqueId' in event.data) mediaUniqueId.value = event.data.uniqueId;
     if ('url' in event.data) mediaPlayingUrl.value = event.data.url;
     if ('action' in event.data) {

@@ -280,7 +280,6 @@ const {
   mediaPlaying,
   mediaPlayingAction,
   mediaPlayingCurrentPosition,
-  // mediaPlayingSeekTo,
   mediaPlayingPanzoom,
   mediaPlayingSubtitlesUrl,
   mediaPlayingUniqueId,
@@ -297,9 +296,6 @@ watch(
   () => mediaPlayingUniqueId.value,
   (newMediaUniqueId) => {
     bc.postMessage({ uniqueId: newMediaUniqueId });
-    // for (const key of Object.keys(panzooms)) {
-    //   if (key !== newMediaUniqueId) zoomReset(key, true);
-    // }
   },
 );
 

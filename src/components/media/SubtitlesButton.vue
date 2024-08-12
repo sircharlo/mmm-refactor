@@ -1,8 +1,8 @@
 <template>
   <!-- todo: add custom icon for this -->
   <q-btn
-    :color="!mediaPlayingSubtitlesVisible ? 'negative' : 'white-transparent'"
-    @click="mediaPlayingSubtitlesVisible = !mediaPlayingSubtitlesVisible"
+    :color="!subtitlesVisible ? 'negative' : 'white-transparent'"
+    @click="subtitlesVisible = !subtitlesVisible"
     class="super-rounded"
     icon="mdi-closed-caption"
     rounded
@@ -16,8 +16,20 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { useCurrentStateStore } from 'src/stores/current-state';
+import { ref, watch } from 'vue';
 
 const currentState = useCurrentStateStore();
-const { currentSettings, mediaPlayingSubtitlesVisible } =
-  storeToRefs(currentState);
+const { currentSettings } = storeToRefs(currentState);
+
+const subtitlesVisible = ref(false);
+
+const bc = new BroadcastChannel('mediaPlayback');
+
+watch(
+  () => subtitlesVisible.value,
+  (newSubtitlesVisible, oldSubtitlesVisible) => {
+    if (newSubtitlesVisible !== oldSubtitlesVisible)
+      bc.postMessage({ subtitlesVisible: newSubtitlesVisible });
+  },
+);
 </script>
