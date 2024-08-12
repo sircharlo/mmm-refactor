@@ -149,11 +149,11 @@ export const useJwStore = defineStore('jw-store', {
           'months',
         );
         if (monthsSinceUpdated > 1) {
-          const mediaItemLinks: MediaLink[] = pubMediaLinks.files[
-            songbook.langwritten
-          ][songbook.fileformat].filter(
-            (mediaLink: MediaLink) => mediaLink.track < MAX_SONGS,
-          );
+          const mediaItemLinks = (
+            pubMediaLinks.files[songbook.langwritten][
+              songbook.fileformat
+            ] as MediaLink[]
+          ).filter((mediaLink: MediaLink) => mediaLink.track < MAX_SONGS);
           const filteredMediaItemLinks = [] as MediaLink[];
           for (const mediaItemLink of mediaItemLinks) {
             const currentTrack = mediaItemLink.track;

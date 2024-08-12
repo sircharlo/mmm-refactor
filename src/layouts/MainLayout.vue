@@ -261,7 +261,6 @@
                     }}</q-btn>
                   </div>
                 </div>
-                <q-inner-loading :showing="remoteVideoLoading" />
               </div>
             </q-dialog>
           </template>
@@ -940,7 +939,6 @@ const remoteVideosLoadingProgress = ref(0);
 const remoteVideos: Ref<MediaItemsMediatorItem[]> = ref([]);
 const remoteVideoFilter = ref('');
 const remoteVideosIncludeAudioDescription = ref(false);
-const remoteVideoLoading = ref(false);
 const hoveredRemoteVideo = ref('');
 const moreOptionsMenuActive = ref(false);
 const cacheFiles: Ref<CacheFile[]> = ref([]);

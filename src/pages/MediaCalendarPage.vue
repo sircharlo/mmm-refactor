@@ -388,7 +388,6 @@ const updateMediaSortPlugin: DNDPlugin = (parent) => {
         item.section = section;
       }
     });
-    console.log(id, section, selectedDateObject.value?.dynamicMedia);
   };
   function dragover() {
     for (const media of sortableAdditionalMediaItems.value) {
@@ -411,11 +410,6 @@ const updateMediaSortPlugin: DNDPlugin = (parent) => {
   function dragend() {
     if (!mediaSort.value[currentCongregation.value])
       mediaSort.value[currentCongregation.value] = {};
-    console.log(
-      'finalSort',
-      sortableMediaItems.value.map((item: DynamicMediaObject) => item.uniqueId),
-      mediaSort.value[currentCongregation.value][selectedDate.value],
-    );
     mediaSort.value[currentCongregation.value][selectedDate.value] =
       // sortableMediaItems.value.map((item: DynamicMediaObject) => item.uniqueId);
       [
@@ -499,16 +493,11 @@ watch(
     try {
       if (newMediaSort && newMediaSort.length === 0) {
         generateMediaList();
-        // newMediaSort = datedAdditionalMediaMap.value
-        //   .concat(selectedDateObject.value?.dynamicMedia)
-        //   .map((item: DynamicMediaObject) => item.uniqueId);
       }
-      // sortableMediaItems.value.sort(mapOrder(newMediaSort));
     } catch (e) {
       console.error(e);
     }
   },
-  // { deep: true },
   { deep: true, immediate: true },
 );
 
@@ -549,13 +538,11 @@ const startDragging = () => {
 onMounted(async () => {
   window.addEventListener('draggingSomething', startDragging);
   window.addEventListener('localFiles-browsed', localFilesBrowsedListener);
-  window.addEventListener('remoteVideo-loading', remoteVideoLoading);
-  // window.addEventListener('remoteVideo-loaded', remoteVideoLoaded);
+  window.addEventListener('remote-video-loading', remoteVideoLoading);
 
   watch(selectedDate, (newVal) => {
     try {
       if (!currentCongregation.value || !newVal) {
-        // sortableMediaItems.value = [];
         return;
       }
       const durations = (customDurations.value[currentCongregation.value] ||=
@@ -1003,9 +990,6 @@ const localFilesBrowsedListener = (event: CustomEventInit) => {
   addToFiles(event.detail).catch((error) => {
     console.error(error);
   });
-  // .then(() => {
-  //   resetDragging();
-  // });
 };
 
 const remoteVideoLoading = (event: CustomEventInit) => {
@@ -1019,7 +1003,6 @@ const remoteVideoLoading = (event: CustomEventInit) => {
 onUnmounted(() => {
   window.removeEventListener('draggingSomething', startDragging);
   window.removeEventListener('localFiles-browsed', localFilesBrowsedListener);
-  window.removeEventListener('remoteVideo-loading', remoteVideoLoading);
-  // window.removeEventListener('remoteVideo-loaded', remoteVideoLoaded);
+  window.removeEventListener('remote-video-loading', remoteVideoLoading);
 });
 </script>

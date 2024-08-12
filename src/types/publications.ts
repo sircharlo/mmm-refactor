@@ -98,7 +98,7 @@ export interface Publication {
   fileformat: string[];
   files: {
     [key: string]: {
-      [key: string]: MediaLink[];
+      [key: string]: MediaItemsMediatorFile[] | MediaLink[];
     };
   };
   formattedDate: string;

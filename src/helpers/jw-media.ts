@@ -1129,10 +1129,10 @@ const getPubMediaLinks = async (publication: PublicationFetcher) => {
         error: true,
       };
     }
-    return response;
+    return response as Publication;
   } catch (e) {
     console.error('getPubMediaLinks', e);
-    return null;
+    return {} as Publication;
   }
 };
 
@@ -1201,12 +1201,14 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
       );
       return files.length > 0 ? files[0].path : '';
     }
+    if (!responseObject) return '';
     if (!publication.fileformat)
       publication.fileformat = Object.keys(
-        responseObject.files[publication.langwritten],
+        (responseObject as Publication).files[publication.langwritten],
       )[0];
-    const mediaItemLinks: MediaLink[] =
-      responseObject.files[publication.langwritten][publication.fileformat];
+    const mediaItemLinks = (responseObject as Publication).files[
+      publication.langwritten
+    ][publication.fileformat] as MediaLink[];
     const bestItem = findBestResolution(mediaItemLinks) as MediaLink;
     if (!bestItem?.file?.url) {
       return '';
@@ -1246,46 +1248,39 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
 };
 
 const downloadAdditionalRemoteVideo = async (
-  mediaItemLinks: MediaItemsMediatorFile[],
+  mediaItemLinks: MediaItemsMediatorFile[] | MediaLink[],
   thumbnailUrl?: string,
 ) => {
   try {
     const currentState = useCurrentStateStore();
     const { getDatedAdditionalMediaDirectory } = storeToRefs(currentState);
-    const bestItem = findBestResolution(
-      mediaItemLinks,
-    ) as MediaItemsMediatorFile;
-    // const downloadedFile: DownloadedFile = { path: '' };
+    const bestItem = findBestResolution(mediaItemLinks) as
+      | MediaItemsMediatorFile
+      | MediaLink;
     if (bestItem) {
+      const bestItemUrl =
+        'progressiveDownloadURL' in bestItem
+          ? bestItem.progressiveDownloadURL
+          : bestItem.file.url;
       window.dispatchEvent(
-        new CustomEvent('remoteVideo-loading', {
+        new CustomEvent('remote-video-loading', {
           detail: {
             duration: bestItem.duration,
             path: path.join(
               getDatedAdditionalMediaDirectory.value,
-              path.basename(bestItem.progressiveDownloadURL),
+              path.basename(bestItemUrl),
             ),
             thumbnailUrl: thumbnailUrl || '',
-            url: bestItem.progressiveDownloadURL,
+            url: bestItemUrl,
           },
         }),
       );
-      // downloadedFile = (await downloadFileIfNeeded({
-      //   dir: getDatedAdditionalMediaDirectory.value,
-      //   size: bestItem.filesize,
-      //   url: bestItem.progressiveDownloadURL,
-      // })) as DownloadedFile;
       await downloadFileIfNeeded({
         dir: getDatedAdditionalMediaDirectory.value,
         size: bestItem.filesize,
-        url: bestItem.progressiveDownloadURL,
+        url: bestItemUrl,
       });
     }
-    // window.dispatchEvent(
-    //   new CustomEvent('remoteVideo-loaded', {
-    //     detail: downloadedFile,
-    //   }),
-    // );
   } catch (e) {
     console.error('downloadAdditionalRemoteVideo', e);
   }
@@ -1357,7 +1352,9 @@ const getJwMediaInfo = async (publication: PublicationFetcher) => {
 const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
   try {
     const { downloadProgress } = storeToRefs(useCurrentStateStore());
-    const publicationInfo: Publication = await getPubMediaLinks(publication);
+    const publicationInfo = (await getPubMediaLinks(
+      publication,
+    )) as Publication;
     if (!publication.fileformat) return;
     if (!publicationInfo?.files) {
       downloadProgress.value[
@@ -1375,9 +1372,11 @@ const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
       };
       return;
     }
-    const mediaLinks: MediaLink[] = publicationInfo.files[
-      publication.langwritten
-    ][publication.fileformat].filter(
+    const mediaLinks = (
+      publicationInfo.files[publication.langwritten][
+        publication.fileformat
+      ] as MediaLink[]
+    ).filter(
       (mediaLink) =>
         !publication.maxTrack || mediaLink.track < publication.maxTrack,
     );
@@ -1484,14 +1483,18 @@ const downloadJwpub = async (
         path: '',
       };
     };
-    const publicationInfo: Publication = await getPubMediaLinks(publication);
+    const publicationInfo = (await getPubMediaLinks(
+      publication,
+    )) as Publication;
     if (!publicationInfo?.files) {
       return handleDownloadError();
     }
-    const mediaLinks: MediaLink[] =
-      publicationInfo.files[publication.langwritten][
-        publication.fileformat
-      ].filter(
+    const mediaLinks =
+      (
+        publicationInfo.files[publication.langwritten][
+          publication.fileformat
+        ] as MediaLink[]
+      ).filter(
         (mediaLink) =>
           !publication.maxTrack || mediaLink.track < publication.maxTrack,
       ) || [];

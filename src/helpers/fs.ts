@@ -212,7 +212,6 @@ const getThumbnailUrl = async (filepath: string, forceRefresh?: boolean) => {
     if (isImage(filepath)) {
       thumbnailUrl = getFileUrl(filepath);
     } else if (isVideo(filepath)) {
-      console.log('Getting thumbnail for video: ' + filepath);
       const thumbnailPath = filepath.split('.')[0] + '.jpg';
       if (fs.existsSync(thumbnailPath)) {
         thumbnailUrl = getFileUrl(thumbnailPath);

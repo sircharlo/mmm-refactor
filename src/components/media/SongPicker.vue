@@ -43,7 +43,6 @@
           $t('cancel')
         }}</q-btn>
       </div>
-      <q-inner-loading :showing="loading" />
     </div>
   </q-dialog>
 </template>
@@ -52,13 +51,12 @@
 import { storeToRefs } from 'pinia';
 import { barStyle, thumbStyle } from 'src/boot/globals';
 import {
-  dynamicMediaMapper,
-  processMissingMediaInfo,
+  downloadAdditionalRemoteVideo,
+  getJwMediaInfo,
+  getPubMediaLinks,
 } from 'src/helpers/jw-media';
 import { useCurrentStateStore } from 'src/stores/current-state';
-import { useJwStore } from 'src/stores/jw';
-import { MediaLink } from 'src/types/publications';
-import { MultimediaItem } from 'src/types/sqlite';
+import { MediaLink, PublicationFetcher } from 'src/types/publications';
 import { computed, ComputedRef, ref, watch } from 'vue';
 
 // Define props and emits
@@ -70,13 +68,10 @@ const emit = defineEmits(['update:modelValue']);
 
 // Setup logic
 const currentState = useCurrentStateStore();
-const { currentSongbook, currentSongs, selectedDateObject } =
+const { currentSettings, currentSongbook, currentSongs } =
   storeToRefs(currentState);
-const jwStore = useJwStore();
-const { addToAdditionMediaMap } = jwStore;
 
 const localValue = ref(props.modelValue);
-const loading = ref(false);
 
 const filter = ref('');
 const filteredSongs: ComputedRef<MediaLink[]> = computed(() => {
@@ -89,24 +84,23 @@ const filteredSongs: ComputedRef<MediaLink[]> = computed(() => {
 
 const dismissPopup = () => {
   localValue.value = false;
-  loading.value = false;
 };
 
 const addSong = async (songTrack: number) => {
   try {
-    loading.value = true;
     if (songTrack) {
-      const multimediaItem = {
-        KeySymbol: currentSongbook.value.pub,
-        Track: songTrack,
-      } as MultimediaItem;
-      await processMissingMediaInfo([multimediaItem]);
-      const additionalMedia = await dynamicMediaMapper(
-        [multimediaItem],
-        selectedDateObject.value?.date,
-        true,
+      const songTrackItem = {
+        fileformat: 'MP4',
+        langwritten: currentSettings.value.lang,
+        pub: currentSongbook.value.pub,
+        track: songTrack,
+      } as PublicationFetcher;
+      const songTrackFiles = await getPubMediaLinks(songTrackItem);
+      const { thumbnail } = await getJwMediaInfo(songTrackItem);
+      downloadAdditionalRemoteVideo(
+        songTrackFiles?.files[currentSettings.value.lang]['MP4'],
+        thumbnail,
       );
-      addToAdditionMediaMap(additionalMedia);
     }
   } catch (error) {
     console.error(error);
