@@ -47,7 +47,7 @@
                   v-for="statusObject in statusConfig"
                 >
                   <p
-                    class="card-section-title text-dark-grey"
+                    class="card-section-title text-dark-grey q-mt-md"
                     v-if="hasStatus(downloadProgress, statusObject.status)"
                   >
                     {{ $t(statusObject.label) }}
