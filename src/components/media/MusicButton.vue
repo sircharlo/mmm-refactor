@@ -1,8 +1,6 @@
 <template>
   <q-btn
     :color="musicPlaying && musicStopping ? 'negative' : 'white-transparent'"
-    :disable="disabled"
-    :outline="disabled"
     :style="musicPlaying ? 'min-width: 110px;' : ''"
     @click="musicPopup = true"
     class="super-rounded"
@@ -16,7 +14,7 @@
       {{ musicRemainingTime }}
     </div>
 
-    <q-tooltip :delay="2000" v-if="!disabled && !musicPopup">
+    <q-tooltip :delay="2000" v-if="!musicPopup">
       {{ $t('setupWizard.backgroundMusic') }}
     </q-tooltip>
     <!-- <q-popup-proxy
@@ -111,10 +109,6 @@ import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 const { fileUrlToPath, parseFile, path } = electronApi;
-
-const props = defineProps<{
-  disabled?: boolean;
-}>();
 
 const currentState = useCurrentStateStore();
 const { currentSettings, mediaPlaying, selectedDateObject } =
@@ -223,12 +217,7 @@ const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
 
 function playMusic() {
   try {
-    if (
-      !currentSettings.value?.enableMusicButton ||
-      musicPlaying.value ||
-      props.disabled
-    )
-      return;
+    if (!currentSettings.value?.enableMusicButton || musicPlaying.value) return;
     musicPlayer.value.appendChild(musicPlayerSource.value);
     musicPlayer.value.style.display = 'none';
     document.body.appendChild(musicPlayer.value);

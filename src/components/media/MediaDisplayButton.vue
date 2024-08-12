@@ -1,13 +1,11 @@
 <template>
   <q-btn
     :color="!mediaWindowVisible ? 'negative' : 'white-transparent'"
-    :disable="!!disabled"
     :icon="
       mediaWindowVisible
         ? 'mmm-media-display-active'
         : 'mmm-media-display-inactive'
     "
-    :outline="!!disabled"
     @click="mediaDisplayPopup = true"
     class="super-rounded"
     rounded
@@ -18,7 +16,7 @@
       :delay="2000"
       anchor="bottom left"
       self="top left"
-      v-if="!disabled && !mediaDisplayPopup"
+      v-if="!mediaDisplayPopup"
     >
       {{ $t('media-display') }}
     </q-tooltip>
@@ -283,10 +281,6 @@ const {
   path,
   pathToFileURL,
 } = electronApi;
-
-defineProps<{
-  disabled?: boolean;
-}>();
 
 const currentState = useCurrentStateStore();
 const { currentSettings, mediaWindowCustomBackground, mediaWindowVisible } =
