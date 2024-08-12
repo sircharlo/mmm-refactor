@@ -173,16 +173,10 @@ const obsConnect = async (setup?: boolean) => {
     obsMessage.value = 'obs.connecting';
     const obsPassword = (currentSettings.value?.obsPassword as string) || '';
 
-    // const getCurrentRoute = () => useRouter()?.currentRoute.value?.fullPath;
-
     let attempt = 0;
     const maxAttempts = setup ? 1 : 12;
-    const timeBetweenAttempts = 5000; // 5 seconds
-    // const previousRoute = getCurrentRoute();
+    const timeBetweenAttempts = 5000;
     while (attempt < maxAttempts) {
-      // if (getCurrentRoute() !== previousRoute) {
-      //   break;
-      // }
       try {
         const { negotiatedRpcVersion, obsWebSocketVersion } =
           await obsWebSocket?.connect('ws://127.0.0.1:' + obsPort, obsPassword);
@@ -208,7 +202,7 @@ const obsConnect = async (setup?: boolean) => {
 
 const setObsScene = async (scene: string | undefined, sceneUuid?: string) => {
   try {
-    if (obsConnectionState.value !== 'connected') await obsConnect();
+    if (!obsConnectionState.value.startsWith('connect')) await obsConnect();
     if (obsConnectionState.value !== 'connected') return;
     let newProgramScene: string | undefined = sceneUuid;
     if (!sceneUuid && scene) {
@@ -239,11 +233,16 @@ const setObsSceneListener = (event: CustomEventInit) => {
   }
 };
 
+const obsSettingsConnect = () => obsConnect(true);
+
 onMounted(() => {
   try {
-    window.addEventListener('obsConnectFromSettings', () => obsConnect(true));
+    window.addEventListener('obsConnectFromSettings', obsSettingsConnect);
     window.addEventListener('obsSceneEvent', setObsSceneListener);
 
+    obsWebSocket.on('ConnectionOpened', () => {
+      obsConnectionState.value = 'connecting';
+    });
     obsWebSocket.on('ConnectionClosed', obsErrorHandler);
     obsWebSocket.on('ConnectionError', obsErrorHandler);
     obsWebSocket.on(
@@ -275,10 +274,11 @@ onMounted(() => {
 
 onUnmounted(() => {
   try {
-    window.removeEventListener('obsConnectFromSettings', setObsSceneListener);
+    window.removeEventListener('obsConnectFromSettings', obsSettingsConnect);
     window.removeEventListener('obsSceneEvent', setObsSceneListener);
     obsWebSocket.removeAllListeners('ConnectionClosed');
     obsWebSocket.removeAllListeners('ConnectionError');
+    obsWebSocket.removeAllListeners('ConnectionOpened');
     obsWebSocket.removeAllListeners('CurrentProgramSceneChanged');
     obsWebSocket.removeAllListeners('Identified');
     obsWebSocket.removeAllListeners('SceneListChanged');
