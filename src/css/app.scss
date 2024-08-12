@@ -99,6 +99,14 @@ body.body--light {
     background: white;
     border-color: $accent-300;
     border: 1px solid $accent-300;
+    & .q-list {
+      & .q-item {
+        margin-left: 0.25em;
+      }
+      & :hover {
+        background: $accent-100;
+      }
+    }
   }
 
   .bg-secondary-contrast {
@@ -245,7 +253,8 @@ body.body--dark {
   // font-size: 14px;
 }
 
-.q-menu, .round-card {
+.q-menu,
+.round-card {
   border: 1px solid $accent-300;
   box-shadow: 0px 8px 24px 0px $shadow;
   font-size: 0.9em;
