@@ -669,6 +669,11 @@ $q.iconMapFn = (iconName) => {
       cls: 'mmm-delete',
     };
   }
+  if (iconName === 'check') {
+    return {
+      cls: 'mmm-check',
+    };
+  }
   if (iconName.startsWith('mmm-')) {
     return {
       cls: iconName,

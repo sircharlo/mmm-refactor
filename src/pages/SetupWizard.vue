@@ -206,7 +206,13 @@
       >
         <p>
           {{ $t('look-for-this-button-in-m-s-footer') }}
-          <MediaDisplayButton :disabled="true" />
+          <q-btn
+            class="super-rounded q-ml-sm"
+            color="primary"
+            disable
+            icon="mmm-media-display-active"
+            outline
+          />
         </p>
         <p>
           {{
@@ -241,7 +247,13 @@
       >
         <p>
           {{ $t('also-look-for-this-button-in-m-s-footer') }}
-          <MusicButton :disabled="true" />
+          <q-btn
+            class="super-rounded q-ml-sm"
+            color="primary"
+            disable
+            icon="mmm-music-note"
+            outline
+          />
         </p>
         <p>
           {{
@@ -519,8 +531,6 @@ import { storeToRefs } from 'pinia';
 import SelectInput from 'src/components/form-inputs/SelectInput.vue';
 import TextInput from 'src/components/form-inputs/TextInput.vue';
 import TimeInput from 'src/components/form-inputs/TimeInput.vue';
-import MediaDisplayButton from 'src/components/media/MediaDisplayButton.vue';
-import MusicButton from 'src/components/media/MusicButton.vue';
 import {
   downloadBackgroundMusic,
   downloadSongbookVideos,
