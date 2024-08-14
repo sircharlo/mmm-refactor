@@ -726,11 +726,6 @@
     "@sentry/types" "8.25.0"
     "@sentry/utils" "8.25.0"
 
-"@sentry/babel-plugin-component-annotate@2.22.0":
-  version "2.22.0"
-  resolved "https://registry.yarnpkg.com/@sentry/babel-plugin-component-annotate/-/babel-plugin-component-annotate-2.22.0.tgz#a7e1cc99d1a738d1eb17757341dff4db3a93c2dc"
-  integrity sha512-UzH+NNhgnOo6UFku3C4TEz+pO/yDcIA5FKTJvLbJ7lQwAjsqLs3DZWm4cCA08skICb8mULArF6S/dn5/butVCA==
-
 "@sentry/babel-plugin-component-annotate@2.22.1":
   version "2.22.1"
   resolved "https://registry.yarnpkg.com/@sentry/babel-plugin-component-annotate/-/babel-plugin-component-annotate-2.22.1.tgz#2877af31f1d0358202593fe6d14141827a2f1e42"
@@ -748,20 +743,6 @@
     "@sentry/core" "8.25.0"
     "@sentry/types" "8.25.0"
     "@sentry/utils" "8.25.0"
-
-"@sentry/bundler-plugin-core@2.22.0":
-  version "2.22.0"
-  resolved "https://registry.yarnpkg.com/@sentry/bundler-plugin-core/-/bundler-plugin-core-2.22.0.tgz#6a67761ff5bc0dc897e56acba0b12547bc623e14"
-  integrity sha512-/xXN8o7565WMsewBnQFfjm0E5wqhYsegg++HJ5RjrY/cTM4qcd/ven44GEMxqGFJitZizvkk3NHszaHylzcRUw==
-  dependencies:
-    "@babel/core" "^7.18.5"
-    "@sentry/babel-plugin-component-annotate" "2.22.0"
-    "@sentry/cli" "^2.33.1"
-    dotenv "^16.3.1"
-    find-up "^5.0.0"
-    glob "^9.3.2"
-    magic-string "0.30.8"
-    unplugin "1.0.1"
 
 "@sentry/bundler-plugin-core@2.22.1":
   version "2.22.1"
@@ -860,12 +841,12 @@
   dependencies:
     "@sentry/types" "8.25.0"
 
-"@sentry/vite-plugin@^2.22.0":
-  version "2.22.0"
-  resolved "https://registry.yarnpkg.com/@sentry/vite-plugin/-/vite-plugin-2.22.0.tgz#09743ac390cf8c1609f2fa6d5424548d0b6f7928"
-  integrity sha512-U1dWldo3gb1oDqERgiSM7zexMwAuqiXO/YUO3xVSpWmhoHz2AqxOcfIX1SygW02NF7Ss3ay4qMAta8PbvdsrnQ==
+"@sentry/vite-plugin@^2.22.1":
+  version "2.22.1"
+  resolved "https://registry.yarnpkg.com/@sentry/vite-plugin/-/vite-plugin-2.22.1.tgz#66192485440fd7f3726279a6bda2de4e59e6fd13"
+  integrity sha512-TC+3RIcu0rnxaEPV8ZHjYlRHLx5M9eRDI2il1lFkSguTc0N89n7Tt/aDnFAwtaPG4yqPkhIMpxi7LfXx+YDJ1Q==
   dependencies:
-    "@sentry/bundler-plugin-core" "2.22.0"
+    "@sentry/bundler-plugin-core" "2.22.1"
     unplugin "1.0.1"
 
 "@sentry/vue@^8.25.0":
