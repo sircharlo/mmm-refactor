@@ -731,6 +731,11 @@
   resolved "https://registry.yarnpkg.com/@sentry/babel-plugin-component-annotate/-/babel-plugin-component-annotate-2.22.0.tgz#a7e1cc99d1a738d1eb17757341dff4db3a93c2dc"
   integrity sha512-UzH+NNhgnOo6UFku3C4TEz+pO/yDcIA5FKTJvLbJ7lQwAjsqLs3DZWm4cCA08skICb8mULArF6S/dn5/butVCA==
 
+"@sentry/babel-plugin-component-annotate@2.22.1":
+  version "2.22.1"
+  resolved "https://registry.yarnpkg.com/@sentry/babel-plugin-component-annotate/-/babel-plugin-component-annotate-2.22.1.tgz#2877af31f1d0358202593fe6d14141827a2f1e42"
+  integrity sha512-rQEk8EeCIBQKivWNONllQhd/wGbfuK/WXJRM6TkjeikM3wrqJf4AmIBXoA6eg089DwBFzBaxGjjLWJNHKY440w==
+
 "@sentry/browser@8.25.0":
   version "8.25.0"
   resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-8.25.0.tgz#eaf129755c365905b427f8031b747211dc388c05"
@@ -751,6 +756,20 @@
   dependencies:
     "@babel/core" "^7.18.5"
     "@sentry/babel-plugin-component-annotate" "2.22.0"
+    "@sentry/cli" "^2.33.1"
+    dotenv "^16.3.1"
+    find-up "^5.0.0"
+    glob "^9.3.2"
+    magic-string "0.30.8"
+    unplugin "1.0.1"
+
+"@sentry/bundler-plugin-core@2.22.1":
+  version "2.22.1"
+  resolved "https://registry.yarnpkg.com/@sentry/bundler-plugin-core/-/bundler-plugin-core-2.22.1.tgz#a3c984fd0e6a7bc3977cd74a635f6222e69c4ef2"
+  integrity sha512-RFbS57zfPvUBe4DL/pjt6BWCEyGFkk/n4gLNZQ9Cf2gRdUVW80AtAMZwrlEELrpW1D8kONy6/kvWf0leicHRMg==
+  dependencies:
+    "@babel/core" "^7.18.5"
+    "@sentry/babel-plugin-component-annotate" "2.22.1"
     "@sentry/cli" "^2.33.1"
     dotenv "^16.3.1"
     find-up "^5.0.0"
@@ -820,12 +839,12 @@
     "@sentry/types" "8.25.0"
     "@sentry/utils" "8.25.0"
 
-"@sentry/esbuild-plugin@^2.22.0":
-  version "2.22.0"
-  resolved "https://registry.yarnpkg.com/@sentry/esbuild-plugin/-/esbuild-plugin-2.22.0.tgz#ec00a05efe306dbbd7fd03f136cebc19a85a30b4"
-  integrity sha512-z456EALozxPzZm+kbWuxeWnGClKHnPTqq/KQ3yiGiaSMxh4ak0n5jEOWgKk14uPNQiVUHAQ4e9D6tlogZFLcWg==
+"@sentry/esbuild-plugin@^2.22.1":
+  version "2.22.1"
+  resolved "https://registry.yarnpkg.com/@sentry/esbuild-plugin/-/esbuild-plugin-2.22.1.tgz#cbfdabb233a65a9096b31d3818aff09011696aeb"
+  integrity sha512-UF8hynrxgiiraGchNy7+daFp1oZhmtZfHXBsWr+qkSSDGpAu8FVC3a9Lq5zjW5c6B6r7xUYVxOGDvU8FPOyHPA==
   dependencies:
-    "@sentry/bundler-plugin-core" "2.22.0"
+    "@sentry/bundler-plugin-core" "2.22.1"
     unplugin "1.0.1"
     uuid "^9.0.0"
 
