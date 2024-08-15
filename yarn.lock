@@ -726,11 +726,6 @@
     "@sentry/types" "8.26.0"
     "@sentry/utils" "8.26.0"
 
-"@sentry/babel-plugin-component-annotate@2.22.1":
-  version "2.22.1"
-  resolved "https://registry.yarnpkg.com/@sentry/babel-plugin-component-annotate/-/babel-plugin-component-annotate-2.22.1.tgz#2877af31f1d0358202593fe6d14141827a2f1e42"
-  integrity sha512-rQEk8EeCIBQKivWNONllQhd/wGbfuK/WXJRM6TkjeikM3wrqJf4AmIBXoA6eg089DwBFzBaxGjjLWJNHKY440w==
-
 "@sentry/babel-plugin-component-annotate@2.22.2":
   version "2.22.2"
   resolved "https://registry.yarnpkg.com/@sentry/babel-plugin-component-annotate/-/babel-plugin-component-annotate-2.22.2.tgz#f4a1ddea4bcac06584a6cec9a43ec088cbb6caaf"
@@ -748,20 +743,6 @@
     "@sentry/core" "8.26.0"
     "@sentry/types" "8.26.0"
     "@sentry/utils" "8.26.0"
-
-"@sentry/bundler-plugin-core@2.22.1":
-  version "2.22.1"
-  resolved "https://registry.yarnpkg.com/@sentry/bundler-plugin-core/-/bundler-plugin-core-2.22.1.tgz#a3c984fd0e6a7bc3977cd74a635f6222e69c4ef2"
-  integrity sha512-RFbS57zfPvUBe4DL/pjt6BWCEyGFkk/n4gLNZQ9Cf2gRdUVW80AtAMZwrlEELrpW1D8kONy6/kvWf0leicHRMg==
-  dependencies:
-    "@babel/core" "^7.18.5"
-    "@sentry/babel-plugin-component-annotate" "2.22.1"
-    "@sentry/cli" "^2.33.1"
-    dotenv "^16.3.1"
-    find-up "^5.0.0"
-    glob "^9.3.2"
-    magic-string "0.30.8"
-    unplugin "1.0.1"
 
 "@sentry/bundler-plugin-core@2.22.2":
   version "2.22.2"
@@ -839,12 +820,12 @@
     "@sentry/types" "8.26.0"
     "@sentry/utils" "8.26.0"
 
-"@sentry/esbuild-plugin@^2.22.1":
-  version "2.22.1"
-  resolved "https://registry.yarnpkg.com/@sentry/esbuild-plugin/-/esbuild-plugin-2.22.1.tgz#cbfdabb233a65a9096b31d3818aff09011696aeb"
-  integrity sha512-UF8hynrxgiiraGchNy7+daFp1oZhmtZfHXBsWr+qkSSDGpAu8FVC3a9Lq5zjW5c6B6r7xUYVxOGDvU8FPOyHPA==
+"@sentry/esbuild-plugin@^2.22.2":
+  version "2.22.2"
+  resolved "https://registry.yarnpkg.com/@sentry/esbuild-plugin/-/esbuild-plugin-2.22.2.tgz#598dfe354ae2e20dc7a02efda59b0553eba150f5"
+  integrity sha512-6yYnI7PNDXYyYwlbIYRPoz9+FamYWr1IZ9PQTNz4bjv8eFcItKZFO5wu25L7yaGszgClATvY17gxxUjWfsRyWQ==
   dependencies:
-    "@sentry/bundler-plugin-core" "2.22.1"
+    "@sentry/bundler-plugin-core" "2.22.2"
     unplugin "1.0.1"
     uuid "^9.0.0"
 
