@@ -572,10 +572,10 @@
     "@pnpm/network.ca-file" "^1.0.1"
     config-chain "^1.1.11"
 
-"@quasar/app-vite@^1.9.4":
-  version "1.9.4"
-  resolved "https://registry.yarnpkg.com/@quasar/app-vite/-/app-vite-1.9.4.tgz#25c8c45aafae4105603718019bf490a41b2d397c"
-  integrity sha512-8O90WJNCA5vP1aD33tWbOg2oSR2mkdHQhzt9s+qKmwIWDKaPB0jm+BNv87Vvan2eNM55apeM6eNJ+BTxEWnXQg==
+"@quasar/app-vite@^1.9.5":
+  version "1.9.5"
+  resolved "https://registry.yarnpkg.com/@quasar/app-vite/-/app-vite-1.9.5.tgz#99c06269fc655e5a35b51d2ecdac9da98b0c3034"
+  integrity sha512-WO/S8Omav28BzV6BAOY9Gq5k/jmrIklZ+/rXtWqmW1OFIyyI9Gw62kGsVHgLQ0f1Jv1BNdaqWixD6fUcV+knTw==
   dependencies:
     "@quasar/render-ssr-error" "^1.0.3"
     "@quasar/vite-plugin" "^1.7.0"
