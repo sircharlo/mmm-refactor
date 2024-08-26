@@ -8,7 +8,14 @@
       >
         <q-icon name="mmm-music-note" size="lg" />
       </div>
-      <div class="q-pr-none rounded-borders relative-position" v-else>
+      <div
+        :class="
+          'q-pr-none rounded-borders relative-position ' + (media.isImage
+            ? 'bg-black'
+            : 'bg-transparent')
+        "
+        v-else
+      >
         <q-img
           :id="media.uniqueId"
           :ratio="16 / 9"
@@ -25,7 +32,7 @@
           <!-- @load="media.isImage" -->
           <q-badge
             :class="
-              'q-mt-xs q-ml-xs cursor-pointer ' +
+              'q-mt-sm q-ml-sm cursor-pointer rounded-borders-sm ' +
               (customDurations[currentCongregation]?.[selectedDate]?.[
                 media.uniqueId
               ] &&
@@ -89,8 +96,8 @@
               <q-card-section class="q-pr-sm" horizontal> -->
                 <div class="row items-center q-mt-lg">
                   <!-- {{ media.duration }} -->
-                  <div class="col-shrink q-pr-md text-left">
-                    {{ formatTime(media.duration) }}
+                  <div class="col-shrink q-pr-md time-duration">
+                    {{ formatTime(0) }}
                   </div>
                   <div class="col">
                     <q-range
@@ -267,6 +274,7 @@
               >
                 <q-btn
                   @click="mediaToDelete = media.uniqueId"
+                  class="q-mr-md"
                   color="negative"
                   flat
                   icon="mmm-delete"

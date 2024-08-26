@@ -3,7 +3,7 @@
     <q-list>
       <div class="media-section website">
         <q-item class="text-website items-center">
-          <q-avatar class="text-white bg-website" rounded size="md">
+          <q-avatar class="text-white bg-website" size="md">
             <q-icon name="mmm-open-web" size="sm" />
           </q-avatar>
           <div class="text-bold text-uppercase text-spaced">

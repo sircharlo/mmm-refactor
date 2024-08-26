@@ -65,7 +65,7 @@
       "
     >
       <q-item class="text-additional items-center">
-        <q-avatar class="text-white bg-additional" rounded size="md">
+        <q-avatar class="text-white bg-additional rounded-borders-sm" size="md">
           <q-icon name="mmm-additional-media" size="md" />
         </q-avatar>
         <div class="text-bold text-uppercase text-spaced">
@@ -91,7 +91,7 @@
       "
     >
       <q-item class="text-tgw items-center">
-        <q-avatar class="text-white bg-tgw jw-icon" rounded size="md"
+        <q-avatar class="text-white bg-tgw jw-icon" size="md"
           ></q-avatar
         >
         <div class="text-bold text-uppercase text-spaced">
@@ -117,7 +117,7 @@
       "
     >
       <q-item class="text-ayfm items-center">
-        <q-avatar class="text-white bg-ayfm jw-icon" rounded size="lg"
+        <q-avatar class="text-white bg-ayfm jw-icon" size="lg"
           ></q-avatar
         >
         <div class="text-bold text-uppercase text-spaced">
@@ -143,7 +143,7 @@
       "
     >
       <q-item class="text-lac items-center">
-        <q-avatar class="text-white bg-lac jw-icon" rounded size="lg"
+        <q-avatar class="text-white bg-lac jw-icon" size="lg"
           ></q-avatar
         >
         <div class="text-bold text-uppercase text-spaced">
@@ -164,7 +164,7 @@
       v-show="selectedDateObject?.complete && sortableWtMediaItems.length"
     >
       <q-item class="text-wt items-center">
-        <q-avatar class="text-white bg-wt jw-icon" rounded size="lg"
+        <q-avatar class="text-white bg-wt jw-icon" size="lg"
           ></q-avatar
         >
         <div class="text-bold text-uppercase text-spaced">

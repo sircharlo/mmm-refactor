@@ -301,5 +301,6 @@
   "use-the-import-button-to-add-media-for-this-date-or-select-another-date-to-view-the-corresponding-meeting-media": "Use the Import button to add media for this date or select another date to view the corresponding meeting media.",
   "select-a-date-to-begin": "Please select a date to begin.",
   "currently-loading": "The media for this date is currently loading.",
-  "please-wait": "Please wait"
+  "please-wait": "Please wait",
+  "select-a-congregation-to-enable": "Select a profile first"
 }

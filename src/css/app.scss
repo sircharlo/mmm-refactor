@@ -103,14 +103,16 @@ body.body--light {
       & .q-item {
         margin-left: 0.25em;
       }
-      & :hover {
-        background: $accent-100;
-      }
     }
   }
 
   .bg-secondary-contrast {
     background-color: $secondary-contrast;
+  }
+
+  .q-hoverable:hover > .q-focus-helper {
+    background-color: #87AFFF;
+    opacity: 0.15;
   }
 }
 
@@ -159,7 +161,7 @@ body.body--dark {
   padding-bottom: 1em;
   position: relative;
   border-radius: 0.75em;
-  margin-bottom: 1.5em;
+  margin-bottom: 1em;
 
   &:before {
     bottom: 0;
@@ -172,6 +174,10 @@ body.body--dark {
     border-radius: 5em;
     margin-top: 0.6em;
     margin-bottom: 0.6em;
+  }
+
+  & .q-avatar {
+    border-radius: 4px;
   }
 
   &.tgw:before {
@@ -447,4 +453,20 @@ a {
 
 .text-smaller {
   font-size: 0.8em;
+}
+
+.text-caption {
+  letter-spacing: unset;
+}
+
+.q-drawer .disabled {
+  opacity: 1 !important;
+}
+
+.rounded-borders-lg {
+  border-radius: 12px;
+}
+
+.rounded-borders-sm {
+  border-radius: 4px;
 }
