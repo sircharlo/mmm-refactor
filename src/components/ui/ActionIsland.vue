@@ -16,7 +16,7 @@
           :download="downloadPopup"
           @update:download="downloadPopup = $event"
         />
-        <q-separator vertical />
+        <q-separator class="bg-semi-white-24" vertical />
         <MusicButton :music="musicPopup" @update:music="musicPopup = $event" />
         <SubtitlesButton />
         <ObsStatus />
