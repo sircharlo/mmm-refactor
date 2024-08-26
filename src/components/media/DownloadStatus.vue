@@ -33,6 +33,7 @@
     />
     <q-tooltip
       :delay="2000"
+      :offset="[14, 28]"
       anchor="bottom left"
       self="top left"
       v-if="!localDownloadPopup"

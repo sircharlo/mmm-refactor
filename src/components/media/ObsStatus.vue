@@ -21,7 +21,7 @@
         />
       </svg>
     </q-icon>
-    <q-tooltip :delay="2000" v-if="!scenePicker">
+    <q-tooltip :delay="2000" :offset="[14, 28]" v-if="!scenePicker">
       {{ $t(obsMessage ?? 'scene-selection') }}
     </q-tooltip>
     <!-- <q-popup-proxy
