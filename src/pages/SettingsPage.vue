@@ -17,7 +17,7 @@
           :caption="$t(description)"
           :icon="icon"
           :label="$t(name)"
-          class="media-section text-subtitle2 text-weight-medium"
+          class="media-section text-subtitle2 text-weight-medium q-pr-md"
           v-if="
             !invalidSettingsLength ||
             !onlyShowInvalidSettings ||
@@ -47,15 +47,18 @@
               "
             >
               <q-separator class="bg-accent-200" spaced v-if="index > 0" />
-              <q-item-label class="q-pl-xl q-ml-lg text-accent-400 text-uppercase" header>{{
-                $t(item.subgroup)
-              }}</q-item-label>
+              <q-item-label
+                class="q-pl-xl q-ml-lg text-accent-400 text-uppercase"
+                header
+                >{{ $t(item.subgroup) }}</q-item-label
+              >
             </template>
             <q-item
               :class="{
                 'q-py-lg': invalidSettings.includes(
                   settingId as keyof SettingsItems,
                 ),
+                'q-mt-sm': index === 0,
               }"
               :inset-level="1"
               tag="label"
