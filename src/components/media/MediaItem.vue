@@ -8,7 +8,14 @@
       >
         <q-icon name="mmm-music-note" size="lg" />
       </div>
-      <div class="q-pr-none rounded-borders relative-position bg-black" v-else>
+      <div
+        :class="
+          'q-pr-none rounded-borders relative-position ' + (media.isImage
+            ? 'bg-black'
+            : 'bg-transparent')
+        "
+        v-else
+      >
         <q-img
           :id="media.uniqueId"
           :ratio="16 / 9"
@@ -25,7 +32,7 @@
           <!-- @load="media.isImage" -->
           <q-badge
             :class="
-              'q-mt-xs q-ml-xs cursor-pointer ' +
+              'q-mt-sm q-ml-sm cursor-pointer rounded-borders-sm ' +
               (customDurations[currentCongregation]?.[selectedDate]?.[
                 media.uniqueId
               ] &&
