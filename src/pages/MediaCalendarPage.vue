@@ -206,7 +206,6 @@ import { storeToRefs } from 'pinia';
 import { date, uid } from 'quasar';
 import DragAndDropper from 'src/components/media/DragAndDropper.vue';
 import MediaItem from 'src/components/media/MediaItem.vue';
-// import { isMwMeetingDay, isWeMeetingDay } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import {
   getDurationFromMediaPath,
@@ -217,13 +216,9 @@ import {
 } from 'src/helpers/fs';
 import {
   addJwpubDocumentMediaToFiles,
-  // addFullFilePathToMultimediaItem,
   downloadFileIfNeeded,
-  // dynamicMediaMapper,
   fetchMedia,
-  // getDocumentMultimediaItems,
   getPublicationInfoFromDb,
-  // processMissingMediaInfo,
   sanitizeId,
 } from 'src/helpers/jw-media';
 import {
@@ -489,7 +484,6 @@ watch(
 watch(
   () => mediaSort.value?.[currentCongregation.value]?.[selectedDate.value],
   (newMediaSort) => {
-    console.debug('newMediaSort', newMediaSort, newMediaSort?.length);
     try {
       if (newMediaSort && newMediaSort.length === 0) {
         generateMediaList();

@@ -707,7 +707,7 @@ const dynamicMediaMapper = async (
           paragraph: m.TargetParagraphNumberLabel,
           section, // if is we: wt; else, if >= middle song: LAC; >= (middle song - 8???): AYFM; else: TGW
           song: mediaIsSong,
-          subtitlesUrl: await getSubtitlesUrl(m, duration),
+          subtitlesUrl: video ? await getSubtitlesUrl(m, duration) : '',
           thumbnailUrl,
           title: mediaIsSong ? m.Label.replace(/^\d+\.\s*/, '') : m.Label,
           uniqueId: sanitizeId(
