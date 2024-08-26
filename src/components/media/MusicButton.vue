@@ -14,7 +14,7 @@
       {{ musicRemainingTime }}
     </div>
 
-    <q-tooltip :delay="2000" v-if="!musicPopup">
+    <q-tooltip :delay="2000" :offset="[14, 28]" v-if="!musicPopup">
       {{ $t('setupWizard.backgroundMusic') }}
     </q-tooltip>
     <!-- <q-popup-proxy
@@ -101,9 +101,14 @@ import klawSync from 'klaw-sync';
 import { storeToRefs } from 'pinia';
 import { date } from 'quasar';
 import { electronApi } from 'src/helpers/electron-api';
-import { getFileUrl, getPublicationDirectoryContents } from 'src/helpers/fs';
+import {
+  getDurationFromMediaPath,
+  getFileUrl,
+  getPublicationDirectoryContents,
+} from 'src/helpers/fs';
 import { formatTime } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
+import { useJwStore } from 'src/stores/jw';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -111,8 +116,17 @@ const { t } = useI18n();
 const { fileUrlToPath, parseFile, path } = electronApi;
 
 const currentState = useCurrentStateStore();
-const { currentSettings, mediaPlaying, selectedDateObject } =
-  storeToRefs(currentState);
+const {
+  currentCongregation,
+  currentSettings,
+  mediaPlaying,
+  selectedDate,
+  selectedDateObject,
+} = storeToRefs(currentState);
+
+const jwStore = useJwStore();
+const { lookupPeriod } = storeToRefs(jwStore);
+
 const musicPlayer = ref<HTMLAudioElement>(document.createElement('audio'));
 const musicPlayerSource = ref<HTMLSourceElement>(
   document.createElement('source'),
@@ -162,21 +176,90 @@ function stopMusic() {
   }
 }
 
-const getNextSongUrl = () => {
+const getNextSong = async () => {
   try {
+    let musicDurationSoFar = 0;
+    const timeBeforeMeetingStart =
+      ((remainingTimeBeforeMeetingStart() as number) ?? 60) - 60;
+    let secsFromEnd = 0;
     if (!songList.value.length) {
       songList.value = getPublicationDirectoryContents(
-        { langwritten: 'E', pub: 'sjjm' },
+        { langwritten: currentSettings.value.lang, pub: 'sjjm' },
         'mp3',
       ).sort(() => Math.random() - 0.5);
+      try {
+        const selectedDayMedia =
+          lookupPeriod.value[currentCongregation.value].find(
+            (d) => date.getDateDiff(selectedDate.value, d.date, 'days') === 0,
+          )?.dynamicMedia ?? [];
+        const regex = /(_r\d{3,4}P)?\.\w+$/;
+        const selectedDaySongs = selectedDayMedia
+          .map((d) =>
+            path.basename(fileUrlToPath(d.fileUrl.replace(regex, ''))),
+          )
+          .map((basename) => {
+            const index = songList.value.findIndex(
+              (s) => path.basename(s.path.replace(regex, '')) === basename,
+            );
+            if (index !== -1) {
+              return songList.value.splice(index, 1)[0];
+            }
+            return null;
+          })
+          .filter((song) => song !== null);
+        if (timeBeforeMeetingStart) {
+          const customSongList = [] as klawSync.Item[];
+          songList.value = songList.value.concat(selectedDaySongs).reverse();
+          // for (const song of selectedDaySongs) {
+            //   const songDuration = await getDurationFromMediaPath(song.path);
+            //   customSongList.push(song);
+            //   secsFromEnd = timeBeforeMeetingStart - musicDurationSoFar;
+            //   musicDurationSoFar += songDuration;
+            //   if (musicDurationSoFar > timeBeforeMeetingStart) break;
+            // }
+            while (musicDurationSoFar < timeBeforeMeetingStart) {
+              const queuedSong = songList.value.shift() as klawSync.Item;
+              const songDuration = await getDurationFromMediaPath(
+                queuedSong.path,
+              );
+              console.debug('queuedSong', queuedSong.path, songDuration);
+              customSongList.unshift(queuedSong);
+              secsFromEnd = timeBeforeMeetingStart - musicDurationSoFar;
+              musicDurationSoFar += songDuration;
+            }
+            songList.value = customSongList;
+          }
+          console.debug('songList.value', songList.value);
+      } catch (error) {
+        console.error(error);
+      }
     }
-    if (!songList.value.length) return '';
+    if (!songList.value.length)
+      return {
+        nextSongUrl: '',
+        secsFromEnd: 0,
+      };
     let nextSong = songList.value.shift() as klawSync.Item;
     songList.value = songList.value.concat(nextSong);
-    return getFileUrl(nextSong.path);
+    try {
+      const metadata = await parseFile(nextSong.path);
+      musicPlayingTitle.value =
+        metadata.common.title ?? path.basename(nextSong.path);
+    } catch (error) {
+      console.error(error);
+      musicPlayingTitle.value = path.basename(nextSong.path) ?? '';
+    }
+    return {
+      duration: await getDurationFromMediaPath(nextSong.path),
+      nextSongUrl: getFileUrl(nextSong.path),
+      secsFromEnd,
+    };
   } catch (error) {
     console.error(error);
-    return '';
+    return {
+      nextSongUrl: '',
+      secsFromEnd: 0,
+    };
   }
 };
 
@@ -215,32 +298,21 @@ const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
   }
 };
 
-function playMusic() {
+async function playMusic() {
   try {
     if (!currentSettings.value?.enableMusicButton || musicPlaying.value) return;
+    songList.value = [];
     musicPlayer.value.appendChild(musicPlayerSource.value);
     musicPlayer.value.style.display = 'none';
     document.body.appendChild(musicPlayer.value);
     musicPlayer.value.volume =
       (currentSettings.value?.musicVolume ?? 100) / 100 ?? 1;
-    const nextSongUrl = getNextSongUrl();
+    const { duration, nextSongUrl, secsFromEnd } = await getNextSong();
     if (!nextSongUrl) return;
     musicPlayerSource.value.src = nextSongUrl;
-    (async () => {
-      try {
-        const metadata = await parseFile(
-          fileUrlToPath(musicPlayerSource.value?.src),
-        );
-        musicPlayingTitle.value =
-          metadata.common.title ?? path.basename(musicPlayerSource.value?.src); // basename
-      } catch (error) {
-        console.error(error);
-        musicPlayingTitle.value =
-          path.basename(musicPlayerSource.value?.src) ?? '';
-      }
-    })();
-
     musicPlayer.value.load();
+    const startTime = duration ? duration - secsFromEnd : 0;
+    musicPlayer.value.currentTime = startTime;
     musicPlayer.value
       .play()
       .then(() => {
@@ -249,9 +321,18 @@ function playMusic() {
       .catch((error) => {
         console.error(error);
       });
-    musicPlayer.value.onended = () => {
+
+    musicPlayer.value
+      .play()
+      .then(() => {
+        musicPlaying.value = true;
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    musicPlayer.value.onended = async () => {
       if (!musicPlayer.value || !musicPlayerSource.value) return;
-      const nextSongUrl = getNextSongUrl();
+      const { nextSongUrl } = await getNextSong();
       if (!nextSongUrl) return;
       musicPlayerSource.value.src = nextSongUrl;
       musicPlayer.value.load();
