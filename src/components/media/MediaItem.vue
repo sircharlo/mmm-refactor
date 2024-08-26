@@ -230,7 +230,7 @@
                     :name="
                       media.paragraph !== 9999
                         ? 'mmm-paragraph'
-                        : 'mdi-asterisk-circle-outline'
+                        : 'mmm-footnote'
                     "
                     class="q-mr-xs"
                   />
@@ -330,11 +330,10 @@
               />
             </template>
             <template v-else>
-              <!-- todo: add custom icon for this -->
               <q-btn
                 :disable="mediaPlayingUrl !== '' && isVideo(mediaPlayingUrl)"
                 color="primary"
-                icon="mdi-play-box-multiple"
+                icon="mmm-play-sign-language"
                 push
                 rounded
               >
