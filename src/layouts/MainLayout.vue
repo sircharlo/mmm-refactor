@@ -195,7 +195,7 @@
                           <div
                             :class="{
                               'cursor-pointer': true,
-                              'rounded-borders': true,
+                              'rounded-borders-lg': true,
                               'full-height': true,
                               'bg-accent-100':
                                 hoveredRemoteVideo === video.guid,
@@ -218,7 +218,7 @@
                                 class="rounded-borders"
                               >
                                 <q-badge
-                                  class="q-mt-xs q-ml-xs bg-semi-black"
+                                  class="q-mt-sm q-ml-sm bg-semi-black rounded-borders-sm"
                                   style="padding: 5px !important"
                                 >
                                   <q-icon
@@ -266,15 +266,16 @@
           </template>
           <template v-else-if="route.fullPath === '/settings'">
             <q-btn color="white-transparent" unelevated v-if="selectedDate">
-              <q-icon class="q-mr-sm" name="mdi-dots-vertical" size="xs" />
+              <q-icon class="q-mr-sm" name="mmm-tools" size="xs" />
               {{ $t('tools') }}
 
               <q-tooltip :delay="2000" v-if="!moreOptionsMenuActive">
                 {{ $t('tools') }}
               </q-tooltip>
               <q-menu
+                :offset="[0, 11]"
                 @before-hide="moreOptionsMenuActive = false"
-                @before-show="
+                @show="
                   moreOptionsMenuActive = true;
                   calculateCacheSize();
                 "
@@ -288,7 +289,7 @@
                     v-close-popup
                   >
                     <q-item-section avatar>
-                      <q-icon color="primary" name="mdi-vacuum" />
+                      <q-icon color="primary" name="mmm-delete-smart" />
                     </q-item-section>
                     <q-item-section>
                       <q-item-label
@@ -306,7 +307,7 @@
                     v-close-popup
                   >
                     <q-item-section avatar>
-                      <q-icon color="primary" name="mdi-bomb" />
+                      <q-icon color="primary" name="mmm-delete-all" />
                     </q-item-section>
                     <q-item-section>
                       <q-item-label>{{ $t('remove-all-cache') }} </q-item-label>
@@ -411,7 +412,11 @@
           self="center left"
           v-if="miniState"
         >
-          {{ $t('titles.meetingMedia') }}
+          {{
+            !currentSettings
+              ? $t('select-a-congregation-to-enable')
+              : $t('titles.meetingMedia')
+          }}
         </q-tooltip>
         <q-item-section avatar>
           <q-icon name="mmm-media" />
@@ -528,7 +533,6 @@
       <div
         class="items-center q-pb-lg q-px-lg q-gutter-y-lg bg-secondary-contrast"
       >
-        <!-- <div class="text-h6 row">{{ $t('titles.about') }}</div> -->
         <div class="row items-center">
           <div class="col-shrink q-mr-md">
             <img
@@ -553,31 +557,45 @@
           <div class="col">
             <q-btn
               @click="openExternalWebsite(githubLink)"
-              class="full-width row"
-              color="primary"
+              class="q-pa-md full-width"
+              color="accent-400"
               no-caps
               outline
               target="_blank"
             >
-              <div class="col-shrink">
-                <q-icon name="mmm-github" />
+              <div class="row q-gutter-x-md full-width items-center">
+                <div class="col-shrink text-primary q-ml-none">
+                  <q-icon name="mmm-github" />
+                </div>
+                <div class="col-shrink text-secondary">
+                  {{ $t('github-repo') }}
+                </div>
+                <div class="col text-right text-accent-400">
+                  <q-icon name="mmm-arrow-outward" />
+                </div>
               </div>
-              <div class="col col-grow">{{ $t('github-repo') }}</div>
-              <div class="col-shrink"><q-icon name="mmm-arrow-outward" /></div>
             </q-btn>
           </div>
           <div class="col">
             <q-btn
               @click="openExternalWebsite(docsLink)"
-              class="full-width row"
-              color="primary"
+              class="q-pa-md full-width"
+              color="accent-400"
               no-caps
               outline
               target="_blank"
             >
-              <div class="col-shrink"><q-icon name="mmm-guide" /></div>
-              <div class="col col-grow">{{ $t('user-guide') }}</div>
-              <div class="col-shrink"><q-icon name="mmm-arrow-outward" /></div>
+              <div class="row q-gutter-x-md full-width items-center">
+                <div class="col-shrink text-primary q-ml-none">
+                  <q-icon name="mmm-guide" />
+                </div>
+                <div class="col-shrink text-secondary">
+                  {{ $t('user-guide') }}
+                </div>
+                <div class="col text-right text-accent-400">
+                  <q-icon name="mmm-arrow-outward" />
+                </div>
+              </div>
             </q-btn>
           </div>
         </div>
@@ -649,35 +667,20 @@ const $q = useQuasar();
 
 $q.iconMapFn = (iconName) => {
   if (iconName.startsWith('chevron_')) {
-    return {
-      cls: iconName.replace('chevron_', 'mmm-'),
-    };
+    iconName = iconName.replace('chevron_', 'mmm-');
+  } else if (iconName.startsWith('keyboard_arrow_')) {
+    iconName = iconName.replace('keyboard_arrow_', 'mmm-');
+  } else if (iconName.startsWith('arrow_drop_')) {
+    iconName = 'mmm-dropdown-arrow';
+  } else if (iconName === 'cancel' || iconName === 'close') {
+    iconName = 'clear';
   }
-  if (iconName.startsWith('keyboard_arrow_')) {
-    return {
-      cls: iconName.replace('keyboard_arrow_', 'mmm-'),
-    };
+  if (!iconName.startsWith('mmm-')) {
+    iconName = 'mmm-' + iconName;
   }
-  if (iconName.startsWith('arrow_drop_')) {
-    return {
-      cls: 'mmm-dropdown-arrow',
-    };
-  }
-  if (iconName === 'cancel') {
-    return {
-      cls: 'mmm-delete',
-    };
-  }
-  if (iconName === 'check') {
-    return {
-      cls: 'mmm-check',
-    };
-  }
-  if (iconName.startsWith('mmm-')) {
-    return {
-      cls: iconName,
-    };
-  }
+  return {
+    cls: iconName,
+  };
 };
 
 // Store and router initializations
@@ -1068,6 +1071,7 @@ const unusedParentDirectories = computed(() => {
 
 const unusedCacheFoldersSize = computed(() => {
   try {
+    if (!cacheFiles.value.length) return '...';
     const size = Object.values(unusedParentDirectories.value).reduce(
       (a, b) => a + b,
       0,
@@ -1081,6 +1085,7 @@ const unusedCacheFoldersSize = computed(() => {
 
 const allCacheFilesSize = computed(() => {
   try {
+    if (!cacheFiles.value.length) return '...';
     return prettyBytes(
       cacheFiles.value.reduce((size, cacheFile) => size + cacheFile.size, 0),
     );

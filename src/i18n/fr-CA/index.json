@@ -265,5 +265,6 @@
   "use-the-import-button-to-add-media-for-this-date-or-select-another-date-to-view-the-corresponding-meeting-media": "Utilisez le bouton Importer pour ajouter des médias pour cette date ou sélectionnez une autre date pour afficher les médias pour la réunion correspondante.",
   "select-a-date-to-begin": "Veuillez sélectionner une date pour commencer.",
   "currently-loading": "Les médias pour cette date sont en cours de chargement.",
-  "please-wait": "Veuillez patienter"
+  "please-wait": "Veuillez patienter",
+  "select-a-congregation-to-enable": "Sélectionnez un profil avant"
 }
