@@ -1,6 +1,7 @@
 import { enable, initialize } from '@electron/remote/main';
 import { app, BrowserWindow, Menu, session } from 'electron';
 import { autoUpdater } from 'electron-updater';
+import windowStateKeeper from 'electron-window-state';
 import os from 'os';
 import path from 'path';
 
@@ -141,9 +142,14 @@ function createWindow() {
   /**
    * Initial window options
    */
+  const mainWindowState = windowStateKeeper({
+    defaultHeight: 600,
+    defaultWidth: 1000,
+  });
+  console.log('mainWindowState', mainWindowState.x, mainWindowState.y);
   mainWindow = new BrowserWindow({
     backgroundColor: 'grey',
-    height: 600,
+    height: mainWindowState.height,
     icon: path.resolve(path.join(__dirname, 'icons', 'icon.png')),
     show: false,
     useContentSize: true,
@@ -154,7 +160,9 @@ function createWindow() {
       sandbox: false,
       webSecurity: false,
     },
-    width: 1000,
+    width: mainWindowState.width,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
   });
 
   Menu.setApplicationMenu(Menu.buildFromTemplate([]));
@@ -181,7 +189,10 @@ function createWindow() {
   });
 
   mainWindow.once('ready-to-show', () => {
-    mainWindow?.show();
+    if (mainWindow) {
+      mainWindow.show();
+      mainWindowState.manage(mainWindow);
+    }
   });
 
   if (!mediaWindow || mediaWindow.isDestroyed()) {

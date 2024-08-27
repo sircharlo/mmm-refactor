@@ -147,6 +147,8 @@ module.exports = configure(function (/* ctx */) {
         },
         mac: {
           icon: 'icons/icon.icns',
+          // TODO: remove this eventually to reduce build size
+          mergeASARs: false,
           publish: ['github'],
           target: {
             arch: ['universal'],
