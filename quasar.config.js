@@ -147,6 +147,7 @@ module.exports = configure(function (/* ctx */) {
         },
         mac: {
           icon: 'icons/icon.icns',
+          mergeASARs: false,
           publish: ['github'],
           target: {
             arch: ['universal'],
