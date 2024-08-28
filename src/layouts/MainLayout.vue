@@ -292,7 +292,14 @@
                       clickable
                     >
                       <q-item-section avatar>
-                        <q-icon :color="onlyShowInvalidSettings ? 'primary' : 'negative'" :name="onlyShowInvalidSettings ? 'mmm-menu' : 'mmm-error'" />
+                        <q-icon
+                          :color="
+                            onlyShowInvalidSettings ? 'primary' : 'negative'
+                          "
+                          :name="
+                            onlyShowInvalidSettings ? 'mmm-menu' : 'mmm-error'
+                          "
+                        />
                       </q-item-section>
                       <q-item-section>
                         <q-item-label
@@ -939,10 +946,18 @@ const maxDate = () => {
 
 const getEventDates = () => {
   try {
-    if (!lookupPeriod.value || !currentCongregation.value) return [];
-    return lookupPeriod.value[currentCongregation.value]
+    if (
+      !(lookupPeriod.value || additionalMediaMaps.value) ||
+      !currentCongregation.value
+    )
+      return [];
+    const meetingDates = lookupPeriod.value[currentCongregation.value]
       ?.filter((day) => day.meeting)
       .map((day) => date.formatDate(day.date, 'YYYY/MM/DD'));
+    const additionalMediaDates = Object.keys(
+      additionalMediaMaps.value[currentCongregation.value],
+    ).map((day) => date.formatDate(day, 'YYYY/MM/DD'));
+    return meetingDates.concat(additionalMediaDates);
   } catch (error) {
     console.error(error);
     return [];
@@ -1292,6 +1307,12 @@ const getEventDayColor = (eventDate: string) => {
         (d) => date.getDateDiff(eventDate, d.date, 'days') === 0,
       )?.complete === true;
     if (isComplete) return 'primary';
+    const isAdditional = Object.keys(
+      additionalMediaMaps.value[currentCongregation.value],
+    )
+      .map((day) => date.formatDate(day, 'YYYY/MM/DD'))
+      .includes(eventDate);
+    if (isAdditional) return 'additional';
   } catch (error) {
     console.error(error);
     return 'negative';
