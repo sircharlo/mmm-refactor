@@ -146,7 +146,6 @@ function createWindow() {
     defaultHeight: 600,
     defaultWidth: 1000,
   });
-  console.log('mainWindowState', mainWindowState.x, mainWindowState.y);
   mainWindow = new BrowserWindow({
     backgroundColor: 'grey',
     height: mainWindowState.height,

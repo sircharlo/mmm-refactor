@@ -1,15 +1,19 @@
 <template>
   <q-input
     :rules="getRules(rules)"
-    class="q-pb-none"
+    @focus="focusHandler($event)"
+    class="q-pb-none bg-accent-100 date-time-input"
     dense
-    filled
+    hide-bottom-space
     mask="date"
-    readonly
+    outlined
     style="width: 240px"
     v-model="localValue"
     v-bind="{ label: label || undefined }"
   >
+    <template v-slot:append>
+      <q-icon name="mmm-calendar-month" size="xs" />
+    </template>
     <q-popup-proxy
       breakpoint="1000"
       transition-hide="scale"
@@ -64,5 +68,9 @@ watch(
 
 const clearDate = () => {
   localValue.value = '';
+};
+
+const focusHandler = (evt: Event) => {
+  (evt.target as HTMLInputElement)?.blur();
 };
 </script>

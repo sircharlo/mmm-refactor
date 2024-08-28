@@ -477,3 +477,7 @@ a {
 .bg-error {
   background-color: $error-semi-transparent;
 }
+
+.date-time-input * {
+  cursor: pointer;
+}

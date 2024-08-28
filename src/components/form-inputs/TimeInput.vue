@@ -1,15 +1,19 @@
 <template>
   <q-input
     :rules="getRules(rules)"
-    class="q-pb-none bg-accent-100"
+    @focus="focusHandler($event)"
+    class="q-pb-none bg-accent-100 date-time-input"
     dense
+    hide-bottom-space
     mask="time"
     outlined
-    readonly
     style="width: 240px"
     v-model="localValue"
     v-bind="{ label: label || undefined }"
   >
+    <template v-slot:append>
+      <q-icon name="mmm-time" size="xs" />
+    </template>
     <q-popup-proxy
       breakpoint="1000"
       transition-hide="scale"
@@ -29,9 +33,12 @@
       </q-time>
     </q-popup-proxy>
   </q-input>
+  <!-- {{ localValue }}
+  </q-btn> -->
 </template>
 
 <script setup lang="ts">
+// import { getTimeOptions } from 'src/helpers/settings';
 import { getRules, getTimeOptions } from 'src/helpers/settings';
 import { ref, watch } from 'vue';
 
@@ -59,5 +66,9 @@ watch(
 
 const clearTime = () => {
   localValue.value = '';
+};
+
+const focusHandler = (evt: Event) => {
+  (evt.target as HTMLInputElement)?.blur();
 };
 </script>
