@@ -147,9 +147,10 @@ module.exports = configure(function (/* ctx */) {
         },
         mac: {
           icon: 'icons/icon.icns',
-          // TODO: remove this eventually to reduce build size
-          mergeASARs: false,
+          mergeASARs: true,
           publish: ['github'],
+          singleArchFiles:
+            'node_modules/better-sqlite3/build/Release/better_sqlite3.node',
           target: {
             arch: ['universal'],
             target: 'dmg',
