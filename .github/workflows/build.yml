@@ -119,6 +119,6 @@ jobs:
         with:
           name: package-${{ matrix.os }}
           path: |
-            dist/electron/Packaged/*/*.exe
-            dist/electron/Packaged/*/*.dmg
-            dist/electron/Packaged/*/*.AppImage
+            dist/electron/Packaged/*.exe
+            dist/electron/Packaged/*.dmg
+            dist/electron/Packaged/*.AppImage
