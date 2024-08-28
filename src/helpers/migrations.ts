@@ -56,7 +56,7 @@ const buildNewPrefsObject = (oldPrefs: OldAppConfig) => {
       coWeek: oldPrefs.meeting.coWeek || '',
       darkMode: 'auto',
       disableMediaFetching: oldPrefs.meeting.specialCong || false,
-      enableExtraCache: true,
+      enableExtraCache: false,
       enableKeyboardShortcuts:
         oldPrefs.media.mediaWinShortcut ||
         oldPrefs.media.ppBackward ||

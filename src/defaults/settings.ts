@@ -265,7 +265,7 @@ export const defaultSettings: SettingsValues = {
   congregationName: '',
   darkMode: 'auto',
   disableMediaFetching: false,
-  enableExtraCache: true,
+  enableExtraCache: false,
   enableKeyboardShortcuts: false,
   enableMediaDisplayButton: false,
   enableMusicButton: true,

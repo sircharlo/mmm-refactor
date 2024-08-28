@@ -1522,7 +1522,6 @@ export {
   downloadAdditionalRemoteVideo,
   downloadBackgroundMusic,
   downloadFileIfNeeded,
-  downloadPubMediaFiles,
   downloadSongbookVideos,
   dynamicMediaMapper,
   fetchMedia,
