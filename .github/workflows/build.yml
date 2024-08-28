@@ -73,13 +73,13 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v4
-        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
-
       - run: |
           corepack enable
           yarn set version berry
+        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
+
+      - name: Check out Git repository
+        uses: actions/checkout@v4
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - name: Install Node.js, NPM and Yarn
