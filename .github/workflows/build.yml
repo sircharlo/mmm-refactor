@@ -99,8 +99,6 @@ jobs:
       #   if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - run: |
-          corepack enable
-          yarn set version berry
           yarn install
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
