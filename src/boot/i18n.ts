@@ -28,6 +28,7 @@ const refreshDateLocale = async (locale: string) => {
     try {
       await langList[`../../node_modules/quasar/lang/${locale}.js`]().then(
         (lang) => {
+          // @ts-expect-error Quasar typings
           Lang.set(lang.default);
         },
       );
