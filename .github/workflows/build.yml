@@ -12,13 +12,12 @@ jobs:
     outputs:
       VERSION_MATCH: ${{ steps.compare-versions.outputs.VERSION_MATCH }}
 
-#    permissions:
-#      contents: write
-#      pull-requests: write
-#      repository-projects: write
+    #    permissions:
+    #      contents: write
+    #      pull-requests: write
+    #      repository-projects: write
 
     steps:
-
       - name: Check out Git repository
         uses: actions/checkout@v4
         with:
@@ -85,28 +84,17 @@ jobs:
           node-version: 22
           cache: 'yarn'
 
-      - uses: actions/setup-python@v5
-        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
-        with:
-          python-version: '3.9'
+      # - uses: actions/setup-python@v5
+      #   if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
+      #   with:
+      #     python-version: '3.9'
 
-
-      # - name: Install dependencies
-      #   run: |
-      #       if [ "$RUNNER_OS" = "Linux" ]; then
-      #         sudo apt-get update && sudo apt-get install -y libpangocairo-1.0-0
-      #         elif [ "$RUNNER_OS" = "Windows" ]; then
-      #           choco install pango
-      #       else
-      #         brew install pango
-      #       fi
+      # - run: |
+      #     pip install setuptools
+      #   if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - run: |
-          pip install setuptools
-        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
-
-      - run: |
-          yarn install && yarn global add @quasar/cli
+          yarn install
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - name: Build and Publish Electron App
@@ -115,3 +103,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      - name: Upload artifacts
+        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ matrix.os }}
+          path: dist/**
