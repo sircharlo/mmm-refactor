@@ -14,26 +14,29 @@ export const useAppSettingsStore = defineStore('app-settings', {
     runMigration(type?: string) {
       try {
         const { congregations } = storeToRefs(useCongregationSettingsStore());
-        if (!type) return [];
+        if (!type) return false;
         if (type === 'firstRun') {
           const oldVersionPath = getOldVersionPath();
-          if (oldVersionPath) {
-            const oldPrefsPaths = getOldPrefsPaths(oldVersionPath);
-            for (const oldPrefsPath of oldPrefsPaths) {
+          if (!oldVersionPath) return false;
+          const oldPrefsPaths = getOldPrefsPaths(oldVersionPath);
+          for (const oldPrefsPath of oldPrefsPaths) {
+            try {
               const oldPrefs: OldAppConfig = parsePrefsFile(oldPrefsPath.path);
               const newPrefsObject = buildNewPrefsObject(oldPrefs);
               const newCongId = uid();
               congregations.value[newCongId] = newPrefsObject;
+            } catch (error) {
+              console.error(error);
             }
           }
         } else {
           // future migrations will go here
         }
         this.migrations.push(type);
-        return [type];
+        return true;
       } catch (error) {
         console.error(error);
-        return [];
+        return false;
       }
     },
   },
