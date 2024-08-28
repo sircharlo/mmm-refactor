@@ -20,10 +20,10 @@
     <div
       class="col content-center"
       v-if="
-        !selectedDateObject?.complete ||
+        (selectedDateObject?.meeting && !selectedDateObject?.complete) ||
         !(
           sortableAdditionalMediaItems?.length ||
-          sortableWtMediaItems.length ||
+          sortableWtMediaItems?.length ||
           sortableTgwMediaItems?.length ||
           sortableAyfmMediaItems?.length ||
           sortableLacMediaItems?.length
@@ -59,10 +59,7 @@
     </div>
     <q-list
       class="media-section additional"
-      v-show="
-        selectedDateObject?.complete &&
-        (sortableAdditionalMediaItems?.length || sortableWtMediaItems.length)
-      "
+      v-show="sortableAdditionalMediaItems?.length"
     >
       <q-item class="text-additional items-center">
         <q-avatar class="text-white bg-additional rounded-borders-sm" size="md">
@@ -91,9 +88,7 @@
       "
     >
       <q-item class="text-tgw items-center">
-        <q-avatar class="text-white bg-tgw jw-icon" size="md"
-          ></q-avatar
-        >
+        <q-avatar class="text-white bg-tgw jw-icon" size="md"></q-avatar>
         <div class="text-bold text-uppercase text-spaced">
           {{ $t('tgw') }}
         </div>
@@ -117,9 +112,7 @@
       "
     >
       <q-item class="text-ayfm items-center">
-        <q-avatar class="text-white bg-ayfm jw-icon" size="lg"
-          ></q-avatar
-        >
+        <q-avatar class="text-white bg-ayfm jw-icon" size="lg"></q-avatar>
         <div class="text-bold text-uppercase text-spaced">
           {{ $t('ayfm') }}
         </div>
@@ -143,9 +136,7 @@
       "
     >
       <q-item class="text-lac items-center">
-        <q-avatar class="text-white bg-lac jw-icon" size="lg"
-          ></q-avatar
-        >
+        <q-avatar class="text-white bg-lac jw-icon" size="lg"></q-avatar>
         <div class="text-bold text-uppercase text-spaced">
           {{ $t('lac') }}
         </div>
@@ -164,9 +155,7 @@
       v-show="selectedDateObject?.complete && sortableWtMediaItems.length"
     >
       <q-item class="text-wt items-center">
-        <q-avatar class="text-white bg-wt jw-icon" size="lg"
-          ></q-avatar
-        >
+        <q-avatar class="text-white bg-wt jw-icon" size="lg"></q-avatar>
         <div class="text-bold text-uppercase text-spaced">
           {{ $t('wt') }}
         </div>
