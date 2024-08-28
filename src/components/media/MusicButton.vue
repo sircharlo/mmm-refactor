@@ -14,7 +14,7 @@
       {{ musicRemainingTime }}
     </div>
 
-    <q-tooltip :delay="2000" :offset="[14, 28]" v-if="!musicPopup">
+    <q-tooltip :delay="2000" :offset="[14, 22]" v-if="!musicPopup">
       {{ $t('setupWizard.backgroundMusic') }}
     </q-tooltip>
     <!-- <q-popup-proxy

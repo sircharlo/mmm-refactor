@@ -9,7 +9,7 @@
     unelevated
     v-if="currentSettings.enableSubtitles"
   >
-    <q-tooltip :delay="2000" :offset="[14, 28]">{{
+    <q-tooltip :delay="2000" :offset="[14, 22]">{{
       $t('subtitles')
     }}</q-tooltip>
   </q-btn>
