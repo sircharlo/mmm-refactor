@@ -196,7 +196,7 @@
                 "
                 style="background: transparent; padding: 5px !important"
               >
-                <q-tooltip :delay="2000">{{
+                <q-tooltip :delay="1000">{{
                   $t(
                     currentScene === 'media'
                       ? 'hide-image-for-zoom-participants'

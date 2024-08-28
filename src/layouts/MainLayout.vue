@@ -269,7 +269,7 @@
               <q-icon class="q-mr-sm" name="mmm-tools" size="xs" />
               {{ $t('tools') }}
 
-              <q-tooltip :delay="2000" v-if="!moreOptionsMenuActive">
+              <q-tooltip :delay="1000" v-if="!moreOptionsMenuActive">
                 {{ $t('tools') }}
               </q-tooltip>
               <q-menu
@@ -403,7 +403,7 @@
     >
       <q-item @click="miniState = !miniState" clickable v-ripple>
         <q-tooltip
-          :delay="2000"
+          :delay="1000"
           anchor="center right"
           self="center left"
           v-if="miniState"
@@ -429,7 +429,7 @@
         v-ripple
       >
         <q-tooltip
-          :delay="2000"
+          :delay="1000"
           anchor="center right"
           self="center left"
           v-if="miniState"
@@ -453,7 +453,7 @@
         v-ripple
       >
         <q-tooltip
-          :delay="2000"
+          :delay="1000"
           anchor="center right"
           self="center left"
           v-if="miniState"
@@ -473,7 +473,7 @@
         v-ripple
       >
         <q-tooltip
-          :delay="2000"
+          :delay="1000"
           anchor="center right"
           self="center left"
           v-if="miniState"
@@ -498,7 +498,7 @@
         v-ripple
       >
         <q-tooltip
-          :delay="2000"
+          :delay="1000"
           anchor="center right"
           self="center left"
           v-if="miniState"

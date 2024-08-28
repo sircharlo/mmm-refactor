@@ -13,7 +13,7 @@
     v-if="currentSettings?.enableMediaDisplayButton"
   >
     <q-tooltip
-      :delay="2000"
+      :delay="1000"
       :offset="[14, 22]"
       anchor="bottom left"
       self="top left"
