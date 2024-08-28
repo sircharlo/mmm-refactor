@@ -77,6 +77,11 @@ jobs:
         uses: actions/checkout@v4
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
+      - run: |
+          corepack enable
+          yarn set version berry
+        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
+
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v4
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
