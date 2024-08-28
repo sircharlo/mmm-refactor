@@ -99,7 +99,7 @@ jobs:
       #   if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - run: |
-          yarn install
+          yarn install --immutable
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - name: Build and Publish Electron App
