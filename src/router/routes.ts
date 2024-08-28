@@ -44,7 +44,7 @@ const routes: RouteRecordRaw[] = [
   {
     children: [{ component: () => import('pages/SetupWizard.vue'), path: '' }],
     component: () => import('layouts/MainLayout.vue'),
-    meta: { title: 'setup-wizard' },
+    meta: { icon: 'mmm-configuration', title: 'setup-wizard' },
     path: '/setup-wizard',
   },
   {
