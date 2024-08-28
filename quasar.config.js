@@ -138,7 +138,8 @@ module.exports = configure(function (/* ctx */) {
         appId: 'sircharlo.meeting-media-manager-v2',
         artifactName: 'meeting-media-manager-${version}.${ext}',
         buildDependenciesFromSource: true,
-        files: ['!node_modules/better-sqlite3/build/Release/*.node'],
+        files: ['!node_modules/better-sqlite3/build/Release/*.node',
+                '!node_modules/canvas/build/Release/*.node'],
         generateUpdatesFilesForAllChannels: true,
         linux: {
           category: 'Utility',
