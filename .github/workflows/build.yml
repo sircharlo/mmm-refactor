@@ -76,12 +76,12 @@ jobs:
       - run: |
           corepack disable
           corepack enable
-          yarn -v
-          yarn set version stable
+          /usr/local/bin/yarn -v
+          /usr/local/bin/yarn set version stable
           corepack prepare yarn@stable --activate
-          yarn -v
-          yarn set version berry
-          yarn -v
+          /usr/local/bin/yarn -v
+          /usr/local/bin/yarn set version berry
+          /usr/local/bin/yarn -v
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - name: Check out Git repository
@@ -113,11 +113,11 @@ jobs:
         run: brew install pkg-config cairo pango libpng jpeg giflib
 
       - run: |
-          yarn install
+          /usr/local/bin/yarn install
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - name: Build and Publish Electron App
-        run: yarn quasar build -m electron
+        run: /usr/local/bin/yarn quasar build -m electron
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
