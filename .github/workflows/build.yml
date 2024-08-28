@@ -74,8 +74,14 @@ jobs:
 
     steps:
       - run: |
+          corepack disable
           corepack enable
+          yarn -v
+          yarn set version stable
+          corepack prepare yarn@stable --activate
+          yarn -v
           yarn set version berry
+          yarn -v
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - name: Check out Git repository
