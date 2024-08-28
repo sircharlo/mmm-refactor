@@ -93,7 +93,7 @@ jobs:
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
         with:
           node-version: 22
-          cache: 'yarn'
+          # cache: 'yarn'
 
       # - uses: actions/setup-python@v5
       #   if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
