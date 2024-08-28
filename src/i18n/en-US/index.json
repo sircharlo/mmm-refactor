@@ -302,5 +302,8 @@
   "currently-loading": "The media for this date is currently loading.",
   "please-wait": "Please wait",
   "select-a-congregation-to-enable": "Select a profile first",
-  "yeartext": "Yeartext"
+  "yeartext": "Yeartext",
+  "cache": "Cache",
+  "invalid-settings": "Invalid Settings",
+  "show-all-settings": "Show all settings"
 }

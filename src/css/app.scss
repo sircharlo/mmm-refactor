@@ -111,7 +111,7 @@ body.body--light {
   }
 
   .q-hoverable:hover > .q-focus-helper {
-    background-color: #87AFFF;
+    background-color: #87afff;
     opacity: 0.15;
   }
 }
@@ -373,13 +373,16 @@ body.body--dark {
   border-radius: 0.75em !important;
 }
 
-.q-expansion-item--expanded .q-expansion-item__content::before {
+.q-expansion-item__content > label:first-child::before,
+.q-expansion-item__content > div:first-child::before {
   content: '';
   height: 1px;
-  width: auto;
+  width: 100%;
   display: block;
+  position: absolute;
   background: $accent-200;
-  // margin: 0 1em;
+  top: 0;
+  left: 0;
 }
 
 .q-field {
@@ -469,4 +472,8 @@ a {
 
 .rounded-borders-sm {
   border-radius: 4px;
+}
+
+.bg-error {
+  background-color: $error-semi-transparent;
 }

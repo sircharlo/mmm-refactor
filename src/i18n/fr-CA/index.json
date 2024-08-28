@@ -266,5 +266,8 @@
   "currently-loading": "Les médias pour cette date sont en cours de chargement.",
   "please-wait": "Veuillez patienter",
   "select-a-congregation-to-enable": "Sélectionnez un profil avant",
-  "yeartext": "Texte de l'année"
+  "yeartext": "Texte de l'année",
+  "cache": "Fichiers en cache",
+  "invalid-settings": "Paramètres invalides",
+  "show-all-settings": "Afficher tous les paramètres"
 }

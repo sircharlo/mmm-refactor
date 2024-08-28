@@ -55,10 +55,11 @@
             </template>
             <q-item
               :class="{
-                'q-py-lg': invalidSettings.includes(
+                'bg-error': invalidSettings.includes(
                   settingId as keyof SettingsItems,
                 ),
                 'q-mt-sm': index === 0,
+                'rounded-borders': true,
               }"
               :inset-level="1"
               tag="label"

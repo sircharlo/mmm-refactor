@@ -281,7 +281,31 @@
                 "
               >
                 <q-list style="min-width: 100px">
-                  <q-item-label header>{{ $t('tools') }}</q-item-label>
+                  <template v-if="invalidSettings()">
+                    <q-item-label header>{{
+                      $t('invalid-settings')
+                    }}</q-item-label>
+                    <q-item
+                      @click="
+                        onlyShowInvalidSettings = !onlyShowInvalidSettings
+                      "
+                      clickable
+                    >
+                      <q-item-section avatar>
+                        <q-icon :color="onlyShowInvalidSettings ? 'primary' : 'negative'" :name="onlyShowInvalidSettings ? 'mmm-menu' : 'mmm-error'" />
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label
+                          >{{
+                            onlyShowInvalidSettings
+                              ? $t('show-all-settings')
+                              : $t('only-show-settings-that-are-not-valid')
+                          }}
+                        </q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                  <q-item-label header>{{ $t('cache') }}</q-item-label>
                   <q-item
                     :disable="calculatingCacheSize"
                     @click="confirmDeleteCacheFiles('smart')"
@@ -319,15 +343,6 @@
                 </q-list>
               </q-menu>
             </q-btn>
-            <q-toggle
-              :label="$t('only-show-settings-that-are-not-valid')"
-              color="red"
-              icon="clear"
-              left-label
-              v-if="invalidSettings()"
-              v-model="onlyShowInvalidSettings"
-            >
-            </q-toggle>
           </template>
           <template v-else-if="route.fullPath === '/present-website'">
             <q-btn
