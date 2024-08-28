@@ -117,11 +117,11 @@ jobs:
         run: brew install pkg-config cairo pango libpng jpeg giflib
 
       - run: |
-          /usr/local/bin/yarn install
+          yarn install
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - name: Build and Publish Electron App
-        run: /usr/local/bin/yarn quasar build -m electron
+        run: yarn quasar build -m electron
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
