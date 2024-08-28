@@ -10,9 +10,8 @@
       </div>
       <div
         :class="
-          'q-pr-none rounded-borders relative-position ' + (media.isImage
-            ? 'bg-black'
-            : 'bg-transparent')
+          'q-pr-none rounded-borders relative-position ' +
+          (media.isImage ? 'bg-black' : 'bg-transparent')
         "
         v-else
       >
@@ -297,11 +296,14 @@
                 "
               >
                 <q-slider
-                  :disable="mediaPlayingAction !== 'pause'"
+                  :label-value="formatTime(mediaPlayingCurrentPosition)"
                   :max="media.duration"
                   :min="0"
+                  :readonly="mediaPlayingAction !== 'pause'"
                   :step="0"
                   @update:model-value="seekTo"
+                  label
+                  track-color="accent-200"
                   v-model="mediaPlayingCurrentPosition"
                 />
               </div>
