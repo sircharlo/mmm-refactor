@@ -105,7 +105,12 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - run: |
-          ls dist/electron/Packaged
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            dir /S dist\\electron\\Packaged
+          else
+            ls -R dist/electron/Packaged
+          fi
+        shell: bash
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - name: Upload artifacts
