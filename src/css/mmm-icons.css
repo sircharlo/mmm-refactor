@@ -1,10 +1,10 @@
 @font-face {
     font-family: mmm-icons;
-    src: url("mmm-icons.eot");src: url("mmm-icons.eot?a24b0363#iefix") format("embedded-opentype"),
-             url("mmm-icons.woff2?a24b0363") format("woff2"),
-             url("mmm-icons.woff?a24b0363") format("woff"),
-             url("mmm-icons.ttf?a24b0363") format("truetype"),
-             url("mmm-icons.svg?a24b0363#mmm-icons") format("svg");
+    src: url("mmm-icons.eot");src: url("mmm-icons.eot?d567c0ea#iefix") format("embedded-opentype"),
+             url("mmm-icons.woff2?d567c0ea") format("woff2"),
+             url("mmm-icons.woff?d567c0ea") format("woff"),
+             url("mmm-icons.ttf?d567c0ea") format("truetype"),
+             url("mmm-icons.svg?d567c0ea#mmm-icons") format("svg");
     font-weight: normal;
     font-style: normal;
 }
