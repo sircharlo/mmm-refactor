@@ -422,7 +422,7 @@
           datePickerActive = true;
         " -->
       <q-item
-        :disable="!currentSettings || invalidSettings() || mediaPlaying"
+        :disable="!currentSettings || invalidSettings()"
         :to="{ path: '/media-calendar', exact: true }"
         active-class="bg-accent-100 text-primary blue-bar"
         clickable
