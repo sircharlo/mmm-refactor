@@ -142,28 +142,36 @@ const timeRemainingBeforeMusicStop = ref();
 const fadeToVolumeLevel = (targetVolume: number, fadeOutSeconds: number) => {
   if (!musicPlayer.value) return;
   targetVolume = Math.min(Math.max(targetVolume, 0), 1);
-  const initialVolume = musicPlayer.value.volume;
-  const volumeChange = targetVolume - initialVolume;
-  const startTime = performance.now();
+  try {
+    const initialVolume = Math.min(musicPlayer.value.volume, 1);
+    const volumeChange = targetVolume - initialVolume;
+    const startTime = performance.now();
 
-  function updateVolume(currentTime: number) {
-    const elapsedTime = currentTime - startTime;
-    const progress = Math.min(elapsedTime / fadeOutSeconds / 1000, 1);
-    musicPlayer.value.volume = initialVolume + volumeChange * progress;
+    function updateVolume(currentTime: number) {
+      try {
+        const elapsedTime = currentTime - startTime;
+        const progress = Math.min(elapsedTime / fadeOutSeconds / 1000, 1);
+        musicPlayer.value.volume = initialVolume + volumeChange * progress;
 
-    if (progress < 1) {
-      requestAnimationFrame(updateVolume);
-    } else {
-      if (musicPlayer.value.volume === 0) {
-        musicPlayer.value.pause();
-        musicPlaying.value = false;
-        musicStopping.value = false;
-        document.body.removeChild(musicPlayer.value);
+        if (progress < 1) {
+          requestAnimationFrame(updateVolume);
+        } else {
+          if (musicPlayer.value.volume === 0) {
+            musicPlayer.value.pause();
+            musicPlaying.value = false;
+            musicStopping.value = false;
+            document.body.removeChild(musicPlayer.value);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+        musicPlayer.value.volume = targetVolume;
       }
     }
+    requestAnimationFrame(updateVolume);
+  } catch (error) {
+    console.error(error);
   }
-
-  requestAnimationFrame(updateVolume);
 };
 
 function stopMusic() {
@@ -210,26 +218,18 @@ const getNextSong = async () => {
         if (timeBeforeMeetingStart) {
           const customSongList = [] as klawSync.Item[];
           songList.value = songList.value.concat(selectedDaySongs).reverse();
-          // for (const song of selectedDaySongs) {
-            //   const songDuration = await getDurationFromMediaPath(song.path);
-            //   customSongList.push(song);
-            //   secsFromEnd = timeBeforeMeetingStart - musicDurationSoFar;
-            //   musicDurationSoFar += songDuration;
-            //   if (musicDurationSoFar > timeBeforeMeetingStart) break;
-            // }
-            while (musicDurationSoFar < timeBeforeMeetingStart) {
-              const queuedSong = songList.value.shift() as klawSync.Item;
-              const songDuration = await getDurationFromMediaPath(
-                queuedSong.path,
-              );
-              console.debug('queuedSong', queuedSong.path, songDuration);
-              customSongList.unshift(queuedSong);
-              secsFromEnd = timeBeforeMeetingStart - musicDurationSoFar;
-              musicDurationSoFar += songDuration;
-            }
-            songList.value = customSongList;
+          while (musicDurationSoFar < timeBeforeMeetingStart) {
+            const queuedSong = songList.value.shift() as klawSync.Item;
+            const songDuration = await getDurationFromMediaPath(
+              queuedSong.path,
+            );
+            console.debug('queuedSong', queuedSong.path, songDuration);
+            customSongList.unshift(queuedSong);
+            secsFromEnd = timeBeforeMeetingStart - musicDurationSoFar;
+            musicDurationSoFar += songDuration;
           }
-          console.debug('songList.value', songList.value);
+          songList.value = customSongList;
+        }
       } catch (error) {
         console.error(error);
       }
