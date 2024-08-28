@@ -20,12 +20,14 @@
         },
       )
     "
+    :rules="getRules(rules)"
     :use-input="useInput"
     @filter="filterFn"
     class="bg-accent-100"
     clearable
     dense
     emit-value
+    hide-bottom-space
     input-debounce="0"
     map-options
     outlined
@@ -40,7 +42,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { getLocaleDayName } from 'src/helpers/date';
-import { filterFn, getListOptions } from 'src/helpers/settings';
+import { filterFn, getListOptions, getRules } from 'src/helpers/settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { ref, watch } from 'vue';
 
@@ -53,6 +55,7 @@ const props = defineProps<{
   label?: null | string;
   modelValue?: string;
   options?: string;
+  rules?: string[] | undefined;
   useInput?: boolean;
 }>();
 

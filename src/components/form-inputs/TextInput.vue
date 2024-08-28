@@ -3,6 +3,7 @@
     :rules="getRules(rules)"
     class="q-pb-none bg-accent-100"
     dense
+    hide-bottom-space
     outlined
     v-model="localValue"
     v-bind="{ label: label || undefined }"

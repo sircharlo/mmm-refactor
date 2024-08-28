@@ -120,6 +120,7 @@
                 />
                 <SelectInput
                   :options="item.list"
+                  :rules="item.rules"
                   :use-input="
                     settingId === 'lang' ||
                     settingId === 'langFallback' ||
