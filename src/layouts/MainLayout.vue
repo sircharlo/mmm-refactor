@@ -18,7 +18,7 @@
           {{ $t(route.meta.title as string) }}
         </div>
         <div class="col-shrink q-gutter-x-sm">
-          <template v-if="route.fullPath === '/congregation-selector'">
+          <template v-if="route.fullPath.includes('congregation-selector')">
             <q-btn
               :label="$t('new-profile')"
               @click="createNewCongregation"

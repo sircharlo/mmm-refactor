@@ -6,11 +6,21 @@
         :done="step > 0"
         :name="0"
         :title="$t('setupWizard.welcome')"
-        icon="mdi-human-greeting"
+        icon="mmm-media-settings"
       >
         {{ $t('setupWizard.intro') }}
         <q-stepper-navigation>
           <q-btn :label="$t('continue')" @click="step++" color="primary" />
+          <q-btn
+            :label="$t('cancel')"
+            @click="
+              deleteCongregation(currentCongregation);
+              goToPage('/congregation-selector');
+            "
+            class="q-ml-sm"
+            color="negative"
+            outline
+          />
         </q-stepper-navigation>
       </q-step>
       <q-step
@@ -175,10 +185,9 @@
         </q-stepper-navigation>
       </q-step>
       <q-step
-        :caption="$t('good-start')"
         :done="step > 100"
         :name="100"
-        :title="$t('excellent')"
+        :title="$t('yeartext')"
         icon="mmm-check"
       >
         {{
@@ -433,7 +442,7 @@
             :done="step > 108"
             :name="108"
             :title="$t('obs-studio-media-scene')"
-            icon="mmm-lectern"
+            icon="mmm-media"
           >
             <p class="text-subtitle1">
               {{
@@ -536,13 +545,17 @@ import {
   downloadSongbookVideos,
   fetchMedia,
 } from 'src/helpers/jw-media';
+import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 const currentState = useCurrentStateStore();
-const { currentSettings } = storeToRefs(currentState);
+const { currentCongregation, currentSettings } = storeToRefs(currentState);
+
+const congregationSettings = useCongregationSettingsStore();
+const { deleteCongregation } = congregationSettings;
 
 // const usingAtKh = ref(false);
 const obsUsed = ref(false);

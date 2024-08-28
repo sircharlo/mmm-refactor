@@ -90,7 +90,6 @@
   "full-screen": "Plein écran",
   "github-repo": "Voir sur GitHub",
   "go-home": "Retourner à la page d'accueil",
-  "good-start": "Le tout est bien parti.",
   "got-it": "Super",
   "hide-image-for-zoom-participants": "Masquer l'image pour les participants Zoom",
   "hide-media-display": "Masquer la fenêtre des médias",
@@ -266,5 +265,6 @@
   "select-a-date-to-begin": "Veuillez sélectionner une date pour commencer.",
   "currently-loading": "Les médias pour cette date sont en cours de chargement.",
   "please-wait": "Veuillez patienter",
-  "select-a-congregation-to-enable": "Sélectionnez un profil avant"
+  "select-a-congregation-to-enable": "Sélectionnez un profil avant",
+  "yeartext": "Texte de l'année"
 }
