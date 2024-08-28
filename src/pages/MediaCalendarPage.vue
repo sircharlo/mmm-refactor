@@ -38,7 +38,7 @@
             {{
               !selectedDate
                 ? $t('noDateSelected')
-                : !selectedDateObject?.complete
+                : selectedDateObject?.meeting
                   ? $t('please-wait')
                   : $t('there-are-no-media-items-for-the-selected-date')
             }}
@@ -47,7 +47,7 @@
             {{
               !selectedDate
                 ? $t('select-a-date-to-begin')
-                : !selectedDateObject?.complete
+                : selectedDateObject?.meeting
                   ? $t('currently-loading')
                   : $t(
                       'use-the-import-button-to-add-media-for-this-date-or-select-another-date-to-view-the-corresponding-meeting-media',
