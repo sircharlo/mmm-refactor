@@ -138,6 +138,9 @@ module.exports = configure(function (/* ctx */) {
         appId: 'sircharlo.meeting-media-manager-v2',
         artifactName: 'meeting-media-manager-${version}.${ext}',
         buildDependenciesFromSource: true,
+        files: [
+          '!node_modules/better-sqlite3/build/Release/better_sqlite3.node',
+        ],
         generateUpdatesFilesForAllChannels: true,
         linux: {
           category: 'Utility',
@@ -147,10 +150,7 @@ module.exports = configure(function (/* ctx */) {
         },
         mac: {
           icon: 'icons/icon.icns',
-          mergeASARs: true,
           publish: ['github'],
-          singleArchFiles:
-            'node_modules/better-sqlite3/build/Release/better_sqlite3.node',
           target: {
             arch: ['universal'],
             target: 'dmg',
