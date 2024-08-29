@@ -5,6 +5,7 @@ import { electronApi } from 'src/helpers/electron-api';
 import { useJwStore } from 'src/stores/jw';
 import { DynamicMediaObject } from 'src/types/media';
 
+import { errorCatcher } from './error-catcher';
 import { getAdditionalMediaPath, removeEmptyDirs } from './fs';
 
 const { fileUrlToPath, fs, klawSync, path } = electronApi;
@@ -48,7 +49,7 @@ const cleanLocalStorage = () => {
       if (changesMade) LocalStorage.set(storageElementName, storageElement);
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -108,7 +109,7 @@ const cleanAdditionalMediaFolder = () => {
 
     removeEmptyDirs(additionalMediaPath);
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 

@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/vue';
 import { boot } from 'quasar/wrappers';
+import { errorCatcher } from 'src/helpers/error-catcher';
 
 import packageInfo from '../../package.json';
 const devMode = process.env.NODE_ENV === 'development';
@@ -22,6 +23,6 @@ export default boot(({ app, router }) => {
         tracesSampleRate: 1.0,
       });
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 });

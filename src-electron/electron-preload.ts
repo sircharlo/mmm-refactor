@@ -1,4 +1,3 @@
-console.log('before preload remote');
 import {
   app,
   BrowserWindow,
@@ -6,7 +5,6 @@ import {
   globalShortcut,
   screen,
 } from '@electron/remote';
-console.log('after preload remote');
 import AdmZip from 'adm-zip';
 import * as sqlite3 from 'better-sqlite3';
 import { contextBridge, shell } from 'electron';
@@ -17,6 +15,7 @@ import { IOptions } from 'music-metadata';
 import { RenderParameters } from 'pdfjs-dist/types/src/display/api';
 import { throttle } from 'quasar';
 import { FULL_HD } from 'src/helpers/converters';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import { ScreenPreferences } from 'src/types/settings';
 import path from 'upath';
 
@@ -130,7 +129,7 @@ const getAllScreens = () => {
       ) as { mainWindow?: boolean } & Electron.Display;
       if (mainWindowScreen) mainWindowScreen.mainWindow = true;
     } catch (err) {
-      console.error(err);
+      errorCatcher(err);
     }
   }
   if (mediaWindow) {
@@ -141,7 +140,7 @@ const getAllScreens = () => {
       ) as { mediaWindow?: boolean } & Electron.Display;
       if (mediaWindowScreen) mediaWindowScreen.mediaWindow = true;
     } catch (err) {
-      console.error(err);
+      errorCatcher(err);
     }
   }
   return displays as ({
@@ -210,7 +209,7 @@ const setWindowPosition = (
         }),
       );
   } catch (err) {
-    console.error(err);
+    errorCatcher(err);
   }
 };
 
@@ -235,7 +234,7 @@ const moveMediaWindow = (
         targetScreenNumber = screenPreferences.preferredScreenNumber;
         windowedMode = screenPreferences.preferWindowed;
       } catch (err) {
-        console.error(err);
+        errorCatcher(err);
       }
     }
     if (otherScreens.length > 0) {
@@ -259,7 +258,7 @@ const moveMediaWindow = (
     setWindowPosition(mediaWindow, targetScreenNumber, windowedMode, noEvent);
     window.dispatchEvent(new CustomEvent('screen-trigger-update'));
   } catch (err) {
-    console.error(err);
+    errorCatcher(err);
   }
 };
 
@@ -293,7 +292,8 @@ const isWritable = (filePath: fs.PathLike) => {
     fs.closeSync(fs.openSync(filePath, 'r+'));
     fileAccess = true;
   } catch (err) {
-    console.error('can not open file:' + filePath, 'error:' + err);
+    errorCatcher('can not open file:' + filePath);
+    errorCatcher(err);
   }
   return fileAccess;
 };
@@ -322,7 +322,7 @@ const registerShortcut = (keySequence: string, callback: () => void) => {
   if (!keySequence) return;
   const ret = globalShortcut.register(keySequence, callback);
   if (!ret) {
-    console.error('registration failed');
+    errorCatcher('registration failed');
   }
 };
 
@@ -381,12 +381,12 @@ const convertPdfToImages = async (pdfPath: string, outputFolder: string) => {
         fs.writeFileSync(outputPath, base64Data, 'base64');
         outputImages.push(outputPath);
       } catch (error) {
-        console.error(error);
+        errorCatcher(error);
       }
     }
     return outputImages;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return outputImages;
   }
 };
@@ -400,7 +400,7 @@ contextBridge.exposeInMainWorld('electronApi', {
     return new Promise<void>((resolve, reject) => {
       zip.extractAllToAsync(outputFolder, true, true, (error) => {
         if (error) {
-          console.error(error);
+          errorCatcher(error);
           reject(error);
         } else {
           resolve();
@@ -426,7 +426,7 @@ contextBridge.exposeInMainWorld('electronApi', {
 
       return {};
     } catch (error) {
-      console.error(error + '\n' + query + '\n' + dbPath);
+      errorCatcher(error + '\n' + query + '\n' + dbPath);
       return {};
     }
   },
@@ -474,7 +474,7 @@ contextBridge.exposeInMainWorld('electronApi', {
         openAtLogin: value,
       });
     } catch (error) {
-      console.error(error);
+      errorCatcher(error);
     }
   },
   setMediaWindowPosition: (x: number, y: number) => {
@@ -484,7 +484,7 @@ contextBridge.exposeInMainWorld('electronApi', {
         mediaWindow.setPosition(x, y);
       }
     } catch (error) {
-      console.error(error);
+      errorCatcher(error);
     }
   },
   toggleMediaWindow,

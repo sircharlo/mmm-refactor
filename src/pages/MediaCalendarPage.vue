@@ -196,6 +196,7 @@ import { date, uid } from 'quasar';
 import DragAndDropper from 'src/components/media/DragAndDropper.vue';
 import MediaItem from 'src/components/media/MediaItem.vue';
 import { electronApi } from 'src/helpers/electron-api';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import {
   getDurationFromMediaPath,
   getFileUrl,
@@ -309,7 +310,7 @@ watch(
           y: newPanzoom.y,
         });
     } catch (error) {
-      console.error(error);
+      errorCatcher(error);
     }
   },
   { deep: true },
@@ -332,7 +333,6 @@ const datedAdditionalMediaMap = computed(() => {
 
 const bc = new BroadcastChannel('mediaPlayback');
 bc.onmessage = (event) => {
-  console.debug('onmessage', event.data);
   if (event.data?.state === 'ended') {
     mediaPlayingCurrentPosition.value = 0;
     // mediaPlayingSeekTo.value = 0;
@@ -357,7 +357,7 @@ const mapOrder =
       if (!sortOrder || sortOrder.length === 0) return 0;
       return sortOrder.indexOf(a[key]) > sortOrder.indexOf(b[key]) ? 1 : -1;
     } catch (e) {
-      console.error(e);
+      errorCatcher(e);
       return 0;
     }
   };
@@ -465,7 +465,7 @@ watch(
         generateMediaList();
       }
     } catch (e) {
-      console.error(e);
+      errorCatcher(e);
     }
   },
 );
@@ -478,7 +478,7 @@ watch(
         generateMediaList();
       }
     } catch (e) {
-      console.error(e);
+      errorCatcher(e);
     }
   },
   { deep: true, immediate: true },
@@ -499,8 +499,8 @@ watch(
       ?.filter((d) => d.error)
       .map((d) => date.formatDate(d.date, 'YYYY/MM/DD')),
   (newVal) => {
-    console.error('RECALCULATING ERRORS', newVal);
     for (const date of newVal) {
+      errorCatcher(date);
       createTemporaryNotification({
         caption: !currentSettings.value?.langFallback
           ? t('tryConfiguringFallbackLanguage')
@@ -532,7 +532,7 @@ onMounted(async () => {
         {});
       durations[newVal] ||= {};
     } catch (e) {
-      console.error(e);
+      errorCatcher(e);
     }
   });
   generateMediaList();
@@ -549,7 +549,7 @@ onMounted(async () => {
       );
     }
   } catch (e) {
-    console.error(e);
+    errorCatcher(e);
   }
   sendObsSceneEvent('camera');
   fetchMedia();
@@ -701,7 +701,8 @@ const copyToDatedAdditionalMedia = async (files: string[]) => {
         fs.copySync(filepathToCopy, datedAdditionalMediaPath);
       await addToAdditionMediaMapFromPath(datedAdditionalMediaPath, uniqueId);
     } catch (error) {
-      console.error(error, filepathToCopy);
+      errorCatcher(filepathToCopy);
+      errorCatcher(error);
     }
   }
 };
@@ -750,7 +751,8 @@ const addToAdditionMediaMapFromPath = async (
       },
     ]);
   } catch (error) {
-    console.error(error, additionalFilePath);
+    errorCatcher(additionalFilePath);
+    errorCatcher(error);
   }
 };
 
@@ -860,7 +862,7 @@ const addToFiles = async (
             addToAdditionMediaMap(additionalMedia);
           })
           .catch((error) => {
-            console.error(error);
+            errorCatcher(error);
           })
           .finally(() => {
             filesLoading.value = false;
@@ -883,7 +885,7 @@ const addToFiles = async (
             )
               .then(() => fs.removeSync(unzipDirectory))
               .catch((error) => {
-                console.error(error);
+                errorCatcher(error);
               })
               .finally(() => {
                 filesLoading.value = false;
@@ -891,7 +893,7 @@ const addToFiles = async (
               });
           })
           .catch((error) => {
-            console.error(error);
+            errorCatcher(error);
             filesLoading.value = false;
             dragging.value = false;
           });
@@ -912,7 +914,7 @@ const addToFiles = async (
         message: t('fileProcessError'),
         type: 'error',
       });
-      console.error(error);
+      errorCatcher(error);
     }
   }
 };
@@ -948,14 +950,14 @@ const dropEnd = (event: DragEvent) => {
       }
       console.log(droppedStuff);
       addToFiles(droppedStuff).catch((error) => {
-        console.error(error);
+        errorCatcher(error);
       });
       // .then(() => {
       //   resetDragging();
       // });
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 // const dropIgnore = (event: DragEvent) => {
@@ -971,7 +973,7 @@ const resetDragging = () => {
 
 const localFilesBrowsedListener = (event: CustomEventInit) => {
   addToFiles(event.detail).catch((error) => {
-    console.error(error);
+    errorCatcher(error);
   });
 };
 

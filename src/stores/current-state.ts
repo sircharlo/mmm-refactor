@@ -2,6 +2,7 @@ import { defineStore, storeToRefs } from 'pinia';
 import { date } from 'quasar';
 import { settingsDefinitions } from 'src/defaults/settings';
 import { electronApi } from 'src/helpers/electron-api';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import { getAdditionalMediaPath } from 'src/helpers/fs';
 import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
 import { useJwStore } from 'src/stores/jw';
@@ -36,7 +37,7 @@ export const useCurrentStateStore = defineStore('current-state', {
         }
         return invalidSettings as (keyof SettingsValues)[];
       } catch (error) {
-        console.error(error);
+        errorCatcher(error);
         return [];
       }
     },
@@ -87,7 +88,7 @@ export const useCurrentStateStore = defineStore('current-state', {
           ? signLanguageSongbook
           : notSignLanguageSongbook;
       } catch (error) {
-        console.error(error);
+        errorCatcher(error);
         return notSignLanguageSongbook;
       }
     },
@@ -114,7 +115,7 @@ export const useCurrentStateStore = defineStore('current-state', {
         fs.ensureDirSync(datedAdditionalMediaDirectory);
         return datedAdditionalMediaDirectory;
       } catch (error) {
-        console.error(error);
+        errorCatcher(error);
         return '';
       }
     },

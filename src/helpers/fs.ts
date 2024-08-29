@@ -10,6 +10,8 @@ import { useCurrentStateStore } from 'src/stores/current-state';
 import { PublicationFetcher } from 'src/types/publications';
 import { MultimediaItem } from 'src/types/sqlite';
 
+import { errorCatcher } from './error-catcher';
+
 const {
   fileUrlToPath,
   fs,
@@ -45,7 +47,7 @@ const getPublicationDirectory = (publication: PublicationFetcher) => {
     fs.ensureDirSync(dir);
     return dir;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return path.resolve('./');
   }
 };
@@ -74,7 +76,7 @@ const getPublicationDirectoryContents = (
     });
     return files as Item[];
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return [];
   }
 };
@@ -129,7 +131,7 @@ const getThumbnailFromMetadata = async (mediaPath: string) => {
       return '';
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return '';
   }
 };
@@ -221,7 +223,7 @@ const getThumbnailUrl = async (filepath: string, forceRefresh?: boolean) => {
     }
     return thumbnailUrl + (forceRefresh ? '?timestamp=' + Date.now() : '');
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return '';
   }
 };
@@ -267,13 +269,13 @@ const getSubtitlesUrl = async (
           throw new Error('Subtitles file not found: ' + subtitlesPath);
         }
       } else {
-        console.info('No subtitles available for: ' + multimediaItem.FilePath);
+        console.log('No subtitles available for: ' + multimediaItem.FilePath);
         return '';
       }
     }
     return subtitlesUrl;
   } catch (error) {
-    console.warn(error);
+    errorCatcher(error);
     return '';
   }
 };
@@ -282,7 +284,7 @@ const isEmptyDir = (directory: PathLike) => {
   try {
     return fs.readdirSync(directory).length === 0;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return false;
   }
 };
@@ -302,7 +304,7 @@ const removeEmptyDirs = (rootDir: string) => {
       }
     });
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 

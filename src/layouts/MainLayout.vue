@@ -652,6 +652,7 @@ import {
 } from 'src/helpers/cleanup';
 import { getDateLocaleFormatted, updateLookupPeriod } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import {
   getAdditionalMediaPath,
   getParentDirectory,
@@ -788,7 +789,7 @@ watch(currentCongregation, (newCongregation, oldCongregation) => {
       }
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 });
 
@@ -809,7 +810,7 @@ watch(online, (isNowOnline) => {
       meetingQueue.pause();
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 });
 
@@ -820,7 +821,7 @@ const navigateToCongregationSelector = () => {
       selectedDate.value = '';
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -878,7 +879,7 @@ watch(
     try {
       if (newEnableExtraCache) downloadSongbookVideos();
     } catch (error) {
-      console.error(error);
+      errorCatcher(error);
     }
   },
 );
@@ -909,7 +910,7 @@ const dateOptions = (lookupDate: string) => {
       date.getDateDiff(lookupDate, maxDate, 'days') <= 0
     );
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return true;
   }
 };
@@ -924,7 +925,7 @@ const minDate = () => {
     const minDate = date.getMinDate(...dateArray);
     return date.formatDate(minDate, 'YYYY/MM');
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return undefined;
   }
 };
@@ -939,7 +940,7 @@ const maxDate = () => {
     const maxDate = date.getMaxDate(...dateArray);
     return date.formatDate(maxDate, 'YYYY/MM');
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return undefined;
   }
 };
@@ -959,7 +960,7 @@ const getEventDates = () => {
     ).map((day) => date.formatDate(day, 'YYYY/MM/DD'));
     return meetingDates.concat(additionalMediaDates);
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return [];
   }
 };
@@ -1037,7 +1038,7 @@ const usedCacheFiles = computed(() => {
     const usedFiles = cacheFiles.value.filter((f) => !f.orphaned);
     return usedFiles;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return [];
   }
 });
@@ -1056,7 +1057,7 @@ const usedParentDirectories = computed(() => {
       {} as { [parentPath: string]: number },
     );
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return {};
   }
 });
@@ -1069,7 +1070,7 @@ const untouchableDirectories = computed(() => {
       getTempDirectory(),
     ]);
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return new Set() as Set<string>;
   }
 });
@@ -1094,7 +1095,7 @@ const unusedParentDirectories = computed(() => {
       {} as { [parentPath: string]: number },
     );
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return {} as { [parentPath: string]: number };
   }
 });
@@ -1108,7 +1109,7 @@ const unusedCacheFoldersSize = computed(() => {
     );
     return prettyBytes(size);
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return prettyBytes(0);
   }
 });
@@ -1120,7 +1121,7 @@ const allCacheFilesSize = computed(() => {
       cacheFiles.value.reduce((size, cacheFile) => size + cacheFile.size, 0),
     );
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return prettyBytes(0);
   }
 });
@@ -1173,7 +1174,7 @@ const calculateCacheSize = async () => {
       );
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
   calculatingCacheSize.value = false;
 };
@@ -1189,7 +1190,7 @@ const deleteCacheFiles = (type: '' | 'all' | 'smart') => {
       try {
         fs.rmSync(filepath, { recursive: true });
       } catch (error) {
-        console.error(error);
+        errorCatcher(error);
       }
       additionalMediaMaps.value = {};
     }
@@ -1206,7 +1207,7 @@ const deleteCacheFiles = (type: '' | 'all' | 'smart') => {
     }
     cancelDeleteCacheFiles();
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -1279,7 +1280,7 @@ const getJwVideos = async () => {
       }
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -1314,7 +1315,7 @@ const getEventDayColor = (eventDate: string) => {
       .includes(eventDate);
     if (isAdditional) return 'additional';
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return 'negative';
   }
   return 'warning';

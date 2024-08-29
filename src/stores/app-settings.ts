@@ -1,5 +1,6 @@
 import { defineStore, storeToRefs } from 'pinia';
 import { LocalStorage, uid } from 'quasar';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import {
   buildNewPrefsObject,
   getOldPrefsPaths,
@@ -26,7 +27,7 @@ export const useAppSettingsStore = defineStore('app-settings', {
               const newCongId = uid();
               congregations.value[newCongId] = newPrefsObject;
             } catch (error) {
-              console.error(error);
+              errorCatcher(error);
             }
           }
         } else {
@@ -35,7 +36,7 @@ export const useAppSettingsStore = defineStore('app-settings', {
         this.migrations.push(type);
         return true;
       } catch (error) {
-        console.error(error);
+        errorCatcher(error);
         return false;
       }
     },

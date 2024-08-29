@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import { errorCatcher } from 'src/helpers/error-catcher';
 // import { boot } from 'quasar/wrappers';
 // export default boot(({ app }) => {
 //   app.config.globalProperties.$axios = axios;
@@ -10,7 +11,7 @@ const get = async (url: string, params?: AxiosRequestConfig) => {
   try {
     returnVal = await axios.get(url, { params });
   } catch (error) {
-    console.warn(error);
+    errorCatcher(error);
   }
   return returnVal?.data ?? undefined;
 };

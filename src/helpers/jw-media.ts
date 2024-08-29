@@ -57,6 +57,8 @@ import {
   VideoMarker,
 } from 'src/types/sqlite';
 
+import { errorCatcher } from './error-catcher';
+
 const { executeQuery, fileUrlToPath, fs, klawSync, path } = electronApi;
 const FEB_2023 = 20230200;
 const FOOTNOTE_TAR_PAR = 9999;
@@ -86,7 +88,7 @@ const addJwpubDocumentMediaToFiles = async (
     );
     addToAdditionMediaMap(dynamicMediaItems);
   } catch (e) {
-    console.error(e);
+    errorCatcher(e);
   }
 };
 
@@ -143,7 +145,7 @@ const downloadFileIfNeeded = async ({
       { priority: lowPriority ? 10 : 100 },
     ) as Promise<DownloadedFile>
   ).catch((error) => {
-    console.error(error);
+    errorCatcher(error);
     return {
       new: false,
       path: '',
@@ -175,7 +177,7 @@ const downloadFile = async ({ dir, filename, url }: FileDownloader) => {
       responseType: 'arraybuffer',
     })
     .catch((error) => {
-      console.error(error);
+      errorCatcher(error);
       downloadProgress.value[url] = {
         error: true,
       };
@@ -258,13 +260,13 @@ const fetchMedia = async () => {
             throw new Error(error);
           });
       } catch (error) {
-        console.error(error);
+        errorCatcher(error);
         day.error = true;
       }
     }
     await queue.onIdle();
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -291,7 +293,7 @@ const getDbFromJWPUB = async (publication: PublicationFetcher) => {
       return dbFile;
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return null;
   }
 };
@@ -307,7 +309,7 @@ const getPublicationInfoFromDb = (db: string) => {
     publication.langwritten = mepslangs[pubQuery.MepsLanguageIndex];
     return publication as PublicationFetcher;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return { issue: '', langwritten: '', pub: '' } as PublicationFetcher;
   }
 };
@@ -329,7 +331,7 @@ function addFullFilePathToMultimediaItem(
         : {}),
     };
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return multimediaItem;
   }
 }
@@ -373,7 +375,7 @@ const getMultimediaMepsLangs = (source: MultimediaItemsFetcher) => {
     }
     return multimediaMepsLangs;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return [];
   }
 };
@@ -389,7 +391,7 @@ const getMediaVideoMarkers = (
     ) as VideoMarker[];
     return mediaVideoMarkers;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return [];
   }
 };
@@ -479,7 +481,7 @@ const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
     ) as MultimediaItem[];
     return items;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return [];
   }
 };
@@ -525,7 +527,7 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
             extract.Lang = (matches.pop() as string).split(':')[0];
           }
         } catch (e: unknown) {
-          console.error(e);
+          errorCatcher(e);
         }
       }
 
@@ -586,7 +588,7 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
     }
     return allExtractItems;
   } catch (e: unknown) {
-    console.error(e);
+    errorCatcher(e);
     return [];
   }
 };
@@ -627,8 +629,8 @@ const getWtIssue = async (
       ) as { DocumentId: number }[]
     )[0]?.DocumentId;
     return { db, docId, issueString, publication, weekNr };
-  } catch (e: unknown) {
-    console.warn(e);
+  } catch (e) {
+    errorCatcher(e);
     return {
       db: '',
       docId: -1,
@@ -717,7 +719,7 @@ const dynamicMediaMapper = async (
       });
     return Promise.all(mediaPromises);
   } catch (e) {
-    console.error(e);
+    errorCatcher(e);
     return [];
   }
 };
@@ -873,7 +875,7 @@ const getWeMedia = async (lookupDate: Date) => {
             : langOverride;
         });
     } catch (e: unknown) {
-      console.error(e);
+      errorCatcher(e);
       songLangs = songs.map(() => currentSettings.value?.lang);
     }
     const mergedSongs = songs
@@ -920,7 +922,7 @@ const getWeMedia = async (lookupDate: Date) => {
       media: dynamicMediaForDay,
     };
   } catch (e) {
-    console.error('getWeMedia', e);
+    errorCatcher(e);
     return {
       error: true,
       media: [],
@@ -936,7 +938,7 @@ function sanitizeId(id: string) {
     });
     return sanitizedString;
   } catch (e) {
-    console.error('sanitizeId', e);
+    errorCatcher(e);
     return id;
   }
 }
@@ -1038,7 +1040,7 @@ const getMwMedia = async (lookupDate: Date) => {
       media: dynamicMediaForDay,
     };
   } catch (e) {
-    console.error('getMwMedia', e);
+    errorCatcher(e);
     return { error: true, media: [] };
   }
 };
@@ -1082,12 +1084,12 @@ async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
               (await getJwMediaInfo(publicationFetcher)).title;
           }
         } catch (e) {
-          console.error('processMissingMediaInfo', e);
+          errorCatcher(e);
         }
       }
     }
   } catch (e) {
-    console.error('processMissingMediaInfo', e);
+    errorCatcher(e);
   }
 }
 
@@ -1131,7 +1133,7 @@ const getPubMediaLinks = async (publication: PublicationFetcher) => {
     }
     return response as Publication;
   } catch (e) {
-    console.error('getPubMediaLinks', e);
+    errorCatcher(e);
     return {} as Publication;
   }
 };
@@ -1160,7 +1162,7 @@ export function findBestResolution(
     }
     return bestItem;
   } catch (e) {
-    console.error('findBestResolution', e);
+    errorCatcher(e);
     return mediaLinks.length > 0 ? mediaLinks[mediaLinks.length - 1] : [];
   }
 }
@@ -1193,12 +1195,12 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
         },
         nodir: true,
       });
-      console.warn(
-        'No response, falling back to cache',
-        publication,
-        pubDir,
+      errorCatcher({
+        error: 'No response, falling back to cache',
         files,
-      );
+        pubDir,
+        publication,
+      });
       return files.length > 0 ? files[0].path : '';
     }
     if (!responseObject) return '';
@@ -1242,7 +1244,7 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
     }
     return downloadedFile?.path;
   } catch (e) {
-    console.error('downloadMissingMedia', e);
+    errorCatcher(e);
     return '';
   }
 };
@@ -1282,7 +1284,7 @@ const downloadAdditionalRemoteVideo = async (
       });
     }
   } catch (e) {
-    console.error('downloadAdditionalRemoteVideo', e);
+    errorCatcher(e);
   }
 };
 
@@ -1312,7 +1314,7 @@ function getBestImageUrl(images: ImageTypeSizes, minSize?: keyof ImageSizes) {
       }
     }
   } catch (e) {
-    console.error(e);
+    errorCatcher(e);
     return '';
   }
 }
@@ -1344,7 +1346,7 @@ const getJwMediaInfo = async (publication: PublicationFetcher) => {
       title: responseObject.media[0].title,
     };
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return { subtitles: '', thumbnail: '', title: '' };
   }
 };
@@ -1407,7 +1409,7 @@ const downloadPubMediaFiles = async (publication: PublicationFetcher) => {
       });
     }
   } catch (e) {
-    console.error('downloadPubMediaFiles', e);
+    errorCatcher(e);
   }
 };
 
@@ -1431,7 +1433,7 @@ const downloadBackgroundMusic = () => {
       pub: currentSongbook.value.pub,
     });
   } catch (e) {
-    console.error('downloadBackgroundMusic', e);
+    errorCatcher(e);
   }
 };
 
@@ -1454,7 +1456,7 @@ const downloadSongbookVideos = () => {
       pub: currentSongbook.value.pub,
     });
   } catch (e) {
-    console.error('downloadSongbookVideos', e);
+    errorCatcher(e);
   }
 };
 
@@ -1508,7 +1510,7 @@ const downloadJwpub = async (
       url: mediaLinks[0].file.url,
     })) as DownloadedFile;
   } catch (e) {
-    console.error('downloadJwpub', e);
+    errorCatcher(e);
     return {
       new: false,
       path: '',

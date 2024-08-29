@@ -50,6 +50,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { barStyle, thumbStyle } from 'src/boot/globals';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import {
   downloadAdditionalRemoteVideo,
   getJwMediaInfo,
@@ -103,7 +104,7 @@ const addSong = async (songTrack: number) => {
       );
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   } finally {
     dismissPopup();
   }

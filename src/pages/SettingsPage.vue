@@ -158,6 +158,7 @@ import TextInput from 'src/components/form-inputs/TextInput.vue';
 import TimeInput from 'src/components/form-inputs/TimeInput.vue';
 import ToggleInput from 'src/components/form-inputs/ToggleInput.vue';
 import { settingsDefinitions, settingsGroups } from 'src/defaults/settings';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { SettingsItems } from 'src/types/settings';
@@ -196,7 +197,7 @@ const validateSettingsLocal = () => {
       ] = true;
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 

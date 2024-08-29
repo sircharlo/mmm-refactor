@@ -74,6 +74,7 @@
 </template>
 
 <script setup lang="ts">
+import { errorCatcher } from 'src/helpers/error-catcher';
 import {
   getCurrentShortcuts,
   registerCustomShortcut,
@@ -121,7 +122,7 @@ const handleKeyPress = (event: KeyboardEvent) => {
       localValue.value = keys.join('+');
     }
   } catch (e) {
-    console.error(e);
+    errorCatcher(e);
   }
 };
 

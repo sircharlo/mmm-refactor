@@ -1,6 +1,8 @@
 import { defaultSettings } from 'src/defaults/settings';
 import { electronApi } from 'src/helpers/electron-api';
 import { OldAppConfig, SettingsValues } from 'src/types/settings';
+
+import { errorCatcher } from './error-catcher';
 const { fs, getAppDataPath, klawSync, path } = electronApi;
 
 const getOldVersionPath = () => {
@@ -8,7 +10,7 @@ const getOldVersionPath = () => {
     const oldVersionPath = path.join(getAppDataPath(), 'meeting-media-manager');
     return fs.existsSync(oldVersionPath) ? oldVersionPath : false;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return false;
   }
 };
@@ -22,7 +24,7 @@ const oldPrefsFilterFn = (item: { path: string }) => {
       oldPrefsFilterFnBasename.endsWith('.json')
     );
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return false;
   }
 };
@@ -32,7 +34,7 @@ const getOldPrefsPaths = (oldPath: string) => {
     if (!oldPath) return [];
     return klawSync(oldPath, { filter: oldPrefsFilterFn });
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return [];
   }
 };
@@ -42,7 +44,7 @@ const parsePrefsFile = (path: string) => {
     const content = fs.readFileSync(path, 'utf8');
     return JSON.parse(content);
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return {};
   }
 };
@@ -96,7 +98,7 @@ const buildNewPrefsObject = (oldPrefs: OldAppConfig) => {
     };
     return newPrefsObject;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return defaultSettings;
   }
 };

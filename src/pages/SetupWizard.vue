@@ -540,6 +540,7 @@ import { storeToRefs } from 'pinia';
 import SelectInput from 'src/components/form-inputs/SelectInput.vue';
 import TextInput from 'src/components/form-inputs/TextInput.vue';
 import TimeInput from 'src/components/form-inputs/TimeInput.vue';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import {
   downloadBackgroundMusic,
   downloadSongbookVideos,
@@ -586,7 +587,7 @@ const goToPage = (path: string) => {
   try {
     router.push({ path });
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 

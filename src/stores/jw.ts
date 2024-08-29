@@ -2,6 +2,7 @@ import { getLanguages, getYeartext } from 'boot/axios';
 import { defineStore, storeToRefs } from 'pinia';
 import { LocalStorage } from 'quasar';
 import { date } from 'quasar';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import { findBestResolution, getPubMediaLinks } from 'src/helpers/jw-media';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { DateInfo } from 'src/types/dates';
@@ -46,7 +47,7 @@ export const useJwStore = defineStore('jw-store', {
           currentState.selectedDate
         ] = uniqueById([...currentArray, ...mediaArray]);
       } catch (e) {
-        console.error(e);
+        errorCatcher(e);
       }
     },
     removeFromAdditionMediaMap(uniqueId: string) {
@@ -72,7 +73,7 @@ export const useJwStore = defineStore('jw-store', {
           );
         }
       } catch (e) {
-        console.error(e);
+        errorCatcher(e);
       }
     },
     resetSort() {
@@ -87,7 +88,7 @@ export const useJwStore = defineStore('jw-store', {
           this.mediaSort[currentCongregation.value][selectedDate.value] = [];
         }
       } catch (e) {
-        console.error(e);
+        errorCatcher(e);
       }
     },
     async updateJwLanguages() {
@@ -105,7 +106,7 @@ export const useJwStore = defineStore('jw-store', {
           };
         }
       } catch (e) {
-        console.error(e);
+        errorCatcher(e);
       }
     },
     async updateJwSongs() {
@@ -115,7 +116,7 @@ export const useJwStore = defineStore('jw-store', {
           !currentState.currentSettings?.lang ||
           !currentState.currentSongbook?.pub
         ) {
-          console.error('No current settings or songbook defined');
+          errorCatcher('No current settings or songbook defined');
           return [];
         }
         const langwritten = currentState.currentSettings.lang as string;
@@ -133,7 +134,7 @@ export const useJwStore = defineStore('jw-store', {
           .sort()
           .pop();
         if (!songbook.fileformat) {
-          console.error('No fileformat defined');
+          errorCatcher('No fileformat defined');
           return [];
         }
         const now = new Date();
@@ -170,7 +171,7 @@ export const useJwStore = defineStore('jw-store', {
           };
         }
       } catch (error) {
-        console.error(error);
+        errorCatcher(error);
       }
     },
     async updateYeartext(lang?: string) {
@@ -190,7 +191,7 @@ export const useJwStore = defineStore('jw-store', {
           }
         }
       } catch (error) {
-        console.error(error);
+        errorCatcher(error);
       }
     },
   },

@@ -4,6 +4,7 @@ import 'dayjs/locale/fr';
 import localeData from 'dayjs/plugin/localeData';
 import { Lang } from 'quasar';
 import { boot } from 'quasar/wrappers';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import messages from 'src/i18n';
 import { createI18n } from 'vue-i18n';
 
@@ -34,7 +35,10 @@ const refreshDateLocale = async (locale: string) => {
       console.log(`Loaded language pack for locale ${locale}`);
       return true; // Successfully loaded the language pack
     } catch (err) {
-      console.error(`Failed to load language pack for locale ${locale}:`, err);
+      errorCatcher({
+        err,
+        message: `Failed to load language pack for locale ${locale}`,
+      });
       return false; // Failed to load the language pack
     }
   };

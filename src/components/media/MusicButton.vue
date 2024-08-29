@@ -101,6 +101,7 @@ import klawSync from 'klaw-sync';
 import { storeToRefs } from 'pinia';
 import { date } from 'quasar';
 import { electronApi } from 'src/helpers/electron-api';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import {
   getDurationFromMediaPath,
   getFileUrl,
@@ -164,13 +165,13 @@ const fadeToVolumeLevel = (targetVolume: number, fadeOutSeconds: number) => {
           }
         }
       } catch (error) {
-        console.error(error);
+        errorCatcher(error);
         musicPlayer.value.volume = targetVolume;
       }
     }
     requestAnimationFrame(updateVolume);
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -180,7 +181,7 @@ function stopMusic() {
     musicStopping.value = true;
     fadeToVolumeLevel(0, 7.5);
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 }
 
@@ -223,7 +224,6 @@ const getNextSong = async () => {
             const songDuration = await getDurationFromMediaPath(
               queuedSong.path,
             );
-            console.debug('queuedSong', queuedSong.path, songDuration);
             customSongList.unshift(queuedSong);
             secsFromEnd = timeBeforeMeetingStart - musicDurationSoFar;
             musicDurationSoFar += songDuration;
@@ -231,7 +231,7 @@ const getNextSong = async () => {
           songList.value = customSongList;
         }
       } catch (error) {
-        console.error(error);
+        errorCatcher(error);
       }
     }
     if (!songList.value.length)
@@ -246,7 +246,7 @@ const getNextSong = async () => {
       musicPlayingTitle.value =
         metadata.common.title ?? path.basename(nextSong.path);
     } catch (error) {
-      console.error(error);
+      errorCatcher(error);
       musicPlayingTitle.value = path.basename(nextSong.path) ?? '';
     }
     return {
@@ -255,7 +255,7 @@ const getNextSong = async () => {
       secsFromEnd,
     };
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return {
       nextSongUrl: '',
       secsFromEnd: 0,
@@ -293,7 +293,7 @@ const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
       return null;
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return null;
   }
 };
@@ -319,7 +319,7 @@ async function playMusic() {
         musicPlaying.value = true;
       })
       .catch((error) => {
-        console.error(error);
+        errorCatcher(error);
       });
 
     musicPlayer.value
@@ -328,7 +328,7 @@ async function playMusic() {
         musicPlaying.value = true;
       })
       .catch((error) => {
-        console.error(error);
+        errorCatcher(error);
       });
     musicPlayer.value.onended = async () => {
       if (!musicPlayer.value || !musicPlayerSource.value) return;
@@ -337,7 +337,7 @@ async function playMusic() {
       musicPlayerSource.value.src = nextSongUrl;
       musicPlayer.value.load();
       musicPlayer.value.play().catch((error) => {
-        console.error(error);
+        errorCatcher(error);
       });
     };
     musicPlayer.value.ontimeupdate = () => {
@@ -357,11 +357,11 @@ async function playMusic() {
           }
         }
       } catch (error) {
-        console.error(error);
+        errorCatcher(error);
       }
     };
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 }
 
@@ -383,7 +383,7 @@ watch(
         playMusic();
       }
     } catch (error) {
-      console.error(error);
+      errorCatcher(error);
     }
   },
   { immediate: true },
@@ -397,7 +397,7 @@ const musicRemainingTime = computed(() => {
       return formatTime(timeRemainingBeforeMusicStop.value);
     return currentSongRemainingTime.value;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return '..:..';
   }
 });
@@ -420,7 +420,7 @@ const toggleMusicListener = () => {
       playMusic();
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 

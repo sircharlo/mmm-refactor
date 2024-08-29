@@ -46,6 +46,7 @@
 <script setup lang="ts">
 import isOnline from 'is-online';
 import { storeToRefs } from 'pinia';
+import { errorCatcher } from 'src/helpers/error-catcher';
 // import { electronApi } from 'src/helpers/electron-api';
 import { useCurrentStateStore } from 'src/stores/current-state';
 // import { DownloadProgressItems } from 'src/types/media';
@@ -79,7 +80,7 @@ const updateOnline = async () => {
   try {
     online.value = await isOnline();
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 

@@ -126,6 +126,7 @@
 import { OBSWebSocketError } from 'obs-websocket-js';
 import { storeToRefs } from 'pinia';
 import { obsWebSocket } from 'src/boot/globals';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import { isImage } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useObsStateStore } from 'src/stores/obs-state';
@@ -154,7 +155,7 @@ const obsErrorHandler = (err: OBSWebSocketError) => {
   obsConnectionState.value = 'disconnected';
   obsMessage.value = 'obs.error';
   obsWebSocket?.disconnect();
-  console.error('Connection closed', err.message);
+  errorCatcher('Connection closed: ' + err.message);
 };
 
 const obsConnect = async (setup?: boolean) => {
@@ -184,9 +185,9 @@ const obsConnect = async (setup?: boolean) => {
           break;
         }
       } catch (error) {
-        console.error(
+        errorCatcher(error);
+        errorCatcher(
           `Failed to connect to OBS (attempt ${attempt + 1}/${maxAttempts})`,
-          error,
         );
       } finally {
         attempt++;
@@ -196,7 +197,7 @@ const obsConnect = async (setup?: boolean) => {
       }
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -221,7 +222,7 @@ const setObsScene = async (scene: string | undefined, sceneUuid?: string) => {
       });
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -229,7 +230,7 @@ const setObsSceneListener = (event: CustomEventInit) => {
   try {
     setObsScene(event.detail.scene);
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -261,14 +262,14 @@ onMounted(() => {
           currentSceneUuid.value = sceneList.currentProgramSceneUuid;
         }
       } catch (error) {
-        console.error(error);
+        errorCatcher(error);
       }
     });
     obsWebSocket.on('SceneListChanged', (data) => {
       scenes.value = data.scenes;
     });
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 });
 
@@ -283,7 +284,7 @@ onUnmounted(() => {
     obsWebSocket.removeAllListeners('Identified');
     obsWebSocket.removeAllListeners('SceneListChanged');
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 });
 </script>

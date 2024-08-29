@@ -3,6 +3,8 @@ import { electronApi } from 'src/helpers/electron-api';
 import { showMediaWindow } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { SettingsValues } from 'src/types/settings';
+
+import { errorCatcher } from './error-catcher';
 const { registerShortcut, unregisterShortcut } = electronApi;
 
 const shortcutCallbacks: Partial<Record<keyof SettingsValues, () => void>> = {
@@ -32,7 +34,7 @@ const getCurrentShortcuts = () => {
     }
     return shortcuts;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return [];
   }
 };
@@ -55,7 +57,7 @@ const registerCustomShortcut = (
       keySequence = currentSettings.value[shortcutName] as string;
     registerShortcut(keySequence, shortcutCallbacks[shortcutName]!);
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -69,7 +71,7 @@ const registerAllCustomShortcuts = () => {
       registerCustomShortcut(shortcutName as keyof SettingsValues);
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -85,7 +87,7 @@ const unregisterAllCustomShortcuts = () => {
       unregisterShortcut(currentSettings.value[shortcutName] as string);
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 

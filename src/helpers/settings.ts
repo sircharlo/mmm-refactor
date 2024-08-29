@@ -12,6 +12,8 @@ const { scenes } = storeToRefs(obsState);
 
 import { localeOptions } from 'src/i18n';
 
+import { errorCatcher } from './error-catcher';
+
 const requiredRule: ValidationRule = (val: string) =>
   (val && val.length > 0) || '';
 
@@ -23,7 +25,7 @@ const coTuesdays = (lookupDate: string) => {
       date.getDateDiff(lookupDate, new Date(), 'days') >= 0
     );
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return false;
   }
 };
@@ -43,7 +45,7 @@ const getDateOptions = (options: string[] | undefined) => {
       ? filteredOptions[0]
       : undefined;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return undefined;
   }
 };
@@ -57,7 +59,7 @@ const getRules = (rules: string[] | undefined) => {
       .filter(Boolean);
     return filteredRules as ValidationRule[];
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return undefined;
   }
 };
@@ -72,7 +74,7 @@ const getActions = (actions: string[] | undefined) => {
       })
       .filter(Boolean);
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return undefined;
   }
 };
@@ -87,7 +89,7 @@ const meetingTime = (hr: number, min: null | number) => {
     }
     return true;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return false;
   }
 };
@@ -108,7 +110,7 @@ const getTimeOptions = (options: string[] | undefined) => {
       ? filteredOptions[0]
       : undefined;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return undefined;
   }
 };
@@ -128,10 +130,10 @@ const filterFn = (
       );
     });
   } catch (error) {
-    console.warn(error);
     update(() => {
       filteredJwLanguages.value = jwLanguages.value.list;
     });
+    errorCatcher(error);
   }
 };
 
@@ -173,7 +175,7 @@ const getListOptions = (list: string | undefined) => {
       throw new Error('List not found: ' + list);
     }
   } catch (error) {
-    console.warn(error);
+    errorCatcher(error);
     return undefined;
   }
 };

@@ -16,6 +16,8 @@ import {
   PlaylistTagItem,
 } from 'src/types/sqlite';
 
+import { errorCatcher, warningCatcher } from './error-catcher';
+
 const { convert, decompress, executeQuery, fs, path, toggleMediaWindow } =
   electronApi;
 const { pad } = format;
@@ -110,8 +112,9 @@ const inferExtension = (filename: string, filetype?: string) => {
   if (!filetype) return filename;
   const extension = mime.extension(filetype);
   if (!extension) {
-    console.warn(
-      'Could not determine the file extension from the provided file type',
+    warningCatcher(
+      'Could not determine the file extension from the provided file type: ' +
+        filetype,
     );
     return filename;
   }
@@ -133,7 +136,7 @@ const jwpubDecompressor = async (jwpubPath: string, outputPath: string) => {
     await decompress(path.join(outputPath, 'contents'), outputPath);
     return outputPath;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return jwpubPath;
   }
 };
@@ -151,7 +154,7 @@ const decompressJwpub = async (jwpubPath: string, outputPath?: string) => {
       );
     return extractedFiles.value[outputPath];
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return jwpubPath;
   }
 };
@@ -239,7 +242,7 @@ const getMediaFromJwPlaylist = async (
     );
     return dynamicPlaylistMediaItems;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return [];
   }
 };
@@ -254,7 +257,7 @@ const findDb = (publicationDirectory: string) => {
         return filename.includes('.db');
       });
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return '';
   }
 };
@@ -272,7 +275,7 @@ const convertHeicToJpg = async (filepath: string) => {
     fs.writeFileSync(newPath, Buffer.from(output));
     return newPath;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return filepath;
   }
 };
@@ -327,7 +330,7 @@ const convertSvgToJpg = async (filepath: string): Promise<string> => {
       };
     });
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return filepath;
   }
 };
@@ -352,7 +355,7 @@ const showMediaWindow = (state?: boolean) => {
     mediaWindowVisible.value = state;
     toggleMediaWindow(state ? 'show' : 'hide');
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 

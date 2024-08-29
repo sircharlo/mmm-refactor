@@ -79,6 +79,7 @@
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { storeToRefs } from 'pinia';
 import { useQuasar } from 'quasar';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import {
   isAudio,
   isImage,
@@ -109,7 +110,7 @@ const initiatePanzoom = () => {
     if (!imageElem) return;
     panzoom.value = Panzoom(imageElem);
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -146,7 +147,7 @@ bc.onmessage = (event) => {
             mediaElement.value.srcObject = stream;
             mediaElement.value.play();
           })
-          .catch((e) => console.error(e));
+          .catch((e) => errorCatcher(e));
       } else {
         if (!mediaElement.value) return;
         mediaElement.value.pause();
@@ -174,7 +175,7 @@ bc.onmessage = (event) => {
         mediaElement.value.pause();
       } else if (event.data.action === 'play') {
         mediaElement.value.play().catch((error) => {
-          console.error(error);
+          errorCatcher(error);
         });
       }
     }
@@ -196,11 +197,11 @@ bc.onmessage = (event) => {
             );
         }
       } catch (error) {
-        console.error(error);
+        errorCatcher(error);
       }
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -240,7 +241,7 @@ const playMedia = () => {
           }
         }
       } catch (e) {
-        console.error(e);
+        errorCatcher(e);
       }
     };
     let customStartStop = { max: 0, min: 0 };
@@ -255,10 +256,10 @@ const playMedia = () => {
     }
     mediaElement.value.currentTime = customStartStop.min;
     mediaElement.value.play().catch((error) => {
-      console.error(error);
+      errorCatcher(error);
     });
   } catch (e) {
-    console.error(e);
+    errorCatcher(e);
   }
 };
 

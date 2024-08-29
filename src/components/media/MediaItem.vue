@@ -503,6 +503,7 @@
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { storeToRefs } from 'pinia';
 import { electronApi } from 'src/helpers/electron-api';
+import { errorCatcher, warningCatcher } from 'src/helpers/error-catcher';
 import { getThumbnailUrl } from 'src/helpers/fs';
 import { formatTime, isImage, isVideo } from 'src/helpers/mediaPlayback';
 import { sendObsSceneEvent } from 'src/helpers/obs';
@@ -548,19 +549,18 @@ const props = defineProps<{
 }>();
 
 const imageLoadingError = (media: DynamicMediaObject) => {
-  console.warn(
-    'Unable to load thumbnail for media; trying to reload from file.',
-    media,
+  warningCatcher(
+    media + ': Unable to load thumbnail for media; trying to reload from file.',
   );
   media.thumbnailUrl = '';
   getThumbnailUrl(media.fileUrl)
     .then((thumbnailUrl) => {
       media.thumbnailUrl = thumbnailUrl;
-      console.warn('Reloaded thumbnail', thumbnailUrl);
+      warningCatcher('Reloaded thumbnail: ' +  thumbnailUrl);
     })
     .catch((error) => {
       media.thumbnailUrl = '';
-      console.error(error);
+      errorCatcher(error);
     });
 };
 
@@ -583,7 +583,7 @@ const showMediaDurationPopup = (media: DynamicMediaObject) => {
     };
     mediaDurationPopups.value[media.uniqueId] = true;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -598,7 +598,7 @@ const resetMediaDuration = (media: DynamicMediaObject) => {
       min: 0,
     };
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -610,7 +610,7 @@ function zoomIn(elemId: string) {
   try {
     panzooms[elemId].zoomIn();
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 }
 
@@ -619,7 +619,7 @@ function zoomOut(elemId: string) {
     panzooms[elemId].zoomOut();
     zoomReset(elemId);
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 }
 
@@ -656,7 +656,7 @@ const destroyPanzoom = (elemId: string) => {
     panzooms[elemId].destroy();
     delete panzooms[elemId];
   } catch (e) {
-    console.error(e);
+    errorCatcher(e);
   }
 };
 
@@ -688,7 +688,7 @@ const initiatePanzoom = (elemId: string) => {
       },
     );
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 

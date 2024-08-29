@@ -100,6 +100,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { getLocaleDayName } from 'src/helpers/date';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
@@ -140,7 +141,7 @@ function chooseCongregation(
       }
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     router.push('/');
   }
 }

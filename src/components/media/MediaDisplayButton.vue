@@ -257,6 +257,7 @@
 import { storeToRefs } from 'pinia';
 import { barStyle, thumbStyle } from 'src/boot/globals';
 import { electronApi } from 'src/helpers/electron-api';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import { getTempDirectory } from 'src/helpers/fs';
 import {
   convertImageIfNeeded,
@@ -373,14 +374,14 @@ const chooseCustomBackground = async (reset?: boolean) => {
           }
         }
       } catch (error) {
-        console.error(error);
+        errorCatcher(error);
         notifyInvalidBackgroundFile();
         mediaWindowCustomBackground.value = '';
         jwpubImportFilePath.value = '';
       }
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -410,7 +411,7 @@ watch(
       );
       screenList.value = getAllScreens();
     } catch (error) {
-      console.error(error);
+      errorCatcher(error);
     }
   },
   { deep: true, immediate: true },
@@ -422,7 +423,7 @@ const windowScreenListener = (event: CustomEventInit) => {
       event.detail.targetScreenNumber;
     screenPreferences.value.preferWindowed = event.detail.windowedMode;
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
@@ -430,7 +431,7 @@ const updateScreenMetrics = () => {
   try {
     screenList.value = getAllScreens();
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 

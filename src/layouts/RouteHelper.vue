@@ -3,16 +3,17 @@
   <p></p>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { errorCatcher } from 'src/helpers/error-catcher';
 import { onBeforeMount } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 
-function searchParam(key) {
+function searchParam(key: string) {
   try {
     return new URLSearchParams(location.search).get(key);
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
     return '';
   }
 }
@@ -24,7 +25,7 @@ onBeforeMount(() => {
       router.push({ path: `/${param}` });
     }
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 });
 </script>

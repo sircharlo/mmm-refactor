@@ -1,5 +1,7 @@
 import { Notify, QNotifyCreateOptions } from 'quasar';
 
+import { errorCatcher } from './error-catcher';
+
 const createTemporaryNotification = ({
   badgeStyle,
   caption,
@@ -28,7 +30,7 @@ const createTemporaryNotification = ({
       ...(badgeStyle && { badgeStyle }),
     });
   } catch (error) {
-    console.error(error);
+    errorCatcher(error);
   }
 };
 
