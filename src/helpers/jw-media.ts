@@ -620,7 +620,7 @@ const getWtIssue = async (
       return weekItem.FirstDateOffset === mondayAsNumber;
     });
     if (weekNr === -1) {
-      throw new Error('No week found: ' + issueString);
+      console.log('No week found in following w: ' + issueString);
     }
     const docId = (
       executeQuery(
