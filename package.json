@@ -83,5 +83,8 @@
     "npm": ">= 6.13.4",
     "yarn": ">= 1.21.1"
   },
-  "packageManager": "yarn@4.4.1"
+  "packageManager": "yarn@4.4.1",
+  "resolutions": {
+    "canvas": "npm:empty-npm-package@1.0.0"
+  }
 }

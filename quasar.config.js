@@ -137,11 +137,11 @@ module.exports = configure(function (/* ctx */) {
       builder: {
         appId: 'sircharlo.meeting-media-manager-v2',
         artifactName: 'meeting-media-manager-${version}.${ext}',
-        buildDependenciesFromSource: true,
-        files: [
-          '!node_modules/better-sqlite3/build/Release/*.node',
-          '!node_modules/canvas/build/Release/*.node',
-        ],
+        // buildDependenciesFromSource: true,
+        // files: [
+        //   '!node_modules/better-sqlite3/build/Release/*.node',
+        //   '!node_modules/canvas/build/Release/*.node',
+        // ],
         generateUpdatesFilesForAllChannels: true,
         linux: {
           category: 'Utility',
@@ -163,7 +163,7 @@ module.exports = configure(function (/* ctx */) {
         },
         productName: 'Meeting Media Manager',
         win: {
-          asar: false,
+          // asar: false,
           icon: 'icons/icon.ico',
           publish: ['github'],
           target: [
