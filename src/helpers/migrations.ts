@@ -78,7 +78,10 @@ const buildNewPrefsObject = (oldPrefs: OldAppConfig) => {
       lang: oldPrefs.media.lang || '',
       langFallback: oldPrefs.media.langFallback || '',
       langSubtitles: oldPrefs.media.langSubs || '',
-      localAppLang: oldPrefs.app.localAppLang || 'en-US',
+      localAppLang:
+        (oldPrefs.app.localAppLang?.includes('-')
+          ? oldPrefs.app.localAppLang
+          : oldPrefs.app.localAppLang + '-US') || 'en-US',
       maxRes: oldPrefs.media.maxRes || '720p',
       musicVolume: oldPrefs.meeting.musicVolume || 100,
       mwDay: oldPrefs.meeting.mwDay?.toString() || '',
