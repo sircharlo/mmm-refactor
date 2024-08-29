@@ -67,7 +67,7 @@
     "autoprefixer": "^10.4.20",
     "electron": "^32.0.1",
     "electron-builder": "^24.13.3",
-    "eslint": "^8.57.0",
+    "eslint": "^9.9.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-perfectionist": "^3.3.0",
     "eslint-plugin-vue": "^9.27.0",
