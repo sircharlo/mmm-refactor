@@ -1195,12 +1195,12 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
         },
         nodir: true,
       });
-      errorCatcher({
-        error: 'No response, falling back to cache',
-        files,
-        pubDir,
-        publication,
-      });
+      errorCatcher(
+        'No response, falling back to cache: ' +
+          pubDir +
+          '\n' +
+          JSON.stringify(publication, null, 2),
+      );
       return files.length > 0 ? files[0].path : '';
     }
     if (!responseObject) return '';
