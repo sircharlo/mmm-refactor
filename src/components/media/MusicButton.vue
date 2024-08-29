@@ -219,17 +219,19 @@ const getNextSong = async () => {
         if (timeBeforeMeetingStart) {
           const customSongList = [] as klawSync.Item[];
           songList.value = songList.value.concat(selectedDaySongs).reverse();
-          while (musicDurationSoFar < timeBeforeMeetingStart) {
-            const queuedSong = songList.value.shift() as klawSync.Item;
-            const songDuration = await getDurationFromMediaPath(
-              queuedSong.path,
-            );
-            customSongList.unshift(queuedSong);
-            secsFromEnd = timeBeforeMeetingStart - musicDurationSoFar;
-            musicDurationSoFar += songDuration;
-            songList.value.push(queuedSong);
+          if (songList.value.length) {
+            while (musicDurationSoFar < timeBeforeMeetingStart) {
+              const queuedSong = songList.value.shift() as klawSync.Item;
+              const songDuration = await getDurationFromMediaPath(
+                queuedSong.path,
+              );
+              customSongList.unshift(queuedSong);
+              secsFromEnd = timeBeforeMeetingStart - musicDurationSoFar;
+              musicDurationSoFar += songDuration;
+              songList.value.push(queuedSong);
+            }
+            songList.value = customSongList;
           }
-          songList.value = customSongList;
         }
       } catch (error) {
         errorCatcher(error);
@@ -306,8 +308,7 @@ async function playMusic() {
     musicPlayer.value.appendChild(musicPlayerSource.value);
     musicPlayer.value.style.display = 'none';
     document.body.appendChild(musicPlayer.value);
-    musicPlayer.value.volume =
-      (currentSettings.value?.musicVolume ?? 100) / 100 ?? 1;
+    musicPlayer.value.volume = 0;
     const { duration, nextSongUrl, secsFromEnd } = await getNextSong();
     if (!nextSongUrl) return;
     musicPlayerSource.value.src = nextSongUrl;
@@ -318,15 +319,10 @@ async function playMusic() {
       .play()
       .then(() => {
         musicPlaying.value = true;
-      })
-      .catch((error) => {
-        errorCatcher(error);
-      });
-
-    musicPlayer.value
-      .play()
-      .then(() => {
-        musicPlaying.value = true;
+        fadeToVolumeLevel(
+          (currentSettings.value?.musicVolume ?? 100) / 100 ?? 1,
+          7.5,
+        );
       })
       .catch((error) => {
         errorCatcher(error);

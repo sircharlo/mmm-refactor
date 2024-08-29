@@ -111,14 +111,18 @@ watch(
 
 const handleKeyPress = (event: KeyboardEvent) => {
   try {
-    const { altKey, ctrlKey, key, metaKey, shiftKey } = event;
+    const { altKey, code, ctrlKey, key, metaKey, shiftKey } = event;
     const keys = [];
     if (ctrlKey) keys.push('Ctrl');
     if (shiftKey) keys.push('Shift');
     if (altKey) keys.push('Alt');
     if (metaKey) keys.push('Meta');
     if (key?.length < 3 && keys.length > 0) {
-      keys.push(key);
+      if (code.startsWith('Key')) {
+        keys.push(code.slice(3).toLowerCase());
+      } else {
+        keys.push(key);
+      }
       localValue.value = keys.join('+');
     }
   } catch (e) {
