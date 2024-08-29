@@ -1,3 +1,4 @@
+console.log('before preload remote');
 import {
   app,
   BrowserWindow,
@@ -5,6 +6,7 @@ import {
   globalShortcut,
   screen,
 } from '@electron/remote';
+console.log('after preload remote');
 import AdmZip from 'adm-zip';
 import * as sqlite3 from 'better-sqlite3';
 import { contextBridge, shell } from 'electron';
