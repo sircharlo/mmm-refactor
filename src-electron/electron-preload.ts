@@ -328,8 +328,12 @@ const registerShortcut = (keySequence: string, callback: () => void) => {
 
 const unregisterShortcut = (keySequence: string) => {
   if (!keySequence) return;
-  if (globalShortcut.isRegistered(keySequence))
-    globalShortcut.unregister(keySequence);
+  try {
+    if (globalShortcut.isRegistered(keySequence))
+      globalShortcut.unregister(keySequence);
+  } catch (err) {
+    errorCatcher(err);
+  }
 };
 
 const convertPdfToImages = async (pdfPath: string, outputFolder: string) => {
