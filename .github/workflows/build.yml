@@ -108,13 +108,13 @@ jobs:
       #     pip install setuptools
       #   if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
-      - name: Install dependencies on Ubuntu
-        if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get update && sudo apt-get install libsdl-pango-dev
+      # - name: Install dependencies on Ubuntu
+      #   if: matrix.os == 'ubuntu-latest'
+      #   run: sudo apt-get update && sudo apt-get install libsdl-pango-dev
 
-      - name: Install dependencies on macOS
-        if: matrix.os == 'macos-latest'
-        run: brew install pkg-config cairo pango libpng jpeg giflib
+      # - name: Install dependencies on macOS
+      #   if: matrix.os == 'macos-latest'
+      #   run: brew install pkg-config cairo pango libpng jpeg giflib
 
       - run: |
           yarn install
