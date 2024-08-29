@@ -119,20 +119,26 @@ const filterFn = (
   val: string,
   update: (arg0: { (): void; (): void }) => void,
 ) => {
-  try {
-    if (val === '') throw new Error('No language');
-    update(() => {
-      const needle = val.toLowerCase();
-      filteredJwLanguages.value = jwLanguages.value.list.filter(
-        (v) =>
-          v.name.toLowerCase().indexOf(needle) > -1 ||
-          v.vernacularName.toLowerCase().indexOf(needle) > -1,
-      );
-    });
-  } catch (error) {
+  const noFilter = () => {
     update(() => {
       filteredJwLanguages.value = jwLanguages.value.list;
     });
+  };
+  try {
+    if (!val) {
+      noFilter();
+    } else {
+      update(() => {
+        const needle = val.toLowerCase();
+        filteredJwLanguages.value = jwLanguages.value.list.filter(
+          (v) =>
+            v.name.toLowerCase().indexOf(needle) > -1 ||
+            v.vernacularName.toLowerCase().indexOf(needle) > -1,
+        );
+      });
+    }
+  } catch (error) {
+    noFilter();
     errorCatcher(error);
   }
 };

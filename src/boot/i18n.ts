@@ -11,13 +11,11 @@ import { createI18n } from 'vue-i18n';
 export type MessageLanguages = keyof typeof messages;
 export type MessageSchema = (typeof messages)['en-US'];
 
-/* eslint-disable @typescript-eslint/no-empty-interface */
-declare module 'vue-i18n' {
-  export interface DefineLocaleMessage extends MessageSchema {}
-  export interface DefineDateTimeFormat {}
-  export interface DefineNumberFormat {}
-}
-/* eslint-enable @typescript-eslint/no-empty-interface */
+// declare module 'vue-i18n' {
+//   export interface DefineLocaleMessage extends MessageSchema {}
+//   export interface DefineDateTimeFormat {}
+//   export interface DefineNumberFormat {}
+// }
 
 const refreshDateLocale = async (locale: string) => {
   const langList = import.meta.glob('../../node_modules/quasar/lang/*.js');
@@ -37,6 +35,7 @@ const refreshDateLocale = async (locale: string) => {
     } catch (err) {
       // errorCatcher(err);
       // errorCatcher(`Failed to load language pack for locale ${locale}`);
+      console.log(err, `Failed to load language pack for locale ${locale}`);
       return false; // Failed to load the language pack
     }
   };
