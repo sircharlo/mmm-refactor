@@ -33,6 +33,29 @@ const getMediaWindow = () =>
   );
 
 const bc = new BroadcastChannel('mediaPlayback');
+let websiteWindow: Electron.CrossProcessExports.BrowserWindow | null = null;
+
+const zoomWebsiteWindow = (action: string) => {
+  if (!websiteWindow) return;
+  if (action === 'in') {
+    websiteWindow.webContents.zoomFactor =
+      websiteWindow.webContents.getZoomFactor() + 0.2;
+  } else if (action === 'out') {
+    websiteWindow.webContents.zoomFactor =
+      websiteWindow.webContents.getZoomFactor() - 0.2;
+  }
+};
+
+const navigateWebsiteWindow = (action: string) => {
+  if (!websiteWindow) return;
+  if (action === 'back') {
+    websiteWindow.webContents.navigationHistory.goBack();
+  } else if (action === 'forward') {
+    websiteWindow.webContents.navigationHistory.goForward();
+  } else if (action === 'refresh') {
+    websiteWindow.webContents.reload();
+  }
+};
 
 const closeWebsiteWindow = () => {
   const websiteWindow = BrowserWindow.getAllWindows().find((w) =>
@@ -47,7 +70,7 @@ const openWebsiteWindow = () => {
   const mainWindow = getMainWindow();
   if (!mainWindow) return;
 
-  const websiteWindow = new BrowserWindow({
+  websiteWindow = new BrowserWindow({
     alwaysOnTop: true,
     height: 720,
     title: 'Website Stream',
@@ -56,9 +79,11 @@ const openWebsiteWindow = () => {
   });
 
   // websiteWindow.webContents.openDevTools();
+  if (!websiteWindow) return;
 
   websiteWindow.webContents.setVisualZoomLevelLimits(1, 5);
   websiteWindow.webContents.on('zoom-changed', (event, zoomDirection) => {
+    if (!websiteWindow) return;
     const currentZoom = websiteWindow.webContents.getZoomFactor();
     if (zoomDirection === 'in') {
       websiteWindow.webContents.setZoomFactor(currentZoom + 0.2);
@@ -68,11 +93,12 @@ const openWebsiteWindow = () => {
   });
   websiteWindow.webContents.setWindowOpenHandler((details) => {
     // Prevent popups from opening new windows; open them in the main browser window instead
-    websiteWindow.webContents.loadURL(details.url);
+    websiteWindow?.webContents.loadURL(details.url);
     return { action: 'deny' };
   });
 
   const setAspectRatio = () => {
+    if (!websiteWindow) return;
     // Compute the new aspect ratio that, when the frame is removed, results in a 16:9 aspect ratio for the content
     const size = websiteWindow.getSize();
     const contentSize = websiteWindow.getContentSize();
@@ -435,6 +461,7 @@ contextBridge.exposeInMainWorld('electronApi', {
     }
   },
   fileUrlToPath: (fileurl: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const url: typeof import('url') = require('node:url');
     return url.fileURLToPath(fileurl);
   },
@@ -451,6 +478,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   },
   klawSync,
   moveMediaWindow,
+  navigateWebsiteWindow,
   openExternalWebsite: (url: string) => {
     shell.openExternal(url);
   },
@@ -468,6 +496,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   },
   path,
   pathToFileURL: (path: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const url: typeof import('url') = require('node:url');
     return url.pathToFileURL(path).href;
   },
@@ -493,4 +522,5 @@ contextBridge.exposeInMainWorld('electronApi', {
   },
   toggleMediaWindow,
   unregisterShortcut,
+  zoomWebsiteWindow,
 });
