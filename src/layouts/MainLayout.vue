@@ -955,9 +955,13 @@ const getEventDates = () => {
     const meetingDates = lookupPeriod.value[currentCongregation.value]
       ?.filter((day) => day.meeting)
       .map((day) => date.formatDate(day.date, 'YYYY/MM/DD'));
-    const additionalMediaDates = Object.keys(
-      additionalMediaMaps.value[currentCongregation.value],
-    ).map((day) => date.formatDate(day, 'YYYY/MM/DD'));
+    const additionalMedia =
+      additionalMediaMaps.value[currentCongregation.value];
+    const additionalMediaDates = additionalMedia
+      ? Object.keys(additionalMedia).map((day) =>
+          date.formatDate(day, 'YYYY/MM/DD'),
+        )
+      : [];
     return meetingDates.concat(additionalMediaDates);
   } catch (error) {
     errorCatcher(error);
