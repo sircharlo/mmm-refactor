@@ -30,6 +30,7 @@ export interface ElectronApi {
     windowedMode?: boolean,
     noEvent?: boolean,
   ) => void;
+  navigateWebsiteWindow: (action: string) => void;
   openExternalWebsite: (url: string) => void;
   openFileDialog: (single?: boolean) => Promise<Electron.OpenDialogReturnValue>;
   openWebsiteWindow: () => void;
@@ -40,6 +41,7 @@ export interface ElectronApi {
   setAutoStartAtLogin: (value: boolean) => void;
   toggleMediaWindow: (action: string) => void;
   unregisterShortcut: (shortcut: string) => void;
+  zoomWebsiteWindow: (action: string) => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment

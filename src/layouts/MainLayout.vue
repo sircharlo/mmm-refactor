@@ -352,6 +352,58 @@
             </q-btn>
           </template>
           <template v-else-if="route.fullPath === '/present-website'">
+            <template v-if="mediaPlayingAction == 'website'">
+              <q-btn-group unelevated>
+                <q-btn
+                  @click="zoomWebsiteWindow('out')"
+                  color="white-transparent"
+                >
+                  <q-icon name="mmm-minus" size="xs" />
+                  <q-tooltip :delay="1000">{{ $t('zoom-out') }}</q-tooltip>
+                </q-btn>
+                <q-btn
+                  @click="zoomWebsiteWindow('in')"
+                  color="white-transparent"
+                >
+                  <q-icon name="mmm-plus" size="xs" />
+                  <q-tooltip :delay="1000">{{ $t('zoom-in') }}</q-tooltip>
+                </q-btn>
+              </q-btn-group>
+              <q-btn-group unelevated>
+                <q-btn
+                  @click="navigateWebsiteWindow('back')"
+                  color="white-transparent"
+                >
+                  <q-icon name="mmm-arrow-back" size="xs" />
+                  <q-tooltip :delay="1000">{{ $t('back') }}</q-tooltip>
+                </q-btn>
+                <q-btn
+                  @click="navigateWebsiteWindow('forward')"
+                  color="white-transparent"
+                >
+                  <q-icon name="mmm-arrow-forward" size="xs" />
+                  <q-tooltip :delay="1000">{{ $t('forward') }}</q-tooltip>
+                </q-btn>
+                <q-btn
+                  @click="navigateWebsiteWindow('refresh')"
+                  color="white-transparent"
+                >
+                  <q-icon name="mmm-refresh" size="xs" />
+                  <q-tooltip :delay="1000">{{ $t('refresh') }}</q-tooltip>
+                </q-btn>
+              </q-btn-group>
+              <q-btn
+                @click="
+                  closeWebsiteWindow();
+                  mediaPlayingAction = '';
+                "
+                color="white-transparent"
+                unelevated
+              >
+                <q-icon class="q-mr-sm" name="mmm-mirror" size="xs" />
+                {{ $t('stop-mirroring') }}
+              </q-btn>
+            </template>
             <q-btn
               :disable="mediaPlaying"
               @click="
@@ -360,22 +412,10 @@
               "
               color="white-transparent"
               unelevated
-              v-if="mediaPlayingAction !== 'website'"
-            >
-              <q-icon class="q-mr-sm" name="mmm-mirror" size="xs" />
-              {{ $t('start-mirroring') }}
-            </q-btn>
-            <q-btn
-              @click="
-                closeWebsiteWindow();
-                mediaPlayingAction = '';
-              "
-              color="white-transparent"
-              unelevated
               v-else
             >
               <q-icon class="q-mr-sm" name="mmm-mirror" size="xs" />
-              {{ $t('stop-mirroring') }}
+              {{ $t('start-mirroring') }}
             </q-btn>
           </template>
         </div>
@@ -757,10 +797,12 @@ const {
   fs,
   getAppVersion,
   klawSync,
+  navigateWebsiteWindow,
   openExternalWebsite,
   openWebsiteWindow,
   pathToFileURL,
   setAutoStartAtLogin,
+  zoomWebsiteWindow,
 } = electronApi;
 
 const { locale, t } = useI18n({ useScope: 'global' });
