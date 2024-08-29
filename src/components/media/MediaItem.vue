@@ -116,7 +116,7 @@
                           ]?.[media.uniqueId]?.max,
                         )
                       "
-                      :step="0"
+                      :step="0.1"
                       label
                       label-always
                       v-model="
@@ -296,11 +296,21 @@
                 "
               >
                 <q-slider
+                  :inner-max="
+                    customDurations?.[currentCongregation]?.[selectedDate]?.[
+                      media.uniqueId
+                    ]?.max ?? media.duration
+                  "
+                  :inner-min="
+                    customDurations?.[currentCongregation]?.[selectedDate]?.[
+                      media.uniqueId
+                    ]?.min ?? 0
+                  "
                   :label-value="formatTime(mediaPlayingCurrentPosition)"
                   :max="media.duration"
                   :min="0"
                   :readonly="mediaPlayingAction !== 'pause'"
-                  :step="0"
+                  :step="0.1"
                   @update:model-value="seekTo"
                   label
                   track-color="accent-200"
@@ -556,7 +566,7 @@ const imageLoadingError = (media: DynamicMediaObject) => {
   getThumbnailUrl(media.fileUrl)
     .then((thumbnailUrl) => {
       media.thumbnailUrl = thumbnailUrl;
-      warningCatcher('Reloaded thumbnail: ' +  thumbnailUrl);
+      warningCatcher('Reloaded thumbnail: ' + thumbnailUrl);
     })
     .catch((error) => {
       media.thumbnailUrl = '';
