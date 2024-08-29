@@ -1312,12 +1312,14 @@ const getEventDayColor = (eventDate: string) => {
         (d) => date.getDateDiff(eventDate, d.date, 'days') === 0,
       )?.complete === true;
     if (isComplete) return 'primary';
-    const isAdditional = Object.keys(
-      additionalMediaMaps.value[currentCongregation.value],
-    )
-      .map((day) => date.formatDate(day, 'YYYY/MM/DD'))
-      .includes(eventDate);
-    if (isAdditional) return 'additional';
+    const additionalDates =
+      additionalMediaMaps.value[currentCongregation.value];
+    if (additionalDates) {
+      const isAdditional = Object.keys(additionalDates)
+        .map((day) => date.formatDate(day, 'YYYY/MM/DD'))
+        .includes(eventDate);
+      if (isAdditional) return 'additional';
+    }
   } catch (error) {
     errorCatcher(error);
     return 'negative';
