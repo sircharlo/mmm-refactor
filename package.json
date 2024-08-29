@@ -15,7 +15,6 @@
     "icons": "node ./build/svg2font.js"
   },
   "dependencies": {
-    "@daipeng7/rollup-plugin-iconfont": "^3.0.6",
     "@electron/remote": "^2.1.2",
     "@formkit/drag-and-drop": "^0.1.6",
     "@panzoom/panzoom": "^4.5.1",
@@ -49,6 +48,7 @@
     "vue-router": "^4.4.3"
   },
   "devDependencies": {
+    "@daipeng7/rollup-plugin-iconfont": "^3.0.6",
     "@electron/rebuild": "^3.6.0",
     "@intlify/vite-plugin-vue-i18n": "^7.0.0",
     "@quasar/app-vite": "^1.9.5",

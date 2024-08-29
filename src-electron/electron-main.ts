@@ -1,4 +1,6 @@
+console.log('before main remote');
 import { enable, initialize } from '@electron/remote/main';
+console.log('after main remote');
 import { app, BrowserWindow, Menu, session } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import windowStateKeeper from 'electron-window-state';

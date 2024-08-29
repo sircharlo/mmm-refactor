@@ -134,5 +134,6 @@ jobs:
           name: package-${{ matrix.os }}
           path: |
             dist/electron/Packaged/*.exe
+            dist/electron/UnPackaged/node_modules/@electron/remote/package.json
             dist/electron/Packaged/*.dmg
             dist/electron/Packaged/*.AppImage
