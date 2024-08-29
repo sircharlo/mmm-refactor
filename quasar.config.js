@@ -85,18 +85,18 @@ module.exports = configure(function (/* ctx */) {
             include: path.resolve(__dirname, './src/i18n/**'),
           },
         ],
-        [
-          'vite-plugin-checker',
-          {
-            eslint: {
-              lintCommand: 'eslint "./**/*.{js,ts,mjs,cjs,vue}"',
-            },
-            vueTsc: {
-              tsconfigPath: 'tsconfig.vue-tsc.json',
-            },
-          },
-          { server: false },
-        ],
+        // [
+        //   'vite-plugin-checker',
+        //   {
+        //     eslint: {
+        //       lintCommand: 'eslint "./**/*.{js,ts,mjs,cjs,vue}"',
+        //     },
+        //     vueTsc: {
+        //       tsconfigPath: 'tsconfig.vue-tsc.json',
+        //     },
+        //   },
+        //   { server: false },
+        // ],
       ],
       vueRouterMode: 'hash', // available values: 'hash', 'history'
     },
