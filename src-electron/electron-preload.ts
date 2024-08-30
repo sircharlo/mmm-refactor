@@ -472,7 +472,7 @@ contextBridge.exposeInMainWorld('electronApi', {
     }
   },
   fileUrlToPath: (fileurl: string) => {
-    if (!fileurl) return null;
+    if (!fileurl) return '';
     if (!isFileUrl(fileurl)) return fileurl;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const url: typeof import('url') = require('node:url');
