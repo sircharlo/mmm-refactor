@@ -145,7 +145,10 @@ bc.onmessage = (event) => {
             }
             if (!mediaElement.value) return;
             mediaElement.value.srcObject = stream;
-            mediaElement.value.play();
+            mediaElement.value.play().catch((error) => {
+              if (!error.includes('removed from the document'))
+                errorCatcher(error);
+            });
           })
           .catch((e) => errorCatcher(e));
       } else {
@@ -175,7 +178,7 @@ bc.onmessage = (event) => {
         mediaElement.value.pause();
       } else if (event.data.action === 'play') {
         mediaElement.value.play().catch((error) => {
-          errorCatcher(error);
+          if (!error.includes('removed from the document')) errorCatcher(error);
         });
       }
     }
@@ -256,7 +259,7 @@ const playMedia = () => {
     }
     mediaElement.value.currentTime = customStartStop.min;
     mediaElement.value.play().catch((error) => {
-      errorCatcher(error);
+      if (!error.includes('removed from the document')) errorCatcher(error);
     });
   } catch (e) {
     errorCatcher(e);
