@@ -34,14 +34,18 @@ const getTempDirectory = () => {
   return tempDirectory;
 };
 
-const getPublicationDirectory = (publication: PublicationFetcher) => {
+const getPublicationDirectory = (
+  publication: PublicationFetcher,
+  noIssue = false,
+) => {
   try {
+    console.log(publication);
     const dir = path.join(
       getPublicationsPath(),
       publication.pub +
         '_' +
         publication.langwritten +
-        (publication.issue !== undefined
+        (publication.issue !== undefined && !noIssue
           ? '_' + publication.issue.toString()
           : ''),
     );
@@ -83,6 +87,7 @@ const getPublicationDirectoryContents = (
 };
 
 const getFileUrl = (path: string) => {
+  console.log(path, isFileUrl(path));
   if (!path) return '';
   if (isFileUrl(path)) return path;
   return pathToFileURL(path);

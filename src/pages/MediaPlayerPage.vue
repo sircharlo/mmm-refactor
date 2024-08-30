@@ -145,8 +145,11 @@ bc.onmessage = (event) => {
             }
             if (!mediaElement.value) return;
             mediaElement.value.srcObject = stream;
-            mediaElement.value.play().catch((error) => {
-              if (!error.includes('removed from the document'))
+            mediaElement.value.play().catch((error: Error) => {
+              if (
+                !error.message.includes('removed from the document') &&
+                !error.message.includes('new load request')
+              )
                 errorCatcher(error);
             });
           })
@@ -177,8 +180,12 @@ bc.onmessage = (event) => {
       if (event.data.action === 'pause') {
         mediaElement.value.pause();
       } else if (event.data.action === 'play') {
-        mediaElement.value.play().catch((error) => {
-          if (!error.includes('removed from the document')) errorCatcher(error);
+        mediaElement.value.play().catch((error: Error) => {
+          if (
+            !error.message.includes('removed from the document') &&
+            !error.message.includes('new load request')
+          )
+            errorCatcher(error);
         });
       }
     }
@@ -258,8 +265,12 @@ const playMedia = () => {
       ]?.[mediaUniqueId.value] ?? { min: 0 };
     }
     mediaElement.value.currentTime = customStartStop.min;
-    mediaElement.value.play().catch((error) => {
-      if (!error.includes('removed from the document')) errorCatcher(error);
+    mediaElement.value.play().catch((error: Error) => {
+      if (
+        !error.message.includes('removed from the document') &&
+        !error.message.includes('new load request')
+      )
+        errorCatcher(error);
     });
   } catch (e) {
     errorCatcher(e);

@@ -13,10 +13,6 @@ export interface DatedTextItem {
   Link: string;
 }
 
-export interface DocumentItem {
-  DocumentId: number;
-}
-
 export interface MultimediaItemsFetcher {
   BeginParagraphOrdinal?: number;
   db: string;
@@ -129,6 +125,7 @@ export interface MultimediaExtractItem {
 }
 
 export interface DocumentItem {
+  DocumentId: number;
   FeatureTitle: string;
   Title: string;
 }

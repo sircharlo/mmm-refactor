@@ -74,18 +74,21 @@ const addJwpubDocumentMediaToFiles = async (
   try {
     if (!dbPath) return;
     const publication = getPublicationInfoFromDb(dbPath);
+    console.log('publication', publication);
     const multimediaItems = getDocumentMultimediaItems({
       db: dbPath,
       docId: document.DocumentId,
     }).map((multimediaItem) =>
       addFullFilePathToMultimediaItem(multimediaItem, publication),
     );
+    console.log('multimediaItems', multimediaItems);
     await processMissingMediaInfo(multimediaItems);
     const dynamicMediaItems = await dynamicMediaMapper(
       multimediaItems,
       selectedDateObject.value?.date,
       true,
     );
+    console.log('dynamicMediaItems', dynamicMediaItems);
     addToAdditionMediaMap(dynamicMediaItems);
   } catch (e) {
     errorCatcher(e);

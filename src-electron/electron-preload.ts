@@ -424,8 +424,7 @@ const convertPdfToImages = async (pdfPath: string, outputFolder: string) => {
 const isFileUrl = (path: string) => {
   if (!path) return false;
   try {
-    const url = new URL(path);
-    return url.protocol === 'file:';
+    return path.startsWith('file://');
   } catch (err) {
     errorCatcher(err + ': ' + path);
     return false;

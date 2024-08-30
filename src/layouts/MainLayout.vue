@@ -84,6 +84,21 @@
                       }}</q-item-label>
                     </q-item-section>
                   </q-item>
+                  <q-item
+                    @click="publicTalkMediaPopup = true"
+                    clickable
+                    v-close-popup
+                  >
+                    <q-item-section avatar>
+                      <q-icon color="primary" name="mmm-lectern" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>{{ $t('public-talk-media') }}</q-item-label>
+                      <q-item-label caption>{{
+                        $t('media-from-s34mp')
+                      }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
                   <q-item-label header>{{
                     $t('from-local-computer')
                   }}</q-item-label>
@@ -432,7 +447,7 @@
     >
       <ActionIsland />
     </q-footer>
-
+    <PublicTalkMediaPicker v-model="publicTalkMediaPopup" />
     <SongPicker v-model="chooseSong" />
     <q-drawer
       :breakpoint="5"
@@ -684,6 +699,7 @@ import { get } from 'src/boot/axios';
 import { queues } from 'src/boot/globals';
 import { barStyle, thumbStyle } from 'src/boot/globals';
 import { refreshDateLocale } from 'src/boot/i18n';
+import PublicTalkMediaPicker from 'src/components/media/PublicTalkMediaPicker.vue';
 import SongPicker from 'src/components/media/SongPicker.vue';
 import ActionIsland from 'src/components/ui/ActionIsland.vue';
 import {
@@ -1026,6 +1042,8 @@ const calculatingCacheSize = ref(false);
 const cacheClearConfirmPopup = ref(false);
 const cacheClearType = ref<'' | 'all' | 'smart'>('');
 const deletingCacheFiles = ref(false);
+
+const publicTalkMediaPopup = ref(false);
 
 const dragging = () => {
   window.dispatchEvent(new Event('draggingSomething'));
