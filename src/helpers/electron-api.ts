@@ -24,6 +24,7 @@ export interface ElectronApi {
   getAppDataPath: () => string;
   getAppVersion: () => string;
   getUserDataPath: () => string;
+  isFileUrl: (url: string) => boolean;
   klawSync: typeof import('klaw-sync');
   moveMediaWindow: (
     targetScreenNumber?: number,

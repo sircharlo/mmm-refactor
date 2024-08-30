@@ -165,5 +165,8 @@
     "enableSubtitles",
     "themePreference",
     "enableKeyboardShortcuts"
-  ]
+  ],
+  "[ignore]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  }
 }

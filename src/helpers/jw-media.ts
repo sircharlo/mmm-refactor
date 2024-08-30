@@ -193,6 +193,7 @@ const downloadFile = async ({ dir, filename, url }: FileDownloader) => {
       path: destinationPath,
     };
   }
+  fs.ensureDirSync(dir);
   fs.writeFileSync(destinationPath, Buffer.from(downloadedData));
   return {
     new: true,
@@ -345,14 +346,19 @@ const getMultimediaMepsLangs = (source: MultimediaItemsFetcher) => {
       'ExtractMultimedia',
     ]) {
       // exists
-      const tableExists =
-        (
-          executeQuery(
-            source.db,
-            `SELECT * FROM sqlite_master WHERE type='table' AND name='${table}'`,
-          ) as TableItem[]
-        ).map((item) => item.name).length > 0;
-      if (!tableExists) continue;
+      try {
+        const tableExists =
+          (
+            executeQuery(
+              source.db,
+              `SELECT * FROM sqlite_master WHERE type='table' AND name='${table}'`,
+            ) as TableItem[]
+          ).map((item) => item.name).length > 0;
+        if (!tableExists) continue;
+      } catch (error) {
+        errorCatcher(source.db + ' - ' + table + ' - ' + error);
+        continue;
+      }
       const columnQueryResult = executeQuery(
         source.db,
         `PRAGMA table_info(${table})`,

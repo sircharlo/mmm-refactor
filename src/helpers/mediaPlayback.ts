@@ -30,6 +30,7 @@ const formatTime = (time: number) => {
     const seconds = Math.floor(time % 60);
     return `${pad(minutes.toString(), 2, '0')}:${pad(seconds.toString(), 2)}`;
   } catch (error) {
+    errorCatcher(error);
     return '..:..';
   }
 };
@@ -40,6 +41,7 @@ const isFileOfType = (filepath: string, validExtensions: string[]) => {
     const fileExtension = path.parse(filepath).ext.toLowerCase();
     return validExtensions.includes(fileExtension);
   } catch (error) {
+    errorCatcher(error);
     return false;
   }
 };
@@ -101,11 +103,6 @@ const isSong = (multimediaItem: MultimediaItem) => {
 const isRemoteUrl = (url: string) => {
   if (!url) return false;
   return url.startsWith('http://') || url.startsWith('https://');
-};
-
-const isFileUrl = (url: string) => {
-  if (!url) return false;
-  return url.startsWith('file://');
 };
 
 const inferExtension = (filename: string, filetype?: string) => {
@@ -370,7 +367,6 @@ export {
   inferExtension,
   isArchive,
   isAudio,
-  isFileUrl,
   isHeic,
   isImage,
   isImageString,

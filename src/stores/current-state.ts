@@ -18,7 +18,6 @@ export const useCurrentStateStore = defineStore('current-state', {
       try {
         if (!congregation) congregation = this.currentCongregation;
         if (!congregation) return [];
-        this.currentCongregation;
         const invalidSettings = [];
         for (const [settingsDefinitionId, settingsDefinition] of Object.entries(
           settingsDefinitions,
@@ -80,7 +79,7 @@ export const useCurrentStateStore = defineStore('current-state', {
         const { jwLanguages } = storeToRefs(jwStore);
         const currentLanguage = this.currentSettings?.lang as string;
         if (!currentLanguage || !jwLanguages.value)
-          throw new Error('No language');
+          return notSignLanguageSongbook;
         const currentLanguageIsSignLanguage = !!jwLanguages.value.list.find(
           (l) => l.langcode === currentLanguage,
         )?.isSignLanguage;

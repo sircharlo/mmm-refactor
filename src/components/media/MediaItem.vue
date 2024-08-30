@@ -560,13 +560,15 @@ const props = defineProps<{
 
 const imageLoadingError = (media: DynamicMediaObject) => {
   warningCatcher(
-    media + ': Unable to load thumbnail for media; trying to reload from file.',
+    media.thumbnailUrl +
+      ' / ' +
+      media.fileUrl +
+      ': Unable to load thumbnail for media; trying to reload from file.',
   );
   media.thumbnailUrl = '';
   getThumbnailUrl(media.fileUrl)
     .then((thumbnailUrl) => {
       media.thumbnailUrl = thumbnailUrl;
-      warningCatcher('Reloaded thumbnail: ' + thumbnailUrl);
     })
     .catch((error) => {
       media.thumbnailUrl = '';

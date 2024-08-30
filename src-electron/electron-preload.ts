@@ -421,6 +421,17 @@ const convertPdfToImages = async (pdfPath: string, outputFolder: string) => {
   }
 };
 
+const isFileUrl = (path: string) => {
+  if (!path) return false;
+  try {
+    const url = new URL(path);
+    return url.protocol === 'file:';
+  } catch (err) {
+    errorCatcher(err + ': ' + path);
+    return false;
+  }
+};
+
 contextBridge.exposeInMainWorld('electronApi', {
   closeWebsiteWindow,
   convert,
@@ -461,6 +472,8 @@ contextBridge.exposeInMainWorld('electronApi', {
     }
   },
   fileUrlToPath: (fileurl: string) => {
+    if (!fileurl) return null;
+    if (!isFileUrl(fileurl)) return fileurl;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const url: typeof import('url') = require('node:url');
     return url.fileURLToPath(fileurl);
@@ -476,6 +489,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   getUserDataPath: () => {
     return app.getPath('userData');
   },
+  isFileUrl,
   klawSync,
   moveMediaWindow,
   navigateWebsiteWindow,
@@ -496,6 +510,8 @@ contextBridge.exposeInMainWorld('electronApi', {
   },
   path,
   pathToFileURL: (path: string) => {
+    if (!path) return '';
+    if (isFileUrl(path)) return path;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const url: typeof import('url') = require('node:url');
     return url.pathToFileURL(path).href;
