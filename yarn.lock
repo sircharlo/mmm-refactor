@@ -7778,7 +7778,7 @@ __metadata:
     is-online: "npm:^11.0.0"
     jszip: "npm:^3.10.1"
     klaw-sync: "npm:^6.0.0"
-    music-metadata: "npm:^10.2.0"
+    music-metadata: "npm:^10.3.0"
     obs-websocket-js: "npm:^5.0.6"
     p-queue: "npm:^8.0.1"
     pdfjs-dist: "npm:^4.5.136"
@@ -7827,9 +7827,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"music-metadata@npm:^10.2.0":
-  version: 10.2.0
-  resolution: "music-metadata@npm:10.2.0"
+"music-metadata@npm:^10.3.0":
+  version: 10.3.0
+  resolution: "music-metadata@npm:10.3.0"
   dependencies:
     "@tokenizer/token": "npm:^0.3.0"
     content-type: "npm:^1.0.5"
@@ -7839,7 +7839,7 @@ __metadata:
     strtok3: "npm:^8.1.0"
     token-types: "npm:^6.0.0"
     uint8array-extras: "npm:^1.4.0"
-  checksum: 10c0/0278cedd224d089e1a07fad16209f85abb687269c0f1781810e82ebe5e4a65d3e0fc20ceb3efadd076e1582c8baab4a2839853873e4c14ec996c125cbbc29e3b
+  checksum: 10c0/3817989b3604d43c3b984d66fd390a4bcd7a3ca36f32232b52e78a03cbac4b62635e2db7815bc987f4cebe5b86af9d43b99bfe5ebc23151b49e169bb019cf112
   languageName: node
   linkType: hard
 
