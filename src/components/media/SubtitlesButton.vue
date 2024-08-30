@@ -1,5 +1,4 @@
 <template>
-  <!-- todo: add custom icon for this -->
   <q-btn
     :color="!subtitlesVisible ? 'negative' : 'white-transparent'"
     :icon="subtitlesVisible ? 'mmm-subtitles' : 'mmm-subtitles-off'"

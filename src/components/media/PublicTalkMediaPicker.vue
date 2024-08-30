@@ -39,7 +39,7 @@
         <q-scroll-area
           :bar-style="barStyle"
           :thumb-style="thumbStyle"
-          style="height: 40vh; width: -webkit-fill-available"
+          style="height: 30vh; width: -webkit-fill-available"
         >
           <template :key="publicTalk" v-for="publicTalk in filteredPublicTalks">
             <q-item

@@ -231,7 +231,6 @@
                   class="media-tag bg-accent-200"
                   square
                 >
-                  <!-- todo: add custom icon for this -->
                   <q-icon
                     :name="
                       media.paragraph !== 9999
