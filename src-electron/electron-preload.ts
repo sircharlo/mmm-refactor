@@ -16,6 +16,7 @@ import { RenderParameters } from 'pdfjs-dist/types/src/display/api';
 import { throttle } from 'quasar';
 import { FULL_HD } from 'src/helpers/converters';
 import { errorCatcher } from 'src/helpers/error-catcher';
+import { isFileUrl } from 'src/helpers/mediaPlayback';
 import { ScreenPreferences } from 'src/types/settings';
 import path from 'upath';
 
@@ -461,6 +462,8 @@ contextBridge.exposeInMainWorld('electronApi', {
     }
   },
   fileUrlToPath: (fileurl: string) => {
+    if (!fileurl) return '';
+    if (!isFileUrl(fileurl)) return fileurl;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const url: typeof import('url') = require('node:url');
     return url.fileURLToPath(fileurl);
@@ -496,6 +499,8 @@ contextBridge.exposeInMainWorld('electronApi', {
   },
   path,
   pathToFileURL: (path: string) => {
+    if (!path) return '';
+    if (isFileUrl(path)) return path;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const url: typeof import('url') = require('node:url');
     return url.pathToFileURL(path).href;

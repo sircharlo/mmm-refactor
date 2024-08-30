@@ -107,15 +107,11 @@ const getDurationFromMediaPath: (mediaPath: string) => Promise<number> = (
       resolve(mediaRef.duration);
     });
 
-    mediaRef.addEventListener('error', (err) => {
+    mediaRef.addEventListener('error', () => {
       mediaRef.remove();
-      reject(new Error('Error loading media: ' + err));
+      reject(new Error('Error loading media: ' + mediaPath));
     });
   });
-};
-
-const convertFileUrl = (path: string): string => {
-  return isFileUrl(path) ? fileUrlToPath(path) : path;
 };
 
 const getThumbnailFromMetadata = async (mediaPath: string) => {
@@ -131,7 +127,7 @@ const getThumbnailFromMetadata = async (mediaPath: string) => {
       return '';
     }
   } catch (error) {
-    errorCatcher(error);
+    errorCatcher(mediaPath + ': ' + error);
     return '';
   }
 };
@@ -142,14 +138,14 @@ const getThumbnailFromVideoPath: (
 ) => Promise<string> = (videoPath: string, thumbnailPath: string) => {
   return new Promise((resolve, reject) => {
     if (!videoPath) {
-      reject(new Error('No video path provided'));
+      reject();
       return;
     }
     const videoFileUrl = videoPath;
-    videoPath = convertFileUrl(videoPath);
-    thumbnailPath = convertFileUrl(thumbnailPath);
+    videoPath = fileUrlToPath(videoPath);
+    thumbnailPath = fileUrlToPath(thumbnailPath);
     if (!fs.existsSync(videoPath)) {
-      reject(new Error('Video path does not exist: ' + videoPath));
+      reject();
       return;
     }
 

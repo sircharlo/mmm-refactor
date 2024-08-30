@@ -186,9 +186,6 @@ const obsConnect = async (setup?: boolean) => {
         }
       } catch (error) {
         errorCatcher(error);
-        errorCatcher(
-          `Failed to connect to OBS (attempt ${attempt + 1}/${maxAttempts})`,
-        );
       } finally {
         attempt++;
         if (attempt < maxAttempts) {
