@@ -117,7 +117,9 @@ const getDurationFromMediaPath: (mediaPath: string) => Promise<number> = (
 
 const getThumbnailFromMetadata = async (mediaPath: string) => {
   try {
-    const metadata = await parseFile(fileUrlToPath(mediaPath));
+    mediaPath = fileUrlToPath(mediaPath);
+    if (!mediaPath || !fs.existsSync(mediaPath)) return '';
+    const metadata = await parseFile(mediaPath);
     if (metadata?.common?.picture?.length) {
       return URL.createObjectURL(
         new Blob([metadata.common.picture[0].data], {
