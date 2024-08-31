@@ -1355,7 +1355,7 @@ const getJwMediaInfo = async (publication: PublicationFetcher) => {
       title: responseObject.media[0].title,
     };
   } catch (error) {
-    errorCatcher(error);
+    console.log(error);
     return { subtitles: '', thumbnail: '', title: '' };
   }
 };

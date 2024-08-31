@@ -7,17 +7,19 @@
       <div class="row">{{ $t('select-s34mp-to-add-public-talk-media') }}</div>
       <div class="row items-center q-gutter-x-md">
         <q-icon name="mmm-file" size="md" />
-        <div class="col-grow">
+        <div class="col text-subtitle2">
           {{
             s34mpDb
               ? path.basename(s34mpDb, path.extname(s34mpDb))
               : $t('select-s34mp')
           }}
-          <!-- TODO: Add "YEAR, version VERSION" here -->
+        </div>
+        <div class="col-grow text-caption" v-if="s34mpDb">
+          {{ s34mpInfo.Year }}, v{{ s34mpInfo.VersionNumber }}
         </div>
         <q-btn @click="browse" color="primary" outline>
           <q-icon class="q-mr-sm" name="mmm-local-media" />
-          {{ $t('browse') }}
+          {{ s34mpDb ? $t('replace') : $t('browse') }}
         </q-btn>
       </div>
       <div class="row">
@@ -68,25 +70,20 @@ import { barStyle, thumbStyle } from 'src/boot/globals';
 // import { errorCatcher } from 'src/helpers/error-catcher';
 import { electronApi } from 'src/helpers/electron-api';
 import { getPublicationsPath } from 'src/helpers/fs';
-import {
-  addJwpubDocumentMediaToFiles,
-  // getDocumentMultimediaItems,
-} from 'src/helpers/jw-media';
+import { addJwpubDocumentMediaToFiles } from 'src/helpers/jw-media';
 import { decompressJwpub, findDb } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
-import { DocumentItem } from 'src/types/sqlite';
+import { DocumentItem, PublicationInfo } from 'src/types/sqlite';
 import { computed, ComputedRef, Ref, ref, watch } from 'vue';
 
 const { executeQuery, fs, openFileDialog, path } = electronApi;
 
-// // Define props and emits
 const props = defineProps<{
   modelValue: boolean | null;
 }>();
 
 const emit = defineEmits(['update:modelValue']);
 
-// // Setup logic
 const currentState = useCurrentStateStore();
 const { currentSettings } = storeToRefs(currentState);
 
@@ -102,12 +99,10 @@ const filteredPublicTalks: ComputedRef<DocumentItem[]> = computed(() => {
     : publicTalks.value;
 });
 
-// TODO: Check why not dynamic/persistent here
-const s34mpBasename = computed(() => 'S-34mp_' + currentSettings.value?.lang + '_0');
-const s34mpDir = computed(() =>
-  path.join(getPublicationsPath(), s34mpBasename.value),
-);
+const s34mpBasename = ref();
+const s34mpDir = ref();
 const s34mpDb = ref();
+const s34mpInfo = ref({} as PublicationInfo);
 
 const populatePublicTalks = () => {
   s34mpDb.value = findDb(s34mpDir.value);
@@ -116,8 +111,12 @@ const populatePublicTalks = () => {
     s34mpDb.value,
     'SELECT DISTINCT Document.DocumentId, Title FROM Document INNER JOIN DocumentMultimedia ON Document.DocumentId = DocumentMultimedia.DocumentId',
   ) as DocumentItem[];
+  const PublicationInfos = executeQuery(
+    s34mpDb.value,
+    'SELECT DISTINCT VersionNumber, Year FROM Publication',
+  ) as PublicationInfo[];
+  if (PublicationInfos.length) s34mpInfo.value = PublicationInfos[0];
 };
-populatePublicTalks();
 
 const browse = async () => {
   const s34mpFileSelection = await openFileDialog(true);
@@ -135,6 +134,7 @@ const dismissPopup = () => {
 const addPublicTalkMedia = (publicTalkDocId: DocumentItem) => {
   if (!s34mpDb.value || !publicTalkDocId) return;
   addJwpubDocumentMediaToFiles(s34mpDb.value, publicTalkDocId);
+  dismissPopup();
 };
 
 watch(localValue, (newValue) => {
@@ -145,6 +145,11 @@ watch(
   () => props.modelValue,
   (newValue) => {
     localValue.value = newValue;
+    if (currentSettings.value?.lang) {
+      s34mpBasename.value = 'S-34mp_' + currentSettings.value?.lang + '_0';
+      s34mpDir.value = path.join(getPublicationsPath(), s34mpBasename.value);
+      populatePublicTalks();
+    }
   },
 );
 </script>

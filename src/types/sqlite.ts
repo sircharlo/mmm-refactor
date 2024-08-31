@@ -137,6 +137,11 @@ export interface PublicationItem {
   UniqueEnglishSymbol: string;
 }
 
+export interface PublicationInfo {
+  VersionNumber: number;
+  Year: number;
+}
+
 export interface PublicationIssuePropertyItem {
   Title: string;
 }
@@ -163,6 +168,7 @@ export type QueryResponseItem =
   | MultimediaExtractRefItem
   | MultimediaItem
   | PlaylistTagItem
+  | PublicationInfo
   | PublicationItem
   | TableItem
   | VideoMarker;

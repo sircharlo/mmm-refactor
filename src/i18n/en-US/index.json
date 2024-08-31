@@ -312,5 +312,6 @@
   "media-from-s34mp": "Media from the S-34mp",
   "select-s34mp-to-add-public-talk-media": "Select an S-34mp JWPUB file downloaded from jw.org to quickly access the Public Talk Media Playlist. The file will be cached and can be updated by browsing to an updated version at any time.",
   "import-media-from-s34mp": "Import media from S-34mp",
-  "select-s34mp": "Select a S-34mp JWPUB file"
+  "select-s34mp": "Select a S-34mp JWPUB file",
+  "replace": "Replace"
 }

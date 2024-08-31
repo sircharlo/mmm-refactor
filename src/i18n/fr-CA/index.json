@@ -276,5 +276,6 @@
   "media-from-s34mp": "Médias du S-34mp",
   "select-s34mp-to-add-public-talk-media": "Sélectionnez un fichier JWPUB S-34mp téléchargé depuis jw.org pour accéder rapidement à la liste de lecture des médias pour discours publiques. Le fichier sera mis en cache et pourra être mis à jour en choissisant une version plus récente à tout moment.",
   "import-media-from-s34mp": "Importer des médias depuis le S-34mp",
-  "select-s34mp": "Sélectionnez un fichier JWPUB S-34mp"
+  "select-s34mp": "Sélectionnez un fichier JWPUB S-34mp",
+  "replace": "Remplacer"
 }
