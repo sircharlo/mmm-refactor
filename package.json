@@ -22,7 +22,7 @@
     "@quasar/extras": "^1.16.12",
     "@sentry/vue": "^8.27.0",
     "adm-zip": "^0.5.15",
-    "axios": "^1.7.5",
+    "axios": "^1.7.7",
     "better-sqlite3": "^11.2.1",
     "dayjs": "^1.11.13",
     "dompurify": "^3.1.6",
