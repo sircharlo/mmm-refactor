@@ -216,9 +216,10 @@ const getNextSong = async () => {
             return null;
           })
           .filter((song) => song !== null);
-        if (timeBeforeMeetingStart) {
+        if (timeBeforeMeetingStart > 0) {
           const customSongList = [] as klawSync.Item[];
-          songList.value = songList.value.concat(selectedDaySongs).reverse();
+          songList.value.push(selectedDaySongs)
+          songList.value.reverse();
           if (songList.value.length) {
             while (musicDurationSoFar < timeBeforeMeetingStart) {
               const queuedSong = songList.value.shift() as klawSync.Item;
@@ -243,7 +244,7 @@ const getNextSong = async () => {
         secsFromEnd: 0,
       };
     let nextSong = songList.value.shift() as klawSync.Item;
-    songList.value = songList.value.concat(nextSong);
+    songList.value.push(nextSong);
     try {
       const metadata = await parseFile(nextSong.path);
       musicPlayingTitle.value =
