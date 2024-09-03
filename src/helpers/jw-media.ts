@@ -625,7 +625,7 @@ const getWtIssue = async (
       return weekItem.FirstDateOffset === mondayAsNumber;
     });
     if (weekNr === -1) {
-      console.log('No week found in following w: ' + issueString);
+      throw new Error('No week found in following w: ' + issueString);
     }
     const docId = (
       executeQuery(
@@ -635,7 +635,7 @@ const getWtIssue = async (
     )[0]?.DocumentId;
     return { db, docId, issueString, publication, weekNr };
   } catch (e) {
-    errorCatcher(e);
+    console.error(e);
     return {
       db: '',
       docId: -1,

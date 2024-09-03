@@ -100,6 +100,12 @@ const getDurationFromMediaPath: (mediaPath: string) => Promise<number> = (
       return;
     }
 
+    if (!fs.existsSync(mediaPath)) {
+      // reject(new Error('Media path does not exist: ' + mediaPath));
+      resolve(0);
+      return;
+    }
+
     const mediaRef = document.createElement(
       isVideo(mediaPath) ? 'video' : 'audio',
     );
