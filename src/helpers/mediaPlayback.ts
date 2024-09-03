@@ -138,13 +138,17 @@ const jwpubDecompressor = async (jwpubPath: string, outputPath: string) => {
   }
 };
 
-const decompressJwpub = async (jwpubPath: string, outputPath?: string) => {
+const decompressJwpub = async (
+  jwpubPath: string,
+  outputPath?: string,
+  force = false,
+) => {
   try {
     const { extractedFiles } = storeToRefs(useCurrentStateStore());
     if (!isJwpub(jwpubPath)) return jwpubPath;
     if (!outputPath)
       outputPath = path.join(getTempDirectory(), path.basename(jwpubPath));
-    if (!extractedFiles.value[outputPath])
+    if (!extractedFiles.value[outputPath] || force)
       extractedFiles.value[outputPath] = jwpubDecompressor(
         jwpubPath,
         outputPath,

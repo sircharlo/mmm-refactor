@@ -14,47 +14,55 @@
               : $t('select-s34mp')
           }}
         </div>
-        <div class="col-grow text-caption" v-if="s34mpDb">
-          {{ s34mpInfo.Year }}, v{{ s34mpInfo.VersionNumber }}
+        <div class="col-grow text-caption" v-if="s34mpDb || s34mpFile">
+          <template v-if="s34mpDb && filteredPublicTalks.length > 0">
+            {{ s34mpInfo.Year }}, v{{ s34mpInfo.VersionNumber }}
+          </template>
+          <q-spinner color="primary" size="sm" v-else />
         </div>
         <q-btn @click="browse" color="primary" outline>
           <q-icon class="q-mr-sm" name="mmm-local-media" />
           {{ s34mpDb ? $t('replace') : $t('browse') }}
         </q-btn>
       </div>
-      <div class="row">
-        <q-input
-          :label="$t('search')"
-          class="col"
-          clearable
-          debounce="100"
-          dense
-          outlined
-          v-model="filter"
-        >
-          <template v-slot:prepend>
-            <q-icon name="mmm-search" />
-          </template>
-        </q-input>
-      </div>
-      <div class="row">
-        <q-scroll-area
-          :bar-style="barStyle"
-          :thumb-style="thumbStyle"
-          style="height: 30vh; width: -webkit-fill-available"
-        >
-          <template :key="publicTalk" v-for="publicTalk in filteredPublicTalks">
-            <q-item
-              @click="addPublicTalkMedia(publicTalk)"
-              class="items-center"
-              clickable
-              v-ripple
+      <template v-if="s34mpDb">
+        <div class="row">
+          <q-input
+            :label="$t('search')"
+            class="col"
+            clearable
+            debounce="100"
+            dense
+            outlined
+            v-model="filter"
+          >
+            <template v-slot:prepend>
+              <q-icon name="mmm-search" />
+            </template>
+          </q-input>
+        </div>
+        <div class="row">
+          <q-scroll-area
+            :bar-style="barStyle"
+            :thumb-style="thumbStyle"
+            style="height: 30vh; width: -webkit-fill-available"
+          >
+            <template
+              :key="publicTalk"
+              v-for="publicTalk in filteredPublicTalks"
             >
-              {{ publicTalk.Title }}
-            </q-item>
-          </template>
-        </q-scroll-area>
-      </div>
+              <q-item
+                @click="addPublicTalkMedia(publicTalk)"
+                class="items-center"
+                clickable
+                v-ripple
+              >
+                {{ publicTalk.Title }}
+              </q-item>
+            </template>
+          </q-scroll-area>
+        </div>
+      </template>
       <div class="row justify-end">
         <q-btn @click="dismissPopup" color="negative" flat>{{
           $t('cancel')
@@ -100,6 +108,7 @@ const filteredPublicTalks: ComputedRef<DocumentItem[]> = computed(() => {
 });
 
 const s34mpBasename = ref();
+const s34mpFile = ref();
 const s34mpDir = ref();
 const s34mpDb = ref();
 const s34mpInfo = ref({} as PublicationInfo);
@@ -121,9 +130,9 @@ const populatePublicTalks = () => {
 const browse = async () => {
   const s34mpFileSelection = await openFileDialog(true);
   if (!s34mpFileSelection || !s34mpFileSelection.filePaths.length) return;
-  const s34mpFile = s34mpFileSelection.filePaths[0];
+  s34mpFile.value = s34mpFileSelection.filePaths[0];
   fs.ensureDirSync(s34mpDir.value);
-  decompressJwpub(s34mpFile, s34mpDir.value);
+  await decompressJwpub(s34mpFile.value, s34mpDir.value, true);
   populatePublicTalks();
 };
 

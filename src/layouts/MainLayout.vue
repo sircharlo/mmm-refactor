@@ -191,7 +191,7 @@
                     )
                   "
                 >
-                  <q-spinner-pie :thickness="2" color="primary" size="4em" />
+                  <q-spinner :thickness="2" color="primary" size="4em" />
                 </div>
                 <div class="row">
                   <q-scroll-area
