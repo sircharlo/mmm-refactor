@@ -74,21 +74,18 @@ const addJwpubDocumentMediaToFiles = async (
   try {
     if (!dbPath) return;
     const publication = getPublicationInfoFromDb(dbPath);
-    console.log('publication', publication);
     const multimediaItems = getDocumentMultimediaItems({
       db: dbPath,
       docId: document.DocumentId,
     }).map((multimediaItem) =>
       addFullFilePathToMultimediaItem(multimediaItem, publication),
     );
-    console.log('multimediaItems', multimediaItems);
     await processMissingMediaInfo(multimediaItems);
     const dynamicMediaItems = await dynamicMediaMapper(
       multimediaItems,
       selectedDateObject.value?.date,
       true,
     );
-    console.log('dynamicMediaItems', dynamicMediaItems);
     addToAdditionMediaMap(dynamicMediaItems);
   } catch (e) {
     errorCatcher(e);
@@ -543,8 +540,7 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
       const symbol = /[^a-zA-Z0-9]/.test(extract.UniqueEnglishSymbol)
         ? extract.UniqueEnglishSymbol
         : extract.UniqueEnglishSymbol.replace(/\d/g, '');
-
-      if (symbol === 'snnw') return []; // That's the "old new songs" songbook; we don't need images from that
+      if (['it', 'snnw'].includes(symbol)) continue; // Exclude Insight and the "old new songs" songbook; we don't need images from that
       let extractLang = extract.Lang ?? currentSettings.value?.lang;
       let extractDb = await getDbFromJWPUB({
         issue: extract.IssueTagNumber,
@@ -561,7 +557,7 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
         extractLang = langFallback;
       }
 
-      if (!extractDb) return [];
+      if (!extractDb) continue;
 
       const extractItems = getDocumentMultimediaItems({
         db: extractDb,
