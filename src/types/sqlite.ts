@@ -61,6 +61,7 @@ export interface MultimediaItem {
   DataType?: number;
   DocumentId: number;
   DocumentMultimediaId?: number;
+  Duration?: number;
   EndParagraphOrdinal?: number;
   FileName?: string;
   FilePath: string;
@@ -81,10 +82,12 @@ export interface MultimediaItem {
   Multimeps?: null | number;
   NextParagraphOrdinal?: number;
   SizeConstraint?: null | number;
+  StreamUrl?: string;
   SuppressZoom?: number;
   tableQuestionIsUsed?: boolean;
   TargetParagraphNumberLabel: number;
   ThumbnailFilePath?: string;
+  ThumbnailUrl?: string;
   Track?: null | number;
   VideoMarkers?: VideoMarker[];
   Width?: null | number;

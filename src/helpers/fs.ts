@@ -39,7 +39,6 @@ const getPublicationDirectory = (
   noIssue = false,
 ) => {
   try {
-    console.log(publication);
     const dir = path.join(
       getPublicationsPath(),
       publication.pub +
@@ -87,7 +86,6 @@ const getPublicationDirectoryContents = (
 };
 
 const getFileUrl = (path: string) => {
-  console.log(path, isFileUrl(path));
   if (!path) return '';
   if (isFileUrl(path)) return path;
   return pathToFileURL(path);
@@ -214,6 +212,7 @@ const getThumbnailFromVideoPath: (
 
 const getThumbnailUrl = async (filepath: string, forceRefresh?: boolean) => {
   try {
+    if (!filepath || !fs.existsSync(fileUrlToPath(filepath))) return '';
     let thumbnailUrl = '';
     if (isImage(filepath)) {
       thumbnailUrl = getFileUrl(filepath);

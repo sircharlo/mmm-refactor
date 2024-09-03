@@ -677,55 +677,55 @@ const dynamicMediaMapper = async (
         }
       }
     }
-    const mediaPromises = allMedia
-      .filter((m) => m.FilePath)
-      .map(async (m) => {
-        m.FilePath = await convertImageIfNeeded(m.FilePath);
-        const fileUrl = getFileUrl(m.FilePath);
-        const mediaIsSong = isSong(m);
-        const thumbnailUrl = await getThumbnailUrl(
-          m.ThumbnailFilePath || m.FilePath,
-        );
-        const video = isVideo(m.FilePath);
-        const audio = isAudio(m.FilePath);
-        let duration = 0;
-        if (video || audio) {
-          duration = await getDurationFromMediaPath(m.FilePath);
+    const mediaPromises = allMedia.map(async (m) => {
+      m.FilePath = await convertImageIfNeeded(m.FilePath);
+      const fileUrl = getFileUrl(m.FilePath);
+      const mediaIsSong = isSong(m);
+      const thumbnailUrl =
+        m.ThumbnailUrl ??
+        (await getThumbnailUrl(m.ThumbnailFilePath || m.FilePath));
+      const video = isVideo(m.FilePath);
+      const audio = isAudio(m.FilePath);
+      let duration = 0;
+      if (video || audio) {
+        duration = m.Duration ?? (await getDurationFromMediaPath(m.FilePath));
+      }
+      let section = additional ? 'additional' : 'wt';
+      if (middleSongParagraphOrdinal > 0) {
+        //this is a meeting with 3 songs
+        if (m.BeginParagraphOrdinal >= middleSongParagraphOrdinal) {
+          // LAC
+          section = 'lac';
+        } else if (m.BeginParagraphOrdinal >= 18) {
+          // AYFM
+          section = 'ayfm';
+        } else {
+          // TGW
+          section = 'tgw';
         }
-        let section = additional ? 'additional' : 'wt';
-        if (middleSongParagraphOrdinal > 0) {
-          //this is a meeting with 3 songs
-          if (m.BeginParagraphOrdinal >= middleSongParagraphOrdinal) {
-            // LAC
-            section = 'lac';
-          } else if (m.BeginParagraphOrdinal >= 18) {
-            // AYFM
-            section = 'ayfm';
-          } else {
-            // TGW
-            section = 'tgw';
-          }
-          // iscoweek
-        }
-        return {
-          duration: duration,
-          fileUrl,
-          isAdditional: !!additional,
-          isAudio: audio,
-          isImage: isImage(m.FilePath),
-          isVideo: video,
-          markers: m.VideoMarkers,
-          paragraph: m.TargetParagraphNumberLabel,
-          section, // if is we: wt; else, if >= middle song: LAC; >= (middle song - 8???): AYFM; else: TGW
-          song: mediaIsSong,
-          subtitlesUrl: video ? await getSubtitlesUrl(m, duration) : '',
-          thumbnailUrl,
-          title: mediaIsSong ? m.Label.replace(/^\d+\.\s*/, '') : m.Label,
-          uniqueId: sanitizeId(
-            date.formatDate(lookupDate, 'YYYYMMDD') + '-' + fileUrl,
-          ),
-        } as DynamicMediaObject;
-      });
+        // iscoweek
+      }
+      if (!m.Label) m.Label = m.Caption;
+      return {
+        duration,
+        fileUrl,
+        isAdditional: !!additional,
+        isAudio: audio,
+        isImage: isImage(m.FilePath),
+        isVideo: video,
+        markers: m.VideoMarkers,
+        paragraph: m.TargetParagraphNumberLabel,
+        section, // if is we: wt; else, if >= middle song: LAC; >= (middle song - 8???): AYFM; else: TGW
+        song: mediaIsSong,
+        streamUrl: m.StreamUrl,
+        subtitlesUrl: video ? await getSubtitlesUrl(m, duration) : '',
+        thumbnailUrl,
+        title: mediaIsSong ? m.Label.replace(/^\d+\.\s*/, '') : m.Label,
+        uniqueId: sanitizeId(
+          date.formatDate(lookupDate, 'YYYYMMDD') + '-' + fileUrl,
+        ),
+      } as DynamicMediaObject;
+    });
     return Promise.all(mediaPromises);
   } catch (e) {
     errorCatcher(e);
@@ -1084,7 +1084,13 @@ async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
               media.Track > 0 && { track: media.Track }),
           };
           if (!media.FilePath || !fs.existsSync(media.FilePath)) {
-            media.FilePath = await downloadMissingMedia(publicationFetcher);
+            const { FilePath, StreamDuration, StreamThumbnailUrl, StreamUrl } =
+              await downloadMissingMedia(publicationFetcher);
+
+            media.FilePath = FilePath ?? media.FilePath;
+            media.StreamUrl = StreamUrl ?? media.StreamUrl;
+            media.Duration = StreamDuration ?? media.Duration;
+            media.ThumbnailUrl = StreamThumbnailUrl ?? media.ThumbnailUrl;
           }
           if (!media.Label) {
             media.Label =
@@ -1181,7 +1187,7 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
     const pubDir = getPublicationDirectory(publication);
     const responseObject = await getPubMediaLinks(publication);
     if (!responseObject?.files) {
-      if (!fs.existsSync(pubDir)) return ''; // Publication not found
+      if (!fs.existsSync(pubDir)) return { FilePath: '' }; // Publication not found
       const files = klawSync(pubDir, {
         filter: (file) => {
           let match = true;
@@ -1210,9 +1216,9 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
           '\n' +
           JSON.stringify(publication, null, 2),
       );
-      return files.length > 0 ? files[0].path : '';
+      return files.length > 0 ? { FilePath: files[0].path } : { FilePath: '' };
     }
-    if (!responseObject) return '';
+    if (!responseObject) return { FilePath: '' };
     if (!publication.fileformat)
       publication.fileformat = Object.keys(
         (responseObject as Publication).files[publication.langwritten],
@@ -1222,39 +1228,48 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
     ][publication.fileformat] as MediaLink[];
     const bestItem = findBestResolution(mediaItemLinks) as MediaLink;
     if (!bestItem?.file?.url) {
-      return '';
+      return { FilePath: '' };
     }
-    const downloadedFile = (await downloadFileIfNeeded({
+    const jwMediaInfo = await getJwMediaInfo(publication);
+    downloadFileIfNeeded({
       dir: pubDir,
       size: bestItem.filesize,
       url: bestItem.file.url,
-    })) as DownloadedFile;
-
-    const jwMediaInfo = await getJwMediaInfo(publication);
-    const { currentSettings } = storeToRefs(useCurrentStateStore());
-    for (const itemUrl of [
-      currentSettings.value.enableSubtitles ? jwMediaInfo.subtitles : undefined,
-      jwMediaInfo.thumbnail,
-    ].filter(Boolean)) {
-      if (!itemUrl) continue;
-      const itemFilename =
-        path.basename(bestItem.file.url).split('.')[0] + path.extname(itemUrl);
-      if (
-        itemUrl &&
-        bestItem.file?.url &&
-        (downloadedFile?.new || !fs.existsSync(path.join(pubDir, itemFilename)))
-      ) {
-        await downloadFileIfNeeded({
-          dir: pubDir,
-          filename: itemFilename,
-          url: itemUrl,
-        });
+    }).then(async (downloadedFile) => {
+      const { currentSettings } = storeToRefs(useCurrentStateStore());
+      for (const itemUrl of [
+        currentSettings.value.enableSubtitles
+          ? jwMediaInfo.subtitles
+          : undefined,
+        jwMediaInfo.thumbnail,
+      ].filter(Boolean)) {
+        if (!itemUrl) continue;
+        const itemFilename =
+          path.basename(bestItem.file.url).split('.')[0] +
+          path.extname(itemUrl);
+        if (
+          itemUrl &&
+          bestItem.file?.url &&
+          (downloadedFile?.new ||
+            !fs.existsSync(path.join(pubDir, itemFilename)))
+        ) {
+          await downloadFileIfNeeded({
+            dir: pubDir,
+            filename: itemFilename,
+            url: itemUrl,
+          });
+        }
       }
-    }
-    return downloadedFile?.path;
+    });
+    return {
+      FilePath: path.join(pubDir, path.basename(bestItem.file.url)),
+      StreamDuration: bestItem.duration,
+      StreamThumbnailUrl: jwMediaInfo.thumbnail,
+      StreamUrl: bestItem.file.url,
+    };
   } catch (e) {
     errorCatcher(e);
-    return '';
+    return { FilePath: '' };
   }
 };
 
