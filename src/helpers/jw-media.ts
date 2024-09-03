@@ -701,7 +701,6 @@ const dynamicMediaMapper = async (
         }
         // iscoweek
       }
-      if (!m.Label) m.Label = m.Caption;
       return {
         duration,
         fileUrl,
@@ -716,7 +715,9 @@ const dynamicMediaMapper = async (
         streamUrl: m.StreamUrl,
         subtitlesUrl: video ? await getSubtitlesUrl(m, duration) : '',
         thumbnailUrl,
-        title: mediaIsSong ? m.Label.replace(/^\d+\.\s*/, '') : m.Label,
+        title: mediaIsSong
+          ? m.Label.replace(/^\d+\.\s*/, '')
+          : (m.Label ?? m.Caption),
         uniqueId: sanitizeId(
           date.formatDate(lookupDate, 'YYYYMMDD') + '-' + fileUrl,
         ),

@@ -87,21 +87,14 @@
 </template>
 
 <script setup lang="ts">
-// import { useCurrentStateStore } from 'src/stores/current-state';
 import { barStyle, thumbStyle } from 'src/boot/globals';
-// import { storeToRefs } from 'pinia';
 import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { addJwpubDocumentMediaToFiles } from 'src/helpers/jw-media';
-// import { useJwStore } from 'src/stores/jw';
 import { DocumentItem } from 'src/types/sqlite';
 import { ref, watch } from 'vue';
 
 const { openFileDialog } = electronApi;
-// const jwStore = useJwStore();
-// const { addToAdditionMediaMap } = jwStore;
-// const currentStateStore = useCurrentStateStore();
-// const { selectedDateObject } = storeToRefs(currentStateStore);
 const props = defineProps<{
   filesLoading: boolean;
   jwpubDb: string;

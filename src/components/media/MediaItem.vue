@@ -490,8 +490,17 @@
       <q-card-section class="row items-center">
         {{
           $t('are-you-sure-delete', {
-            mediaToDelete: props.list.find((m) => m.uniqueId === mediaToDelete)
-              ?.title,
+            mediaToDelete:
+              props.list.find((m) => m.uniqueId === mediaToDelete)?.title ||
+              (props.list.find((m) => m.uniqueId === mediaToDelete)?.fileUrl
+                ? path.basename(
+                    (
+                      props.list.find(
+                        (m) => m.uniqueId === mediaToDelete,
+                      ) as any
+                    ).fileUrl,
+                  )
+                : ''),
           })
         }}
       </q-card-section>
