@@ -18,7 +18,7 @@
     padding
   >
     <div
-      class="col content-center"
+      class="col content-center q-py-xl"
       v-if="
         (selectedDateObject?.meeting && !selectedDateObject?.complete) ||
         !(
@@ -32,6 +32,21 @@
     >
       <div class="row justify-center">
         <div class="col-6 text-center">
+          <div class="row items-center justify-center q-my-lg">
+            <q-spinner
+              color="primary"
+              size="lg"
+              v-if="
+                selectedDateObject?.meeting && !selectedDateObject?.complete
+              "
+            />
+            <q-img
+              fit="contain"
+              src="images/no-media.svg"
+              style="max-height: 30vh"
+              v-else
+            />
+          </div>
           <div
             class="row items-center justify-center text-subtitle1 text-semibold"
           >
@@ -43,7 +58,7 @@
                   : $t('there-are-no-media-items-for-the-selected-date')
             }}
           </div>
-          <div class="row items-center justify-center">
+          <div class="row items-center justify-center text-center">
             {{
               !selectedDate
                 ? $t('select-a-date-to-begin')
@@ -53,6 +68,21 @@
                       'use-the-import-button-to-add-media-for-this-date-or-select-another-date-to-view-the-corresponding-meeting-media',
                     )
             }}
+          </div>
+          <div
+            class="row items-center justify-center q-mt-lg q-gutter-md"
+            v-if="
+              !(selectedDateObject?.meeting && !selectedDateObject?.complete)
+            "
+          >
+            <q-btn @click="goToNextMeeting()" color="primary" outline>
+              <q-icon class="q-mr-sm" name="mmm-go-to-date" size="xs" />
+              {{ $t('next-meeting') }}
+            </q-btn>
+            <q-btn @click="openImportMenu()" color="primary">
+              <q-icon class="q-mr-sm" name="mmm-import-media" size="xs" />
+              {{ $t('import-media') }}
+            </q-btn>
           </div>
         </div>
       </div>
@@ -518,6 +548,28 @@ const startDragging = () => {
   dragging.value = true;
 };
 
+const goToNextMeeting = () => {
+  try {
+    if (
+      currentCongregation.value &&
+      lookupPeriod.value[currentCongregation.value]
+    ) {
+      selectedDate.value = date.formatDate(
+        lookupPeriod.value[currentCongregation.value]
+          ?.filter((day) => day.meeting)
+          .map((day) => day.date)[0],
+        'YYYY/MM/DD',
+      );
+    }
+  } catch (e) {
+    errorCatcher(e);
+  }
+};
+
+const openImportMenu = () => {
+  window.dispatchEvent(new CustomEvent('openImportMenu'));
+};
+
 onMounted(async () => {
   window.addEventListener('draggingSomething', startDragging);
   window.addEventListener('localFiles-browsed', localFilesBrowsedListener);
@@ -536,21 +588,7 @@ onMounted(async () => {
     }
   });
   generateMediaList();
-  try {
-    if (
-      currentCongregation.value &&
-      lookupPeriod.value[currentCongregation.value]
-    ) {
-      selectedDate.value = date.formatDate(
-        lookupPeriod.value[currentCongregation.value]
-          ?.filter((day) => day.meeting)
-          .map((day) => day.date)[0],
-        'YYYY/MM/DD',
-      );
-    }
-  } catch (e) {
-    errorCatcher(e);
-  }
+  goToNextMeeting();
   sendObsSceneEvent('camera');
   fetchMedia();
 });

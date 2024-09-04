@@ -43,9 +43,8 @@
               {{ $t('import-media') }}
               <q-menu
                 :offset="[0, 11]"
-                @before-hide="importMediaMenuActive = false"
-                @before-show="importMediaMenuActive = true"
                 class="top-menu"
+                ref="importMenu"
               >
                 <q-list style="min-width: 100px">
                   <q-item-label header>{{ $t('from-jw-org') }}</q-item-label>
@@ -191,7 +190,7 @@
                     )
                   "
                 >
-                  <q-spinner :thickness="2" color="primary" size="4em" />
+                  <q-spinner color="primary" size="md" />
                 </div>
                 <div class="row">
                   <q-scroll-area
@@ -466,16 +465,10 @@
           {{ $t('expand-sidebar') }}
         </q-tooltip>
         <q-item-section avatar>
-          <!-- <q-icon :name="'mmm-menu' + (miniState ? '' : '-open')" /> -->
           <q-icon name="mmm-menu" />
         </q-item-section>
         <q-item-section>{{ $t('collapse-sidebar') }}</q-item-section>
       </q-item>
-
-      <!-- @click="
-          selectedDate = '';
-          datePickerActive = true;
-        " -->
       <q-item
         :disable="!currentSettings || invalidSettings()"
         :to="{ path: '/media-calendar', exact: true }"
@@ -693,7 +686,7 @@
 import PQueue from 'p-queue';
 import { storeToRefs } from 'pinia';
 import prettyBytes from 'pretty-bytes';
-import { Dark, date, LocalStorage } from 'quasar';
+import { Dark, date, LocalStorage, QMenu } from 'quasar';
 import { useQuasar } from 'quasar';
 import { get } from 'src/boot/axios';
 import { queues } from 'src/boot/globals';
@@ -1028,7 +1021,6 @@ const getEventDates = () => {
 };
 
 // Ref for UI states
-const importMediaMenuActive = ref(false);
 const datePickerActive = ref(false);
 const remoteVideoPopup = ref(false);
 const remoteVideosLoadingProgress = ref(0);
@@ -1396,8 +1388,14 @@ const appVersion = getAppVersion();
 const githubLink = 'https://github.com/sircharlo/mmm-refactor';
 const docsLink = 'https://sircharlo.github.io/mmm-refactor/';
 
+const importMenu: Ref<QMenu | undefined> = ref();
+const openImportMenu = () => {
+  importMenu.value?.show();
+};
+
 onMounted(() => {
   document.title = 'Meeting Media Manager';
   if (!currentSettings.value) navigateToCongregationSelector();
+  window.addEventListener('openImportMenu', openImportMenu);
 });
 </script>
