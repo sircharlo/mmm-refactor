@@ -155,7 +155,7 @@ const obsErrorHandler = (err: OBSWebSocketError) => {
   obsConnectionState.value = 'disconnected';
   obsMessage.value = 'obs.error';
   obsWebSocket?.disconnect();
-  errorCatcher('Connection closed: ' + err.message);
+  if (err.message) errorCatcher('OBS Error: ' + err.message);
 };
 
 const obsConnect = async (setup?: boolean) => {
