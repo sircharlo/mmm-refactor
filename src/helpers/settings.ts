@@ -17,6 +17,13 @@ import { errorCatcher } from './error-catcher';
 const requiredRule: ValidationRule = (val: string) =>
   (val && val.length > 0) || '';
 
+const portNumberRule: ValidationRule = (val: string) =>
+  (val &&
+    Number.isInteger(Number(val)) &&
+    Number(val) > 0 &&
+    Number(val) < 65536) ||
+  '';
+
 const coTuesdays = (lookupDate: string) => {
   try {
     if (!lookupDate) return false;
@@ -54,7 +61,13 @@ const getRules = (rules: string[] | undefined) => {
   try {
     const filteredRules = rules
       ?.map((rule) => {
-        return rule == 'notEmpty' ? requiredRule : undefined;
+        if (rule == 'notEmpty') {
+          return requiredRule;
+        } else if (rule == 'portNumber') {
+          return portNumberRule;
+        } else {
+          return undefined;
+        }
       })
       .filter(Boolean);
     return filteredRules as ValidationRule[];

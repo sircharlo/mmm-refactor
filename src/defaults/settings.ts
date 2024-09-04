@@ -137,6 +137,7 @@ export const settingsDefinitions: SettingsItems = {
     actions: ['obsConnect'],
     depends: 'obsEnable',
     group: 'integrations',
+    rules: ['portNumber'],
     subgroup: 'obsStudio',
     type: 'text',
   },
