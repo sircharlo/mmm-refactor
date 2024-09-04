@@ -7,7 +7,7 @@ import {
 } from '@electron/remote';
 import AdmZip from 'adm-zip';
 import * as sqlite3 from 'better-sqlite3';
-import { contextBridge, shell } from 'electron';
+import { contextBridge, shell, webUtils } from 'electron';
 import fs from 'fs-extra';
 import convert from 'heic-convert';
 import klawSync from 'klaw-sync';
@@ -484,6 +484,9 @@ contextBridge.exposeInMainWorld('electronApi', {
   },
   getAppVersion: () => {
     return app.getVersion();
+  },
+  getLocalPathFromFileObject: (fileObject: File) => {
+    return webUtils.getPathForFile(fileObject);
   },
   getUserDataPath: () => {
     return app.getPath('userData');

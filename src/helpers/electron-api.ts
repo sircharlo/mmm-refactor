@@ -23,6 +23,7 @@ export interface ElectronApi {
   ) => ({ mainWindow?: boolean; mediaWindow?: boolean } & Electron.Display)[];
   getAppDataPath: () => string;
   getAppVersion: () => string;
+  getLocalPathFromFileObject: (fileObject: File) => string;
   getUserDataPath: () => string;
   isFileUrl: (url: string) => boolean;
   klawSync: typeof import('klaw-sync');

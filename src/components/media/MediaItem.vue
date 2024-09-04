@@ -22,7 +22,6 @@
           fit="contain"
           width="150px"
         >
-          <!-- @load="media.isImage" -->
           <q-badge
             :class="
               'q-mt-sm q-ml-sm cursor-pointer rounded-borders-sm ' +

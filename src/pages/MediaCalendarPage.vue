@@ -303,7 +303,14 @@ const {
   selectedDateObject,
 } = storeToRefs(currentState);
 updateJwSongs();
-const { convertPdfToImages, decompress, executeQuery, fs, path } = electronApi;
+const {
+  convertPdfToImages,
+  decompress,
+  executeQuery,
+  fs,
+  getLocalPathFromFileObject,
+  path,
+} = electronApi;
 
 const filesLoading = ref(false);
 
@@ -969,10 +976,12 @@ const dropEnd = (event: DragEvent) => {
   event.stopPropagation();
   try {
     if (event.dataTransfer?.files.length) {
-      const droppedStuff = Array.from(event.dataTransfer.files) as {
-        filetype?: string;
-        path: string;
-      }[];
+      const droppedStuff = Array.from(event.dataTransfer.files).map((file) => {
+        return {
+          path: getLocalPathFromFileObject(file),
+          type: file.type,
+        };
+      });
       let noLocalDroppedFiles =
         droppedStuff.filter((file) => file.path).length === 0;
       if (noLocalDroppedFiles && droppedStuff.length > 0) {
@@ -981,12 +990,12 @@ const dropEnd = (event: DragEvent) => {
         let src = new DOMParser()
           .parseFromString(sanitizedHtml, 'text/html')
           .querySelector('img')?.src;
-        const filetype = Array.from(event.dataTransfer.items).find(
-          (item) => item.kind === 'file',
-        )?.type;
-        if (src) droppedStuff[0] = { filetype, path: src };
+        const type =
+          Array.from(event.dataTransfer.items).find(
+            (item) => item.kind === 'file',
+          )?.type ?? '';
+        if (src) droppedStuff[0] = { path: src, type };
       }
-      console.log(droppedStuff);
       addToFiles(droppedStuff).catch((error) => {
         errorCatcher(error);
       });
