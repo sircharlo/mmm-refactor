@@ -1094,7 +1094,8 @@ async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
             media.Label =
               media.Label ||
               media.Caption ||
-              (await getJwMediaInfo(publicationFetcher)).title;
+              (await getJwMediaInfo(publicationFetcher)).title ||
+              '';
           }
         } catch (e) {
           errorCatcher(e);

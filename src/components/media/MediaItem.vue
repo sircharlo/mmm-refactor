@@ -8,13 +8,7 @@
       >
         <q-icon name="mmm-music-note" size="lg" />
       </div>
-      <div
-        :class="
-          'q-pr-none rounded-borders relative-position ' +
-          (media.isImage ? 'bg-black' : 'bg-transparent')
-        "
-        v-else
-      >
+      <div class="q-pr-none rounded-borders relative-position bg-black" v-else>
         <q-img
           :id="media.uniqueId"
           :ratio="16 / 9"
@@ -585,10 +579,22 @@ const imageLoadingError = (media: DynamicMediaObject) => {
 };
 
 const thumbnailFromMetadata = ref('');
-if (props.media.isVideo && !props.media.thumbnailUrl)
-  getThumbnailUrl(props.media.fileUrl).then((thumbnailUrl) => {
-    thumbnailFromMetadata.value = thumbnailUrl;
-  });
+function findThumbnailUrl() {
+  if (!thumbnailFromMetadata.value) {
+    setTimeout(() => {
+      getThumbnailUrl(props.media.fileUrl).then((thumbnailUrl) => {
+        if (!thumbnailFromMetadata.value) {
+          thumbnailFromMetadata.value = thumbnailUrl;
+        }
+        if (!thumbnailFromMetadata.value) {
+          findThumbnailUrl();
+        }
+      });
+    }, 2000);
+  }
+}
+
+if (props.media.isVideo && !props.media.thumbnailUrl) findThumbnailUrl();
 
 const showMediaDurationPopup = (media: DynamicMediaObject) => {
   try {
