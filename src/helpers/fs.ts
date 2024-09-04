@@ -261,9 +261,11 @@ const getSubtitlesUrl = async (
           track: multimediaItem.Track,
         };
         const { duration, subtitles } = await getJwMediaInfo(subtitleFetcher);
-        if (!subtitles) throw new Error('No subtitles found');
+        if (!subtitles) return '';
         if (duration && Math.abs(duration - comparisonDuration) > 10)
-          throw new Error('Duration mismatch');
+          throw new Error(
+            'Duration mismatch: ' + JSON.stringify(subtitleFetcher),
+          );
         const subtitlesFilename = path.basename(subtitles);
         const subDirectory = getPublicationDirectory(subtitleFetcher);
         await downloadFileIfNeeded({
