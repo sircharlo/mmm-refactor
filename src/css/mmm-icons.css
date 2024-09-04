@@ -1,10 +1,10 @@
 @font-face {
     font-family: mmm-icons;
-    src: url("mmm-icons.eot");src: url("mmm-icons.eot?f19f8c1e#iefix") format("embedded-opentype"),
-             url("mmm-icons.woff2?f19f8c1e") format("woff2"),
-             url("mmm-icons.woff?f19f8c1e") format("woff"),
-             url("mmm-icons.ttf?f19f8c1e") format("truetype"),
-             url("mmm-icons.svg?f19f8c1e#mmm-icons") format("svg");
+    src: url("mmm-icons.eot");src: url("mmm-icons.eot?3a67af75#iefix") format("embedded-opentype"),
+             url("mmm-icons.woff2?3a67af75") format("woff2"),
+             url("mmm-icons.woff?3a67af75") format("woff"),
+             url("mmm-icons.ttf?3a67af75") format("truetype"),
+             url("mmm-icons.svg?3a67af75#mmm-icons") format("svg");
     font-weight: normal;
     font-style: normal;
 }
@@ -17,7 +17,7 @@
 }
 
 
-.mmm-additional-media, .mmm-advanced-settings, .mmm-arrow-back, .mmm-arrow-forward, .mmm-arrow-outward, .mmm-background-remove, .mmm-background, .mmm-calendar-month, .mmm-check, .mmm-clear, .mmm-cloud-done, .mmm-cloud-error, .mmm-cloud, .mmm-configuration, .mmm-congregation, .mmm-delete-all, .mmm-delete-smart, .mmm-delete, .mmm-display-current, .mmm-down, .mmm-drag-n-drop, .mmm-dropdown-arrow, .mmm-edit, .mmm-error, .mmm-file, .mmm-footnote, .mmm-fullscreen, .mmm-github, .mmm-go-to-date, .mmm-groups, .mmm-guide, .mmm-import-media, .mmm-info, .mmm-integrations, .mmm-jwlplaylist, .mmm-jwpub, .mmm-lectern, .mmm-left, .mmm-local-media, .mmm-media-display-active, .mmm-media-display-inactive, .mmm-media-settings, .mmm-media, .mmm-menu, .mmm-minus, .mmm-mirror, .mmm-movie, .mmm-music-note, .mmm-obs-studio, .mmm-open-web, .mmm-paragraph, .mmm-pause, .mmm-picture_in_picture, .mmm-play-sign-language, .mmm-play, .mmm-plus, .mmm-refresh, .mmm-reset, .mmm-right, .mmm-search, .mmm-settings, .mmm-stop, .mmm-stream-now, .mmm-subtitles-off, .mmm-subtitles, .mmm-time, .mmm-tools, .mmm-window {
+.mmm-additional-media, .mmm-advanced-settings, .mmm-arrow-back, .mmm-arrow-forward, .mmm-arrow-outward, .mmm-background-remove, .mmm-background, .mmm-calendar-month, .mmm-check, .mmm-clear, .mmm-cloud-done, .mmm-cloud-error, .mmm-cloud, .mmm-configuration, .mmm-congregation, .mmm-delete-all, .mmm-delete-smart, .mmm-delete, .mmm-display-current, .mmm-down, .mmm-drag-n-drop, .mmm-dropdown-arrow, .mmm-edit, .mmm-error, .mmm-file, .mmm-footnote, .mmm-fullscreen, .mmm-github, .mmm-go-to-date, .mmm-groups, .mmm-guide, .mmm-import-media, .mmm-info, .mmm-integrations, .mmm-jwlplaylist, .mmm-jwpub, .mmm-lectern, .mmm-left, .mmm-local-media, .mmm-media-display-active, .mmm-media-display-inactive, .mmm-media-settings, .mmm-media, .mmm-menu, .mmm-minus, .mmm-mirror, .mmm-movie, .mmm-music-note, .mmm-obs-studio, .mmm-open-web, .mmm-paragraph, .mmm-pause, .mmm-picture_in_picture, .mmm-play-sign-language, .mmm-play, .mmm-plus, .mmm-radio-button-checked, .mmm-radio-button-unchecked, .mmm-refresh, .mmm-reset, .mmm-right, .mmm-search, .mmm-settings, .mmm-stop, .mmm-stream-now, .mmm-subtitles-off, .mmm-subtitles, .mmm-time, .mmm-tools, .mmm-window {
     font-family: 'mmm-icons';
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -250,51 +250,59 @@
     content: "\ea38";
 }
 
-.mmm-refresh::before {
+.mmm-radio-button-checked::before {
     content: "\ea39";
 }
 
-.mmm-reset::before {
+.mmm-radio-button-unchecked::before {
     content: "\ea3a";
 }
 
-.mmm-right::before {
+.mmm-refresh::before {
     content: "\ea3b";
 }
 
-.mmm-search::before {
+.mmm-reset::before {
     content: "\ea3c";
 }
 
-.mmm-settings::before {
+.mmm-right::before {
     content: "\ea3d";
 }
 
-.mmm-stop::before {
+.mmm-search::before {
     content: "\ea3e";
 }
 
-.mmm-stream-now::before {
+.mmm-settings::before {
     content: "\ea3f";
 }
 
-.mmm-subtitles-off::before {
+.mmm-stop::before {
     content: "\ea40";
 }
 
-.mmm-subtitles::before {
+.mmm-stream-now::before {
     content: "\ea41";
 }
 
-.mmm-time::before {
+.mmm-subtitles-off::before {
     content: "\ea42";
 }
 
-.mmm-tools::before {
+.mmm-subtitles::before {
     content: "\ea43";
 }
 
-.mmm-window::before {
+.mmm-time::before {
     content: "\ea44";
+}
+
+.mmm-tools::before {
+    content: "\ea45";
+}
+
+.mmm-window::before {
+    content: "\ea46";
 }
 
