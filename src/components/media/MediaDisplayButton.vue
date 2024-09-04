@@ -330,9 +330,7 @@ const chooseCustomBackground = async (reset?: boolean) => {
       return;
     } else {
       try {
-        const backgroundPicker = await openFileDialog(true, [
-          'images+jwpub',
-        ]);
+        const backgroundPicker = await openFileDialog(true, ['images+jwpub']);
         if (
           backgroundPicker.canceled ||
           backgroundPicker.filePaths?.length === 0
@@ -413,7 +411,7 @@ watch(
       );
       screenList.value = getAllScreens();
     } catch (error) {
-      errorCatcher(error);
+      errorCatcher(error + ': ' + JSON.stringify(newScreenPreferences));
     }
   },
   { deep: true, immediate: true },
