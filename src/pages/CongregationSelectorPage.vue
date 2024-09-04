@@ -56,13 +56,26 @@
           </div>
           <div class="col-shrink">
             <q-btn
-              :class="hoveredCongregation !== id ? 'invisible' : ''"
+              :class="
+                (hoveredCongregation !== id ? 'invisible' : '') + ' q-mr-lg'
+              "
               :label="$t('delete')"
               @click.stop="congToDelete = id"
               color="negative"
               flat
               icon="mmm-delete"
               size="md"
+            />
+            <q-icon
+              :class="
+                currentCongregation === id ? 'text-primary' : 'text-accent-300'
+              "
+              :name="
+                currentCongregation === id
+                  ? 'mmm-radio-button-checked'
+                  : 'mmm-radio-button-unchecked'
+              "
+              size="sm"
             />
           </div>
         </q-item>
@@ -71,14 +84,17 @@
   </q-page>
   <q-dialog v-model="deletePending">
     <q-card class="modal-confirm">
-      <q-card-section class="row items-center text-bigger text-semibold text-negative q-pb-none">
+      <q-card-section
+        class="row items-center text-bigger text-semibold text-negative q-pb-none"
+      >
         <q-icon class="q-mr-sm" name="mmm-delete" />
         {{ $t('profile-deletion') }}
       </q-card-section>
       <q-card-section class="row items-center">
         {{
-          $t('are-you-sure-you-want-to-delete-this-profile',
-          { profileName: congregations[congToDelete]?.congregationName })
+          $t('are-you-sure-you-want-to-delete-this-profile', {
+            profileName: congregations[congToDelete]?.congregationName,
+          })
         }}
       </q-card-section>
       <q-card-actions align="right" class="text-primary">
