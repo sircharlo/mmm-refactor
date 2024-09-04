@@ -128,7 +128,7 @@ const populatePublicTalks = () => {
 };
 
 const browse = async () => {
-  const s34mpFileSelection = await openFileDialog(true);
+  const s34mpFileSelection = await openFileDialog(true, ['jwpub']);
   if (!s34mpFileSelection || !s34mpFileSelection.filePaths.length) return;
   s34mpFile.value = s34mpFileSelection.filePaths[0];
   fs.ensureDirSync(s34mpDir.value);

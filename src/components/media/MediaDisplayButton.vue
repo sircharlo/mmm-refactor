@@ -314,6 +314,7 @@ const setMediaBackground = (filepath?: string) => {
       mediaWindowCustomBackground.value = pathToFileURL(filepath);
     }
   } catch (error) {
+    console.error(error);
     if (filepath) notifyInvalidBackgroundFile();
     mediaWindowCustomBackground.value = '';
   } finally {
@@ -329,7 +330,9 @@ const chooseCustomBackground = async (reset?: boolean) => {
       return;
     } else {
       try {
-        const backgroundPicker = await openFileDialog(true);
+        const backgroundPicker = await openFileDialog(true, [
+          'images+jwpub',
+        ]);
         if (
           backgroundPicker.canceled ||
           backgroundPicker.filePaths?.length === 0
@@ -337,7 +340,6 @@ const chooseCustomBackground = async (reset?: boolean) => {
           throw new Error('No file selected');
         } else {
           const filepath = backgroundPicker.filePaths[0];
-          filepath;
           if (isJwpub(filepath)) {
             jwpubImportFilePath.value = filepath;
             const unzipDir = await decompressJwpub(filepath);

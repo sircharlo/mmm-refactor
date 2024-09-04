@@ -495,8 +495,43 @@ contextBridge.exposeInMainWorld('electronApi', {
   openExternalWebsite: (url: string) => {
     shell.openExternal(url);
   },
-  openFileDialog: (single?: boolean) => {
+  openFileDialog: (single?: boolean, filter?: string[]) => {
+    const filesFilter: Electron.FileFilter[] = [
+      {
+        extensions: ['*'],
+        name: 'All files',
+      },
+    ];
+    // if (filter?.includes('images')) {
+    //   filesFilter.push({
+    //     extensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'heic', 'svg'],
+    //     name: 'Images',
+    //   });
+    // }
+    if (filter?.includes('jwpub')) {
+      filesFilter.push({
+        extensions: ['jwpub'],
+        name: 'JWPUB',
+      });
+    }
+    if (filter?.includes('images+jwpub')) {
+      filesFilter.push({
+        extensions: [
+          'jwpub',
+          'jpg',
+          'jpeg',
+          'png',
+          'gif',
+          'bmp',
+          'webp',
+          'heic',
+          'svg',
+        ],
+        name: 'Background image sources',
+      });
+    }
     return dialog.showOpenDialog({
+      filters: filesFilter,
       properties: single ? ['openFile'] : ['openFile', 'multiSelections'],
     });
   },

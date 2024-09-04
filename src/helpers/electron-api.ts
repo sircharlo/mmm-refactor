@@ -33,7 +33,10 @@ export interface ElectronApi {
   ) => void;
   navigateWebsiteWindow: (action: string) => void;
   openExternalWebsite: (url: string) => void;
-  openFileDialog: (single?: boolean) => Promise<Electron.OpenDialogReturnValue>;
+  openFileDialog: (
+    single?: boolean,
+    filter?: string[],
+  ) => Promise<Electron.OpenDialogReturnValue>;
   openWebsiteWindow: () => void;
   parseFile: (filePath: string, options?: IOptions) => Promise<IAudioMetadata>;
   path: typeof import('path');
