@@ -861,11 +861,11 @@ watch(online, (isNowOnline) => {
     const meetingQueue = meetings[congregation];
 
     if (isNowOnline) {
-      downloadQueue.start();
-      meetingQueue.start();
+      downloadQueue?.start();
+      meetingQueue?.start();
     } else {
-      downloadQueue.pause();
-      meetingQueue.pause();
+      downloadQueue?.pause();
+      meetingQueue?.pause();
     }
   } catch (error) {
     errorCatcher(error);
