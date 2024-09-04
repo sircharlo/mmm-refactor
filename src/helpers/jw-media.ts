@@ -404,6 +404,7 @@ const getMediaVideoMarkers = (
 
 const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
   try {
+    if (!source.db) return [];
     const currentState = useCurrentStateStore();
     const { currentSettings } = storeToRefs(currentState);
     const DocumentMultimediaTable = (
