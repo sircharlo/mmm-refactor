@@ -409,6 +409,11 @@ const updateMediaSortPlugin: DNDPlugin = (parent) => {
         item.section = section;
       }
     });
+    (additionalMediaMaps.value[currentCongregation.value]?.[selectedDate.value] ?? []).forEach((item) => {
+      if (item.uniqueId === id && item.section !== section) {
+        item.section = section;
+      }
+    });
   };
   function dragover() {
     for (const media of sortableAdditionalMediaItems.value) {
