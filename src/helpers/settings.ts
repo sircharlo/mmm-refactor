@@ -12,6 +12,7 @@ const { scenes } = storeToRefs(obsState);
 
 import { localeOptions } from 'src/i18n';
 
+import { getSpecificWeekday } from './date';
 import { errorCatcher } from './error-catcher';
 
 const requiredRule: ValidationRule = (val: string) =>
@@ -29,7 +30,8 @@ const coTuesdays = (lookupDate: string) => {
     if (!lookupDate) return false;
     return (
       new Date(lookupDate).getDay() === 2 &&
-      date.getDateDiff(lookupDate, new Date(), 'days') >= 0
+      date.getDateDiff(lookupDate, getSpecificWeekday(new Date(), 0), 'days') >=
+        0
     );
   } catch (error) {
     errorCatcher(error);

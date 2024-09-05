@@ -41,11 +41,7 @@
             <q-btn color="white-transparent" unelevated v-if="selectedDate">
               <q-icon class="q-mr-sm" name="mmm-import-media" size="xs" />
               {{ $t('import-media') }}
-              <q-menu
-                :offset="[0, 11]"
-                class="top-menu"
-                ref="importMenu"
-              >
+              <q-menu :offset="[0, 11]" class="top-menu" ref="importMenu">
                 <q-list style="min-width: 100px">
                   <q-item-label header>{{ $t('from-jw-org') }}</q-item-label>
                   <q-item
@@ -907,10 +903,11 @@ watch(
     currentSettings.value?.enableSubtitles,
     currentSettings.value?.mwDay,
     currentSettings.value?.weDay,
+    currentSettings.value?.coWeek,
   ],
   (
-    [newCurrentCongregation, , , , , ,],
-    [oldCurrentCongregation, , , , , ,],
+    [newCurrentCongregation, , , , , , ,],
+    [oldCurrentCongregation, , , , , , ,],
   ) => {
     if (newCurrentCongregation === oldCurrentCongregation)
       updateLookupPeriod(true);
@@ -1082,10 +1079,10 @@ const frequentlyUsedDirectories = computed(() => {
   });
   return new Set([
     backgroundMusicFilesDirectory,
-    songbookDirectory,
+    enjoyLifeForeverDirectory,
     insightDirectory,
     lovePeopleDirectory,
-    enjoyLifeForeverDirectory,
+    songbookDirectory,
   ]);
 });
 
@@ -1203,10 +1200,10 @@ const calculateCacheSize = async () => {
       Object.values(congregationAdditionalMediaMap).flat(),
     );
     const mediaFileParentDirectories = new Set([
-      ...lookupPeriodsCollections.map((media) =>
+      ...additionalMediaCollections.map((media) =>
         pathToFileURL(getParentDirectory(media.fileUrl)),
       ),
-      ...additionalMediaCollections.map((media) =>
+      ...lookupPeriodsCollections.map((media) =>
         pathToFileURL(getParentDirectory(media.fileUrl)),
       ),
     ]);
