@@ -94,7 +94,7 @@
         <TextInput v-model="currentSettings.congregationName" />
         <q-stepper-navigation>
           <q-btn
-            :disable="!currentSettings.congregationName"
+            :disable="!currentSettings?.congregationName"
             :label="$t('continue')"
             @click="step++"
             color="primary"
