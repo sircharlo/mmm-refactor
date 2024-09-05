@@ -91,37 +91,30 @@ const getFileUrl = (path: string) => {
   return pathToFileURL(path);
 };
 
-const getDurationFromMediaPath: (mediaPath: string) => Promise<number> = (
-  mediaPath: string,
-) => {
-  return new Promise((resolve, reject) => {
-    if (!mediaPath) {
-      reject(new Error('No media path provided'));
-      return;
-    }
+const getDurationFromMediaPath = async (mediaPath: string) => {
+  const metadata = await getMetadataFromMediaPath(mediaPath);
+  return metadata?.format?.duration || 0;
+};
 
-    if (!fs.existsSync(mediaPath)) {
-      // reject(new Error('Media path does not exist: ' + mediaPath));
-      resolve(0);
-      return;
-    }
-
-    const mediaRef = document.createElement(
-      isVideo(mediaPath) ? 'video' : 'audio',
-    );
-    mediaRef.src = getFileUrl(mediaPath);
-    mediaRef.load();
-
-    mediaRef.addEventListener('loadeddata', () => {
-      mediaRef.remove();
-      resolve(mediaRef.duration);
-    });
-
-    mediaRef.addEventListener('error', () => {
-      mediaRef.remove();
-      reject(new Error('Error loading media: ' + mediaPath));
-    });
-  });
+const getMetadataFromMediaPath = async (mediaPath: string) => {
+  const defaultMetadata = {
+    common: {
+      title: '',
+    },
+    format: {
+      duration: 0,
+    },
+  };
+  try {
+    mediaPath = fileUrlToPath(mediaPath);
+    if (!mediaPath) return defaultMetadata;
+    if (!mediaPath || !fs.existsSync(mediaPath)) return;
+    const metadata = await parseFile(mediaPath);
+    return metadata;
+  } catch (error) {
+    errorCatcher(mediaPath + ': ' + error);
+    return defaultMetadata;
+  }
 };
 
 const getThumbnailFromMetadata = async (mediaPath: string) => {
@@ -323,6 +316,7 @@ export {
   getAdditionalMediaPath,
   getDurationFromMediaPath,
   getFileUrl,
+  getMetadataFromMediaPath,
   getParentDirectory,
   getPublicationDirectory,
   getPublicationDirectoryContents,

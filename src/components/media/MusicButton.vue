@@ -39,14 +39,32 @@
                 <p class="card-section-title text-dark-grey">
                   {{ $t('current-song') }}
                 </p>
-                <p>
-                  <span class="text-weight-medium">{{
-                    musicPlayingTitle
-                  }}</span>
-                  <span class="text-grey">
-                    – {{ currentSongRemainingTime }}</span
-                  >
-                </p>
+                <div class="row q-my-sm">
+                  <div class="col text-weight-medium">
+                    {{ musicPlayingTitle }}
+                  </div>
+                  <div class="col-shrink text-grey">
+                    {{ currentSongRemainingTime }}
+                  </div>
+                </div>
+                <q-separator class="bg-accent-200 q-mb-md" />
+                <div>
+                  <p class="card-section-title text-dark-grey">
+                    {{ $t('upcoming-songs') }}
+                  </p>
+                  <q-scroll-area style="height: 100px; max-width: 100%">
+                    <template :key="i" v-for="(song, i) in songList">
+                      <div class="row q-my-sm">
+                        <div class="col text-weight-medium">
+                          {{ song.title }}
+                        </div>
+                        <div class="col-shrink text-grey">
+                          {{ formatTime(song.duration ?? 0) }}
+                        </div>
+                      </div>
+                    </template>
+                  </q-scroll-area>
+                </div>
               </div>
               <q-separator class="bg-accent-200 q-mb-md" />
             </div>
@@ -97,20 +115,20 @@
 </template>
 
 <script setup lang="ts">
-import klawSync from 'klaw-sync';
 import { storeToRefs } from 'pinia';
 import { date } from 'quasar';
 import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import {
-  getDurationFromMediaPath,
   getFileUrl,
+  getMetadataFromMediaPath,
   getPublicationDirectoryContents,
 } from 'src/helpers/fs';
 import { formatTime } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { SongItem } from 'src/types/media';
+import { computed, onMounted, onUnmounted, Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -136,7 +154,7 @@ const musicPlayingTitle = ref('');
 const musicPlaying = ref(false);
 const musicStopping = ref(false);
 const musicStoppedAutomatically = ref(false);
-const songList = ref([] as klawSync.Item[]);
+const songList: Ref<SongItem[]> = ref([]);
 const currentSongRemainingTime = ref('..:..');
 const timeRemainingBeforeMusicStop = ref();
 
@@ -202,7 +220,7 @@ const getNextSong = async () => {
             (d) => date.getDateDiff(selectedDate.value, d.date, 'days') === 0,
           )?.dynamicMedia ?? [];
         const regex = /(_r\d{3,4}P)?\.\w+$/;
-        const selectedDaySongs = selectedDayMedia
+        const selectedDaySongs: SongItem[] = selectedDayMedia
           .map((d) =>
             path.basename(fileUrlToPath(d.fileUrl.replace(regex, ''))),
           )
@@ -217,18 +235,20 @@ const getNextSong = async () => {
           })
           .filter((song) => song !== null);
         if (timeBeforeMeetingStart > 0) {
-          const customSongList = [] as klawSync.Item[];
-          songList.value.push(selectedDaySongs)
+          const customSongList = [] as SongItem[];
+          songList.value.push(...selectedDaySongs);
           songList.value.reverse();
           if (songList.value.length) {
             while (musicDurationSoFar < timeBeforeMeetingStart) {
-              const queuedSong = songList.value.shift() as klawSync.Item;
-              const songDuration = await getDurationFromMediaPath(
-                queuedSong.path,
-              );
+              const queuedSong = songList.value.shift() as SongItem;
+              const metadata = await getMetadataFromMediaPath(queuedSong.path);
+              const songDuration = metadata?.format.duration ?? 0;
               customSongList.unshift(queuedSong);
               secsFromEnd = timeBeforeMeetingStart - musicDurationSoFar;
               musicDurationSoFar += songDuration;
+              queuedSong.duration = songDuration;
+              queuedSong.title =
+                metadata?.common.title ?? path.basename(queuedSong.path);
               songList.value.push(queuedSong);
             }
             songList.value = customSongList;
@@ -243,7 +263,7 @@ const getNextSong = async () => {
         nextSongUrl: '',
         secsFromEnd: 0,
       };
-    let nextSong = songList.value.shift() as klawSync.Item;
+    let nextSong = songList.value.shift() as SongItem;
     songList.value.push(nextSong);
     try {
       const metadata = await parseFile(nextSong.path);
@@ -254,7 +274,7 @@ const getNextSong = async () => {
       musicPlayingTitle.value = path.basename(nextSong.path) ?? '';
     }
     return {
-      duration: await getDurationFromMediaPath(nextSong.path),
+      duration: nextSong.duration,
       nextSongUrl: getFileUrl(nextSong.path),
       secsFromEnd,
     };
