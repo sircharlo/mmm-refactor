@@ -101,6 +101,7 @@
   "expand-sidebar": "Expand sidebar",
   "external-screen": "External screen",
   "feel-free-to-browse-around-the-other-available-options-or-if-you-prefer-you-can-head-right-to-the-media-playback-screen-and-start-using-it-to-display-media": "Feel free to browse around the other available options, or if you prefer you can head right to the media playback screen and start using it to display media.",
+  "file-not-available": "The file is not available at this time. Please try again later, or import the file if you have it on your device.",
   "fileProcessError": "There was an error processing this file",
   "files-listed-below": "These files are listed below.",
   "filetypeNotSupported": "This file type is not yet supported",

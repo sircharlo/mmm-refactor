@@ -80,13 +80,14 @@ const addJwpubDocumentMediaToFiles = async (
     }).map((multimediaItem) =>
       addFullFilePathToMultimediaItem(multimediaItem, publication),
     );
-    await processMissingMediaInfo(multimediaItems);
+    const errors = await processMissingMediaInfo(multimediaItems);
     const dynamicMediaItems = await dynamicMediaMapper(
       multimediaItems,
       selectedDateObject.value?.date,
       true,
     );
     addToAdditionMediaMap(dynamicMediaItems);
+    if (errors?.length) return errors;
   } catch (e) {
     errorCatcher(e);
   }
@@ -1056,6 +1057,7 @@ async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
   try {
     const currentState = useCurrentStateStore();
     const { currentSettings } = storeToRefs(currentState);
+    const errors = [];
     for (const media of allMedia.filter(
       (m) =>
         m.KeySymbol && (!m.Label || !m.FilePath || !fs.existsSync(m.FilePath)),
@@ -1069,26 +1071,29 @@ async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
         currentSettings.value?.langFallback,
       ];
       for (const langwritten of langsWritten) {
+        if (!langwritten) {
+          continue;
+        }
+        const publicationFetcher = {
+          fileformat: media.MimeType?.includes('audio') ? 'MP3' : 'MP4',
+          issue: media.IssueTagNumber,
+          langwritten,
+          pub: media.KeySymbol,
+          ...(typeof media.Track === 'number' &&
+            media.Track > 0 && { track: media.Track }),
+        };
         try {
-          if (!langwritten) {
-            continue;
-          }
-          const publicationFetcher = {
-            fileformat: media.MimeType?.includes('audio') ? 'MP3' : 'MP4',
-            issue: media.IssueTagNumber,
-            langwritten,
-            pub: media.KeySymbol,
-            ...(typeof media.Track === 'number' &&
-              media.Track > 0 && { track: media.Track }),
-          };
           if (!media.FilePath || !fs.existsSync(media.FilePath)) {
             const { FilePath, StreamDuration, StreamThumbnailUrl, StreamUrl } =
               await downloadMissingMedia(publicationFetcher);
-
             media.FilePath = FilePath ?? media.FilePath;
             media.StreamUrl = StreamUrl ?? media.StreamUrl;
             media.Duration = StreamDuration ?? media.Duration;
             media.ThumbnailUrl = StreamThumbnailUrl ?? media.ThumbnailUrl;
+          }
+          if (!media.FilePath && !media.StreamUrl) {
+            errors.push(publicationFetcher);
+            continue;
           }
           if (!media.Label) {
             media.Label =
@@ -1098,10 +1103,12 @@ async function processMissingMediaInfo(allMedia: MultimediaItem[]) {
               '';
           }
         } catch (e) {
+          errors.push(publicationFetcher);
           errorCatcher(e);
         }
       }
     }
+    return errors;
   } catch (e) {
     errorCatcher(e);
   }

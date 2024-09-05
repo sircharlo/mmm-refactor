@@ -1271,7 +1271,7 @@ if (!migrations.value.includes('firstRun')) {
       caption: t('successfully-migrated-from-the-previous-version'),
       icon: 'mmm-info',
       message: t('welcome-to-mmm'),
-      timeout: 10000,
+      timeout: 15000,
       type: 'positive',
     });
   }

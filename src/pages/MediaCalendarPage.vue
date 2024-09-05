@@ -409,7 +409,11 @@ const updateMediaSortPlugin: DNDPlugin = (parent) => {
         item.section = section;
       }
     });
-    (additionalMediaMaps.value[currentCongregation.value]?.[selectedDate.value] ?? []).forEach((item) => {
+    (
+      additionalMediaMaps.value[currentCongregation.value]?.[
+        selectedDate.value
+      ] ?? []
+    ).forEach((item) => {
       if (item.uniqueId === id && item.section !== section) {
         item.section = section;
       }
@@ -548,7 +552,7 @@ watch(
           ? t('tryConfiguringFallbackLanguage')
           : '',
         message: date + ' | ' + t('errorDownloadingMeetingMedia'),
-        timeout: 10000,
+        timeout: 15000,
         type: 'negative',
       });
     }
@@ -891,12 +895,30 @@ const addToFiles = async (
           // if (jwpubImportDocuments.value.length > 1) {
           // } else if (jwpubImportDocuments.value.length === 1) {
           if (jwpubImportDocuments.value.length === 1) {
-            await addJwpubDocumentMediaToFiles(
+            const errors = await addJwpubDocumentMediaToFiles(
               jwpubImportDb.value,
               jwpubImportDocuments.value[0],
             );
             jwpubImportDb.value = '';
             jwpubImportDocuments.value = [];
+            if (errors?.length)
+              errors.forEach((e) =>
+                createTemporaryNotification({
+                  caption: t('file-not-available'),
+                  icon: 'mmm-error',
+                  message: [
+                    e.pub,
+                    e.issue,
+                    e.track,
+                    e.langwritten,
+                    e.fileformat,
+                  ]
+                    .filter(Boolean)
+                    .join('_'),
+                  timeout: 15000,
+                  type: 'negative',
+                }),
+              );
           } else {
             filesLoading.value = false;
           }
@@ -952,7 +974,7 @@ const addToFiles = async (
           caption: filepath ? path.basename(filepath) : filepath,
           icon: 'mmm-local-media',
           message: t('filetypeNotSupported'),
-          type: 'error',
+          type: 'negative',
         });
       }
       filesLoading.value = false;
@@ -962,7 +984,7 @@ const addToFiles = async (
         caption: filepath ? path.basename(filepath) : filepath,
         icon: 'mmm-error',
         message: t('fileProcessError'),
-        type: 'error',
+        type: 'negative',
       });
       errorCatcher(error);
     }

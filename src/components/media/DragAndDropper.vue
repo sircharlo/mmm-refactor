@@ -55,9 +55,27 @@
                   addJwpubDocumentMediaToFiles(
                     localJwpubDb,
                     jwpubImportDocument,
-                  ).then(() => {
+                  ).then((errors) => {
                     localValue = false;
                     jwpubLoading = false;
+                    if (errors?.length)
+                      errors.forEach((e) =>
+                        createTemporaryNotification({
+                          message: [
+                            e.pub,
+                            e.issue,
+                            e.track,
+                            e.langwritten,
+                            e.fileformat,
+                          ]
+                            .filter(Boolean)
+                            .join('_'),
+                          icon: 'mmm-error',
+                          caption: $t('file-not-available'),
+                          type: 'negative',
+                          timeout: 15000,
+                        }),
+                      );
                   });
                 "
                 clickable
@@ -91,6 +109,7 @@ import { barStyle, thumbStyle } from 'src/boot/globals';
 import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { addJwpubDocumentMediaToFiles } from 'src/helpers/jw-media';
+import { createTemporaryNotification } from 'src/helpers/notifications';
 import { DocumentItem } from 'src/types/sqlite';
 import { ref, watch } from 'vue';
 
