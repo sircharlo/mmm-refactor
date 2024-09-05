@@ -28,6 +28,14 @@ const createTemporaryNotification = ({
       ...(icon && { icon }),
       ...(group && { group }),
       ...(badgeStyle && { badgeStyle }),
+      actions: [
+        {
+          color: 'white',
+          icon: 'close',
+          round: true,
+        },
+      ],
+      position: 'top',
     });
   } catch (error) {
     errorCatcher(error);
