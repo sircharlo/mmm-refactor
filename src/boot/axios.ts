@@ -1,9 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { errorCatcher } from 'src/helpers/error-catcher';
-// import { boot } from 'quasar/wrappers';
-// export default boot(({ app }) => {
-//   app.config.globalProperties.$axios = axios;
-// });
+import { warningCatcher } from 'src/helpers/error-catcher';
 
 const get = async (url: string, params?: AxiosRequestConfig) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -11,7 +7,7 @@ const get = async (url: string, params?: AxiosRequestConfig) => {
   try {
     returnVal = await axios.get(url, { params });
   } catch (error) {
-    errorCatcher(error);
+    warningCatcher(error + ': ' + url);
   }
   return returnVal?.data ?? undefined;
 };
