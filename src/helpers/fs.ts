@@ -294,6 +294,7 @@ const isEmptyDir = (directory: PathLike) => {
 };
 const removeEmptyDirs = (rootDir: string) => {
   try {
+    if (!fs.existsSync(rootDir)) return;
     const dirs = klawSync(rootDir, {
       depthLimit: -1,
       nodir: false,
