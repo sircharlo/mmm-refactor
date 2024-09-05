@@ -1216,12 +1216,12 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
         },
         nodir: true,
       });
-      errorCatcher(
-        'No response, falling back to cache: ' +
-          pubDir +
-          '\n' +
-          JSON.stringify(publication, null, 2),
-      );
+      // errorCatcher(
+      //   'No response, falling back to cache: ' +
+      //     pubDir +
+      //     '\n' +
+      //     JSON.stringify(publication, null, 2),
+      // );
       return files.length > 0 ? { FilePath: files[0].path } : { FilePath: '' };
     }
     if (!responseObject) return { FilePath: '' };
