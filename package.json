@@ -40,7 +40,7 @@
     "pinia": "^2.2.2",
     "pinia-shared-state": "^0.5.1",
     "pretty-bytes": "^6.1.1",
-    "quasar": "^2.16.9",
+    "quasar": "^2.16.10",
     "sanitize-filename": "^1.6.3",
     "upath": "^2.0.1",
     "vue": "^3.4.38",
