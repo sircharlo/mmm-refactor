@@ -7759,7 +7759,7 @@ __metadata:
     prettier: "npm:^3.3.3"
     pretty-bytes: "npm:^6.1.1"
     process: "npm:^0.11.10"
-    quasar: "npm:^2.16.9"
+    quasar: "npm:^2.16.10"
     sanitize-filename: "npm:^1.6.3"
     typescript: "npm:~5.5.4"
     upath: "npm:^2.0.1"
@@ -8892,10 +8892,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"quasar@npm:^2.16.9":
-  version: 2.16.9
-  resolution: "quasar@npm:2.16.9"
-  checksum: 10c0/0caa4b33388c0d758a54e4dd092c885b35cddb712a5cac5ce9fc7aa09e660bf0cc19f7bbc9bd64f3bb87bedef3b83ef68ee4d9e9e13f91419d3989d5a6d8347c
+"quasar@npm:^2.16.10":
+  version: 2.16.10
+  resolution: "quasar@npm:2.16.10"
+  checksum: 10c0/48a997374622bf214f23d1efdc67209707718d872bf608b707d65c21eaf84e3bf00aef13fbcd6c8de5b409e0de4d783529c8f2a7ee7d9436a030a32f7f51359b
   languageName: node
   linkType: hard
 
