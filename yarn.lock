@@ -4027,16 +4027,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:^32.0.1":
-  version: 32.0.1
-  resolution: "electron@npm:32.0.1"
+"electron@npm:^32.0.2":
+  version: 32.0.2
+  resolution: "electron@npm:32.0.2"
   dependencies:
     "@electron/get": "npm:^2.0.0"
     "@types/node": "npm:^20.9.0"
     extract-zip: "npm:^2.0.1"
   bin:
     electron: cli.js
-  checksum: 10c0/274412b2da617c2489f4cb0bcbd2316a8429adbc07ef8a469e5f312ca3113558b7e9b25fdc78faea95270ee11ed155c5cf4a5b11083342577defcb9b298012d7
+  checksum: 10c0/1c8efa61e70f2a06b83da059aebc055f5e75bb30b3ae4e32e83d238f808e075d6aac43265475e22d46b0a9d44ab0f0464b4d534f24e6dc9f7ef150170dab0602
   languageName: node
   linkType: hard
 
@@ -7766,7 +7766,7 @@ __metadata:
     better-sqlite3: "npm:^11.2.1"
     dayjs: "npm:^1.11.13"
     dompurify: "npm:^3.1.6"
-    electron: "npm:^32.0.1"
+    electron: "npm:^32.0.2"
     electron-builder: "npm:^25.0.5"
     electron-updater: "npm:^6.3.4"
     electron-window-state: "npm:^5.0.3"
