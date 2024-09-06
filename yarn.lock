@@ -7779,7 +7779,7 @@ __metadata:
     is-online: "npm:^11.0.0"
     jszip: "npm:^3.10.1"
     klaw-sync: "npm:^6.0.0"
-    music-metadata: "npm:^10.3.1"
+    music-metadata: "npm:^10.4.0"
     obs-websocket-js: "npm:^5.0.6"
     p-queue: "npm:^8.0.1"
     pdfjs-dist: "npm:^4.6.82"
@@ -7828,19 +7828,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"music-metadata@npm:^10.3.1":
-  version: 10.3.1
-  resolution: "music-metadata@npm:10.3.1"
+"music-metadata@npm:^10.4.0":
+  version: 10.4.0
+  resolution: "music-metadata@npm:10.4.0"
   dependencies:
     "@tokenizer/token": "npm:^0.3.0"
     content-type: "npm:^1.0.5"
     debug: "npm:^4.3.4"
     file-type: "npm:^19.4.1"
     media-typer: "npm:^1.1.0"
-    strtok3: "npm:^8.1.0"
+    strtok3: "npm:^9.0.0"
     token-types: "npm:^6.0.0"
     uint8array-extras: "npm:^1.4.0"
-  checksum: 10c0/013cd6bc012d5a79c7c65a11bf6dd10fdfdddc4397bdb763470c7c2630787158655fe1d6d1ce172ddc49a3c38aa5160396e76570bef18601bdf6a168ba1e1ac1
+  checksum: 10c0/c8368f6b88d98c54d3465c566db6801481d0ad2e586a83d06d8ef95cb59d9fe9bae9057d2c50425e6bd2c8324dbcd23975dfbce223c87bab933b26a0490dfd3c
   languageName: node
   linkType: hard
 
@@ -8620,7 +8620,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"peek-readable@npm:^5.1.4":
+"peek-readable@npm:^5.1.4, peek-readable@npm:^5.2.0":
   version: 5.2.0
   resolution: "peek-readable@npm:5.2.0"
   checksum: 10c0/7647d56786c94fc7f5f39923ef5f6ed1da7be92a2c221b743db74f1517821b1e944cc965d8f018a7e6984d969b6ced8a0c421aece7996c0b1981eac9daa4c323
@@ -10079,6 +10079,16 @@ __metadata:
     "@tokenizer/token": "npm:^0.3.0"
     peek-readable: "npm:^5.1.4"
   checksum: 10c0/e999dda4ea423773c7da01f19bd156f07ce3d88fe1fc92557d18a5c95cd56e1223d0cd501e743de88db047d58c71b8e52af28b1a465b501ab28c719bf26ed4ff
+  languageName: node
+  linkType: hard
+
+"strtok3@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "strtok3@npm:9.0.0"
+  dependencies:
+    "@tokenizer/token": "npm:^0.3.0"
+    peek-readable: "npm:^5.2.0"
+  checksum: 10c0/7d7cde9c5a3b195131f3652c8b0cb20d96e80b10d30a19294379e4302d0d4952bdc24a516c8a6cfa82bcb96f5b47e49ec917e8cc23c81052044a2ec41d15fb30
   languageName: node
   linkType: hard
 
