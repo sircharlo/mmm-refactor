@@ -210,9 +210,15 @@ function updateLookupPeriod(reset = false) {
 }
 
 const getLocaleDayName = (lang: string, day: number) => {
-  day++;
-  const dayName = dayjs().locale(lang).day(day).format('dddd');
-  return dayName;
+  if (!day) return (day = 0);
+  try {
+    day++;
+    const dayName = dayjs().locale(lang).day(day).format('dddd');
+    return dayName;
+  } catch (error) {
+    errorCatcher(error);
+    dayjs().day(day).format('dddd');
+  }
 };
 
 const getDateLocaleFormatted = (lang: string, date: Date | string) => {
