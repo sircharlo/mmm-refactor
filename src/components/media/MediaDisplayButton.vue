@@ -304,6 +304,8 @@ const notifyInvalidBackgroundFile = () => {
   createTemporaryNotification({
     message: t('please-use-image-or-jwpub'),
   });
+  mediaWindowCustomBackground.value = '';
+  jwpubImportFilePath.value = '';
 };
 
 const setMediaBackground = (filepath?: string) => {
@@ -355,7 +357,7 @@ const chooseCustomBackground = async (reset?: boolean) => {
               };
             });
             if (jwpubImages.value?.length === 0) {
-              throw new Error('No multimedia in jwpub: ' + filepath);
+              notifyInvalidBackgroundFile();
             }
           } else {
             const tempDirectory = getTempDirectory();
@@ -376,8 +378,6 @@ const chooseCustomBackground = async (reset?: boolean) => {
       } catch (error) {
         errorCatcher(error);
         notifyInvalidBackgroundFile();
-        mediaWindowCustomBackground.value = '';
-        jwpubImportFilePath.value = '';
       }
     }
   } catch (error) {
