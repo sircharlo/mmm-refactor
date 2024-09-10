@@ -997,7 +997,9 @@ const getMwMedia = async (lookupDate: Date) => {
       )[0]?.DocumentId ?? -1;
 
     if (docId < 0)
-      throw new Error('No document id found for ' + monday + ' ' + issueString);
+      throw new Error(
+        'No document id found for ' + monday + ' ' + issueString + ' ' + db,
+      );
 
     const mms = getDocumentMultimediaItems({ db, docId }).map(
       (multimediaItem) => {
