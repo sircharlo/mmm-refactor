@@ -633,7 +633,7 @@ const seekTo = (newSeekTo: null | number) => {
 
 function zoomIn(elemId: string) {
   try {
-    panzooms[elemId].zoomIn();
+    panzooms[elemId]?.zoomIn();
   } catch (error) {
     errorCatcher(error);
   }
@@ -641,7 +641,7 @@ function zoomIn(elemId: string) {
 
 function zoomOut(elemId: string) {
   try {
-    panzooms[elemId].zoomOut();
+    panzooms[elemId]?.zoomOut();
     zoomReset(elemId);
   } catch (error) {
     errorCatcher(error);
