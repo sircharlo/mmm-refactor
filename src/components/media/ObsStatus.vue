@@ -155,7 +155,16 @@ const obsErrorHandler = (err: OBSWebSocketError) => {
   obsConnectionState.value = 'disconnected';
   obsMessage.value = 'obs.error';
   obsWebSocket?.disconnect();
-  if (err.message) errorCatcher('OBS Error: ' + err.message);
+  if (
+    err.message &&
+    !(
+      err.message.includes('stopping') ||
+      err.message.includes('authentication is required') ||
+      err.message.includes('Authentication failed')
+    )
+  ) {
+  }
+  errorCatcher('OBS Error: ' + err.message);
 };
 
 const obsConnect = async (setup?: boolean) => {
