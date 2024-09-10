@@ -51,7 +51,7 @@ const isJwHostname = (hostname: string) => {
 
 function createMediaWindow() {
   const window = new BrowserWindow({
-    alwaysOnTop: true,
+    alwaysOnTop: false,
     backgroundColor: 'black',
     frame: false,
     // roundedCorners: windowOpts.fullscreen,
