@@ -499,6 +499,9 @@ contextBridge.exposeInMainWorld('electronApi', {
     shell.openExternal(url);
   },
   openFileDialog: (single?: boolean, filter?: string[]) => {
+    const mainWindow = getMainWindow();
+    if (!mainWindow) return;
+
     const filesFilter: Electron.FileFilter[] = [
       {
         extensions: ['*'],
@@ -533,7 +536,7 @@ contextBridge.exposeInMainWorld('electronApi', {
         name: 'Background image sources',
       });
     }
-    return dialog.showOpenDialog({
+    return dialog.showOpenDialog(mainWindow, {
       filters: filesFilter,
       properties: single ? ['openFile'] : ['openFile', 'multiSelections'],
     });
