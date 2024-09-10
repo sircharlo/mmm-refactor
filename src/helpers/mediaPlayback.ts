@@ -171,12 +171,16 @@ const getMediaFromJwPlaylist = async (
     await decompress(jwPlaylistPath, outputPath);
     const dbFile = findDb(outputPath);
     if (!dbFile) return [];
-    const playlistName = (
-      executeQuery(
+    let playlistName = '';
+    try {
+      const playlistNameQuery = executeQuery(
         dbFile,
         'SELECT Name FROM Tag ORDER BY TagId ASC LIMIT 1;',
-      ) as PlaylistTagItem[]
-    )[0].Name;
+      ) as PlaylistTagItem[];
+      if (playlistNameQuery) playlistName = playlistNameQuery[0].Name + ' - ';
+    } catch (error) {
+      warningCatcher(`Could not read playlist name from ${dbFile}: ${error}`);
+    }
     const playlistItems = executeQuery(
       dbFile,
       `SELECT
@@ -228,7 +232,7 @@ const getMediaFromJwPlaylist = async (
           : '',
         IssueTagNumber: item.IssueTagNumber,
         KeySymbol: item.KeySymbol,
-        Label: playlistName + ' - ' + item.Label,
+        Label: playlistName + item.Label,
         MimeType: item.MimeType,
         ThumbnailFilePath: item.ThumbnailFilePath || '',
         Track: item.Track,
