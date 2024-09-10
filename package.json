@@ -20,7 +20,7 @@
     "@panzoom/panzoom": "^4.5.1",
     "@quasar/cli": "^2.4.1",
     "@quasar/extras": "^1.16.12",
-    "@sentry/vue": "^8.29.0",
+    "@sentry/vue": "^8.30.0",
     "adm-zip": "^0.5.16",
     "axios": "^1.7.7",
     "better-sqlite3": "^11.3.0",
@@ -43,9 +43,9 @@
     "quasar": "^2.16.11",
     "sanitize-filename": "^1.6.3",
     "upath": "^2.0.1",
-    "vue": "^3.5.3",
+    "vue": "^3.5.4",
     "vue-i18n": "^10.0.0",
-    "vue-router": "^4.4.3"
+    "vue-router": "^4.4.4"
   },
   "devDependencies": {
     "@daipeng7/rollup-plugin-iconfont": "^3.0.6",
