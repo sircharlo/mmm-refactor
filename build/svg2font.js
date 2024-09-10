@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 var IconfontWebpackPlugin = require('@daipeng7/rollup-plugin-iconfont');
 var options = {
   cssOutput: 'src/css/mmm-icons.css',
