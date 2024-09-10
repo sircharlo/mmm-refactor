@@ -116,6 +116,7 @@
     </q-dialog>
     <!-- </q-popup-proxy> -->
   </q-btn>
+  <audio ref="musicPlayer" style="display: none" />
 </template>
 
 <script setup lang="ts">
@@ -150,7 +151,7 @@ const {
 const jwStore = useJwStore();
 const { lookupPeriod } = storeToRefs(jwStore);
 
-const musicPlayer = ref<HTMLAudioElement>(document.createElement('audio'));
+const musicPlayer = ref<HTMLAudioElement>();
 const musicPlayerSource = ref<HTMLSourceElement>(
   document.createElement('source'),
 );
@@ -173,6 +174,7 @@ const fadeToVolumeLevel = (targetVolume: number, fadeOutSeconds: number) => {
 
     function updateVolume(currentTime: number) {
       try {
+        if (!musicPlayer.value) return;
         const elapsedTime = currentTime - startTime;
         const progress = Math.min(elapsedTime / fadeOutSeconds / 1000, 1);
         musicPlayer.value.volume = initialVolume + volumeChange * progress;
@@ -184,11 +186,11 @@ const fadeToVolumeLevel = (targetVolume: number, fadeOutSeconds: number) => {
             musicPlayer.value.pause();
             musicPlaying.value = false;
             musicStopping.value = false;
-            document.body.removeChild(musicPlayer.value);
           }
         }
       } catch (error) {
         errorCatcher(error);
+        if (!musicPlayer.value) return;
         musicPlayer.value.volume = targetVolume;
       }
     }
@@ -329,12 +331,16 @@ const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
 
 async function playMusic() {
   try {
-    if (!currentSettings.value?.enableMusicButton || musicPlaying.value) return;
+    if (
+      !currentSettings.value?.enableMusicButton ||
+      musicPlaying.value ||
+      !musicPlayer.value
+    )
+      return;
     musicStarting.value = true;
     songList.value = [];
     musicPlayer.value.appendChild(musicPlayerSource.value);
     musicPlayer.value.style.display = 'none';
-    document.body.appendChild(musicPlayer.value);
     musicPlayer.value.volume = 0;
     const { duration, nextSongUrl, secsFromEnd } = await getNextSong();
     if (!nextSongUrl) return;
@@ -353,7 +359,8 @@ async function playMusic() {
       })
       .catch((error) => {
         errorCatcher(error);
-      }).finally(() => {
+      })
+      .finally(() => {
         musicStarting.value = false;
       });
     musicPlayer.value.onended = async () => {
@@ -464,8 +471,5 @@ onUnmounted(() => {
   window.removeEventListener('toggleMusic', toggleMusicListener);
   window.removeEventListener('muteBackgroundMusic', muteBackgroundMusic);
   window.removeEventListener('unmuteBackgroundMusic', unmuteBackgroundMusic);
-
-  if (musicPlayer.value?.parentElement)
-    document.body.removeChild(musicPlayer.value);
 });
 </script>
