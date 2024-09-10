@@ -13,9 +13,8 @@
           :id="media.uniqueId"
           :ratio="16 / 9"
           :src="
-            media.isImage
-              ? media.fileUrl
-              : media.thumbnailUrl || thumbnailFromMetadata
+            thumbnailFromMetadata ||
+            (media.isImage ? media.fileUrl : media.thumbnailUrl)
           "
           @error="imageLoadingError"
           class="rounded-borders"
@@ -568,14 +567,16 @@ const imageLoadingError = () => {
 function findThumbnailUrl() {
   if (!thumbnailFromMetadata.value) {
     setTimeout(() => {
-      getThumbnailUrl(props.media.fileUrl).then((thumbnailUrl) => {
-        if (!thumbnailFromMetadata.value) {
-          thumbnailFromMetadata.value = thumbnailUrl;
-        }
-        if (!thumbnailFromMetadata.value) {
-          findThumbnailUrl();
-        }
-      });
+      if (fs.existsSync(fileUrlToPath(props.media.fileUrl))) {
+        getThumbnailUrl(props.media.fileUrl).then((thumbnailUrl) => {
+          if (!thumbnailFromMetadata.value) {
+            thumbnailFromMetadata.value = thumbnailUrl;
+          }
+          if (!thumbnailFromMetadata.value) {
+            findThumbnailUrl();
+          }
+        });
+      }
     }, 2000);
   }
 }
