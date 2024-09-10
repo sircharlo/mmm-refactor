@@ -210,14 +210,14 @@ function updateLookupPeriod(reset = false) {
 }
 
 const getLocaleDayName = (lang: string, day: number) => {
-  if (!day) return (day = 0);
+  if (!day) day = 0;
   try {
     day++;
     const dayName = dayjs().locale(lang).day(day).format('dddd');
     return dayName;
   } catch (error) {
     errorCatcher(error);
-    dayjs().day(day).format('dddd');
+    return dayjs().day(day).format('dddd');
   }
 };
 
