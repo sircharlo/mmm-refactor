@@ -72,7 +72,11 @@
           <div class="row items-center">
             <div class="col-6">
               <div class="row text-subtitle1 text-weight-medium">
-                {{ musicPlaying ? musicRemainingTime : $t('not-playing') }}
+                {{
+                  musicPlaying || musicStarting
+                    ? musicRemainingTime
+                    : $t('not-playing')
+                }}
               </div>
               <div
                 class="row text-dark-grey"
@@ -88,7 +92,7 @@
             </div>
             <div class="col-6">
               <q-btn
-                :disabled="mediaPlaying"
+                :disabled="mediaPlaying || musicStarting"
                 @click="playMusic"
                 class="full-width"
                 color="primary"
@@ -153,6 +157,7 @@ const musicPlayerSource = ref<HTMLSourceElement>(
 const musicPlayingTitle = ref('');
 const musicPlaying = ref(false);
 const musicStopping = ref(false);
+const musicStarting = ref(false);
 const musicStoppedAutomatically = ref(false);
 const songList: Ref<SongItem[]> = ref([]);
 const currentSongRemainingTime = ref('..:..');
@@ -214,6 +219,12 @@ const getNextSong = async () => {
         { langwritten: currentSettings.value.lang, pub: 'sjjm' },
         'mp3',
       ).sort(() => Math.random() - 0.5);
+      for (const queuedSong of songList.value) {
+        const metadata = await getMetadataFromMediaPath(queuedSong.path);
+        queuedSong.duration = metadata?.format?.duration ?? 0;
+        queuedSong.title =
+          metadata?.common.title ?? path.basename(queuedSong.path);
+      }
       try {
         const selectedDayMedia =
           lookupPeriod.value[currentCongregation.value].find(
@@ -241,15 +252,9 @@ const getNextSong = async () => {
           if (songList.value.length) {
             while (musicDurationSoFar < timeBeforeMeetingStart) {
               const queuedSong = songList.value.shift() as SongItem;
-              const metadata = await getMetadataFromMediaPath(queuedSong.path);
-              const songDuration = metadata?.format.duration ?? 0;
               customSongList.unshift(queuedSong);
               secsFromEnd = timeBeforeMeetingStart - musicDurationSoFar;
-              musicDurationSoFar += songDuration;
-              queuedSong.duration = songDuration;
-              queuedSong.title =
-                metadata?.common.title ?? path.basename(queuedSong.path);
-              songList.value.push(queuedSong);
+              musicDurationSoFar += queuedSong.duration as number;
             }
             songList.value = customSongList;
           }
@@ -325,6 +330,7 @@ const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
 async function playMusic() {
   try {
     if (!currentSettings.value?.enableMusicButton || musicPlaying.value) return;
+    musicStarting.value = true;
     songList.value = [];
     musicPlayer.value.appendChild(musicPlayerSource.value);
     musicPlayer.value.style.display = 'none';
@@ -347,6 +353,8 @@ async function playMusic() {
       })
       .catch((error) => {
         errorCatcher(error);
+      }).finally(() => {
+        musicStarting.value = false;
       });
     musicPlayer.value.onended = async () => {
       if (!musicPlayer.value || !musicPlayerSource.value) return;
@@ -380,6 +388,7 @@ async function playMusic() {
     };
   } catch (error) {
     errorCatcher(error);
+    musicStarting.value = false;
   }
 }
 
@@ -409,7 +418,7 @@ watch(
 
 const musicRemainingTime = computed(() => {
   try {
-    if (!musicPlayer.value) return '..:..';
+    if (!musicPlayer.value || musicStarting.value) return '..:..';
     if (musicStopping.value) return ref(t('music.stopping')).value;
     if (meetingDay.value && timeRemainingBeforeMusicStop.value > 0)
       return formatTime(timeRemainingBeforeMusicStop.value);
