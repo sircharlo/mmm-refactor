@@ -17,7 +17,7 @@
               ? media.fileUrl
               : media.thumbnailUrl || thumbnailFromMetadata
           "
-          @error="imageLoadingError(media)"
+          @error="imageLoadingError"
           class="rounded-borders"
           fit="contain"
           width="150px"
@@ -514,7 +514,7 @@
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { storeToRefs } from 'pinia';
 import { electronApi } from 'src/helpers/electron-api';
-import { errorCatcher, warningCatcher } from 'src/helpers/error-catcher';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import { getThumbnailUrl } from 'src/helpers/fs';
 import { formatTime, isImage, isVideo } from 'src/helpers/mediaPlayback';
 import { sendObsSceneEvent } from 'src/helpers/obs';
@@ -559,25 +559,12 @@ const props = defineProps<{
   media: DynamicMediaObject;
 }>();
 
-const imageLoadingError = (media: DynamicMediaObject) => {
-  warningCatcher(
-    'Unable to load thumbnail; reloading from file:' +
-      media.thumbnailUrl +
-      ' / ' +
-      media.fileUrl,
-  );
-  media.thumbnailUrl = '';
-  getThumbnailUrl(media.fileUrl)
-    .then((thumbnailUrl) => {
-      media.thumbnailUrl = thumbnailUrl;
-    })
-    .catch((error) => {
-      media.thumbnailUrl = '';
-      errorCatcher(error);
-    });
+const thumbnailFromMetadata = ref('');
+
+const imageLoadingError = () => {
+  findThumbnailUrl();
 };
 
-const thumbnailFromMetadata = ref('');
 function findThumbnailUrl() {
   if (!thumbnailFromMetadata.value) {
     setTimeout(() => {
