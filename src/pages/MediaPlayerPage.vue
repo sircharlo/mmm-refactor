@@ -292,6 +292,7 @@ function onResize(size: { height: number; width: number }) {
     group: 'resize',
     icon: 'mmm-info',
     message: size.width + 'x' + size.height,
+    noClose: true,
     type: 'info',
   });
 }

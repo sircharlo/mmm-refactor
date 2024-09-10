@@ -8,9 +8,10 @@ const createTemporaryNotification = ({
   group,
   icon,
   message,
+  noClose = false,
   timeout = 2000,
   type,
-}: QNotifyCreateOptions) => {
+}: { noClose?: boolean } & QNotifyCreateOptions) => {
   try {
     return Notify.create({
       // actions: [
@@ -28,13 +29,15 @@ const createTemporaryNotification = ({
       ...(icon && { icon }),
       ...(group && { group }),
       ...(badgeStyle && { badgeStyle }),
-      actions: [
-        {
-          color: 'white',
-          icon: 'close',
-          round: true,
-        },
-      ],
+      ...(!noClose && {
+        actions: [
+          {
+            color: 'white',
+            icon: 'close',
+            round: true,
+          },
+        ],
+      }),
       position: 'top',
     });
   } catch (error) {
