@@ -622,10 +622,12 @@ const getWtIssue = async (
       db,
       'SELECT * FROM DatedText',
     ) as DatedTextItem[];
-    const weekNr = datedTexts.findIndex((weekItem) => {
-      const mondayAsNumber = parseInt(date.formatDate(monday, 'YYYYMMDD'));
-      return weekItem.FirstDateOffset === mondayAsNumber;
-    });
+    const weekNr = datedTexts
+      ? datedTexts.findIndex((weekItem) => {
+          const mondayAsNumber = parseInt(date.formatDate(monday, 'YYYYMMDD'));
+          return weekItem.FirstDateOffset === mondayAsNumber;
+        })
+      : -1;
     if (weekNr === -1) {
       throw new Error('No week found in following w: ' + issueString);
     }
@@ -759,7 +761,9 @@ const getWeMedia = async (lookupDate: Date) => {
       ));
     }
     if (!db || docId < 0) {
-      throw new Error('error.downloadMedia');
+      throw new Error(
+        'No WT article found for date: ' + monday + ' (' + lookupDate + ')',
+      );
     }
     const videos = executeQuery(
       db,

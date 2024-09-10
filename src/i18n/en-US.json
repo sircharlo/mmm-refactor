@@ -90,7 +90,6 @@
   "enter-the-port-and-password-configured-in-obs-studios-websocket-plugin": "Enter the port and password configured in OBS Studio's Websocket plugin.",
   "entireFile": "Play from start to finish",
   "error": "Error",
-  "error.downloadMedia": "An error occurred while downloading media. Please try again later.",
   "errorDownloadingMeetingMedia": "Error downloading media for meeting",
   "errors": "Errors",
   "excellent": "Excellent!",
