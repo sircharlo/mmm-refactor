@@ -7,7 +7,7 @@ import {
 } from '@electron/remote';
 import AdmZip from 'adm-zip';
 import * as sqlite3 from 'better-sqlite3';
-import { contextBridge, shell, webUtils } from 'electron';
+import { contextBridge, shell, /*ShortcutDetails,*/ webUtils } from 'electron';
 import fs from 'fs-extra';
 import convert from 'heic-convert';
 import klawSync from 'klaw-sync';
@@ -556,6 +556,14 @@ contextBridge.exposeInMainWorld('electronApi', {
     const url: typeof import('url') = require('node:url');
     return url.pathToFileURL(path).href;
   },
+  // readShortcutLink: (path: string) => {
+  //   try {
+  //     return shell.readShortcutLink(path);
+  //   } catch (error) {
+  //     errorCatcher(error);
+  //     return {};
+  //   }
+  // },
   registerShortcut,
   setAutoStartAtLogin: (value: boolean) => {
     try {
@@ -578,5 +586,12 @@ contextBridge.exposeInMainWorld('electronApi', {
   },
   toggleMediaWindow,
   unregisterShortcut,
+  // writeShortcutLink: (path: string, details: ShortcutDetails) => {
+  //   try {
+  //     shell.writeShortcutLink(path, 'update', details);
+  //   } catch (error) {
+  //     errorCatcher(error);
+  //   }
+  // },
   zoomWebsiteWindow,
 });
