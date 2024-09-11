@@ -121,11 +121,7 @@
                 <SelectInput
                   :options="item.list"
                   :rules="item.rules"
-                  :use-input="
-                    settingId === 'lang' ||
-                    settingId === 'langFallback' ||
-                    settingId === 'langSubtitles'
-                  "
+                  :use-input="settingId.toLowerCase().includes('lang')"
                   v-else-if="item.type === 'list'"
                   v-model="
                     currentSettings[settingId as keyof SettingsItems] as string

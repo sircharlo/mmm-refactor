@@ -11,6 +11,7 @@ const obsState = useObsStateStore();
 const { scenes } = storeToRefs(obsState);
 
 import { localeOptions } from 'src/i18n';
+const filteredLocaleAppLang = ref(localeOptions);
 
 import { getSpecificWeekday } from './date';
 import { errorCatcher } from './error-catcher';
@@ -137,6 +138,7 @@ const filterFn = (
   const noFilter = () => {
     update(() => {
       filteredJwLanguages.value = jwLanguages.value.list;
+      filteredLocaleAppLang.value = localeOptions;
     });
   };
   try {
@@ -149,6 +151,11 @@ const filterFn = (
           (v) =>
             v.name.toLowerCase().indexOf(needle) > -1 ||
             v.vernacularName.toLowerCase().indexOf(needle) > -1,
+        );
+        filteredLocaleAppLang.value = localeOptions.filter(
+          (v) =>
+            v.englishName.toLowerCase().indexOf(needle) > -1 ||
+            v.label.toLowerCase().indexOf(needle) > -1,
         );
       });
     }
@@ -168,7 +175,18 @@ const getListOptions = (list: string | undefined) => {
         };
       });
     } else if (list === 'appLanguages') {
-      return localeOptions;
+      return filteredLocaleAppLang.value
+        .sort((a, b) => a.englishName.localeCompare(b.englishName))
+        .map((language) => {
+          return {
+            label:
+              language.label +
+              (language.englishName !== language.label
+                ? ` (${language.englishName})`
+                : ''),
+            value: language.value,
+          };
+        });
     } else if (list == 'darkModes') {
       return [
         { label: 'automatic', value: 'auto' },
