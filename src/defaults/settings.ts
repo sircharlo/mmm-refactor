@@ -282,7 +282,7 @@ export const defaultSettings: SettingsValues = {
   lang: 'E',
   langFallback: '',
   langSubtitles: '',
-  localAppLang: 'en-US',
+  localAppLang: 'en',
   maxRes: '720p',
   musicVolume: 100,
   mwDay: '',

@@ -891,9 +891,10 @@ watch(
 );
 
 watch(
-  () => currentSettings.value?.localAppLang,
-  (newAppLang) => {
+  () => [currentSettings.value?.localAppLang],
+  ([newAppLang]) => {
     if (newAppLang) {
+      if (newAppLang.includes('-')) newAppLang = newAppLang.split('-')[0];
       locale.value = newAppLang;
       refreshDateLocale(newAppLang);
     }
