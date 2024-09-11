@@ -1,4 +1,4 @@
-// import { ShortcutDetails } from 'electron';
+import { ShortcutDetails } from 'electron';
 import { PathLike } from 'fs';
 import { IAudioMetadata, IOptions } from 'music-metadata';
 import { QueryResponseItem } from 'src/types/sqlite';
@@ -26,6 +26,7 @@ export interface ElectronApi {
   getAppVersion: () => string;
   getLocalPathFromFileObject: (fileObject: File) => string;
   getUserDataPath: () => string;
+  getUserDesktopPath: () => string;
   isFileUrl: (url: string) => boolean;
   klawSync: typeof import('klaw-sync');
   moveMediaWindow: (
@@ -43,12 +44,12 @@ export interface ElectronApi {
   parseFile: (filePath: string, options?: IOptions) => Promise<IAudioMetadata>;
   path: typeof import('path');
   pathToFileURL: (path: string) => string;
-  // readShortcutLink: (shortcutPath: string) => ShortcutDetails;
+  readShortcutLink: (shortcutPath: string) => ShortcutDetails;
   registerShortcut: (shortcut: string, callback: () => void) => void;
   setAutoStartAtLogin: (value: boolean) => void;
   toggleMediaWindow: (action: string) => void;
   unregisterShortcut: (shortcut: string) => void;
-  // writeShortcutLink: (shortcutPath: string, details: ShortcutDetails) => void;
+  writeShortcutLink: (shortcutPath: string, details: ShortcutDetails) => void;
   zoomWebsiteWindow: (action: string) => void;
 }
 

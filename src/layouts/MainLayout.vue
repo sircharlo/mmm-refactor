@@ -800,18 +800,19 @@ const mediaSortForDay = ref(true);
 const {
   closeWebsiteWindow,
   fs,
-  // getAppDataPath,
+  getAppDataPath,
   getAppVersion,
-  // getUserDataPath,
+  getUserDataPath,
+  getUserDesktopPath,
   klawSync,
   navigateWebsiteWindow,
   openExternalWebsite,
   openWebsiteWindow,
-  // path,
+  path,
   pathToFileURL,
-  // readShortcutLink,
+  readShortcutLink,
   setAutoStartAtLogin,
-  // writeShortcutLink,
+  writeShortcutLink,
   zoomWebsiteWindow,
 } = electronApi;
 
@@ -1283,36 +1284,47 @@ if (!migrations.value.includes('firstRun')) {
 }
 
 // Hack for Windows shortcut glitch, possibly related to https://github.com/electron-userland/electron-builder/issues/2435
-// try {
-//   if ($q.platform.is.platform === 'win') {
-//     const shortcutPath = path.join(
-//       getAppDataPath(),
-//       'Microsoft',
-//       'Windows',
-//       'Start Menu',
-//       'Programs',
-//       'Meeting Media Manager.lnk',
-//     );
-//     if (fs.existsSync(shortcutPath)) {
-//       fs.copySync(
-//         shortcutPath,
-//         path.join(getUserDataPath(), 'Meeting Media Manager - Original.lnk'),
-//       );
-//       const shortcut = readShortcutLink(shortcutPath);
-//       if (
-//         shortcut.target &&
-//         (shortcut.icon !== shortcut.target ||
-//           shortcut.cwd !== path.resolve(path.basename(shortcut.target)))
-//       ) {
-//         shortcut.cwd = path.resolve(path.basename(shortcut.target));
-//         shortcut.icon = shortcut.target;
-//         writeShortcutLink(shortcutPath, shortcut);
-//       }
-//     }
-//   }
-// } catch (error) {
-//   errorCatcher(error);
-// }
+try {
+  if ($q.platform.is.platform === 'win') {
+    for (const parentDir of [
+      path.join(
+        getAppDataPath(),
+        'Microsoft',
+        'Windows',
+        'Start Menu',
+        'Programs',
+      ),
+      getUserDesktopPath(),
+    ]) {
+      try {
+        const shortcutPath = path.join(parentDir, 'Meeting Media Manager.lnk');
+        if (fs.existsSync(shortcutPath)) {
+          fs.copySync(
+            shortcutPath,
+            path.join(
+              getUserDataPath(),
+              'Meeting Media Manager - ' + path.basename(parentDir) + '.lnk',
+            ),
+          );
+          const shortcut = readShortcutLink(shortcutPath);
+          if (
+            shortcut.target &&
+            (shortcut.icon !== shortcut.target ||
+              shortcut.cwd !== path.resolve(path.basename(shortcut.target)))
+          ) {
+            shortcut.cwd = path.resolve(path.basename(shortcut.target));
+            shortcut.icon = shortcut.target;
+            writeShortcutLink(shortcutPath, shortcut);
+          }
+        }
+      } catch (error) {
+        errorCatcher(error);
+      }
+    }
+  }
+} catch (error) {
+  errorCatcher(error);
+}
 
 cleanLocalStorage();
 cleanAdditionalMediaFolder();
