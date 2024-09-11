@@ -1,10 +1,10 @@
 @font-face {
     font-family: mmm-icons;
-    src: url("mmm-icons.eot");src: url("mmm-icons.eot?3a67af75#iefix") format("embedded-opentype"),
-             url("mmm-icons.woff2?3a67af75") format("woff2"),
-             url("mmm-icons.woff?3a67af75") format("woff"),
-             url("mmm-icons.ttf?3a67af75") format("truetype"),
-             url("mmm-icons.svg?3a67af75#mmm-icons") format("svg");
+    src: url("mmm-icons.eot");src: url("mmm-icons.eot?ce240e1b#iefix") format("embedded-opentype"),
+             url("mmm-icons.woff2?ce240e1b") format("woff2"),
+             url("mmm-icons.woff?ce240e1b") format("woff"),
+             url("mmm-icons.ttf?ce240e1b") format("truetype"),
+             url("mmm-icons.svg?ce240e1b#mmm-icons") format("svg");
     font-weight: normal;
     font-style: normal;
 }
@@ -17,7 +17,7 @@
 }
 
 
-.mmm-additional-media, .mmm-advanced-settings, .mmm-arrow-back, .mmm-arrow-forward, .mmm-arrow-outward, .mmm-background-remove, .mmm-background, .mmm-calendar-month, .mmm-check, .mmm-clear, .mmm-cloud-done, .mmm-cloud-error, .mmm-cloud, .mmm-configuration, .mmm-congregation, .mmm-delete-all, .mmm-delete-smart, .mmm-delete, .mmm-display-current, .mmm-down, .mmm-drag-n-drop, .mmm-dropdown-arrow, .mmm-edit, .mmm-error, .mmm-file, .mmm-footnote, .mmm-fullscreen, .mmm-github, .mmm-go-to-date, .mmm-groups, .mmm-guide, .mmm-import-media, .mmm-info, .mmm-integrations, .mmm-jwlplaylist, .mmm-jwpub, .mmm-lectern, .mmm-left, .mmm-local-media, .mmm-media-display-active, .mmm-media-display-inactive, .mmm-media-settings, .mmm-media, .mmm-menu, .mmm-minus, .mmm-mirror, .mmm-movie, .mmm-music-note, .mmm-obs-studio, .mmm-open-web, .mmm-paragraph, .mmm-pause, .mmm-picture_in_picture, .mmm-play-sign-language, .mmm-play, .mmm-plus, .mmm-radio-button-checked, .mmm-radio-button-unchecked, .mmm-refresh, .mmm-reset, .mmm-right, .mmm-search, .mmm-settings, .mmm-stop, .mmm-stream-now, .mmm-subtitles-off, .mmm-subtitles, .mmm-time, .mmm-tools, .mmm-window {
+.mmm-additional-media, .mmm-advanced-settings, .mmm-almost-done, .mmm-arrow-back, .mmm-arrow-forward, .mmm-arrow-outward, .mmm-background-remove, .mmm-background, .mmm-calendar-month, .mmm-check, .mmm-clear, .mmm-cloud-done, .mmm-cloud-error, .mmm-cloud, .mmm-configuration, .mmm-congregation, .mmm-delete-all, .mmm-delete-smart, .mmm-delete, .mmm-display-current, .mmm-down, .mmm-drag-n-drop, .mmm-dropdown-arrow, .mmm-edit, .mmm-error, .mmm-file, .mmm-footnote, .mmm-fullscreen, .mmm-github, .mmm-go-to-date, .mmm-groups, .mmm-guide, .mmm-import-media, .mmm-info, .mmm-integrations, .mmm-jwlplaylist, .mmm-jwpub, .mmm-lectern, .mmm-left, .mmm-local-media, .mmm-media-display-active, .mmm-media-display-inactive, .mmm-media-language, .mmm-media-settings, .mmm-media, .mmm-menu, .mmm-minus, .mmm-mirror, .mmm-movie, .mmm-music-note, .mmm-obs-configured, .mmm-obs-password, .mmm-obs-studio, .mmm-open-web, .mmm-paragraph, .mmm-pause, .mmm-picture-for-zoom-participants, .mmm-picture_in_picture, .mmm-play-sign-language, .mmm-play, .mmm-plus, .mmm-radio-button-checked, .mmm-radio-button-unchecked, .mmm-refresh, .mmm-reset, .mmm-right, .mmm-search, .mmm-settings, .mmm-stop, .mmm-stream-now, .mmm-subtitles-off, .mmm-subtitles, .mmm-time, .mmm-tools, .mmm-ui-language, .mmm-window {
     font-family: 'mmm-icons';
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -34,275 +34,299 @@
     content: "\ea02";
 }
 
-.mmm-arrow-back::before {
+.mmm-almost-done::before {
     content: "\ea03";
 }
 
-.mmm-arrow-forward::before {
+.mmm-arrow-back::before {
     content: "\ea04";
 }
 
-.mmm-arrow-outward::before {
+.mmm-arrow-forward::before {
     content: "\ea05";
 }
 
-.mmm-background-remove::before {
+.mmm-arrow-outward::before {
     content: "\ea06";
 }
 
-.mmm-background::before {
+.mmm-background-remove::before {
     content: "\ea07";
 }
 
-.mmm-calendar-month::before {
+.mmm-background::before {
     content: "\ea08";
 }
 
-.mmm-check::before {
+.mmm-calendar-month::before {
     content: "\ea09";
 }
 
-.mmm-clear::before {
+.mmm-check::before {
     content: "\ea0a";
 }
 
-.mmm-cloud-done::before {
+.mmm-clear::before {
     content: "\ea0b";
 }
 
-.mmm-cloud-error::before {
+.mmm-cloud-done::before {
     content: "\ea0c";
 }
 
-.mmm-cloud::before {
+.mmm-cloud-error::before {
     content: "\ea0d";
 }
 
-.mmm-configuration::before {
+.mmm-cloud::before {
     content: "\ea0e";
 }
 
-.mmm-congregation::before {
+.mmm-configuration::before {
     content: "\ea0f";
 }
 
-.mmm-delete-all::before {
+.mmm-congregation::before {
     content: "\ea10";
 }
 
-.mmm-delete-smart::before {
+.mmm-delete-all::before {
     content: "\ea11";
 }
 
-.mmm-delete::before {
+.mmm-delete-smart::before {
     content: "\ea12";
 }
 
-.mmm-display-current::before {
+.mmm-delete::before {
     content: "\ea13";
 }
 
-.mmm-down::before {
+.mmm-display-current::before {
     content: "\ea14";
 }
 
-.mmm-drag-n-drop::before {
+.mmm-down::before {
     content: "\ea15";
 }
 
-.mmm-dropdown-arrow::before {
+.mmm-drag-n-drop::before {
     content: "\ea16";
 }
 
-.mmm-edit::before {
+.mmm-dropdown-arrow::before {
     content: "\ea17";
 }
 
-.mmm-error::before {
+.mmm-edit::before {
     content: "\ea18";
 }
 
-.mmm-file::before {
+.mmm-error::before {
     content: "\ea19";
 }
 
-.mmm-footnote::before {
+.mmm-file::before {
     content: "\ea1a";
 }
 
-.mmm-fullscreen::before {
+.mmm-footnote::before {
     content: "\ea1b";
 }
 
-.mmm-github::before {
+.mmm-fullscreen::before {
     content: "\ea1c";
 }
 
-.mmm-go-to-date::before {
+.mmm-github::before {
     content: "\ea1d";
 }
 
-.mmm-groups::before {
+.mmm-go-to-date::before {
     content: "\ea1e";
 }
 
-.mmm-guide::before {
+.mmm-groups::before {
     content: "\ea1f";
 }
 
-.mmm-import-media::before {
+.mmm-guide::before {
     content: "\ea20";
 }
 
-.mmm-info::before {
+.mmm-import-media::before {
     content: "\ea21";
 }
 
-.mmm-integrations::before {
+.mmm-info::before {
     content: "\ea22";
 }
 
-.mmm-jwlplaylist::before {
+.mmm-integrations::before {
     content: "\ea23";
 }
 
-.mmm-jwpub::before {
+.mmm-jwlplaylist::before {
     content: "\ea24";
 }
 
-.mmm-lectern::before {
+.mmm-jwpub::before {
     content: "\ea25";
 }
 
-.mmm-left::before {
+.mmm-lectern::before {
     content: "\ea26";
 }
 
-.mmm-local-media::before {
+.mmm-left::before {
     content: "\ea27";
 }
 
-.mmm-media-display-active::before {
+.mmm-local-media::before {
     content: "\ea28";
 }
 
-.mmm-media-display-inactive::before {
+.mmm-media-display-active::before {
     content: "\ea29";
 }
 
-.mmm-media-settings::before {
+.mmm-media-display-inactive::before {
     content: "\ea2a";
 }
 
-.mmm-media::before {
+.mmm-media-language::before {
     content: "\ea2b";
 }
 
-.mmm-menu::before {
+.mmm-media-settings::before {
     content: "\ea2c";
 }
 
-.mmm-minus::before {
+.mmm-media::before {
     content: "\ea2d";
 }
 
-.mmm-mirror::before {
+.mmm-menu::before {
     content: "\ea2e";
 }
 
-.mmm-movie::before {
+.mmm-minus::before {
     content: "\ea2f";
 }
 
-.mmm-music-note::before {
+.mmm-mirror::before {
     content: "\ea30";
 }
 
-.mmm-obs-studio::before {
+.mmm-movie::before {
     content: "\ea31";
 }
 
-.mmm-open-web::before {
+.mmm-music-note::before {
     content: "\ea32";
 }
 
-.mmm-paragraph::before {
+.mmm-obs-configured::before {
     content: "\ea33";
 }
 
-.mmm-pause::before {
+.mmm-obs-password::before {
     content: "\ea34";
 }
 
-.mmm-picture_in_picture::before {
+.mmm-obs-studio::before {
     content: "\ea35";
 }
 
-.mmm-play-sign-language::before {
+.mmm-open-web::before {
     content: "\ea36";
 }
 
-.mmm-play::before {
+.mmm-paragraph::before {
     content: "\ea37";
 }
 
-.mmm-plus::before {
+.mmm-pause::before {
     content: "\ea38";
 }
 
-.mmm-radio-button-checked::before {
+.mmm-picture-for-zoom-participants::before {
     content: "\ea39";
 }
 
-.mmm-radio-button-unchecked::before {
+.mmm-picture_in_picture::before {
     content: "\ea3a";
 }
 
-.mmm-refresh::before {
+.mmm-play-sign-language::before {
     content: "\ea3b";
 }
 
-.mmm-reset::before {
+.mmm-play::before {
     content: "\ea3c";
 }
 
-.mmm-right::before {
+.mmm-plus::before {
     content: "\ea3d";
 }
 
-.mmm-search::before {
+.mmm-radio-button-checked::before {
     content: "\ea3e";
 }
 
-.mmm-settings::before {
+.mmm-radio-button-unchecked::before {
     content: "\ea3f";
 }
 
-.mmm-stop::before {
+.mmm-refresh::before {
     content: "\ea40";
 }
 
-.mmm-stream-now::before {
+.mmm-reset::before {
     content: "\ea41";
 }
 
-.mmm-subtitles-off::before {
+.mmm-right::before {
     content: "\ea42";
 }
 
-.mmm-subtitles::before {
+.mmm-search::before {
     content: "\ea43";
 }
 
-.mmm-time::before {
+.mmm-settings::before {
     content: "\ea44";
 }
 
-.mmm-tools::before {
+.mmm-stop::before {
     content: "\ea45";
 }
 
-.mmm-window::before {
+.mmm-stream-now::before {
     content: "\ea46";
+}
+
+.mmm-subtitles-off::before {
+    content: "\ea47";
+}
+
+.mmm-subtitles::before {
+    content: "\ea48";
+}
+
+.mmm-time::before {
+    content: "\ea49";
+}
+
+.mmm-tools::before {
+    content: "\ea4a";
+}
+
+.mmm-ui-language::before {
+    content: "\ea4b";
+}
+
+.mmm-window::before {
+    content: "\ea4c";
 }
 
