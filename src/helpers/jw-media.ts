@@ -1288,6 +1288,8 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
 const downloadAdditionalRemoteVideo = async (
   mediaItemLinks: MediaItemsMediatorFile[] | MediaLink[],
   thumbnailUrl?: string,
+  song: boolean | number | string = false,
+  title?: string,
 ) => {
   try {
     const currentState = useCurrentStateStore();
@@ -1308,7 +1310,9 @@ const downloadAdditionalRemoteVideo = async (
               getDatedAdditionalMediaDirectory.value,
               path.basename(bestItemUrl),
             ),
+            song,
             thumbnailUrl: thumbnailUrl || '',
+            title,
             url: bestItemUrl,
           },
         }),

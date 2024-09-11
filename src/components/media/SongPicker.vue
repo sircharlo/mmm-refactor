@@ -97,10 +97,12 @@ const addSong = async (songTrack: number) => {
         track: songTrack,
       } as PublicationFetcher;
       const songTrackFiles = await getPubMediaLinks(songTrackItem);
-      const { thumbnail } = await getJwMediaInfo(songTrackItem);
+      const { thumbnail, title } = await getJwMediaInfo(songTrackItem);
       downloadAdditionalRemoteVideo(
         songTrackFiles?.files[currentSettings.value.lang]['MP4'],
         thumbnail,
+        songTrack,
+        title.replace(/^\d+\.\s*/, ''),
       );
     }
   } catch (error) {

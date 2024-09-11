@@ -766,7 +766,9 @@ const addToAdditionMediaMapFromPath = async (
   uniqueId?: string,
   stream?: {
     duration: number;
+    song?: string;
     thumbnailUrl: string;
+    title?: string;
     url: string;
   },
 ) => {
@@ -796,11 +798,12 @@ const addToAdditionMediaMapFromPath = async (
         isImage: isImage(additionalFilePath),
         isVideo: isVideoFile,
         section: 'additional',
+        song: stream?.song,
         streamUrl: stream?.url,
         thumbnailUrl:
           stream?.thumbnailUrl ??
           (await getThumbnailUrl(additionalFilePath, true)),
-        title: path.basename(additionalFilePath),
+        title: stream?.title ?? path.basename(additionalFilePath),
         uniqueId,
       },
     ]);
@@ -1054,7 +1057,9 @@ const localFilesBrowsedListener = (event: CustomEventInit) => {
 const remoteVideoLoading = (event: CustomEventInit) => {
   addToAdditionMediaMapFromPath(event.detail.path, undefined, {
     duration: event.detail.duration,
+    song: event.detail.song,
     thumbnailUrl: event.detail.thumbnailUrl,
+    title: event.detail.title,
     url: event.detail.url,
   });
 };
