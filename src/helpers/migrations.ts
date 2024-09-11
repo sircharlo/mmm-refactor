@@ -52,52 +52,53 @@ const parsePrefsFile = (path: string) => {
 const buildNewPrefsObject = (oldPrefs: OldAppConfig) => {
   try {
     const newPrefsObject: SettingsValues = {
-      autoStartAtLogin: oldPrefs.app.autoRunAtBoot || false,
-      autoStartMusic: oldPrefs.meeting.autoStartMusic || true,
-      congregationName: oldPrefs.app.congregationName || '',
-      coWeek: oldPrefs.meeting.coWeek || '',
+      autoStartAtLogin: oldPrefs.app?.autoRunAtBoot || false,
+      autoStartMusic: oldPrefs.meeting?.autoStartMusic || true,
+      congregationName: oldPrefs.app?.congregationName || '',
+      coWeek: oldPrefs.meeting?.coWeek || '',
       darkMode: 'auto',
-      disableMediaFetching: oldPrefs.meeting.specialCong || false,
+      disableMediaFetching: oldPrefs.meeting?.specialCong || false,
       enableExtraCache: false,
       enableKeyboardShortcuts:
-        oldPrefs.media.mediaWinShortcut ||
-        oldPrefs.media.ppBackward ||
-        oldPrefs.media.ppForward ||
-        // oldPrefs.media.presentShortcut ||
-        oldPrefs.meeting.shuffleShortcut
+        oldPrefs.media?.mediaWinShortcut ||
+        oldPrefs.media?.ppBackward ||
+        oldPrefs.media?.ppForward ||
+        // oldPrefs.media?.presentShortcut ||
+        oldPrefs.meeting?.shuffleShortcut
           ? true
           : false,
-      enableMediaDisplayButton: oldPrefs.media.enableMediaDisplayButton || true,
-      enableMusicButton: oldPrefs.meeting.enableMusicButton || true,
-      // enableMusicFadeOut: oldPrefs.meeting.enableMusicFadeOut || true,
-      enableSubtitles: oldPrefs.media.enableSubtitles || false,
-      excludeFootnotes: oldPrefs.media.excludeFootnotes || false,
-      excludeTh: oldPrefs.media.excludeTh || true,
-      hideMediaLogo: oldPrefs.media.hideMediaLogo || false,
-      includePrinted: oldPrefs.media.includePrinted || true,
-      lang: oldPrefs.media.lang || '',
-      langFallback: oldPrefs.media.langFallback || '',
-      langSubtitles: oldPrefs.media.langSubs || '',
+      enableMediaDisplayButton:
+        oldPrefs.media?.enableMediaDisplayButton || true,
+      enableMusicButton: oldPrefs.meeting?.enableMusicButton || true,
+      // enableMusicFadeOut: oldPrefs.meeting?.enableMusicFadeOut || true,
+      enableSubtitles: oldPrefs.media?.enableSubtitles || false,
+      excludeFootnotes: oldPrefs.media?.excludeFootnotes || false,
+      excludeTh: oldPrefs.media?.excludeTh || true,
+      hideMediaLogo: oldPrefs.media?.hideMediaLogo || false,
+      includePrinted: oldPrefs.media?.includePrinted || true,
+      lang: oldPrefs.media?.lang || '',
+      langFallback: oldPrefs.media?.langFallback || '',
+      langSubtitles: oldPrefs.media?.langSubs || '',
       localAppLang:
-        (oldPrefs.app.localAppLang?.includes('-')
-          ? oldPrefs.app.localAppLang
-          : oldPrefs.app.localAppLang + '-US') || 'en-US',
-      maxRes: oldPrefs.media.maxRes || '720p',
-      musicVolume: oldPrefs.meeting.musicVolume || 100,
-      mwDay: oldPrefs.meeting.mwDay?.toString() || '',
-      mwStartTime: oldPrefs.meeting.mwStartTime?.toString() || '',
-      obsCameraScene: oldPrefs.app.obs.cameraScene || '',
-      obsEnable: oldPrefs.app.obs.enable || false,
-      obsImageScene: oldPrefs.app.obs.imageScene || '',
-      obsMediaScene: oldPrefs.app.obs.mediaScene || '',
-      obsPassword: oldPrefs.app.obs.password || '',
-      obsPort: oldPrefs.app.obs.port?.toString() || '',
-      // shortcutMediaNext: oldPrefs.media.ppForward || '',
-      // shortcutMediaPrevious: oldPrefs.media.ppBackward || '',
-      shortcutMediaWindow: oldPrefs.media.mediaWinShortcut || '',
-      shortcutMusic: oldPrefs.meeting.shuffleShortcut || '',
-      weDay: oldPrefs.meeting.weDay?.toString() || '',
-      weStartTime: oldPrefs.meeting.weStartTime?.toString() || '',
+        (oldPrefs.app?.localAppLang?.includes('-')
+          ? oldPrefs.app?.localAppLang
+          : oldPrefs.app?.localAppLang + '-US') || 'en-US',
+      maxRes: oldPrefs.media?.maxRes || '720p',
+      musicVolume: oldPrefs.meeting?.musicVolume || 100,
+      mwDay: oldPrefs.meeting?.mwDay?.toString() || '',
+      mwStartTime: oldPrefs.meeting?.mwStartTime?.toString() || '',
+      obsCameraScene: oldPrefs.app?.obs?.cameraScene || '',
+      obsEnable: oldPrefs.app?.obs?.enable || false,
+      obsImageScene: oldPrefs.app?.obs?.imageScene || '',
+      obsMediaScene: oldPrefs.app?.obs?.mediaScene || '',
+      obsPassword: oldPrefs.app?.obs?.password || '',
+      obsPort: oldPrefs.app?.obs?.port?.toString() || '',
+      // shortcutMediaNext: oldPrefs.media?.ppForward || '',
+      // shortcutMediaPrevious: oldPrefs.media?.ppBackward || '',
+      shortcutMediaWindow: oldPrefs.media?.mediaWinShortcut || '',
+      shortcutMusic: oldPrefs.meeting?.shuffleShortcut || '',
+      weDay: oldPrefs.meeting?.weDay?.toString() || '',
+      weStartTime: oldPrefs.meeting?.weStartTime?.toString() || '',
     };
     return newPrefsObject;
   } catch (error) {
