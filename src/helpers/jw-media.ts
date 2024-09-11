@@ -721,7 +721,7 @@ const dynamicMediaMapper = async (
         thumbnailUrl,
         title: mediaIsSong
           ? m.Label.replace(/^\d+\.\s*/, '')
-          : (m.Label ?? m.Caption),
+          : m.Label || m.Caption,
         uniqueId: sanitizeId(
           date.formatDate(lookupDate, 'YYYYMMDD') + '-' + fileUrl,
         ),
