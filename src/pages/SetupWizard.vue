@@ -27,7 +27,7 @@
         :done="step > 1"
         :name="1"
         :title="$t('localAppLang')"
-        icon="mdi-translate-variant"
+        icon="mmm-ui-language"
       >
         {{ $t('what-language-would-you-like-m-to-be-displayed-in') }}
         <SelectInput
@@ -55,7 +55,7 @@
         :done="step > 2"
         :name="2"
         :title="$t('lang')"
-        icon="mdi-download"
+        icon="mmm-media-language"
       >
         {{ $t('in-what-language-should-media-be-downloaded') }}
         <SelectInput
@@ -164,7 +164,7 @@
         :done="step > 5"
         :name="5"
         :title="$t('almost-done')"
-        icon="mdi-progress-clock"
+        icon="mmm-almost-done"
       >
         {{
           $t(
@@ -347,7 +347,7 @@
             :done="step > 105"
             :name="105"
             :title="$t('obs-studio-configuration')"
-            icon="mmm-settings"
+            icon="mmm-obs-configured"
           >
             <p class="text-subtitle1">
               {{ $t('is-obs-studio-configured-correctly') }}
@@ -378,7 +378,7 @@
             :done="step > 106"
             :name="106"
             :title="$t('obs-studio-port-and-password')"
-            icon="mdi-form-textbox-password"
+            icon="mmm-obs-password"
           >
             <p>
               {{

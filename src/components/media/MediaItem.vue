@@ -166,45 +166,6 @@
               </q-badge>
             </div>
           </transition>
-          <transition
-            appear
-            enter-active-class="animated fadeIn"
-            leave-active-class="animated fadeOut"
-            mode="out-in"
-            name="fade"
-          >
-            <!-- todo: add custom icons for this -->
-            <div
-              class="absolute-bottom-left q-mr-xs q-mt-xs row rounded-borders"
-              v-if="obsConnectionState === 'connected'"
-            >
-              <q-badge
-                :color="currentScene === 'media' ? 'primary' : 'negative'"
-                @click="
-                  sendObsSceneEvent(
-                    currentScene === 'media' ? 'camera' : 'media',
-                  )
-                "
-                style="background: transparent; padding: 5px !important"
-              >
-                <q-tooltip :delay="1000">{{
-                  $t(
-                    currentScene === 'media'
-                      ? 'hide-image-for-zoom-participants'
-                      : 'show-image-for-zoom-participants',
-                  )
-                }}</q-tooltip>
-                <q-icon
-                  :name="
-                    currentScene === 'media'
-                      ? 'mdi-broadcast'
-                      : 'mdi-broadcast-off'
-                  "
-                  color="white"
-                />
-              </q-badge>
-            </div>
-          </transition>
         </template>
       </div>
     </div>
@@ -413,6 +374,29 @@
           </div>
           <template v-else>
             <div class="col-shrink items-center justify-center flex">
+              <q-btn
+                :color="currentScene === 'media' ? 'negative' : 'primary'"
+                @click="
+                  sendObsSceneEvent(
+                    currentScene === 'media' ? 'camera' : 'media',
+                  )
+                "
+                icon="
+                    mmm-picture-for-zoom-participants
+                "
+                rounded
+                v-if="
+                  isImage(mediaPlayingUrl) && obsConnectionState === 'connected'
+                "
+              >
+                <q-tooltip :delay="1000">{{
+                  $t(
+                    currentScene === 'media'
+                      ? 'hide-image-for-zoom-participants'
+                      : 'show-image-for-zoom-participants',
+                  )
+                }}</q-tooltip>
+              </q-btn>
               <q-btn
                 @click="
                   mediaPlayingAction = 'play';
