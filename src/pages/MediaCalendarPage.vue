@@ -37,7 +37,9 @@
               color="primary"
               size="lg"
               v-if="
-                selectedDateObject?.meeting && !selectedDateObject?.complete
+                selectedDateObject?.meeting &&
+                !selectedDateObject?.complete &&
+                !selectedDateObject?.error
               "
             />
             <q-img
@@ -53,7 +55,7 @@
             {{
               !selectedDate
                 ? $t('noDateSelected')
-                : selectedDateObject?.meeting
+                : selectedDateObject?.meeting && !selectedDateObject?.error
                   ? $t('please-wait')
                   : $t('there-are-no-media-items-for-the-selected-date')
             }}
@@ -62,7 +64,7 @@
             {{
               !selectedDate
                 ? $t('select-a-date-to-begin')
-                : selectedDateObject?.meeting
+                : selectedDateObject?.meeting && !selectedDateObject?.error
                   ? $t('currently-loading')
                   : $t(
                       'use-the-import-button-to-add-media-for-this-date-or-select-another-date-to-view-the-corresponding-meeting-media',
@@ -71,9 +73,7 @@
           </div>
           <div
             class="row items-center justify-center q-mt-lg q-gutter-md"
-            v-if="
-              !(selectedDateObject?.meeting && !selectedDateObject?.complete)
-            "
+            v-if="!selectedDateObject?.meeting || selectedDateObject?.error"
           >
             <q-btn @click="goToNextMeeting()" color="primary" outline>
               <q-icon class="q-mr-sm" name="mmm-go-to-date" size="xs" />
