@@ -70,7 +70,12 @@
                           :name="statusObject.icon"
                           size="sm"
                           v-if="statusObject.icon"
-                        />
+                        >
+                          <q-tooltip v-if="statusObject.status === 'error'">
+                            {{ $t('errorDownloadingMeetingMedia') }}.
+                            {{ $t('tryConfiguringFallbackLanguage') }}.
+                          </q-tooltip>
+                        </q-icon>
                         <q-circular-progress
                           :thickness="0.3"
                           :value="progressValue(item)"
