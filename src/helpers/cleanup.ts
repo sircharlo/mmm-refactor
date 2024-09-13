@@ -69,8 +69,6 @@ const cleanAdditionalMediaFolder = () => {
     const dirListing = klawSync(additionalMediaPath, { nodir: true }).map((f) =>
       path.resolve(f.path),
     );
-    console.log('flattenedFilePaths:', filesReferencedInAdditionalMediaMaps);
-    console.log('dirListing:', dirListing);
     for (const additionalMediaFilePath of dirListing) {
       if (
         !filesReferencedInAdditionalMediaMaps.includes(additionalMediaFilePath)
