@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { Buffer } from 'buffer';
 import PQueue from 'p-queue';
 import { storeToRefs } from 'pinia';
@@ -177,7 +177,7 @@ const downloadFile = async ({ dir, filename, url }: FileDownloader) => {
       },
       responseType: 'arraybuffer',
     })
-    .catch((error) => {
+    .catch((error: AxiosError) => {
       errorCatcher(error);
       downloadProgress.value[url] = {
         error: true,
@@ -274,14 +274,6 @@ const fetchMedia = async () => {
 
 const getDbFromJWPUB = async (publication: PublicationFetcher) => {
   try {
-    if (
-      publication.pub === 'w' &&
-      publication.issue &&
-      parseInt(publication.issue.toString()) >= 20080101 &&
-      publication.issue.toString().slice(-2) === '01'
-    ) {
-      publication.pub = 'wp';
-    }
     const jwpub = await downloadJwpub(publication);
     if (jwpub.error) throw new Error('JWPUB download error: ' + publication);
     const publicationDirectory = getPublicationDirectory(publication);
@@ -539,10 +531,18 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
         }
       }
 
-      const symbol = /[^a-zA-Z0-9]/.test(extract.UniqueEnglishSymbol)
+      let symbol = /[^a-zA-Z0-9]/.test(extract.UniqueEnglishSymbol)
         ? extract.UniqueEnglishSymbol
         : extract.UniqueEnglishSymbol.replace(/\d/g, '');
       if (['it', 'snnw'].includes(symbol)) continue; // Exclude Insight and the "old new songs" songbook; we don't need images from that
+      if (
+        symbol === 'w' &&
+        extract.IssueTagNumber &&
+        parseInt(extract.IssueTagNumber.toString()) >= 20080101 &&
+        extract.IssueTagNumber.toString().slice(-2) === '01'
+      ) {
+        symbol = 'wp';
+      }
       let extractLang = extract.Lang ?? currentSettings.value?.lang;
       let extractDb = await getDbFromJWPUB({
         issue: extract.IssueTagNumber,
@@ -604,6 +604,7 @@ const getWtIssue = async (
   monday: Date,
   weeksInPast: number,
   langwritten: string,
+  lastChance = false,
 ) => {
   try {
     const issue = date.subtractFromDate(monday, {
@@ -639,7 +640,7 @@ const getWtIssue = async (
     )[0]?.DocumentId;
     return { db, docId, issueString, publication, weekNr };
   } catch (e) {
-    console.error(e);
+    if (lastChance) errorCatcher(e);
     return {
       db: '',
       docId: -1,
@@ -742,10 +743,10 @@ const getWeMedia = async (lookupDate: Date) => {
     lookupDate = dateFromString(lookupDate);
     const monday = getSpecificWeekday(lookupDate, 0);
 
-    const getIssue = async (monday: Date, lang: string) => {
+    const getIssue = async (monday: Date, lang: string, lastChance = false) => {
       let result = await getWtIssue(monday, 8, lang);
       if (result.db?.length === 0) {
-        result = await getWtIssue(monday, 10, lang);
+        result = await getWtIssue(monday, 10, lang, lastChance);
       }
       return result;
     };
@@ -758,6 +759,7 @@ const getWeMedia = async (lookupDate: Date) => {
       ({ db, docId, issueString, publication, weekNr } = await getIssue(
         monday,
         currentSettings.value?.langFallback,
+        true,
       ));
     }
     if (!db || docId < 0) {
