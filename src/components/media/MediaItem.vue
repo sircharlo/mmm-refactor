@@ -344,6 +344,12 @@
                           {};
                         customDurations[currentCongregation][selectedDate][
                           media.uniqueId
+                        ] ??= {
+                          min: 0,
+                          max: media.duration,
+                        };
+                        customDurations[currentCongregation][selectedDate][
+                          media.uniqueId
                         ].min = marker.StartTimeTicks / 10000 / 1000;
                         customDurations[currentCongregation][selectedDate][
                           media.uniqueId
