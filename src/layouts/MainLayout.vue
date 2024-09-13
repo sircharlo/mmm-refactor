@@ -1406,11 +1406,14 @@ const getEventDayColor = (eventDate: string) => {
   try {
     if (!lookupPeriod.value || !currentCongregation.value)
       throw new Error('No congregation or lookup period');
-    const isComplete =
-      lookupPeriod.value[currentCongregation.value]?.find(
-        (d) => date.getDateDiff(eventDate, d.date, 'days') === 0,
-      )?.complete === true;
-    if (isComplete) return 'primary';
+    const lookupDate = lookupPeriod.value[currentCongregation.value]?.find(
+      (d) => date.getDateDiff(eventDate, d.date, 'days') === 0,
+    );
+    if (lookupDate?.complete) {
+      return 'primary';
+    } else if (lookupDate?.error) {
+      return 'negative';
+    }
     const additionalDates =
       additionalMediaMaps.value[currentCongregation.value];
     if (additionalDates) {
