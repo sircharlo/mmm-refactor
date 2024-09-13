@@ -290,7 +290,7 @@ const getDbFromJWPUB = async (publication: PublicationFetcher) => {
     }
     const dbFile = findDb(publicationDirectory);
     if (!dbFile) {
-      throw new Error('No db file found: ' + publicationDirectory);
+      return null;
     } else {
       return dbFile;
     }
@@ -761,9 +761,10 @@ const getWeMedia = async (lookupDate: Date) => {
       ));
     }
     if (!db || docId < 0) {
-      throw new Error(
-        'No WT article found for date: ' + monday + ' (' + lookupDate + ')',
-      );
+      return {
+        error: true,
+        media: [],
+      };
     }
     const videos = executeQuery(
       db,
