@@ -984,7 +984,7 @@ const getMwMedia = async (lookupDate: Date) => {
       db = await getMwbIssue(currentSettings.value?.langFallback);
     }
     if (!db) {
-      throw new Error('No db found');
+      return { error: true, media: [] };
     }
     const docId =
       (
