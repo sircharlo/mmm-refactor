@@ -5,7 +5,10 @@ const get = async (url: string, params?: AxiosRequestConfig) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let returnVal: { data: any | undefined } = { data: undefined };
   try {
-    returnVal = await axios.get(url, { params });
+    returnVal = await axios.get(url, { params }).catch((error) => {
+      warningCatcher(error + ': ' + url);
+      return { data: undefined };
+    });
   } catch (error) {
     warningCatcher(error + ': ' + url);
   }

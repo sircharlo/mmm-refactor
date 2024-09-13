@@ -545,17 +545,18 @@ watch(
       ?.filter((d) => d.error)
       .map((d) => date.formatDate(d.date, 'YYYY/MM/DD')),
   (newVal) => {
-    for (const date of newVal) {
-      errorCatcher(date);
+    newVal.forEach(() => {
       createTemporaryNotification({
         caption: !currentSettings.value?.langFallback
           ? t('tryConfiguringFallbackLanguage')
           : '',
-        message: date + ' | ' + t('errorDownloadingMeetingMedia'),
+        group: 'meetingMediaDownloadError',
+        icon: 'mmm-error',
+        message: t('errorDownloadingMeetingMedia'),
         timeout: 15000,
         type: 'negative',
       });
-    }
+    });
   },
 );
 
