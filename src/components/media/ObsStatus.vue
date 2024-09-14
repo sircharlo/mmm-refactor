@@ -209,6 +209,17 @@ const obsConnect = async (setup?: boolean) => {
   }
 };
 
+const isUUID = (uuid: string) => {
+  try {
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(uuid);
+  } catch (error) {
+    errorCatcher(error);
+    return false;
+  }
+};
+
 const setObsScene = async (scene: string | undefined, sceneUuid?: string) => {
   try {
     if (!obsConnectionState.value.startsWith('connect')) await obsConnect();
@@ -228,9 +239,19 @@ const setObsScene = async (scene: string | undefined, sceneUuid?: string) => {
       const hasSceneUuid = scenes.value.every((scene) =>
         scene.hasOwnProperty('sceneUuid'),
       );
+      const currentScenesAreUuids = [
+        currentSettings.value?.obsMediaScene,
+        currentSettings.value?.obsCameraScene,
+        currentSettings.value?.obsImageScene,
+      ]
+        .filter(Boolean)
+        .every((scene) => isUUID(scene as string));
       obsWebSocket?.call('SetCurrentProgramScene', {
-        ...(hasSceneUuid && { sceneUuid: newProgramScene }),
-        ...(!hasSceneUuid && { sceneName: newProgramScene }),
+        ...(hasSceneUuid &&
+          currentScenesAreUuids && { sceneUuid: newProgramScene }),
+        ...((!hasSceneUuid || !currentScenesAreUuids) && {
+          sceneName: newProgramScene,
+        }),
       });
     }
   } catch (error) {
