@@ -531,7 +531,7 @@ watch(
 );
 
 watch(
-  () => [mediaPlaying.value, mediaPaused.value],
+  () => [mediaPlaying.value, mediaPaused.value, mediaPlayingUrl.value],
   ([newMediaPlaying, newMediaPaused]) => {
     sendObsSceneEvent(
       newMediaPaused ? 'camera' : newMediaPlaying ? 'media' : 'camera',
