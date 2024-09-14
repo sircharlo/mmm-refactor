@@ -14,8 +14,27 @@
         </div>
         <q-separator class="bg-semi-white-24 q-ml-none" inset vertical />
         <div class="col q-ml-md flex items-center">
-          <q-icon :name="route.meta.icon as string" class="q-mr-md" size="md" />
-          {{ $t(route.meta.title as string) }}
+          <div class="col-shrink items-center">
+            <q-icon
+              :name="route.meta.icon as string"
+              class="q-mr-md"
+              size="md"
+            />
+          </div>
+          <div class="col items-center">
+            <div class="row text-current-page ellipsis-1-line">
+              {{ $t(route.meta.title as string) }}
+            </div>
+            <div
+              class="row text-congregation ellipsis-1-line"
+              v-if="!route.fullPath.includes('congregation-selector')"
+            >
+              {{
+                congregationSettings?.congregations?.[currentCongregation]
+                  ?.congregationName
+              }}
+            </div>
+          </div>
         </div>
         <div class="col-shrink q-gutter-x-sm">
           <template v-if="route.fullPath.includes('congregation-selector')">
