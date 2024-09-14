@@ -46,24 +46,26 @@
           </div>
           <div class="row items-center q-col-gutter-sm">
             <template
-              :key="scene"
-              v-for="scene in [cameraScene, mediaScene, pipScene].filter(
-                Boolean,
-              )"
+              :key="sceneUuid"
+              v-for="sceneUuid in [
+                currentSettings?.obsCameraScene,
+                currentSettings?.obsMediaScene,
+                currentSettings?.obsImageScene,
+              ].filter(Boolean)"
             >
               <div class="col">
                 <q-btn
-                  :outline="scene?.sceneUuid !== currentSceneUuid"
-                  @click="setObsScene(undefined, scene?.sceneUuid as string)"
+                  :outline="sceneUuid !== currentSceneUuid"
+                  @click="setObsScene(undefined, sceneUuid as string)"
                   class="full-width"
                   color="primary"
                   unelevated
                 >
                   <q-icon
                     :name="
-                      scene?.sceneUuid === cameraScene?.sceneUuid
+                      sceneUuid === currentSettings?.obsCameraScene
                         ? 'mmm-lectern'
-                        : scene?.sceneUuid === mediaScene?.sceneUuid
+                        : sceneUuid === currentSettings?.obsMediaScene
                           ? 'mmm-stream-now'
                           : 'mmm-picture-in-picture'
                     "
@@ -71,9 +73,9 @@
                     size="xs"
                   />
                   {{
-                    scene?.sceneUuid === cameraScene?.sceneUuid
+                    sceneUuid === currentSettings?.obsCameraScene
                       ? $t('speaker')
-                      : scene?.sceneUuid === mediaScene?.sceneUuid
+                      : sceneUuid === currentSettings?.obsMediaScene
                         ? $t('media-only')
                         : $t('picture-in-picture')
                   }}
@@ -100,9 +102,9 @@
                   >
                     <q-icon
                       :name="
-                        scene?.sceneUuid === cameraScene?.sceneUuid
+                        scene?.sceneUuid === currentSettings?.obsCameraScene
                           ? 'mmm-lectern'
-                          : scene?.sceneUuid === mediaScene?.sceneUuid
+                          : scene?.sceneUuid === currentSettings?.obsMediaScene
                             ? 'mmm-stream-now'
                             : 'mmm-picture-in-picture'
                       "
@@ -138,13 +140,10 @@ const { currentSettings, mediaPlayingUrl } = storeToRefs(currentState);
 const obsState = useObsStateStore();
 const {
   additionalScenes,
-  cameraScene,
   currentScene,
   currentSceneUuid,
-  mediaScene,
   obsConnectionState,
   obsMessage,
-  pipScene,
   scenes,
 } = storeToRefs(obsState);
 
@@ -164,7 +163,10 @@ const obsErrorHandler = (err: OBSWebSocketError) => {
     )
   ) {
   }
-  errorCatcher('OBS Error: ' + err.message);
+  errorCatcher(
+    'OBS Error: ' +
+      [err.message, err.code, err.name, err.cause].filter(Boolean).join(', '),
+  );
 };
 
 const obsConnect = async (setup?: boolean) => {
@@ -223,8 +225,12 @@ const setObsScene = async (scene: string | undefined, sceneUuid?: string) => {
       if (scene === 'camera') newProgramScene = cameraScene;
     }
     if (newProgramScene) {
+      const hasSceneUuid = scenes.value.every((scene) =>
+        scene.hasOwnProperty('sceneUuid'),
+      );
       obsWebSocket?.call('SetCurrentProgramScene', {
-        sceneUuid: newProgramScene,
+        ...(hasSceneUuid && { sceneUuid: newProgramScene }),
+        ...(!hasSceneUuid && { sceneName: newProgramScene }),
       });
     }
   } catch (error) {

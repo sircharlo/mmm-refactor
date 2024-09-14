@@ -208,7 +208,10 @@ const getListOptions = (list: string | undefined) => {
       return array;
     } else if (list?.startsWith('obs')) {
       return scenes.value.map((scene) => {
-        return { label: scene.sceneName, value: scene.sceneUuid };
+        return {
+          label: scene.sceneName,
+          value: scene.sceneUuid ?? scene.sceneName,
+        };
       });
     } else {
       throw new Error('List not found: ' + list);
