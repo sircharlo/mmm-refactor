@@ -143,6 +143,10 @@ body.body--dark {
     color: $dark-grey-dark;
   }
 
+  .text-secondary {
+    color: $secondary-contrast !important;
+  }
+
   .media-section {
     background: $dark;
     border-color: $accent-100-dark;
@@ -150,7 +154,7 @@ body.body--dark {
 
   .bg-secondary-contrast {
     background-color: $secondary-contrast-dark;
-    color: $dark;
+    color: $secondary-contrast;
   }
 }
 
