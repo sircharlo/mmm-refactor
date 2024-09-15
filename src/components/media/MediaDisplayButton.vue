@@ -337,7 +337,7 @@ const chooseCustomBackground = async (reset?: boolean) => {
           backgroundPicker.canceled ||
           backgroundPicker.filePaths?.length === 0
         ) {
-          throw new Error('No file selected');
+          notifyInvalidBackgroundFile();
         } else {
           const filepath = backgroundPicker.filePaths[0];
           if (isJwpub(filepath)) {
