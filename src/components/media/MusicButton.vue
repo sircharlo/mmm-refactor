@@ -177,7 +177,10 @@ const fadeToVolumeLevel = (targetVolume: number, fadeOutSeconds: number) => {
         if (!musicPlayer.value) return;
         const elapsedTime = currentTime - startTime;
         const progress = Math.min(elapsedTime / fadeOutSeconds / 1000, 1);
-        musicPlayer.value.volume = Math.min(initialVolume + volumeChange * progress, 1);
+        musicPlayer.value.volume = Math.min(
+          initialVolume + volumeChange * progress,
+          1,
+        );
 
         if (progress < 1) {
           requestAnimationFrame(updateVolume);
@@ -401,28 +404,6 @@ async function playMusic() {
 
 const meetingDay = ref(false);
 
-watch(
-  () => [selectedDateObject.value?.today, selectedDateObject.value?.meeting],
-  ([newToday, newMeeting]) => {
-    try {
-      meetingDay.value = !!newToday && !!newMeeting;
-      const timeBeforeMeetingStart =
-        (remainingTimeBeforeMeetingStart() as number) ?? 0;
-      if (
-        currentSettings.value?.enableMusicButton &&
-        currentSettings.value?.autoStartMusic &&
-        meetingDay.value &&
-        timeBeforeMeetingStart > 90
-      ) {
-        playMusic();
-      }
-    } catch (error) {
-      errorCatcher(error);
-    }
-  },
-  { immediate: true },
-);
-
 const musicRemainingTime = computed(() => {
   try {
     if (!musicPlayer.value || musicStarting.value) return '..:..';
@@ -437,13 +418,6 @@ const musicRemainingTime = computed(() => {
 });
 
 const musicPopup = ref(false);
-
-watch(
-  () => currentSettings.value?.enableMusicButton,
-  (newMusicButtonEnabled) => {
-    if (!newMusicButtonEnabled) stopMusic();
-  },
-);
 
 const toggleMusicListener = () => {
   try {
@@ -465,6 +439,35 @@ onMounted(() => {
   window.addEventListener('toggleMusic', toggleMusicListener);
   window.addEventListener('muteBackgroundMusic', muteBackgroundMusic);
   window.addEventListener('unmuteBackgroundMusic', unmuteBackgroundMusic);
+
+  watch(
+    () => [selectedDateObject.value?.today, selectedDateObject.value?.meeting],
+    ([newToday, newMeeting]) => {
+      try {
+        meetingDay.value = !!newToday && !!newMeeting;
+        const timeBeforeMeetingStart =
+          (remainingTimeBeforeMeetingStart() as number) ?? 0;
+        if (
+          currentSettings.value?.enableMusicButton &&
+          currentSettings.value?.autoStartMusic &&
+          meetingDay.value &&
+          timeBeforeMeetingStart > 90
+        ) {
+          playMusic();
+        }
+      } catch (error) {
+        errorCatcher(error);
+      }
+    },
+    { immediate: true },
+  );
+
+  watch(
+    () => currentSettings.value?.enableMusicButton,
+    (newMusicButtonEnabled) => {
+      if (!newMusicButtonEnabled) stopMusic();
+    },
+  );
 });
 
 onUnmounted(() => {

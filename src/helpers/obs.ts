@@ -33,7 +33,6 @@ const configuredScenesAreAllUUIDs = () => {
       currentSettings?.value?.obsImageScene,
       currentSettings?.value?.obsMediaScene,
     ].filter(Boolean);
-    console.debug(configuredScenes);
     if (!configuredScenes.length) return true;
     return configuredScenes.every((scene) => isUUID(scene));
   } catch (error) {
