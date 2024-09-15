@@ -177,7 +177,7 @@ const fadeToVolumeLevel = (targetVolume: number, fadeOutSeconds: number) => {
         if (!musicPlayer.value) return;
         const elapsedTime = currentTime - startTime;
         const progress = Math.min(elapsedTime / fadeOutSeconds / 1000, 1);
-        musicPlayer.value.volume = initialVolume + volumeChange * progress;
+        musicPlayer.value.volume = Math.min(initialVolume + volumeChange * progress, 1);
 
         if (progress < 1) {
           requestAnimationFrame(updateVolume);
