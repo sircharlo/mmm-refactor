@@ -270,11 +270,10 @@ const getSubtitlesUrl = async (
         if (fs.existsSync(subtitlesPath)) {
           subtitlesUrl = getFileUrl(subtitlesPath);
         } else {
-          throw new Error('Subtitles file not found: ' + subtitlesPath);
+          subtitlesUrl = '';
         }
       } else {
-        console.log('No subtitles available for: ' + multimediaItem.FilePath);
-        return '';
+        subtitlesUrl = '';
       }
     }
     return subtitlesUrl;
