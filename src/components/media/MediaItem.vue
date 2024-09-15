@@ -381,10 +381,10 @@
           <template v-else>
             <div class="col-shrink items-center justify-center flex">
               <q-btn
-                :color="currentScene === 'media' ? 'negative' : 'primary'"
+                :color="currentSceneType === 'media' ? 'negative' : 'primary'"
                 @click="
                   sendObsSceneEvent(
-                    currentScene === 'media' ? 'camera' : 'media',
+                    currentSceneType === 'media' ? 'camera' : 'media',
                   )
                 "
                 icon="
@@ -397,7 +397,7 @@
               >
                 <q-tooltip :delay="1000">{{
                   $t(
-                    currentScene === 'media'
+                    currentSceneType === 'media'
                       ? 'hide-image-for-zoom-participants'
                       : 'show-image-for-zoom-participants',
                   )
@@ -532,7 +532,7 @@ const { removeFromAdditionMediaMap } = jwStore;
 const { customDurations } = storeToRefs(jwStore);
 
 const obsState = useObsStateStore();
-const { currentScene, obsConnectionState } = storeToRefs(obsState);
+const { currentSceneType, obsConnectionState } = storeToRefs(obsState);
 
 const { fileUrlToPath, fs, path } = electronApi;
 

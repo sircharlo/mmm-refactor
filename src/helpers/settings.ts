@@ -1,20 +1,21 @@
 import { storeToRefs } from 'pinia';
 import { date, ValidationRule } from 'quasar';
+import { getSpecificWeekday } from 'src/helpers/date';
+import { errorCatcher } from 'src/helpers/error-catcher';
+import { configuredScenesAreAllUUIDs } from 'src/helpers/obs';
+import { localeOptions } from 'src/i18n';
 import { useJwStore } from 'src/stores/jw';
+import { useObsStateStore } from 'src/stores/obs-state';
 import { ref } from 'vue';
+
 const jwStore = useJwStore();
 const { jwLanguages } = storeToRefs(jwStore);
 const filteredJwLanguages = ref(jwLanguages.value.list);
 
-import { useObsStateStore } from 'src/stores/obs-state';
 const obsState = useObsStateStore();
 const { scenes } = storeToRefs(obsState);
 
-import { localeOptions } from 'src/i18n';
 const filteredLocaleAppLang = ref(localeOptions);
-
-import { getSpecificWeekday } from './date';
-import { errorCatcher } from './error-catcher';
 
 const requiredRule: ValidationRule = (val: string) =>
   (val && val.length > 0) || '';
@@ -210,7 +211,10 @@ const getListOptions = (list: string | undefined) => {
       return scenes.value.map((scene) => {
         return {
           label: scene.sceneName,
-          value: scene.sceneUuid ?? scene.sceneName,
+          value:
+            configuredScenesAreAllUUIDs() && scene.sceneUuid
+              ? scene.sceneUuid
+              : scene.sceneName,
         };
       });
     } else {
