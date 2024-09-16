@@ -178,7 +178,7 @@ const fadeToVolumeLevel = (targetVolume: number, fadeOutSeconds: number) => {
         const elapsedTime = currentTime - startTime;
         const progress = Math.min(elapsedTime / fadeOutSeconds / 1000, 1);
         musicPlayer.value.volume = Math.min(
-          initialVolume + volumeChange * progress,
+          Math.max(initialVolume + volumeChange * progress, 0),
           1,
         );
 

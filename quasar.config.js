@@ -13,6 +13,7 @@ const { sentryVitePlugin } = require('@sentry/vite-plugin');
 const path = require('path');
 const { configure } = require('quasar/wrappers');
 const { mergeConfig } = require('vite'); // use mergeConfig helper to avoid overwriting the default config
+
 const { version } = require('./package.json');
 const devMode = process.env.NODE_ENV === 'development';
 
@@ -136,7 +137,7 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/configuring-electron
     electron: {
       builder: {
-        appId: 'sircharlo.meeting-media-manager-v2',
+        appId: 'sircharlo.meeting-media-manager',
         artifactName: 'meeting-media-manager-${version}.${ext}',
         // buildDependenciesFromSource: true,
         // files: [
