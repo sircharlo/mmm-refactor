@@ -144,30 +144,28 @@ const {
 const scenePicker = ref(false);
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const obsErrorHandler = (err: OBSWebSocketError) => {
+const obsCloseHandler = () => {
   obsConnectionState.value = 'disconnected';
-  obsMessage.value = 'obs.error';
+  obsMessage.value = 'obs.disconnected';
+};
+
+const obsErrorHandler = (err: OBSWebSocketError) => {
   obsWebSocket?.disconnect();
-  if (
-    err.message?.length &&
-    !(
-      err.message.includes('stopping') ||
-      err.message.includes('authentication is required') ||
-      err.message.includes('Authentication failed')
-    )
-  ) {
+  obsMessage.value = 'obs.error';
+  if (!(err?.code === 1001 || err?.code === 1006 || err?.code === 4009)) {
+    errorCatcher(
+      'OBS Error: ' +
+        [err?.code, err?.name, err?.message, err?.cause, err?.stack]
+          .filter(Boolean)
+          .join(', '),
+    );
   }
-  errorCatcher(
-    'OBS Error: ' +
-      [err.message, err.code, err.name, err.cause].filter(Boolean).join(', '),
-  );
 };
 
 const obsConnect = async (setup?: boolean) => {
   try {
     if (!currentSettings.value?.obsEnable) {
       await obsWebSocket?.disconnect();
-      obsMessage.value = 'obs.disconnected';
       return;
     }
 
@@ -182,7 +180,7 @@ const obsConnect = async (setup?: boolean) => {
     let attempt = 0;
     const maxAttempts = setup ? 1 : 12;
     const timeBetweenAttempts = 5000;
-    while (attempt < maxAttempts) {
+    while (attempt < maxAttempts && obsConnectionState.value !== 'connected') {
       try {
         const { negotiatedRpcVersion, obsWebSocketVersion } =
           await obsWebSocket?.connect('ws://127.0.0.1:' + obsPort, obsPassword);
@@ -249,15 +247,43 @@ const setObsSceneListener = (event: CustomEventInit) => {
 
 const obsSettingsConnect = () => obsConnect(true);
 
+const fetchSceneList = async (retryInterval = 2000, maxRetries = 5) => {
+  let attempts = 0;
+  while (attempts < maxRetries) {
+    try {
+      const sceneList = await obsWebSocket?.call('GetSceneList');
+      if (sceneList) {
+        scenes.value = sceneList.scenes.reverse();
+        currentScene.value = configuredScenesAreAllUUIDs()
+          ? sceneList.currentProgramSceneUuid
+          : sceneList.currentProgramSceneName;
+        return;
+      }
+    } catch (error) {
+      attempts++;
+      if (
+        error instanceof OBSWebSocketError &&
+        error.message.includes('OBS is not ready')
+      ) {
+        console.log(`Retrying... (${attempts}/${maxRetries})`);
+        await new Promise((resolve) => setTimeout(resolve, retryInterval));
+      } else {
+        errorCatcher('Error fetching scene list: ' + error);
+        // throw error;
+      }
+    }
+  }
+  errorCatcher('OBS Error: Max retries reached. Could not fetch scene list.');
+};
+
 onMounted(() => {
   try {
     window.addEventListener('obsConnectFromSettings', obsSettingsConnect);
     window.addEventListener('obsSceneEvent', setObsSceneListener);
-
     obsWebSocket.on('ConnectionOpened', () => {
       obsConnectionState.value = 'connecting';
     });
-    obsWebSocket.on('ConnectionClosed', obsErrorHandler);
+    obsWebSocket.on('ConnectionClosed', obsCloseHandler);
     obsWebSocket.on('ConnectionError', obsErrorHandler);
     obsWebSocket.on(
       'CurrentProgramSceneChanged',
@@ -270,17 +296,7 @@ onMounted(() => {
     obsWebSocket.on('Identified', async () => {
       obsConnectionState.value = 'connected';
       obsMessage.value = 'obs.connected';
-      try {
-        const sceneList = await obsWebSocket?.call('GetSceneList');
-        if (sceneList) {
-          scenes.value = sceneList.scenes.reverse();
-          currentScene.value = configuredScenesAreAllUUIDs()
-            ? sceneList.currentProgramSceneUuid
-            : sceneList.currentProgramSceneName;
-        }
-      } catch (error) {
-        errorCatcher(error);
-      }
+      fetchSceneList();
     });
     obsWebSocket.on('SceneListChanged', (data) => {
       scenes.value = data.scenes;
