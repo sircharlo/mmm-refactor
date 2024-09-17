@@ -135,8 +135,8 @@
         "npm:@types/heic-convert@^2.1.0",
         "npm:@types/klaw-sync@^6.0.5",
         "npm:@types/pretty-bytes@^5.2.0",
-        "npm:@typescript-eslint/eslint-plugin@^8.5.0",
-        "npm:@typescript-eslint/parser@^8.5.0",
+        "npm:@typescript-eslint/eslint-plugin@^8.6.0",
+        "npm:@typescript-eslint/parser@^8.6.0",
         "npm:adm-zip@^0.5.16",
         "npm:autoprefixer@^10.4.20",
         "npm:axios@^1.7.7",
@@ -174,7 +174,7 @@
         "npm:vue-i18n@^10.0.1",
         "npm:vue-router@^4.4.5",
         "npm:vue-tsc@^2.1.6",
-        "npm:vue@^3.5.5"
+        "npm:vue@^3.5.6"
       ]
     }
   }
