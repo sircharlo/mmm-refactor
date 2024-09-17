@@ -416,6 +416,7 @@ async function playMusic() {
     };
   } catch (error) {
     errorCatcher(error);
+  } finally {
     musicStarting.value = false;
   }
 }
