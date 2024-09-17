@@ -123,7 +123,7 @@ const mediaPlayingUrl = ref('');
 const mediaUniqueId = ref('');
 const mediaPlayerCustomBackground = ref('');
 const mediaPlayerSubtitlesUrl = ref('');
-const subtitlesVisible = ref(false);
+const subtitlesVisible = ref(true);
 
 const videoStreaming = ref(false);
 
