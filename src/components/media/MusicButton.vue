@@ -129,6 +129,7 @@ import {
   getMetadataFromMediaPath,
   getPublicationDirectoryContents,
 } from 'src/helpers/fs';
+import { downloadBackgroundMusic } from 'src/helpers/jw-media';
 import { formatTime } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
@@ -220,10 +221,18 @@ const getNextSong = async () => {
       ((remainingTimeBeforeMeetingStart() as number) ?? 60) - 60;
     let secsFromEnd = 0;
     if (!songList.value.length) {
-      songList.value = getPublicationDirectoryContents(
-        { langwritten: currentSettings.value.lang, pub: 'sjjm' },
-        'mp3',
-      ).sort(() => Math.random() - 0.5);
+      let attempts = 0;
+      while (songList.value.length < 10 && attempts < 10) {
+        songList.value = getPublicationDirectoryContents(
+          { langwritten: currentSettings.value.lang, pub: 'sjjm' },
+          'mp3',
+        ).sort(() => Math.random() - 0.5);
+        if (songList.value.length >= 10) {
+          break;
+        }
+        attempts++;
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+      }
       for (const queuedSong of songList.value) {
         const metadata = await getMetadataFromMediaPath(queuedSong.path);
         queuedSong.duration = metadata?.format?.duration ?? 0;
@@ -252,11 +261,15 @@ const getNextSong = async () => {
           .filter((song) => song !== null);
         if (timeBeforeMeetingStart > 0) {
           const customSongList = [] as SongItem[];
-          songList.value.push(...selectedDaySongs);
-          songList.value.reverse();
+          if (selectedDaySongs.length) {
+            songList.value.push(...selectedDaySongs);
+            songList.value.reverse();
+          }
+          songList.value = songList.value.filter(Boolean);
           if (songList.value.length) {
             while (musicDurationSoFar < timeBeforeMeetingStart) {
               const queuedSong = songList.value.shift() as SongItem;
+              if (!queuedSong) break;
               customSongList.unshift(queuedSong);
               secsFromEnd = timeBeforeMeetingStart - musicDurationSoFar;
               musicDurationSoFar += queuedSong.duration as number;
@@ -340,6 +353,7 @@ async function playMusic() {
       !musicPlayer.value
     )
       return;
+    downloadBackgroundMusic();
     musicStarting.value = true;
     songList.value = [];
     musicPlayer.value.appendChild(musicPlayerSource.value);

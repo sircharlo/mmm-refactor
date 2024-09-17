@@ -1469,9 +1469,7 @@ const downloadBackgroundMusic = () => {
       return;
     downloadPubMediaFiles({
       fileformat: currentSongbook.value.fileformat,
-      langwritten: currentSongbook.value.signLanguage
-        ? currentSettings.value.lang
-        : 'E',
+      langwritten: currentSettings.value.lang,
       maxTrack: MAX_SONGS,
       pub: currentSongbook.value.pub,
     });

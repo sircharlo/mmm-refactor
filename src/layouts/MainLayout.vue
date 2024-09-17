@@ -727,7 +727,6 @@ import {
 } from 'src/helpers/fs';
 import {
   downloadAdditionalRemoteVideo,
-  downloadBackgroundMusic,
   downloadSongbookVideos,
   getBestImageUrl,
 } from 'src/helpers/jw-media';
@@ -854,7 +853,6 @@ watch(currentCongregation, (newCongregation, oldCongregation) => {
       downloadProgress.value = {};
       updateLookupPeriod();
       registerAllCustomShortcuts();
-      downloadBackgroundMusic();
       downloadSongbookVideos();
       if (queues.meetings[newCongregation]) {
         queues.meetings[newCongregation].start();
@@ -1077,9 +1075,7 @@ const cancelDeleteCacheFiles = () => {
 
 const frequentlyUsedDirectories = computed(() => {
   const backgroundMusicFilesDirectory = getPublicationDirectory({
-    langwritten: currentSongbook.value.signLanguage
-      ? currentSettings.value.lang
-      : 'E',
+    langwritten: currentSettings.value.lang,
     pub: currentSongbook.value.pub,
   });
 
