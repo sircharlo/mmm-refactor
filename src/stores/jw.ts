@@ -79,7 +79,8 @@ export const useJwStore = defineStore('jw-store', {
     resetSort() {
       try {
         const currentState = useCurrentStateStore();
-        const { currentCongregation, selectedDate } = storeToRefs(currentState);
+        const { currentCongregation, selectedDate, selectedDateObject } =
+          storeToRefs(currentState);
         if (
           currentCongregation.value &&
           selectedDate.value &&
@@ -87,6 +88,12 @@ export const useJwStore = defineStore('jw-store', {
         ) {
           this.mediaSort[currentCongregation.value][selectedDate.value] = [];
         }
+        (selectedDateObject.value?.dynamicMedia ?? [])
+          .filter((item) => item.sectionOriginal)
+          .filter((item) => item.section !== item.sectionOriginal)
+          .forEach((item) => {
+            item.section = item.sectionOriginal;
+          });
       } catch (e) {
         errorCatcher(e);
       }

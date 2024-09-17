@@ -13,6 +13,7 @@ export interface DynamicMediaObject {
   markers?: VideoMarker[];
   paragraph?: number;
   section: string;
+  sectionOriginal: string;
   song?: boolean | string;
   streamUrl?: string;
   subtitlesUrl?: string;

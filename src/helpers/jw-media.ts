@@ -716,6 +716,7 @@ const dynamicMediaMapper = async (
         markers: m.VideoMarkers,
         paragraph: m.TargetParagraphNumberLabel,
         section, // if is we: wt; else, if >= middle song: LAC; >= (middle song - 8???): AYFM; else: TGW
+        sectionOriginal: section, // to enable restoring the original section after custom sorting
         song: mediaIsSong,
         streamUrl: m.StreamUrl,
         subtitlesUrl: video ? await getSubtitlesUrl(m, duration) : '',
