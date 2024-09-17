@@ -240,6 +240,7 @@ export const settingsDefinitions: SettingsItems = {
   enableExtraCache: {
     depends: 'enableMediaDisplayButton',
     group: 'advanced',
+    subgroup: 'cache',
     type: 'toggle',
   },
   musicVolume: {
