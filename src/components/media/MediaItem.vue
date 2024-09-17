@@ -264,8 +264,9 @@
                   :readonly="mediaPlayingAction !== 'pause'"
                   :step="0.1"
                   @update:model-value="seekTo"
+                  inner-track-color="accent-300"
                   label
-                  track-color="accent-200"
+                  track-color="negative"
                   v-model="mediaPlayingCurrentPosition"
                 />
               </div>
