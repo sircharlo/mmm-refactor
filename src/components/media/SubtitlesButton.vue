@@ -6,7 +6,7 @@
     class="super-rounded"
     rounded
     unelevated
-    v-if="currentSettings.enableSubtitles"
+    v-if="currentSettings?.enableSubtitles"
   >
     <q-tooltip :delay="1000" :offset="[14, 22]">{{
       $t('subtitles')
@@ -22,7 +22,7 @@ import { ref, watch } from 'vue';
 const currentState = useCurrentStateStore();
 const { currentSettings } = storeToRefs(currentState);
 
-const subtitlesVisible = ref(false);
+const subtitlesVisible = ref(true);
 
 const bc = new BroadcastChannel('mediaPlayback');
 
