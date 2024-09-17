@@ -270,11 +270,10 @@ const getNextSong = async () => {
             songList.value.push(...selectedDaySongs);
             songList.value.reverse();
           }
-          songList.value = songList.value.filter(Boolean);
           if (songList.value.length) {
             while (musicDurationSoFar < timeBeforeMeetingStart) {
               const queuedSong = songList.value.shift() as SongItem;
-              if (!queuedSong) break;
+              songList.value.push(queuedSong);
               customSongList.unshift(queuedSong);
               secsFromEnd = timeBeforeMeetingStart - musicDurationSoFar;
               musicDurationSoFar += queuedSong.duration as number;
