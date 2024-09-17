@@ -209,8 +209,8 @@
                 </div>
                 <div class="row">
                   <q-scroll-area
-                    :bar-style="barStyle"
-                    :thumb-style="thumbStyle"
+                    :bar-style="barStyle()"
+                    :thumb-style="thumbStyle()"
                     style="width: 100vw; height: 40vh"
                   >
                     <div class="row q-col-gutter-md">
@@ -580,8 +580,8 @@
       </q-item>
     </q-drawer>
     <q-scroll-area
-      :bar-style="barStyle"
-      :thumb-style="thumbStyle"
+      :bar-style="barStyle()"
+      :thumb-style="thumbStyle()"
       style="flex: 1 1 1px"
     >
       <q-page-container class="main-bg">

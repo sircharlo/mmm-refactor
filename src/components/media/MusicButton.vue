@@ -52,7 +52,11 @@
                   <p class="card-section-title text-dark-grey">
                     {{ $t('upcoming-songs') }}
                   </p>
-                  <q-scroll-area style="height: 100px; max-width: 100%">
+                  <q-scroll-area
+                    :bar-style="barStyle()"
+                    :thumb-style="thumbStyle()"
+                    style="height: 100px; max-width: 100%"
+                  >
                     <template :key="i" v-for="(song, i) in songList">
                       <div class="row q-my-sm">
                         <div class="col text-weight-medium">
@@ -122,6 +126,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { date } from 'quasar';
+import { barStyle, thumbStyle } from 'src/boot/globals';
 import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import {

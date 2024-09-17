@@ -22,8 +22,8 @@
       </div>
       <div class="row">
         <q-scroll-area
-          :bar-style="barStyle"
-          :thumb-style="thumbStyle"
+          :bar-style="barStyle()"
+          :thumb-style="thumbStyle()"
           style="height: 40vh; width: -webkit-fill-available"
         >
           <template :key="song.url" v-for="song in filteredSongs">

@@ -47,7 +47,6 @@
                   :key="statusObject.status"
                   v-for="statusObject in statusConfig"
                 >
-                  <!-- <q-scroll-area style="height: 200px; max-width: 100%"> -->
                   <p
                     class="card-section-title text-dark-grey q-mt-md"
                     v-if="hasStatus(downloadProgress, statusObject.status)"
@@ -88,7 +87,6 @@
                     </div>
                     <q-separator class="bg-accent-200" />
                   </template>
-                  <!-- </q-scroll-area> -->
                 </template>
               </template>
             </div>
