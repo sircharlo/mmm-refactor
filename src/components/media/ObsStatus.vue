@@ -176,6 +176,7 @@ const obsConnect = async (setup?: boolean) => {
     obsConnectionState.value = 'connecting';
     obsMessage.value = 'obs.connecting';
     const obsPassword = (currentSettings.value?.obsPassword as string) || '';
+    if (obsPassword?.length === 0) return;
 
     let attempt = 0;
     const maxAttempts = setup ? 1 : 12;
