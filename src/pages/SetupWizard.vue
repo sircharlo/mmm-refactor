@@ -181,7 +181,6 @@
             "
             color="primary"
           />
-          <!-- <q-btn flat @click="step--" color="primary" :label="$t('back')" class="q-ml-sm" />-->
         </q-stepper-navigation>
       </q-step>
       <q-step
@@ -199,7 +198,7 @@
           <q-btn :label="$t('continue')" @click="step++" color="primary" />
           <q-btn
             :label="$t('back')"
-            @click="step--"
+            @click="step = 5"
             class="q-ml-sm"
             color="primary"
             flat
