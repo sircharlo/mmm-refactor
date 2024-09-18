@@ -19,7 +19,7 @@ pull_request_rules:
       - or:
         - and:
           - author = dependabot[bot]
-          - title ~= ^chore\(deps\). bump [^\s]+ from ([\d]+)\..+ to \1\.
+          - title ~= ^chore\(deps(?:-dev)*\). bump [^\s]+ from ([\d]+)\..+ to \1\.
         - and:
           - author = github-actions[bot]
           - title ~= Change version to
