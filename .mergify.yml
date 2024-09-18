@@ -21,7 +21,7 @@ pull_request_rules:
           - author = dependabot[bot]
           - title ~= ^chore\(deps\). bump [^\s]+ from ([\d]+)\..+ to \1\.
         - and:
-          - author = sircharlo
+          - author = github-actions[bot]
           - title ~= Change version to
     actions:
       update:
