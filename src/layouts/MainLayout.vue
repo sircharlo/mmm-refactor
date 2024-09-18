@@ -48,18 +48,31 @@
           </template>
           <template v-else-if="route.fullPath === '/media-calendar'">
             <q-btn
-              :disable="mediaPlaying"
+              :disable="mediaPlaying || !mediaSortForDay"
               @click="resetSort"
               color="white-transparent"
               unelevated
-              v-if="mediaSortForDay && selectedDate"
             >
-              <q-icon class="q-mr-sm" name="mmm-reset" size="xs" />
-              {{ $t('reset-sort-order') }}
+              <q-icon
+                :class="{ 'q-mr-sm': $q.screen.gt.sm }"
+                name="mmm-reset"
+                size="xs"
+              />
+              {{ $q.screen.gt.sm ? $t('reset-sort-order') : '' }}
+              <q-tooltip :delay="1000">
+                {{ $t('reset-sort-order') }}
+              </q-tooltip>
             </q-btn>
             <q-btn color="white-transparent" unelevated v-if="selectedDate">
-              <q-icon class="q-mr-sm" name="mmm-import-media" size="xs" />
-              {{ $t('import-media') }}
+              <q-icon
+                :class="{ 'q-mr-sm': $q.screen.gt.sm }"
+                name="mmm-import-media"
+                size="xs"
+              />
+              {{ $q.screen.gt.sm ? $t('import-media') : '' }}
+              <q-tooltip :delay="1000">
+                {{ $t('import-media') }}
+              </q-tooltip>
               <q-menu :offset="[0, 11]" class="top-menu" ref="importMenu">
                 <q-list style="min-width: 100px">
                   <q-item-label header>{{ $t('from-jw-org') }}</q-item-label>
@@ -140,12 +153,18 @@
               </q-menu>
             </q-btn>
             <q-btn :disable="mediaPlaying" color="white-transparent" unelevated>
-              <q-icon class="q-mr-sm" name="mmm-calendar-month" size="xs" />
+              <q-icon
+                :class="{ 'q-mr-sm': $q.screen.gt.xs }"
+                name="mmm-calendar-month"
+                size="xs"
+              />
               {{
-                getDateLocaleFormatted(
-                  currentSettings?.localAppLang,
-                  selectedDate,
-                ) || $t('select-a-date')
+                $q.screen.gt.xs
+                  ? getDateLocaleFormatted(
+                      currentSettings?.localAppLang,
+                      selectedDate,
+                    ) || $t('select-a-date')
+                  : ''
               }}
               <!--dayjs-->
               <q-popup-proxy :offset="[0, 11]" v-model="datePickerActive">
@@ -297,7 +316,6 @@
             <q-btn color="white-transparent" unelevated v-if="selectedDate">
               <q-icon class="q-mr-sm" name="mmm-tools" size="xs" />
               {{ $t('tools') }}
-
               <q-tooltip :delay="1000" v-if="!moreOptionsMenuActive">
                 {{ $t('tools') }}
               </q-tooltip>
@@ -801,7 +819,7 @@ congregationSettings.$subscribe((_, state) => {
 
 const jwStore = useJwStore();
 const { resetSort, updateJwLanguages } = jwStore;
-const { additionalMediaMaps, lookupPeriod } = storeToRefs(jwStore);
+const { additionalMediaMaps, lookupPeriod, mediaSort } = storeToRefs(jwStore);
 jwStore.$subscribe((_, state) => {
   LocalStorage.set('jwLanguages', state.jwLanguages);
   LocalStorage.set('jwSongs', state.jwSongs);
@@ -814,7 +832,19 @@ jwStore.$subscribe((_, state) => {
 
 // Ref and reactive initializations
 const chooseSong = ref(false);
-const mediaSortForDay = ref(true);
+const mediaSortForDay = computed(() => {
+  if (!selectedDate.value || !currentCongregation.value || !mediaSort.value)
+    return false;
+  try {
+    return (
+      mediaSort.value?.[currentCongregation.value]?.[selectedDate.value]
+        ?.length > 0
+    );
+  } catch (error) {
+    errorCatcher(error);
+    return false;
+  }
+});
 const {
   closeWebsiteWindow,
   fs,
