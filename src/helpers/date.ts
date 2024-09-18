@@ -211,10 +211,10 @@ function updateLookupPeriod(reset = false) {
 
 const getLocaleDayName = (lang: string, day: number) => {
   if (!day) day = 0;
+  day++;
+  if (!lang) return dayjs().day(day).format('dddd');
   try {
-    day++;
-    const dayName = dayjs().locale(lang).day(day).format('dddd');
-    return dayName;
+    return dayjs().locale(lang).day(day).format('dddd');
   } catch (error) {
     warningCatcher(lang + ' / ' + day);
     errorCatcher(error);
