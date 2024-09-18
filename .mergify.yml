@@ -17,9 +17,12 @@ pull_request_rules:
   - name: Automatically merge Dependabot PRs
     conditions:
       - or:
-        - author = dependabot[bot]
-        - title ~= chore\(deps
-        - title ~= Change version to
+        - and:
+          - author = dependabot[bot]
+          - title ~= ^chore\(deps\). bump [^\s]+ from ([\d]+)\..+ to \1\.
+        - and:
+          - author = sircharlo
+          - title ~= Change version to
     actions:
       update:
       merge:
