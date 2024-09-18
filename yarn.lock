@@ -2203,16 +2203,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"app-builder-bin@npm:5.0.0-alpha.8":
-  version: 5.0.0-alpha.8
-  resolution: "app-builder-bin@npm:5.0.0-alpha.8"
-  checksum: 10c0/9dcad36bdfcc02c967515ab6be99a0b7834c74f37fcac337fdf85e5a6d3ace447867bd1bf9236556f86decf795a7d8ac51c868d5cb58c042c75f2e9bfa7ce0a1
+"app-builder-bin@npm:5.0.0-alpha.9":
+  version: 5.0.0-alpha.9
+  resolution: "app-builder-bin@npm:5.0.0-alpha.9"
+  checksum: 10c0/47ae87c87c7e7923973c7c53a3263eccf1bb04db850efef4d551dd590db7b80e2763f15d03d770e1b0f00203202bb95f58d0b0f71da0d86225b8dc3112031423
   languageName: node
   linkType: hard
 
-"app-builder-lib@npm:25.1.2":
-  version: 25.1.2
-  resolution: "app-builder-lib@npm:25.1.2"
+"app-builder-lib@npm:25.1.3":
+  version: 25.1.3
+  resolution: "app-builder-lib@npm:25.1.3"
   dependencies:
     "@develar/schema-utils": "npm:~2.6.5"
     "@electron/notarize": "npm:2.4.0"
@@ -2223,15 +2223,15 @@ __metadata:
     "@types/fs-extra": "npm:9.0.13"
     async-exit-hook: "npm:^2.0.1"
     bluebird-lst: "npm:^1.0.9"
-    builder-util: "npm:25.1.2"
-    builder-util-runtime: "npm:9.2.7"
+    builder-util: "npm:25.1.3"
+    builder-util-runtime: "npm:9.2.8"
     chromium-pickle-js: "npm:^0.2.0"
     config-file-ts: "npm:0.2.8-rc1"
     debug: "npm:^4.3.4"
     dotenv: "npm:^16.4.5"
     dotenv-expand: "npm:^11.0.6"
     ejs: "npm:^3.1.8"
-    electron-publish: "npm:25.1.2"
+    electron-publish: "npm:25.1.3"
     form-data: "npm:^4.0.0"
     fs-extra: "npm:^10.1.0"
     hosted-git-info: "npm:^4.1.0"
@@ -2247,9 +2247,9 @@ __metadata:
     tar: "npm:^6.1.12"
     temp-file: "npm:^3.4.0"
   peerDependencies:
-    dmg-builder: 25.1.2
-    electron-builder-squirrel-windows: 25.1.2
-  checksum: 10c0/dbaa1b3547df4292be367f30266f79e9073960fc32260005fad73fd5e987f137141b66c2d4548642621d72b53fadc390f5b60f3c35008fd2fcbd479bfdef7994
+    dmg-builder: 25.1.3
+    electron-builder-squirrel-windows: 25.1.3
+  checksum: 10c0/4f6a6e6fecf05d942e09a39b986319aa6f6add37cd7cf89e2dcb0e935bcee48fe989dc7bf235202ebf47e9b3580d8433235fe2c1f4d284a1529a481b1662a6b2
   languageName: node
   linkType: hard
 
@@ -2807,15 +2807,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"builder-util@npm:25.1.2":
-  version: 25.1.2
-  resolution: "builder-util@npm:25.1.2"
+"builder-util-runtime@npm:9.2.8":
+  version: 9.2.8
+  resolution: "builder-util-runtime@npm:9.2.8"
+  dependencies:
+    debug: "npm:^4.3.4"
+    sax: "npm:^1.2.4"
+  checksum: 10c0/75a924e7b407ceeda69644dd972adea68c38e8d0857c2ef841c56e66f68751647c5389c76b9e5ddbaf45e39d1a276c9ffb9b32a5c3c7f3534b4a8f680c2689cd
+  languageName: node
+  linkType: hard
+
+"builder-util@npm:25.1.3":
+  version: 25.1.3
+  resolution: "builder-util@npm:25.1.3"
   dependencies:
     7zip-bin: "npm:~5.2.0"
     "@types/debug": "npm:^4.1.6"
-    app-builder-bin: "npm:5.0.0-alpha.8"
+    app-builder-bin: "npm:5.0.0-alpha.9"
     bluebird-lst: "npm:^1.0.9"
-    builder-util-runtime: "npm:9.2.7"
+    builder-util-runtime: "npm:9.2.8"
     chalk: "npm:^4.1.2"
     cross-spawn: "npm:^7.0.3"
     debug: "npm:^4.3.4"
@@ -2827,7 +2837,7 @@ __metadata:
     source-map-support: "npm:^0.5.19"
     stat-mode: "npm:^1.0.0"
     temp-file: "npm:^3.4.0"
-  checksum: 10c0/939dd2e21745f8f7ec2362a5f36e40ad76589b6ee446ba9d4436348343b2110f2466bd76b6019c2c5c9a3635218eaf4d1f7269f2f0d1b4056d6d8ec8c633c4e5
+  checksum: 10c0/b7b001e6617353ecc5734df15667a6a517cecc32bec9dfddd323fd96b1a3f6c2801b4a0eb102fdd37a588c883bec208f05c10e03eb5599469bbfaaf8c8dc584b
   languageName: node
   linkType: hard
 
@@ -3855,13 +3865,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dmg-builder@npm:25.1.2":
-  version: 25.1.2
-  resolution: "dmg-builder@npm:25.1.2"
+"dmg-builder@npm:25.1.3":
+  version: 25.1.3
+  resolution: "dmg-builder@npm:25.1.3"
   dependencies:
-    app-builder-lib: "npm:25.1.2"
-    builder-util: "npm:25.1.2"
-    builder-util-runtime: "npm:9.2.7"
+    app-builder-lib: "npm:25.1.3"
+    builder-util: "npm:25.1.3"
+    builder-util-runtime: "npm:9.2.8"
     dmg-license: "npm:^1.0.11"
     fs-extra: "npm:^10.1.0"
     iconv-lite: "npm:^0.6.2"
@@ -3869,7 +3879,7 @@ __metadata:
   dependenciesMeta:
     dmg-license:
       optional: true
-  checksum: 10c0/09f1ff1895af21815177a0f00448bd1f19bce150eb043267c3513ebfc1fe9dd3f29b6a0e206d4b829dce010adafd3170ecf894009d975bffafd828408657ba13
+  checksum: 10c0/e2ae048b9db0eb9f0aa85dd2eee2f3cc9ecd753e0260d5e7f2d7908e87cc06bb64d6c192afd786d0e28fdf90aafb7b998958e5d5445e62825d5558c72f258d16
   languageName: node
   linkType: hard
 
@@ -3976,15 +3986,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron-builder@npm:^25.0.5":
-  version: 25.1.2
-  resolution: "electron-builder@npm:25.1.2"
+"electron-builder@npm:^25.1.3":
+  version: 25.1.3
+  resolution: "electron-builder@npm:25.1.3"
   dependencies:
-    app-builder-lib: "npm:25.1.2"
-    builder-util: "npm:25.1.2"
-    builder-util-runtime: "npm:9.2.7"
+    app-builder-lib: "npm:25.1.3"
+    builder-util: "npm:25.1.3"
+    builder-util-runtime: "npm:9.2.8"
     chalk: "npm:^4.1.2"
-    dmg-builder: "npm:25.1.2"
+    dmg-builder: "npm:25.1.3"
     fs-extra: "npm:^10.1.0"
     is-ci: "npm:^3.0.0"
     lazy-val: "npm:^1.0.5"
@@ -3993,22 +4003,22 @@ __metadata:
   bin:
     electron-builder: cli.js
     install-app-deps: install-app-deps.js
-  checksum: 10c0/66f9e59432ac60329d37a086a25256622f0db6f01cbfc1a35a4c6a32ea8efd4bc4828e0f7dab4c06094117f08c92ec7e1b7be478b512ba6bdc72535e293c0f74
+  checksum: 10c0/275de64d0873463d0f82524cbf2eab22e3cb62ef7e73bbe48c1f33661a065994b31e184d96ba4bcdce833f1f0fe203e0751078fa419cd6d373eea9b69b734e3f
   languageName: node
   linkType: hard
 
-"electron-publish@npm:25.1.2":
-  version: 25.1.2
-  resolution: "electron-publish@npm:25.1.2"
+"electron-publish@npm:25.1.3":
+  version: 25.1.3
+  resolution: "electron-publish@npm:25.1.3"
   dependencies:
     "@types/fs-extra": "npm:^9.0.11"
-    builder-util: "npm:25.1.2"
-    builder-util-runtime: "npm:9.2.7"
+    builder-util: "npm:25.1.3"
+    builder-util-runtime: "npm:9.2.8"
     chalk: "npm:^4.1.2"
     fs-extra: "npm:^10.1.0"
     lazy-val: "npm:^1.0.5"
     mime: "npm:^2.5.2"
-  checksum: 10c0/9b0f3be2af22a97e312fc8bee91f7edc7aa1f5aa4d22b7daacaf0f806c81d3a359802796e410e4ba03a017f8a91aa072db4ab712f4e65cd072b99fe2f803668b
+  checksum: 10c0/11a95ff7dd230a3435e469075658a6776173628a8dae2fef228c6a58652cc741ccf43bd4f12e4e734285a7a225c88d1c8850895d4fb8e2c94589d5c81efb3c23
   languageName: node
   linkType: hard
 
@@ -7820,7 +7830,7 @@ __metadata:
     dayjs: "npm:^1.11.13"
     dompurify: "npm:^3.1.6"
     electron: "npm:^32.1.0"
-    electron-builder: "npm:^25.0.5"
+    electron-builder: "npm:^25.1.3"
     electron-updater: "npm:^6.3.4"
     electron-window-state: "npm:^5.0.3"
     eslint: "npm:^9.10.0"
