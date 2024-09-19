@@ -85,9 +85,13 @@ const getActions = (actions: string[] | undefined) => {
   try {
     return actions
       ?.map(async (action) => {
-        return action == 'obsConnect'
-          ? window.dispatchEvent(new CustomEvent('obsConnectFromSettings'))
-          : undefined;
+        if (action == 'obsConnect') {
+          return window.dispatchEvent(
+            new CustomEvent('obsConnectFromSettings'),
+          );
+        } else {
+          return undefined;
+        }
       })
       .filter(Boolean);
   } catch (error) {

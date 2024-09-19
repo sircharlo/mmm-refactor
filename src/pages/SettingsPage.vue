@@ -94,6 +94,7 @@
                   "
                 />
                 <SliderInput
+                  :actions="item.actions"
                   :max="item.max"
                   :min="item.min"
                   :step="item.step"

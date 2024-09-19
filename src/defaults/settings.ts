@@ -244,10 +244,11 @@ export const settingsDefinitions: SettingsItems = {
     type: 'toggle',
   },
   musicVolume: {
+    actions: ['setBackgroundMusicVolume'],
     depends: 'enableMusicButton',
     group: 'advanced',
     max: 100,
-    min: 0,
+    min: 1,
     step: 1,
     subgroup: 'setupWizard.backgroundMusic',
     type: 'slider',

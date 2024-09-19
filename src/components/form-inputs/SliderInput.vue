@@ -17,6 +17,7 @@ import { ref, watch } from 'vue';
 const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps<{
+  actions?: string[];
   max?: number;
   min?: number;
   modelValue?: number;
@@ -27,6 +28,10 @@ const localValue = ref(props.modelValue);
 
 watch(localValue, (newValue) => {
   emit('update:modelValue', newValue);
+  if (props?.actions?.includes('setBackgroundMusicVolume')) {
+    const bc = new BroadcastChannel('volumeSetter');
+    bc.postMessage(newValue);
+  }
 });
 
 watch(

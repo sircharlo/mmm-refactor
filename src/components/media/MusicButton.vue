@@ -455,10 +455,24 @@ const muteBackgroundMusic = () => fadeToVolumeLevel(0.001, 1);
 const unmuteBackgroundMusic = () =>
   fadeToVolumeLevel((currentSettings?.value?.musicVolume ?? 100) / 100 ?? 1, 1);
 
+const setBackgroundMusicVolume = (volume: number) => {
+  try {
+    if (!musicPlayer.value || !Number.isInteger(volume) || volume < 0) return;
+    musicPlayer.value.volume = Math.min(Math.max(volume / 100, 0), 1);
+  } catch (error) {
+    errorCatcher(error);
+  }
+};
+
 onMounted(() => {
   window.addEventListener('toggleMusic', toggleMusicListener);
   window.addEventListener('muteBackgroundMusic', muteBackgroundMusic);
   window.addEventListener('unmuteBackgroundMusic', unmuteBackgroundMusic);
+
+  const bc = new BroadcastChannel('volumeSetter');
+  bc.onmessage = (event) => {
+    setBackgroundMusicVolume(event?.data);
+  };
 
   watch(
     () => [selectedDateObject.value?.today, selectedDateObject.value?.meeting],
@@ -494,5 +508,9 @@ onUnmounted(() => {
   window.removeEventListener('toggleMusic', toggleMusicListener);
   window.removeEventListener('muteBackgroundMusic', muteBackgroundMusic);
   window.removeEventListener('unmuteBackgroundMusic', unmuteBackgroundMusic);
+  // window.removeEventListener(
+  //   'setBackgroundMusicVolume',
+  //   setBackgroundMusicVolume,
+  // );
 });
 </script>
