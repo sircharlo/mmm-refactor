@@ -452,7 +452,8 @@ const toggleMusicListener = () => {
 };
 
 const muteBackgroundMusic = () => fadeToVolumeLevel(0.001, 1);
-const unmuteBackgroundMusic = () => fadeToVolumeLevel(1, 1);
+const unmuteBackgroundMusic = () =>
+  fadeToVolumeLevel((currentSettings?.value?.musicVolume ?? 100) / 100 ?? 1, 1);
 
 onMounted(() => {
   window.addEventListener('toggleMusic', toggleMusicListener);
