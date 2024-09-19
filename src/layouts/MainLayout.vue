@@ -1488,6 +1488,32 @@ const openImportMenu = () => {
   importMenu.value?.show();
 };
 
+const bcClose = new BroadcastChannel('closeAttempts');
+const attemptedClose = ref(false);
+bcClose.onmessage = (event) => {
+  attemptedClose.value = event?.data?.attemptedClose;
+};
+
+watch(
+  () => attemptedClose.value,
+  (newAttemptedClose, oldAttemptedClose) => {
+    if (newAttemptedClose && !oldAttemptedClose) {
+      createTemporaryNotification({
+        caption: ref(t('clicking-the-close-button-again-will-close-app')).value,
+        icon: 'mmm-error',
+        message: ref(t('make-sure-that-m-is-in-not-use-before-quitting')).value,
+        noClose: true,
+        progress: true,
+        timeout: 10000,
+        type: 'negative',
+      });
+      setTimeout(() => {
+        attemptedClose.value = false;
+      }, 10000);
+    }
+  },
+);
+
 onMounted(() => {
   document.title = 'Meeting Media Manager';
   if (!currentSettings.value) navigateToCongregationSelector();

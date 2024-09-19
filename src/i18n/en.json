@@ -315,5 +315,7 @@
   "yes": "Yes",
   "you-can-also-use-the-button-below-to-browse-for-files": "You can also browse for files manually if you prefer.",
   "zoom-in": "Zoom in",
-  "zoom-out": "Zoom out"
+  "zoom-out": "Zoom out",
+  "clicking-the-close-button-again-will-close-app": "Clicking the same button again will quit M³.",
+  "make-sure-that-m-is-in-not-use-before-quitting": "Make sure that M³ is in not use before closing it."
 }

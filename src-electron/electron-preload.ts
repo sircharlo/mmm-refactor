@@ -7,7 +7,13 @@ import {
 } from '@electron/remote';
 import AdmZip from 'adm-zip';
 import * as sqlite3 from 'better-sqlite3';
-import { contextBridge, shell, ShortcutDetails, webUtils } from 'electron';
+import {
+  contextBridge,
+  ipcRenderer,
+  shell,
+  ShortcutDetails,
+  webUtils,
+} from 'electron';
 import fs from 'fs-extra';
 import convert from 'heic-convert';
 import klawSync from 'klaw-sync';
@@ -361,6 +367,11 @@ const unregisterShortcut = (keySequence: string) => {
     errorCatcher(err);
   }
 };
+
+ipcRenderer.on('attemptedClose', () => {
+  const bcClose = new BroadcastChannel('closeAttempts');
+  bcClose.postMessage({ attemptedClose: true });
+});
 
 const convertPdfToImages = async (pdfPath: string, outputFolder: string) => {
   const outputImages: string[] = [];

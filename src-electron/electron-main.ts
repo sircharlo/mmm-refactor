@@ -176,12 +176,30 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
   }
 
-  mainWindow.on('close', () => {
-    if (mediaWindow && !mediaWindow.isDestroyed()) mediaWindow.close();
-    const websiteWindow = BrowserWindow.getAllWindows().find((w) =>
-      w.webContents.getURL().includes('https://'),
-    );
-    if (websiteWindow && !websiteWindow.isDestroyed()) websiteWindow.close();
+  let closeAttempts = 0;
+  mainWindow.on('close', async (e) => {
+    const closeAppWindows = () => {
+      if (mediaWindow && !mediaWindow.isDestroyed()) mediaWindow.close();
+      const websiteWindow = BrowserWindow.getAllWindows().find((w) =>
+        w.webContents.getURL().includes('https://'),
+      );
+      if (websiteWindow && !websiteWindow.isDestroyed()) websiteWindow.close();
+    };
+    try {
+      closeAttempts++;
+      setTimeout(() => {
+        closeAttempts--;
+      }, 10000);
+      if (closeAttempts < 2) {
+        e.preventDefault();
+        mainWindow?.webContents?.send('attemptedClose');
+      } else {
+        closeAppWindows();
+      }
+    } catch (err) {
+      errorCatcher(err);
+      closeAppWindows();
+    }
   });
 
   mainWindow.on('closed', () => {
