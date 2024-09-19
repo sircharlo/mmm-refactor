@@ -756,7 +756,7 @@ const getWeMedia = async (lookupDate: Date) => {
       monday,
       currentSettings.value?.lang,
     );
-    if (db?.length === 0) {
+    if (db?.length === 0 && currentSettings.value?.langFallback) {
       ({ db, docId, issueString, publication, weekNr } = await getIssue(
         monday,
         currentSettings.value?.langFallback,
@@ -983,7 +983,7 @@ const getMwMedia = async (lookupDate: Date) => {
     };
 
     let db = await getMwbIssue(currentSettings.value?.lang);
-    if (!db) {
+    if (!db && currentSettings.value?.langFallback) {
       db = await getMwbIssue(currentSettings.value?.langFallback);
     }
     if (!db) {
@@ -1226,12 +1226,6 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
         },
         nodir: true,
       });
-      // errorCatcher(
-      //   'No response, falling back to cache: ' +
-      //     pubDir +
-      //     '\n' +
-      //     JSON.stringify(publication, null, 2),
-      // );
       return files.length > 0 ? { FilePath: files[0].path } : { FilePath: '' };
     }
     if (!responseObject) return { FilePath: '' };
