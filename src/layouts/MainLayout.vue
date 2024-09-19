@@ -488,7 +488,7 @@
       class="column justify-between no-wrap bg-secondary-contrast text-weight-medium text-dark-grey"
       v-model="drawer"
     >
-      <q-item @click="miniState = !miniState" clickable v-ripple>
+      <q-item @click="miniState = !miniState" clickable v-if="$q.screen.gt.xs" v-ripple>
         <q-tooltip
           :delay="1000"
           anchor="center right"
@@ -1513,6 +1513,15 @@ watch(
     }
   },
 );
+
+watch(
+  () => $q?.screen?.lt?.sm,
+  (isNowExtraSmall) => {
+    if (isNowExtraSmall) {
+      miniState.value = true;
+    }
+  }
+)
 
 onMounted(() => {
   document.title = 'Meeting Media Manager';

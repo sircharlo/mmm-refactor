@@ -151,6 +151,8 @@ function createWindow() {
     backgroundColor: 'grey',
     height: mainWindowState.height,
     icon: path.resolve(path.join(__dirname, 'icons', 'icon.png')),
+    minHeight: 400,
+    minWidth: 500,
     show: false,
     useContentSize: true,
     webPreferences: {
