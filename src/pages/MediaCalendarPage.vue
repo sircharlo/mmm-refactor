@@ -799,6 +799,7 @@ const addToAdditionMediaMapFromPath = async (
         isImage: isImage(additionalFilePath),
         isVideo: isVideoFile,
         section: 'additional',
+        sectionOriginal: 'additional',
         song: stream?.song,
         streamUrl: stream?.url,
         thumbnailUrl:
