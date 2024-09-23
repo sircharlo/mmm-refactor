@@ -106,7 +106,7 @@ export const useJwStore = defineStore('jw-store', {
           this.jwLanguages.updated,
           'months',
         );
-        if (monthsSinceUpdated > 3) {
+        if (monthsSinceUpdated > 3 || !this.jwLanguages?.list?.length) {
           this.jwLanguages = {
             list: await getLanguages(),
             updated: now,
