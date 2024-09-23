@@ -8,12 +8,12 @@ const errorCatcher = (error: Error | string | unknown) => {
   }
 };
 
-const warningCatcher = (warning: string) => {
-  if (process.env.NODE_ENV === 'production') {
-    Sentry.captureMessage(warning);
-  } else {
-    console.warn(warning);
-  }
-};
+// const warningCatcher = (warning: string) => {
+//   if (process.env.NODE_ENV === 'production') {
+//     Sentry.captureMessage(warning);
+//   } else {
+//     console.warn(warning);
+//   }
+// };
 
-export { errorCatcher, warningCatcher };
+export { errorCatcher /*warningCatcher*/ };

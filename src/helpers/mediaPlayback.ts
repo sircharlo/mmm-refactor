@@ -16,7 +16,7 @@ import {
   PlaylistTagItem,
 } from 'src/types/sqlite';
 
-import { errorCatcher, warningCatcher } from './error-catcher';
+import { errorCatcher } from './error-catcher';
 
 const { convert, decompress, executeQuery, fs, path, toggleMediaWindow } =
   electronApi;
@@ -107,19 +107,19 @@ const isRemoteUrl = (url: string) => {
 
 const inferExtension = (filename: string, filetype?: string) => {
   if (!filetype) return filename;
-  const extension = mime.extension(filetype);
-  if (!extension) {
-    warningCatcher(
-      'Could not determine the file extension from the provided file type: ' +
-        filetype,
-    );
+  const extractedExtension = mime.extension(filetype);
+  if (!extractedExtension) {
+    // warningCatcher(
+    //   'Could not determine the file extension from the provided file type: ' +
+    //     filetype,
+    // );
     return filename;
   }
   const hasExtension = /\.[0-9a-z]+$/i.test(filename);
   if (hasExtension) {
     return filename;
   }
-  return `${filename}.${extension}`;
+  return `${filename}.${extractedExtension}`;
 };
 
 const isImageString = (url: string) => {
@@ -179,7 +179,7 @@ const getMediaFromJwPlaylist = async (
       ) as PlaylistTagItem[];
       if (playlistNameQuery) playlistName = playlistNameQuery[0].Name + ' - ';
     } catch (error) {
-      warningCatcher(`Could not read playlist name from ${dbFile}: ${error}`);
+      errorCatcher(error);
     }
     const playlistItems = executeQuery(
       dbFile,

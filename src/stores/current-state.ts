@@ -80,7 +80,7 @@ export const useCurrentStateStore = defineStore('current-state', {
         const currentLanguage = this.currentSettings?.lang as string;
         if (!currentLanguage || !jwLanguages.value)
           return notSignLanguageSongbook;
-        const currentLanguageIsSignLanguage = !!jwLanguages.value.list.find(
+        const currentLanguageIsSignLanguage = !!jwLanguages.value?.list?.find(
           (l) => l.langcode === currentLanguage,
         )?.isSignLanguage;
         return currentLanguageIsSignLanguage

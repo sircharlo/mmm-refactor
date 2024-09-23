@@ -7,7 +7,7 @@ import { useJwStore } from 'src/stores/jw';
 import { DateInfo } from 'src/types/dates';
 import { DynamicMediaObject } from 'src/types/media';
 
-import { errorCatcher, warningCatcher } from './error-catcher';
+import { errorCatcher } from './error-catcher';
 
 const daysInFuture = 35;
 
@@ -216,7 +216,7 @@ const getLocaleDayName = (lang: string, day: number) => {
   try {
     return dayjs().locale(lang).day(day).format('dddd');
   } catch (error) {
-    warningCatcher(lang + ' / ' + day);
+    // warningCatcher(lang + ' / ' + day);
     errorCatcher(error);
     return dayjs().day(day).format('dddd');
   }

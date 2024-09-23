@@ -10,7 +10,7 @@ import { ref } from 'vue';
 
 const jwStore = useJwStore();
 const { jwLanguages } = storeToRefs(jwStore);
-const filteredJwLanguages = ref(jwLanguages.value.list);
+const filteredJwLanguages = ref(jwLanguages.value?.list || []);
 
 const obsState = useObsStateStore();
 const { scenes } = storeToRefs(obsState);
@@ -141,7 +141,7 @@ const filterFn = (
 ) => {
   const noFilter = () => {
     update(() => {
-      filteredJwLanguages.value = jwLanguages.value.list;
+      filteredJwLanguages.value = jwLanguages.value?.list || [];
       filteredLocaleAppLang.value = localeOptions;
     });
   };
@@ -151,7 +151,7 @@ const filterFn = (
     } else {
       update(() => {
         const needle = val.toLowerCase();
-        filteredJwLanguages.value = jwLanguages.value.list.filter(
+        filteredJwLanguages.value = (jwLanguages.value?.list || []).filter(
           (v) =>
             v.name.toLowerCase().indexOf(needle) > -1 ||
             v.vernacularName.toLowerCase().indexOf(needle) > -1,
