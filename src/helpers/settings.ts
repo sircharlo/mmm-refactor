@@ -20,12 +20,11 @@ const filteredLocaleAppLang = ref(localeOptions);
 const requiredRule: ValidationRule = (val: string) =>
   (val && val.length > 0) || '';
 
+export const portNumberValidator = (val: string) =>
+  val && Number.isInteger(Number(val)) && Number(val) > 0 ? true : false;
+
 const portNumberRule: ValidationRule = (val: string) =>
-  (val &&
-    Number.isInteger(Number(val)) &&
-    Number(val) > 0 &&
-    Number(val) < 65536) ||
-  '';
+  portNumberValidator(val) || '';
 
 const coTuesdays = (lookupDate: string) => {
   try {

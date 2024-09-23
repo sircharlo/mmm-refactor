@@ -124,6 +124,7 @@ import { obsWebSocket } from 'src/boot/globals';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { isImage } from 'src/helpers/mediaPlayback';
 import { configuredScenesAreAllUUIDs, isUUID } from 'src/helpers/obs';
+import { portNumberValidator } from 'src/helpers/settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useObsStateStore } from 'src/stores/obs-state';
 import { onMounted, onUnmounted, ref } from 'vue';
@@ -150,15 +151,16 @@ const obsCloseHandler = () => {
 };
 
 const obsErrorHandler = (err: OBSWebSocketError) => {
-  obsWebSocket?.disconnect();
   obsMessage.value = 'obs.error';
-  if (!(err?.code === 1001 || err?.code === 1006 || err?.code === 4009)) {
-    errorCatcher(
-      'OBS Error: ' +
-        [err?.code, err?.name, err?.message, err?.cause, err?.stack]
-          .filter(Boolean)
-          .join(', '),
-    );
+  if (
+    !(
+      err?.code === -1 ||
+      err?.code === 1001 ||
+      err?.code === 1006 ||
+      err?.code === 4009
+    )
+  ) {
+    errorCatcher(err);
   }
 };
 
@@ -169,14 +171,14 @@ const obsConnect = async (setup?: boolean) => {
       return;
     }
 
-    const obsPort = currentSettings.value?.obsPort as string;
-    const obsPortDigits = obsPort?.toString().replace(/\D/g, '');
-    if (obsPortDigits?.length === 0) return;
+    const obsPort = (currentSettings.value?.obsPort as string) || '';
+    if (!portNumberValidator(obsPort)) return;
+
+    const obsPassword = (currentSettings.value?.obsPassword as string) || '';
+    if (obsPassword?.length === 0) return;
 
     obsConnectionState.value = 'connecting';
     obsMessage.value = 'obs.connecting';
-    const obsPassword = (currentSettings.value?.obsPassword as string) || '';
-    if (obsPassword?.length === 0) return;
 
     let attempt = 0;
     const maxAttempts = setup ? 1 : 12;
@@ -185,11 +187,11 @@ const obsConnect = async (setup?: boolean) => {
       try {
         const { negotiatedRpcVersion, obsWebSocketVersion } =
           await obsWebSocket?.connect('ws://127.0.0.1:' + obsPort, obsPassword);
-        if (obsWebSocketVersion && negotiatedRpcVersion) {
+        if (negotiatedRpcVersion && obsWebSocketVersion) {
           break;
         }
-      } catch (error) {
-        errorCatcher(error);
+      } catch (err) {
+        errorCatcher(err);
       } finally {
         attempt++;
         if (attempt < maxAttempts) {
@@ -269,7 +271,7 @@ const fetchSceneList = async (retryInterval = 2000, maxRetries = 5) => {
         console.log(`Retrying... (${attempts}/${maxRetries})`);
         await new Promise((resolve) => setTimeout(resolve, retryInterval));
       } else {
-        errorCatcher('Error fetching scene list: ' + error);
+        errorCatcher(error);
         // throw error;
       }
     }
