@@ -275,7 +275,7 @@ const fetchMedia = async () => {
 const getDbFromJWPUB = async (publication: PublicationFetcher) => {
   try {
     const jwpub = await downloadJwpub(publication);
-    if (jwpub.error) throw new Error('JWPUB download error: ' + publication);
+    if (jwpub.error) return null;
     const publicationDirectory = getPublicationDirectory(publication);
     if (jwpub.new || !findDb(publicationDirectory)) {
       await decompressJwpub(jwpub.path, publicationDirectory);
