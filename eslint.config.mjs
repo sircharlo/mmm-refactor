@@ -1,6 +1,7 @@
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
 // import perfectionist from 'eslint-plugin-perfectionist';
 import vue from 'eslint-plugin-vue';
 import globals from 'globals';
@@ -56,8 +57,7 @@ export default [
       },
       parserOptions: {
         extraFileExtensions: ['.vue'],
-        parser:
-          'C:\\Users\\Olivier\\GitHub\\mmm-v2\\node_modules\\@typescript-eslint\\parser\\dist\\index.js',
+        parser: tsParser,
       },
 
       sourceType: 'commonjs',
