@@ -89,6 +89,34 @@
     </div>
     <q-list
       class="media-section additional"
+      v-show="
+        selectedDateObject?.meeting === 'we' &&
+        selectedDateObject?.complete &&
+        !sortableAdditionalMediaItems?.length
+      "
+    >
+      <q-item class="text-additional items-center">
+        <q-avatar class="text-white bg-additional rounded-borders-sm" size="md">
+          <q-icon name="mmm-music-note" size="sm" />
+        </q-avatar>
+        <div class="col text-bold text-uppercase text-spaced">
+          {{ $t('opening-song') }}
+        </div>
+        <div class="text-bold text-uppercase text-spaced">
+          <q-btn
+            @click="addOpeningSong()"
+            class="q-ml-sm"
+            color="primary"
+            rounded
+          >
+            <q-icon class="q-mr-sm" name="mmm-music-note" size="xs" />
+            {{ $t('add-an-opening-song') }}
+          </q-btn>
+        </div>
+      </q-item>
+    </q-list>
+    <q-list
+      class="media-section additional"
       v-show="sortableAdditionalMediaItems?.length"
     >
       <q-item class="text-additional items-center">
@@ -994,6 +1022,10 @@ const addToFiles = async (
       errorCatcher(error);
     }
   }
+};
+
+const addOpeningSong = () => {
+  window.dispatchEvent(new CustomEvent('openSongPicker'));
 };
 
 const dropActive = (event: DragEvent) => {

@@ -488,7 +488,12 @@
       class="column justify-between no-wrap bg-secondary-contrast text-weight-medium text-dark-grey"
       v-model="drawer"
     >
-      <q-item @click="miniState = !miniState" clickable v-if="$q.screen.gt.xs" v-ripple>
+      <q-item
+        @click="miniState = !miniState"
+        clickable
+        v-if="$q.screen.gt.xs"
+        v-ripple
+      >
         <q-tooltip
           :delay="1000"
           anchor="center right"
@@ -1488,6 +1493,10 @@ const openImportMenu = () => {
   importMenu.value?.show();
 };
 
+const openSongPicker = () => {
+  chooseSong.value = true;
+};
+
 const bcClose = new BroadcastChannel('closeAttempts');
 const attemptedClose = ref(false);
 bcClose.onmessage = (event) => {
@@ -1520,12 +1529,13 @@ watch(
     if (isNowExtraSmall) {
       miniState.value = true;
     }
-  }
-)
+  },
+);
 
 onMounted(() => {
   document.title = 'Meeting Media Manager';
   if (!currentSettings.value) navigateToCongregationSelector();
   window.addEventListener('openImportMenu', openImportMenu);
+  window.addEventListener('openSongPicker', openSongPicker);
 });
 </script>
