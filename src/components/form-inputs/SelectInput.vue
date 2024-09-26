@@ -44,6 +44,7 @@ import { storeToRefs } from 'pinia';
 import { getLocaleDayName } from 'src/helpers/date';
 import { filterFn, getListOptions, getRules } from 'src/helpers/settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
+import { SettingsItemRule } from 'src/types/settings';
 import { ref, watch } from 'vue';
 
 const currentState = useCurrentStateStore();
@@ -55,7 +56,7 @@ const props = defineProps<{
   label?: null | string;
   modelValue?: string;
   options?: string;
-  rules?: string[] | undefined;
+  rules?: SettingsItemRule[] | undefined;
   useInput?: boolean;
 }>();
 

@@ -7,18 +7,19 @@
     outlined
     v-model="localValue"
     v-bind="{ label: label || undefined }"
-    style="width: 240px;"
+    style="width: 240px"
   />
 </template>
 
 <script setup lang="ts">
 import { getActions, getRules } from 'src/helpers/settings';
+import { SettingsItemAction } from 'src/types/settings';
 import { ref, watch } from 'vue';
 
 const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps<{
-  actions?: string[];
+  actions?: SettingsItemAction[];
   label?: null | string;
   modelValue?: string;
   rules?: string[];

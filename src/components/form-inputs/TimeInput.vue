@@ -40,13 +40,14 @@
 <script setup lang="ts">
 // import { getTimeOptions } from 'src/helpers/settings';
 import { getRules, getTimeOptions } from 'src/helpers/settings';
+import { SettingsItemOption, SettingsItemRule } from 'src/types/settings';
 import { ref, watch } from 'vue';
 
 const props = defineProps<{
   label?: string;
   modelValue: string;
-  options: string[] | undefined;
-  rules?: string[] | undefined;
+  options: SettingsItemOption[] | undefined;
+  rules?: SettingsItemRule[] | undefined;
 }>();
 
 const emit = defineEmits(['update:modelValue']);

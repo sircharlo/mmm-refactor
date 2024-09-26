@@ -1,3 +1,5 @@
+import type { MessageSchema } from 'src/boot/i18n';
+
 export interface SettingsValues {
   // autoOpenFolderWhenDone: boolean;
   // autoPlayFirst: boolean;
@@ -56,29 +58,44 @@ export interface SettingsValues {
   weStartTime: string;
 }
 
+export type SettingsItemType =
+  | 'date'
+  | 'list'
+  | 'shortcut'
+  | 'slider'
+  | 'text'
+  | 'time'
+  | 'toggle';
+
+export type SettingsItemAction = 'obsConnect' | 'setBackgroundMusicVolume';
+export type SettingsItemOption = 'coTuesdays' | 'meetingTime';
+export type SettingsItemRule = 'notEmpty' | 'portNumber';
+
 export interface SettingsItem {
-  actions?: string[];
-  depends?: string;
-  group: string;
+  actions?: SettingsItemAction[];
+  depends?: keyof SettingsValues;
+  group: SettingsGroupKey;
   icon?: string;
   list?: string;
   max?: number;
   min?: number;
-  options?: string[];
+  options?: SettingsItemOption[];
   order?: number;
-  rules?: string[];
+  rules?: SettingsItemRule[];
   step?: number;
   subgroup?: string;
-  type: string;
+  type: SettingsItemType;
 }
 
-export type SettingsItems = {
-  [key in keyof SettingsValues]: SettingsItem;
-};
+export type SettingsItems = Record<keyof SettingsValues, SettingsItem>;
 
-export interface SettingsGroups {
-  [id: string]: SettingsGroup;
-}
+export type SettingsGroupKey =
+  | 'advanced'
+  | 'app'
+  | 'congregationMeetings'
+  | 'integrations'
+  | 'mediaRetrievalPlayback';
+export type SettingsGroups = Record<SettingsGroupKey, SettingsGroup>;
 
 export interface ScreenPreferences {
   preferredScreenNumber: number;
@@ -86,10 +103,10 @@ export interface ScreenPreferences {
 }
 
 export interface SettingsGroup {
-  description: string;
+  description: keyof MessageSchema;
   hidden?: boolean;
   icon: string;
-  name: string;
+  name: keyof MessageSchema;
   order?: number;
 }
 

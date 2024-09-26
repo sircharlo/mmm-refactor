@@ -12,12 +12,13 @@
 </template>
 
 <script setup lang="ts">
+import { SettingsItemAction } from 'src/types/settings';
 import { ref, watch } from 'vue';
 
 const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps<{
-  actions?: string[];
+  actions?: SettingsItemAction[];
   max?: number;
   min?: number;
   modelValue?: number;
