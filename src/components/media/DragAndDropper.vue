@@ -94,6 +94,7 @@
           @click="
             localJwpubDb = '';
             localValue = false;
+            localFilesLoading = false;
           "
           color="negative"
           flat
