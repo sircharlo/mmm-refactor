@@ -352,8 +352,8 @@
     </q-header>
 
     <q-footer
+      :style="'left: calc(50% + ' + (miniState ? '28' : '150') + 'px) !important'"
       class="q-pb-sm"
-      style="background-color: transparent"
       v-if="
         currentSettings?.enableMediaDisplayButton ||
         currentSettings?.enableMusicButton

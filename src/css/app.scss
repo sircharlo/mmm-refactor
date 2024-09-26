@@ -508,3 +508,9 @@ a {
 .date-time-input * {
   cursor: pointer;
 }
+
+.q-footer.fixed-bottom {
+  transform: translateX(-50%);
+  width: max-content;
+  background-color: transparent;
+}
