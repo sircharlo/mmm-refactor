@@ -293,8 +293,6 @@
                   mediaPlayingSubtitlesUrl = media.subtitlesUrl ?? '';
                   if (isImage(mediaPlayingUrl)) {
                     initiatePanzoom(media.uniqueId);
-                  } else {
-                    muteBackgroundMusic();
                   }
                 "
                 color="primary"
@@ -405,10 +403,7 @@
                 }}</q-tooltip>
               </q-btn>
               <q-btn
-                @click="
-                  mediaPlayingAction = 'play';
-                  muteBackgroundMusic();
-                "
+                @click="mediaPlayingAction = 'play'"
                 color="primary"
                 icon="mmm-play"
                 outline
@@ -416,10 +411,7 @@
                 v-if="mediaPlayingAction === 'pause'"
               />
               <q-btn
-                @click="
-                  mediaPlayingAction = 'pause';
-                  unmuteBackgroundMusic();
-                "
+                @click="mediaPlayingAction = 'pause'"
                 color="negative"
                 icon="mmm-pause"
                 outline
@@ -635,7 +627,6 @@ const zoomReset = (elemId: string, forced = false, animate = true) => {
 function stopMedia() {
   // mediaPlayingAction.value = 'stop';
   destroyPanzoom(mediaPlayingUniqueId.value);
-  unmuteBackgroundMusic();
   mediaPlayingAction.value = 'pause';
   mediaPlayingUrl.value = '';
   mediaPlayingUniqueId.value = '';
@@ -643,14 +634,6 @@ function stopMedia() {
   mediaPlayingAction.value = '';
   mediaToStop.value = '';
 }
-
-const muteBackgroundMusic = () => {
-  window.dispatchEvent(new Event('muteBackgroundMusic'));
-};
-
-const unmuteBackgroundMusic = () => {
-  window.dispatchEvent(new Event('unmuteBackgroundMusic'));
-};
 
 const destroyPanzoom = (elemId: string) => {
   try {
