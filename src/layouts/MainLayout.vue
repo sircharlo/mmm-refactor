@@ -493,38 +493,18 @@
         <router-view />
       </q-page-container>
     </q-scroll-area>
-    <q-dialog v-model="cacheClearConfirmPopup">
-      <q-card class="modal-confirm">
-        <q-card-section
-          class="row items-center text-bigger text-semibold text-negative q-pb-none"
-        >
-          <q-icon class="q-mr-sm" name="mmm-delete" />
-          {{ $t('clear-cache') }}
-        </q-card-section>
-        <q-card-section class="row items-center">
-          {{ $t('are-you-sure-you-want-to-clear-the-cache') }}
-        </q-card-section>
-        <q-card-actions align="right" class="text-primary">
-          <q-btn
-            :label="$t('cancel')"
-            @click="cacheClearConfirmPopup = false"
-            flat
-          />
-          <q-btn
-            :label="$t('delete')"
-            @click="deleteCacheFiles(cacheClearType)"
-            color="negative"
-            flat
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <DialogCacheClear
+      :cache-files="cacheFiles"
+      :untouchable-directories="untouchableDirectories"
+      :unused-parent-directories="unusedParentDirectories"
+      v-model="cacheClearConfirmPopup"
+      v-model:cache-clear-type="cacheClearType"
+    />
     <DialogAbout v-model="aboutModal" />
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import PQueue from 'p-queue';
 import { storeToRefs } from 'pinia';
 import prettyBytes from 'pretty-bytes';
 import { Dark, date, LocalStorage, QMenu } from 'quasar';
@@ -534,6 +514,7 @@ import { queues } from 'src/boot/globals';
 import { barStyle, thumbStyle } from 'src/boot/globals';
 import { refreshDateLocale } from 'src/boot/i18n';
 import DialogAbout from 'src/components/dialog/DialogAbout.vue';
+import DialogCacheClear from 'src/components/dialog/DialogCacheClear.vue';
 import DialogRemoteVideo from 'src/components/dialog/DialogRemoteVideo.vue';
 import PublicTalkMediaPicker from 'src/components/media/PublicTalkMediaPicker.vue';
 import SongPicker from 'src/components/media/SongPicker.vue';
@@ -551,7 +532,6 @@ import {
   getPublicationDirectory,
   getPublicationsPath,
   getTempDirectory,
-  removeEmptyDirs,
 } from 'src/helpers/fs';
 import { downloadSongbookVideos } from 'src/helpers/jw-media';
 import {
@@ -884,7 +864,6 @@ const cacheFiles: Ref<CacheFile[]> = ref([]);
 const calculatingCacheSize = ref(false);
 const cacheClearConfirmPopup = ref(false);
 const cacheClearType = ref<'' | 'all' | 'smart'>('');
-const deletingCacheFiles = ref(false);
 
 const publicTalkMediaPopup = ref(false);
 
@@ -895,12 +874,6 @@ const dragging = () => {
 const confirmDeleteCacheFiles = (type: 'all' | 'smart') => {
   cacheClearType.value = type;
   cacheClearConfirmPopup.value = true;
-};
-
-const cancelDeleteCacheFiles = () => {
-  cacheClearType.value = '';
-  cacheClearConfirmPopup.value = false;
-  deletingCacheFiles.value = false;
 };
 
 const frequentlyUsedDirectories = computed(() => {
@@ -1082,38 +1055,6 @@ const calculateCacheSize = async () => {
     errorCatcher(error);
   }
   calculatingCacheSize.value = false;
-};
-
-const deleteCacheFiles = (type: '' | 'all' | 'smart') => {
-  try {
-    deletingCacheFiles.value = true;
-    const filepathsToDelete =
-      type === 'smart'
-        ? Object.keys(unusedParentDirectories.value)
-        : cacheFiles.value.map((f) => f.path);
-    for (const filepath of filepathsToDelete) {
-      try {
-        fs.rmSync(filepath, { recursive: true });
-      } catch (error) {
-        errorCatcher(error);
-      }
-      additionalMediaMaps.value = {};
-    }
-    for (const untouchableDirectory of untouchableDirectories.value) {
-      removeEmptyDirs(untouchableDirectory);
-    }
-    queues.downloads[currentCongregation.value]?.clear();
-    queues.downloads[currentCongregation.value] = new PQueue({
-      concurrency: 5,
-    });
-    if (type === 'all') {
-      lookupPeriod.value[currentCongregation.value] = [];
-      updateLookupPeriod();
-    }
-    cancelDeleteCacheFiles();
-  } catch (error) {
-    errorCatcher(error);
-  }
 };
 
 if (!migrations.value.includes('firstRun')) {
