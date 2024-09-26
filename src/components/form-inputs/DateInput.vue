@@ -42,6 +42,7 @@
 
 <script setup lang="ts">
 import { getDateOptions, getRules } from 'src/helpers/settings';
+import { SettingsItemOption, SettingsItemRule } from 'src/types/settings';
 import { ref, watch } from 'vue';
 
 const emit = defineEmits(['update:modelValue']);
@@ -49,8 +50,8 @@ const emit = defineEmits(['update:modelValue']);
 const props = defineProps<{
   label?: null | string;
   modelValue?: string;
-  options?: string[];
-  rules?: string[];
+  options?: SettingsItemOption[];
+  rules?: SettingsItemRule[];
 }>();
 
 const localValue = ref(props.modelValue);

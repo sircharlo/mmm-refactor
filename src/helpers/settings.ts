@@ -6,6 +6,11 @@ import { configuredScenesAreAllUUIDs } from 'src/helpers/obs';
 import { localeOptions } from 'src/i18n';
 import { useJwStore } from 'src/stores/jw';
 import { useObsStateStore } from 'src/stores/obs-state';
+import {
+  SettingsItemAction,
+  SettingsItemOption,
+  SettingsItemRule,
+} from 'src/types/settings';
 import { ref } from 'vue';
 
 const jwStore = useJwStore();
@@ -40,7 +45,7 @@ const coTuesdays = (lookupDate: string) => {
   }
 };
 
-const getDateOptions = (options: string[] | undefined) => {
+const getDateOptions = (options: SettingsItemOption[] | undefined) => {
   try {
     const filteredOptions = options
       ?.map((option) => {
@@ -60,7 +65,7 @@ const getDateOptions = (options: string[] | undefined) => {
   }
 };
 
-const getRules = (rules: string[] | undefined) => {
+const getRules = (rules: SettingsItemRule[] | undefined) => {
   try {
     const filteredRules = rules
       ?.map((rule) => {
@@ -80,7 +85,7 @@ const getRules = (rules: string[] | undefined) => {
   }
 };
 
-const getActions = (actions: string[] | undefined) => {
+const getActions = (actions: SettingsItemAction[] | undefined) => {
   try {
     return actions
       ?.map(async (action) => {
@@ -113,7 +118,7 @@ const meetingTime = (hr: number, min: null | number) => {
     return false;
   }
 };
-const getTimeOptions = (options: string[] | undefined) => {
+const getTimeOptions = (options: SettingsItemOption[] | undefined) => {
   try {
     if (!options) return undefined;
     const filteredOptions = options

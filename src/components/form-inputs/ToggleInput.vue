@@ -1,19 +1,16 @@
 <template>
-  <q-toggle
-    checked-icon="mmm-check"
-    color="primary"
-    v-model="localValue"
-    />
-    <!-- unchecked-icon="clear" -->
+  <q-toggle checked-icon="mmm-check" color="primary" v-model="localValue" />
+  <!-- unchecked-icon="clear" -->
 </template>
 
 <script setup lang="ts">
 import { getActions } from 'src/helpers/settings';
+import { SettingsItemAction } from 'src/types/settings';
 import { ref, watch } from 'vue';
 
 // Define props and emits
 const props = defineProps<{
-  actions: string[] | undefined;
+  actions: SettingsItemAction[] | undefined;
   modelValue: boolean;
 }>();
 
