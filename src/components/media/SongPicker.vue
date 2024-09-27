@@ -84,7 +84,7 @@ const loading = ref(false);
 const filter = ref('');
 const filteredSongs: ComputedRef<MediaLink[]> = computed(() => {
   return filter.value
-    ? currentSongs.value.filter((s) =>
+    ? currentSongs.value?.filter((s) =>
         s.title.toLowerCase().includes(filter.value.toLowerCase()),
       )
     : currentSongs.value;
@@ -101,8 +101,8 @@ const addSong = async (songTrack: number) => {
     if (songTrack) {
       const songTrackItem = {
         fileformat: 'MP4',
-        langwritten: currentSettings.value.lang,
-        pub: currentSongbook.value.pub,
+        langwritten: currentSettings.value?.lang,
+        pub: currentSongbook.value?.pub,
         track: songTrack,
       } as PublicationFetcher;
       const [songTrackFiles, { thumbnail, title }] = await Promise.all([
@@ -110,7 +110,7 @@ const addSong = async (songTrack: number) => {
         getJwMediaInfo(songTrackItem),
       ]);
       downloadAdditionalRemoteVideo(
-        songTrackFiles?.files[currentSettings.value.lang]['MP4'],
+        songTrackFiles?.files[currentSettings.value?.lang]['MP4'],
         thumbnail,
         songTrack,
         title.replace(/^\d+\.\s*/, ''),

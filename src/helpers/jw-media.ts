@@ -493,7 +493,7 @@ const getDocumentExtractItems = async (db: string, docId: number) => {
     const currentState = useCurrentStateStore();
     const { currentSettings } = storeToRefs(currentState);
     const extracts = executeQuery(
-      // ${currentSongbook.value.pub === 'sjjm'
+      // ${currentSongbook.value?.pub === 'sjjm'
       //   ? "AND NOT UniqueEnglishSymbol = 'sjj' "
       //   : ''
       // }
@@ -809,7 +809,7 @@ const getWeMedia = async (lookupDate: Date) => {
          WHERE DocumentMultimedia.DocumentId = ${docId}
            AND CategoryType <> 9
            AND CategoryType <> -1
-           AND (KeySymbol != '${currentSongbook.value.pub}' OR KeySymbol IS NULL)
+           AND (KeySymbol != '${currentSongbook.value?.pub}' OR KeySymbol IS NULL)
          GROUP BY DocumentMultimedia.MultimediaId
          ORDER BY DocumentParagraph.BeginPosition`, // pictures
       ) as MultimediaItem[]
@@ -915,7 +915,7 @@ const getWeMedia = async (lookupDate: Date) => {
     for (const media of allMedia) {
       const mediaKeySymbol =
         media.KeySymbol === 'sjjm'
-          ? currentSongbook.value.pub
+          ? currentSongbook.value?.pub
           : media.KeySymbol;
       const multimediaMepsLangItem = multimediaMepsLangs.find(
         (item) =>
@@ -1040,7 +1040,7 @@ const getMwMedia = async (lookupDate: Date) => {
     for (const media of allMedia) {
       const mediaKeySymbol =
         media.KeySymbol === 'sjjm'
-          ? currentSongbook.value.pub
+          ? currentSongbook.value?.pub
           : media.KeySymbol;
       const multimediaMepsLangItem = multimediaMepsLangs.find(
         (item) =>
@@ -1134,8 +1134,8 @@ const getPubMediaLinks = async (publication: PublicationFetcher) => {
     const url = 'https://b.jw-cdn.org/apis/pub-media/GETPUBMEDIALINKS';
     if (!publication.fileformat) publication.fileformat = '';
     if (publication.pub === 'sjjm') {
-      publication.pub = currentSongbook.value.pub;
-      // publication.fileformat = currentSongbook.value.fileformat;
+      publication.pub = currentSongbook.value?.pub;
+      // publication.fileformat = currentSongbook.value?.fileformat;
     }
     publication.fileformat = publication.fileformat.toUpperCase();
     const params = {
@@ -1250,7 +1250,7 @@ const downloadMissingMedia = async (publication: PublicationFetcher) => {
     }).then(async (downloadedFile) => {
       const { currentSettings } = storeToRefs(useCurrentStateStore());
       for (const itemUrl of [
-        currentSettings.value.enableSubtitles
+        currentSettings.value?.enableSubtitles
           ? jwMediaInfo.subtitles
           : undefined,
         jwMediaInfo.thumbnail,
@@ -1465,10 +1465,10 @@ const downloadBackgroundMusic = () => {
     )
       return;
     downloadPubMediaFiles({
-      fileformat: currentSongbook.value.fileformat,
-      langwritten: currentSettings.value.lang,
+      fileformat: currentSongbook.value?.fileformat,
+      langwritten: currentSettings.value?.lang,
       maxTrack: MAX_SONGS,
-      pub: currentSongbook.value.pub,
+      pub: currentSongbook.value?.pub,
     });
   } catch (e) {
     errorCatcher(e);
@@ -1489,9 +1489,9 @@ const downloadSongbookVideos = () => {
     downloadPubMediaFiles({
       fileformat: 'MP4',
       issue: 0,
-      langwritten: currentSettings.value.lang,
+      langwritten: currentSettings.value?.lang,
       maxTrack: MAX_SONGS,
-      pub: currentSongbook.value.pub,
+      pub: currentSongbook.value?.pub,
     });
   } catch (e) {
     errorCatcher(e);

@@ -491,15 +491,13 @@ const updateMediaSortPlugin: DNDPlugin = (parent) => {
   function dragend() {
     if (!mediaSort.value[currentCongregation.value])
       mediaSort.value[currentCongregation.value] = {};
-    mediaSort.value[currentCongregation.value][selectedDate.value] =
-      // sortableMediaItems.value.map((item: DynamicMediaObject) => item.uniqueId);
-      [
-        ...sortableAdditionalMediaItems.value,
-        ...sortableTgwMediaItems.value,
-        ...sortableAyfmMediaItems.value,
-        ...sortableLacMediaItems.value,
-        ...sortableWtMediaItems.value,
-      ].map((item: DynamicMediaObject) => item.uniqueId);
+    mediaSort.value[currentCongregation.value][selectedDate.value] = [
+      ...sortableAdditionalMediaItems.value,
+      ...sortableTgwMediaItems.value,
+      ...sortableAyfmMediaItems.value,
+      ...sortableLacMediaItems.value,
+      ...sortableWtMediaItems.value,
+    ].map((item: DynamicMediaObject) => item.uniqueId);
   }
 
   return {
@@ -947,9 +945,6 @@ const addToFiles = async (
             db,
             `SELECT DISTINCT Document.DocumentId, Title FROM Document JOIN ${mmTable} ON Document.DocumentId = ${mmTable}.DocumentId;`,
           ) as DocumentItem[];
-          console.log(jwpubImportDocuments.value.length);
-          // if (jwpubImportDocuments.value.length > 1) {
-          // } else if (jwpubImportDocuments.value.length === 1) {
           if (jwpubImportDocuments.value.length === 1) {
             const errors = await addJwpubDocumentMediaToFiles(
               jwpubImportDb.value,

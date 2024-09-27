@@ -128,38 +128,32 @@ const cacheClearType = ref<'' | 'all' | 'smart'>('');
 const cacheFiles: Ref<CacheFile[]> = ref([]);
 
 const frequentlyUsedDirectories = computed(() => {
-  const backgroundMusicFilesDirectory = getPublicationDirectory({
-    langwritten: currentSettings.value.lang,
-    pub: currentSongbook.value.pub,
-  });
+  const getDirectory = (pub: string, issue?: number) => {
+    const directoryParams: {
+      issue?: number;
+      langwritten: string;
+      pub: string;
+    } = {
+      langwritten: currentSettings.value?.lang,
+      pub,
+    };
+    if (issue === 0) {
+      directoryParams.issue = issue;
+    }
+    return currentSettings.value
+      ? getPublicationDirectory(directoryParams)
+      : '';
+  };
 
-  const songbookDirectory = getPublicationDirectory({
-    langwritten: currentSettings.value.lang,
-    pub: currentSongbook.value.pub,
-  });
+  const directories = [
+    currentSongbook.value ? getDirectory(currentSongbook.value.pub) : '', // Background music
+    currentSongbook.value ? getDirectory(currentSongbook.value.pub, 0) : '', // Songbook videos
+    getDirectory('it', 0), // Insight
+    getDirectory('lff', 0), // Enjoy Life Forever
+    getDirectory('lmd', 0), // Love People
+  ];
 
-  const insightDirectory = getPublicationDirectory({
-    issue: 0,
-    langwritten: currentSettings.value.lang,
-    pub: 'it',
-  });
-  const enjoyLifeForeverDirectory = getPublicationDirectory({
-    issue: 0,
-    langwritten: currentSettings.value.lang,
-    pub: 'lff',
-  });
-  const lovePeopleDirectory = getPublicationDirectory({
-    issue: 0,
-    langwritten: currentSettings.value.lang,
-    pub: 'lmd',
-  });
-  return new Set([
-    backgroundMusicFilesDirectory,
-    enjoyLifeForeverDirectory,
-    insightDirectory,
-    lovePeopleDirectory,
-    songbookDirectory,
-  ]);
+  return new Set(directories.filter(Boolean));
 });
 
 const confirmDeleteCacheFiles = (type: 'all' | 'smart') => {

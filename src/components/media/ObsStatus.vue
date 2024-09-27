@@ -209,7 +209,7 @@ const setObsScene = async (
   desiredScene?: string,
 ) => {
   try {
-    if (!obsConnectionState.value.startsWith('connect')) await obsConnect();
+    if (!obsConnectionState.value?.startsWith('connect')) await obsConnect();
     if (obsConnectionState.value !== 'connected') return;
     let newProgramScene: string | undefined = desiredScene;
     if (!desiredScene && sceneType) {
@@ -223,7 +223,7 @@ const setObsScene = async (
       if (sceneType === 'camera') newProgramScene = cameraScene;
     }
     if (newProgramScene) {
-      const hasSceneUuid = scenes.value.every((scene) =>
+      const hasSceneUuid = scenes.value?.every((scene) =>
         scene.hasOwnProperty('sceneUuid'),
       );
       const currentScenesAreUuids = configuredScenesAreAllUUIDs();

@@ -565,12 +565,13 @@ const jwStore = useJwStore();
 const { updateYeartext } = jwStore;
 const router = useRouter();
 
-// watch(usingAtKh, (newUsingAtKh) => {
-currentSettings.value.enableMediaDisplayButton = true;
-currentSettings.value.autoStartMusic = true;
-// });
+if (currentSettings.value) {
+  currentSettings.value.enableMediaDisplayButton = true;
+  currentSettings.value.autoStartMusic = true;
+}
+
 watch(obsIntegrate, (newObsIntegrate) => {
-  if (newObsIntegrate && obsUsed.value) {
+  if (newObsIntegrate && obsUsed.value && currentSettings.value) {
     currentSettings.value.obsEnable = true;
   }
 });

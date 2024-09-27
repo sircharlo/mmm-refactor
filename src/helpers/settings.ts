@@ -216,7 +216,7 @@ const getListOptions = (list: string | undefined) => {
       }
       return array;
     } else if (list?.startsWith('obs')) {
-      return scenes.value.map((scene) => {
+      return scenes.value?.map((scene) => {
         return {
           label: scene.sceneName,
           value:

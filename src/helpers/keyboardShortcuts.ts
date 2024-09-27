@@ -50,7 +50,7 @@ const registerCustomShortcut = (
       !shortcutCallbacks[shortcutName] ||
       !currentSettings.value ||
       !currentSettings.value[shortcutName] ||
-      !currentSettings.value.enableKeyboardShortcuts
+      !currentSettings.value?.enableKeyboardShortcuts
     )
       return;
     if (!keySequence)

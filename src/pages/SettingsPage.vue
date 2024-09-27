@@ -211,5 +211,5 @@ watch(
 );
 
 const invalidSettings = computed(() => getInvalidSettings());
-const invalidSettingsLength = computed(() => invalidSettings.value.length > 0);
+const invalidSettingsLength = computed(() => invalidSettings.value?.length > 0);
 </script>

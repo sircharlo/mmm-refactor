@@ -105,7 +105,7 @@ const appSettings = useAppSettingsStore();
 const { migrations } = storeToRefs(appSettings);
 const { runMigration } = appSettings;
 
-if (!migrations.value.includes('firstRun')) {
+if (!migrations.value?.includes('firstRun')) {
   const migrationResult = runMigration('firstRun');
   if (migrationResult) {
     createTemporaryNotification({
