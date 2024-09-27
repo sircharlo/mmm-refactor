@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { jwLanguage } from 'src/types/languages';
 
@@ -6,7 +6,8 @@ const get = async (url: string, params?: AxiosRequestConfig) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let returnVal: { data: any | undefined } = { data: undefined };
   returnVal = await axios.get(url, { params }).catch((error) => {
-    errorCatcher(error);
+    if (!(error instanceof AxiosError) || error.status !== 400)
+      errorCatcher(error);
     return { data: undefined };
   });
   return returnVal?.data ?? undefined;
