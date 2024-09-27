@@ -377,7 +377,7 @@ async function playMusic() {
         musicPlaying.value = true;
         fadeToVolumeLevel(
           (currentSettings.value?.musicVolume ?? 100) / 100 ?? 1,
-          7.5,
+          1,
         );
       })
       .catch((error) => {
