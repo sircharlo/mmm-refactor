@@ -23,17 +23,33 @@
   </q-dialog>
 </template>
 <script setup lang="ts">
+// Packages
 import PQueue from 'p-queue';
 import { storeToRefs } from 'pinia';
+import { ref } from 'vue';
+
+// Globals
 import { queues } from 'src/boot/globals';
+
+// Helpers
 import { updateLookupPeriod } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { removeEmptyDirs } from 'src/helpers/fs';
+
+// Stores
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
+
+// Types
 import { CacheFile } from 'src/types/media';
-import { ref } from 'vue';
+
+// Props
+const props = defineProps<{
+  cacheFiles: CacheFile[];
+  untouchableDirectories: Set<string>;
+  unusedParentDirectories: Record<string, number>;
+}>();
 
 const { fs } = electronApi;
 
@@ -42,12 +58,6 @@ const { additionalMediaMaps, lookupPeriod } = storeToRefs(jwStore);
 
 const currentState = useCurrentStateStore();
 const { currentCongregation } = storeToRefs(currentState);
-
-const props = defineProps<{
-  cacheFiles: CacheFile[];
-  untouchableDirectories: Set<string>;
-  unusedParentDirectories: Record<string, number>;
-}>();
 
 const open = defineModel<boolean>({ default: false });
 const cacheClearType = defineModel<'' | 'all' | 'smart'>('cacheClearType', {

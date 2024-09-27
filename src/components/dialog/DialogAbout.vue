@@ -82,6 +82,7 @@ import { electronApi } from 'src/helpers/electron-api';
 const { getAppVersion, openExternalWebsite } = electronApi;
 
 const open = defineModel<boolean>({ default: false });
+
 const appVersion = getAppVersion();
 const githubLink = 'https://github.com/sircharlo/mmm-refactor';
 const docsLink = 'https://sircharlo.github.io/mmm-refactor/';
