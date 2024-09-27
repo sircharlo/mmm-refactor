@@ -114,15 +114,23 @@
   </q-dialog>
 </template>
 <script setup lang="ts">
+// Packages
+import { computed, ref } from 'vue';
+
+// Globals
 import { barStyle, thumbStyle } from 'src/boot/globals';
+
+// Helpers
 import {
   downloadAdditionalRemoteVideo,
   getBestImageUrl,
 } from 'src/helpers/jw-media';
 import { formatTime } from 'src/helpers/mediaPlayback';
-import { MediaItemsMediatorItem } from 'src/types/publications';
-import { computed, ref } from 'vue';
 
+// Types
+import { MediaItemsMediatorItem } from 'src/types/publications';
+
+// Props
 const props = defineProps<{
   remoteVideos: MediaItemsMediatorItem[];
   remoteVideosLoadingProgress: number;
