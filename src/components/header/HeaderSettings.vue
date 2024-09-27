@@ -1,83 +1,81 @@
 <template>
-  <div>
-    <DialogCacheClear
-      v-model="cacheClearConfirmPopup"
-      v-model:cache-clear-type="cacheClearType"
-      :cache-files="cacheFiles"
-      :untouchable-directories="untouchableDirectories"
-      :unused-parent-directories="unusedParentDirectories"
-    />
-    <q-btn v-if="selectedDate" color="white-transparent" unelevated>
-      <q-icon class="q-mr-sm" name="mmm-tools" size="xs" />
+  <DialogCacheClear
+    v-model="cacheClearConfirmPopup"
+    v-model:cache-clear-type="cacheClearType"
+    :cache-files="cacheFiles"
+    :untouchable-directories="untouchableDirectories"
+    :unused-parent-directories="unusedParentDirectories"
+  />
+  <q-btn v-if="selectedDate" color="white-transparent" unelevated>
+    <q-icon class="q-mr-sm" name="mmm-tools" size="xs" />
+    {{ $t('tools') }}
+    <q-tooltip v-if="!moreOptionsMenuActive" :delay="1000">
       {{ $t('tools') }}
-      <q-tooltip v-if="!moreOptionsMenuActive" :delay="1000">
-        {{ $t('tools') }}
-      </q-tooltip>
-      <q-menu
-        :offset="[0, 11]"
-        @before-hide="moreOptionsMenuActive = false"
-        @show="
-          moreOptionsMenuActive = true;
-          calculateCacheSize();
-        "
-      >
-        <q-list style="min-width: 100px">
-          <template v-if="invalidSettings()">
-            <q-item-label header>{{ $t('invalid-settings') }}</q-item-label>
-            <q-item
-              clickable
-              @click="onlyShowInvalidSettings = !onlyShowInvalidSettings"
-            >
-              <q-item-section avatar>
-                <q-icon
-                  :color="onlyShowInvalidSettings ? 'primary' : 'negative'"
-                  :name="onlyShowInvalidSettings ? 'mmm-menu' : 'mmm-error'"
-                />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label
-                  >{{
-                    onlyShowInvalidSettings
-                      ? $t('show-all-settings')
-                      : $t('only-show-settings-that-are-not-valid')
-                  }}
-                </q-item-label>
-              </q-item-section>
-            </q-item>
-          </template>
-          <q-item-label header>{{ $t('cache') }}</q-item-label>
+    </q-tooltip>
+    <q-menu
+      :offset="[0, 11]"
+      @before-hide="moreOptionsMenuActive = false"
+      @show="
+        moreOptionsMenuActive = true;
+        calculateCacheSize();
+      "
+    >
+      <q-list style="min-width: 100px">
+        <template v-if="invalidSettings()">
+          <q-item-label header>{{ $t('invalid-settings') }}</q-item-label>
           <q-item
-            v-close-popup
-            :disable="calculatingCacheSize"
             clickable
-            @click="confirmDeleteCacheFiles('smart')"
+            @click="onlyShowInvalidSettings = !onlyShowInvalidSettings"
           >
             <q-item-section avatar>
-              <q-icon color="primary" name="mmm-delete-smart" />
+              <q-icon
+                :color="onlyShowInvalidSettings ? 'primary' : 'negative'"
+                :name="onlyShowInvalidSettings ? 'mmm-menu' : 'mmm-error'"
+              />
             </q-item-section>
             <q-item-section>
-              <q-item-label>{{ $t('remove-unused-cache') }} </q-item-label>
-              <q-item-label caption>{{ unusedCacheFoldersSize }}</q-item-label>
+              <q-item-label
+                >{{
+                  onlyShowInvalidSettings
+                    ? $t('show-all-settings')
+                    : $t('only-show-settings-that-are-not-valid')
+                }}
+              </q-item-label>
             </q-item-section>
           </q-item>
-          <q-item
-            v-close-popup
-            :disable="calculatingCacheSize"
-            clickable
-            @click="confirmDeleteCacheFiles('all')"
-          >
-            <q-item-section avatar>
-              <q-icon color="primary" name="mmm-delete-all" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ $t('remove-all-cache') }} </q-item-label>
-              <q-item-label caption>{{ allCacheFilesSize }}</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-menu>
-    </q-btn>
-  </div>
+        </template>
+        <q-item-label header>{{ $t('cache') }}</q-item-label>
+        <q-item
+          v-close-popup
+          :disable="calculatingCacheSize"
+          clickable
+          @click="confirmDeleteCacheFiles('smart')"
+        >
+          <q-item-section avatar>
+            <q-icon color="primary" name="mmm-delete-smart" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ $t('remove-unused-cache') }} </q-item-label>
+            <q-item-label caption>{{ unusedCacheFoldersSize }}</q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-item
+          v-close-popup
+          :disable="calculatingCacheSize"
+          clickable
+          @click="confirmDeleteCacheFiles('all')"
+        >
+          <q-item-section avatar>
+            <q-icon color="primary" name="mmm-delete-all" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ $t('remove-all-cache') }} </q-item-label>
+            <q-item-label caption>{{ allCacheFilesSize }}</q-item-label>
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </q-menu>
+  </q-btn>
 </template>
 <script setup lang="ts">
 // Packages

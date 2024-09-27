@@ -1,137 +1,133 @@
 <template>
-  <div>
-    <SongPicker v-model="chooseSong" />
-    <PublicTalkMediaPicker v-model="publicTalkMediaPopup" />
-    <q-btn
-      :disable="mediaPlaying || !mediaSortForDay"
-      color="white-transparent"
-      unelevated
-      @click="resetSort"
-    >
-      <q-icon
-        :class="{ 'q-mr-sm': $q.screen.gt.sm }"
-        name="mmm-reset"
-        size="xs"
-      />
-      {{ $q.screen.gt.sm ? $t('reset-sort-order') : '' }}
-      <q-tooltip :delay="1000">
-        {{ $t('reset-sort-order') }}
-      </q-tooltip>
-    </q-btn>
-    <q-btn v-if="selectedDate" color="white-transparent" unelevated>
-      <q-icon
-        :class="{ 'q-mr-sm': $q.screen.gt.sm }"
-        name="mmm-import-media"
-        size="xs"
-      />
-      {{ $q.screen.gt.sm ? $t('import-media') : '' }}
-      <q-tooltip :delay="1000">
-        {{ $t('import-media') }}
-      </q-tooltip>
-      <q-menu ref="importMenu" :offset="[0, 11]" class="top-menu">
-        <q-list style="min-width: 100px">
-          <q-item-label header>{{ $t('from-jw-org') }}</q-item-label>
-          <q-item
-            v-close-popup
-            :disable="!online"
-            clickable
-            @click="chooseSong = true"
-          >
-            <q-item-section avatar>
-              <q-icon color="primary" name="mmm-music-note" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ $t('song') }}</q-item-label>
-              <q-item-label caption>{{ $t('from-songbook') }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item
-            v-close-popup
-            :disable="!online"
-            clickable
-            @click="
-              remoteVideoPopup = true;
-              getJwVideos();
-            "
-          >
-            <q-item-section avatar>
-              <q-icon color="primary" name="mmm-movie" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ $t('video') }}</q-item-label>
-              <q-item-label caption>{{
-                $t('latest-videos-from-jw-org')
-              }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item v-close-popup clickable @click="publicTalkMediaPopup = true">
-            <q-item-section avatar>
-              <q-icon color="primary" name="mmm-lectern" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ $t('public-talk-media') }}</q-item-label>
-              <q-item-label caption>{{ $t('media-from-s34mp') }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item-label header>{{ $t('from-local-computer') }}</q-item-label>
-          <template
-            v-for="[icon, name] in [
-              ['mmm-local-media', 'images-videos'],
-              ['mmm-jwpub', 'jwpub-file'],
-              ['mmm-jwlplaylist', 'jw-playlist'],
-            ]"
-            :key="name"
-          >
-            <q-item v-close-popup clickable @click="dragging">
-              <q-item-section avatar>
-                <q-icon :name="icon" color="primary" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>{{ $t(name) }}</q-item-label>
-                <q-item-label caption>{{ $t(name + '-explain') }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </template>
-        </q-list>
-      </q-menu>
-    </q-btn>
-    <q-btn :disable="mediaPlaying" color="white-transparent" unelevated>
-      <q-icon
-        :class="{ 'q-mr-sm': $q.screen.gt.xs }"
-        name="mmm-calendar-month"
-        size="xs"
-      />
-      {{
-        $q.screen.gt.xs
-          ? getDateLocaleFormatted(
-              currentSettings?.localAppLang,
-              selectedDate,
-            ) || $t('select-a-date')
-          : ''
-      }}
-      <!--dayjs-->
-      <q-popup-proxy v-model="datePickerActive" :offset="[0, 11]">
-        <q-date
-          v-model="selectedDate"
-          :event-color="getEventDayColor"
-          :events="getEventDates()"
-          :navigation-max-year-month="maxDate()"
-          :navigation-min-year-month="minDate()"
-          :options="dateOptions"
-          landscape
-        >
-          <div class="row items-center justify-end q-gutter-sm">
-            <q-btn v-close-popup :label="$t('close')" color="primary" outline />
-          </div>
-        </q-date>
-      </q-popup-proxy>
-    </q-btn>
-    <DialogRemoteVideo
-      v-model="remoteVideoPopup"
-      :remote-videos="remoteVideos"
-      :remote-videos-loading-progress="remoteVideosLoadingProgress"
+  <SongPicker v-model="chooseSong" />
+  <PublicTalkMediaPicker v-model="publicTalkMediaPopup" />
+  <q-btn
+    :disable="mediaPlaying || !mediaSortForDay"
+    color="white-transparent"
+    unelevated
+    @click="resetSort"
+  >
+    <q-icon
+      :class="{ 'q-mr-sm': $q.screen.gt.sm }"
+      name="mmm-reset"
+      size="xs"
     />
-  </div>
+    {{ $q.screen.gt.sm ? $t('reset-sort-order') : '' }}
+    <q-tooltip :delay="1000">
+      {{ $t('reset-sort-order') }}
+    </q-tooltip>
+  </q-btn>
+  <q-btn v-if="selectedDate" color="white-transparent" unelevated>
+    <q-icon
+      :class="{ 'q-mr-sm': $q.screen.gt.sm }"
+      name="mmm-import-media"
+      size="xs"
+    />
+    {{ $q.screen.gt.sm ? $t('import-media') : '' }}
+    <q-tooltip :delay="1000">
+      {{ $t('import-media') }}
+    </q-tooltip>
+    <q-menu ref="importMenu" :offset="[0, 11]" class="top-menu">
+      <q-list style="min-width: 100px">
+        <q-item-label header>{{ $t('from-jw-org') }}</q-item-label>
+        <q-item
+          v-close-popup
+          :disable="!online"
+          clickable
+          @click="chooseSong = true"
+        >
+          <q-item-section avatar>
+            <q-icon color="primary" name="mmm-music-note" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ $t('song') }}</q-item-label>
+            <q-item-label caption>{{ $t('from-songbook') }}</q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-item
+          v-close-popup
+          :disable="!online"
+          clickable
+          @click="
+            remoteVideoPopup = true;
+            getJwVideos();
+          "
+        >
+          <q-item-section avatar>
+            <q-icon color="primary" name="mmm-movie" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ $t('video') }}</q-item-label>
+            <q-item-label caption>{{
+              $t('latest-videos-from-jw-org')
+            }}</q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-item v-close-popup clickable @click="publicTalkMediaPopup = true">
+          <q-item-section avatar>
+            <q-icon color="primary" name="mmm-lectern" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ $t('public-talk-media') }}</q-item-label>
+            <q-item-label caption>{{ $t('media-from-s34mp') }}</q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-item-label header>{{ $t('from-local-computer') }}</q-item-label>
+        <template
+          v-for="[icon, name] in [
+            ['mmm-local-media', 'images-videos'],
+            ['mmm-jwpub', 'jwpub-file'],
+            ['mmm-jwlplaylist', 'jw-playlist'],
+          ]"
+          :key="name"
+        >
+          <q-item v-close-popup clickable @click="dragging">
+            <q-item-section avatar>
+              <q-icon :name="icon" color="primary" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ $t(name) }}</q-item-label>
+              <q-item-label caption>{{ $t(name + '-explain') }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </template>
+      </q-list>
+    </q-menu>
+  </q-btn>
+  <q-btn :disable="mediaPlaying" color="white-transparent" unelevated>
+    <q-icon
+      :class="{ 'q-mr-sm': $q.screen.gt.xs }"
+      name="mmm-calendar-month"
+      size="xs"
+    />
+    {{
+      $q.screen.gt.xs
+        ? getDateLocaleFormatted(currentSettings?.localAppLang, selectedDate) ||
+          $t('select-a-date')
+        : ''
+    }}
+    <!--dayjs-->
+    <q-popup-proxy v-model="datePickerActive" :offset="[0, 11]">
+      <q-date
+        v-model="selectedDate"
+        :event-color="getEventDayColor"
+        :events="getEventDates()"
+        :navigation-max-year-month="maxDate()"
+        :navigation-min-year-month="minDate()"
+        :options="dateOptions"
+        landscape
+      >
+        <div class="row items-center justify-end q-gutter-sm">
+          <q-btn v-close-popup :label="$t('close')" color="primary" outline />
+        </div>
+      </q-date>
+    </q-popup-proxy>
+  </q-btn>
+  <DialogRemoteVideo
+    v-model="remoteVideoPopup"
+    :remote-videos="remoteVideos"
+    :remote-videos-loading-progress="remoteVideosLoadingProgress"
+  />
 </template>
 <script setup lang="ts">
 // Packages
