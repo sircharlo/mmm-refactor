@@ -332,6 +332,7 @@ function addFullFilePathToMultimediaItem(
 
 const getMultimediaMepsLangs = (source: MultimediaItemsFetcher) => {
   try {
+    if (!source.db) return [];
     const multimediaMepsLangs = [] as MultimediaItem[];
     for (const table of [
       'Multimedia',
@@ -346,10 +347,11 @@ const getMultimediaMepsLangs = (source: MultimediaItemsFetcher) => {
               source.db,
               `SELECT * FROM sqlite_master WHERE type='table' AND name='${table}'`,
             ) as TableItem[]
-          ).map((item) => item.name).length > 0;
+          )?.map((item) => item.name).length > 0;
         if (!tableExists) continue;
       } catch (error) {
-        errorCatcher(source.db + ' - ' + table + ' - ' + error);
+        errorCatcher(source.db + ' - ' + table);
+        errorCatcher(error);
         continue;
       }
       const columnQueryResult = executeQuery(
