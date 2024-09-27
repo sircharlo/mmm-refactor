@@ -235,8 +235,6 @@ jwStore.$subscribe((_, state) => {
   LocalStorage.set('lookupPeriod', state.lookupPeriod);
 });
 
-// Ref and reactive initializations
-
 const {
   fs,
   getAppDataPath,
@@ -440,11 +438,6 @@ try {
 cleanLocalStorage();
 cleanAdditionalMediaFolder();
 
-const importMenu: Ref<QMenu | undefined> = ref();
-const openImportMenu = () => {
-  importMenu.value?.show();
-};
-
 const bcClose = new BroadcastChannel('closeAttempts');
 const attemptedClose = ref(false);
 bcClose.onmessage = (event) => {
@@ -483,6 +476,5 @@ watch(
 onMounted(() => {
   document.title = 'Meeting Media Manager';
   if (!currentSettings.value) navigateToCongregationSelector();
-  window.addEventListener('openImportMenu', openImportMenu);
 });
 </script>

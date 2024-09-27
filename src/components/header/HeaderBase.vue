@@ -528,10 +528,12 @@ const untouchableDirectories = computed(() => {
 
 onMounted(() => {
   window.addEventListener('openSongPicker', openSongPicker);
+  window.addEventListener('openImportMenu', openImportMenu);
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener('openSongPicker', openSongPicker);
+  window.removeEventListener('openImportMenu', openImportMenu);
 });
 
 const openSongPicker = () => {
@@ -692,6 +694,11 @@ const maxDate = () => {
     errorCatcher(error);
     return undefined;
   }
+};
+
+const importMenu: Ref<QMenu | undefined> = ref();
+const openImportMenu = () => {
+  importMenu.value?.show();
 };
 
 const dateOptions = (lookupDate: string) => {
