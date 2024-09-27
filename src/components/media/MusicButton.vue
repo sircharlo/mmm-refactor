@@ -135,7 +135,7 @@ import {
   getPublicationDirectoryContents,
 } from 'src/helpers/fs';
 import { downloadBackgroundMusic } from 'src/helpers/jw-media';
-import { formatTime } from 'src/helpers/mediaPlayback';
+import { formatTime, isVideo } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { SongItem } from 'src/types/media';
@@ -150,6 +150,8 @@ const {
   currentCongregation,
   currentSettings,
   mediaPlaying,
+  mediaPlayingAction,
+  mediaPlayingUrl,
   selectedDate,
   selectedDateObject,
 } = storeToRefs(currentState);
@@ -455,6 +457,17 @@ const muteBackgroundMusic = () => fadeToVolumeLevel(0.001, 1);
 const unmuteBackgroundMusic = () =>
   fadeToVolumeLevel((currentSettings?.value?.musicVolume ?? 100) / 100 ?? 1, 1);
 
+watch(
+  () => [mediaPlayingAction.value, mediaPlayingUrl.value],
+  ([newAction, newUrl]) => {
+    if (newUrl && isVideo(newUrl) && newAction !== 'pause') {
+      muteBackgroundMusic();
+    } else {
+      unmuteBackgroundMusic();
+    }
+  },
+);
+
 const setBackgroundMusicVolume = (volume: number) => {
   try {
     if (!musicPlayer.value || !Number.isInteger(volume) || volume < 0) return;
@@ -466,8 +479,6 @@ const setBackgroundMusicVolume = (volume: number) => {
 
 onMounted(() => {
   window.addEventListener('toggleMusic', toggleMusicListener);
-  window.addEventListener('muteBackgroundMusic', muteBackgroundMusic);
-  window.addEventListener('unmuteBackgroundMusic', unmuteBackgroundMusic);
 
   const bc = new BroadcastChannel('volumeSetter');
   bc.onmessage = (event) => {
@@ -506,11 +517,5 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('toggleMusic', toggleMusicListener);
-  window.removeEventListener('muteBackgroundMusic', muteBackgroundMusic);
-  window.removeEventListener('unmuteBackgroundMusic', unmuteBackgroundMusic);
-  // window.removeEventListener(
-  //   'setBackgroundMusicVolume',
-  //   setBackgroundMusicVolume,
-  // );
 });
 </script>

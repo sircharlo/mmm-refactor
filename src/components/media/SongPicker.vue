@@ -28,6 +28,7 @@
         >
           <template :key="song.url" v-for="song in filteredSongs">
             <q-item
+              :disable="loading"
               @click="addSong(song.track)"
               class="items-center"
               clickable
@@ -38,10 +39,15 @@
           </template>
         </q-scroll-area>
       </div>
-      <div class="row justify-end">
-        <q-btn @click="dismissPopup" color="negative" flat>{{
-          $t('cancel')
-        }}</q-btn>
+      <div class="row">
+        <div class="col">
+          <q-spinner color="primary" size="2em" v-if="loading" />
+        </div>
+        <div class="col text-right">
+          <q-btn @click="dismissPopup" color="negative" flat>{{
+            $t('cancel')
+          }}</q-btn>
+        </div>
       </div>
     </div>
   </q-dialog>
@@ -73,6 +79,7 @@ const { currentSettings, currentSongbook, currentSongs } =
   storeToRefs(currentState);
 
 const localValue = ref(props.modelValue);
+const loading = ref(false);
 
 const filter = ref('');
 const filteredSongs: ComputedRef<MediaLink[]> = computed(() => {
@@ -85,10 +92,12 @@ const filteredSongs: ComputedRef<MediaLink[]> = computed(() => {
 
 const dismissPopup = () => {
   localValue.value = false;
+  loading.value = false;
 };
 
 const addSong = async (songTrack: number) => {
   try {
+    loading.value = true;
     if (songTrack) {
       const songTrackItem = {
         fileformat: 'MP4',
@@ -96,8 +105,10 @@ const addSong = async (songTrack: number) => {
         pub: currentSongbook.value.pub,
         track: songTrack,
       } as PublicationFetcher;
-      const songTrackFiles = await getPubMediaLinks(songTrackItem);
-      const { thumbnail, title } = await getJwMediaInfo(songTrackItem);
+      const [songTrackFiles, { thumbnail, title }] = await Promise.all([
+        getPubMediaLinks(songTrackItem),
+        getJwMediaInfo(songTrackItem),
+      ]);
       downloadAdditionalRemoteVideo(
         songTrackFiles?.files[currentSettings.value.lang]['MP4'],
         thumbnail,

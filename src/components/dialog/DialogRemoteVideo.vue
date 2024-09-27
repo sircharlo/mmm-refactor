@@ -57,6 +57,8 @@
                     downloadAdditionalRemoteVideo(
                       video.files,
                       getBestImageUrl(video.images, 'md'),
+                      false,
+                      video.title,
                     );
                     open = false;
                   "
