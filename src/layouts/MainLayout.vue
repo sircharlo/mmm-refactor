@@ -3,7 +3,9 @@
     <HeaderBase />
 
     <q-footer
-      :style="'left: calc(50% + ' + (miniState ? '28' : '150') + 'px) !important'"
+      :style="
+        'left: calc(50% + ' + (miniState ? '28' : '150') + 'px) !important'
+      "
       class="q-pb-sm"
       v-if="
         currentSettings?.enableMediaDisplayButton ||
@@ -148,7 +150,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { Dark, LocalStorage, QMenu } from 'quasar';
+import { Dark, LocalStorage } from 'quasar';
 import { useQuasar } from 'quasar';
 import { queues } from 'src/boot/globals';
 import { barStyle, thumbStyle } from 'src/boot/globals';
@@ -172,7 +174,7 @@ import { useAppSettingsStore } from 'src/stores/app-settings';
 import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
-import { onMounted, Ref, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 
