@@ -14,26 +14,26 @@
       <div class="row">
         <div class="col-grow">
           <q-input
+            v-model="remoteVideoFilter"
             :label="$t('search')"
             clearable
             dense
             outlined
-            v-model="remoteVideoFilter"
           >
-            <template v-slot:prepend>
+            <template #prepend>
               <q-icon name="mmm-search" />
             </template>
           </q-input>
         </div>
       </div>
       <div
-        class="text-center row items-center justify-center"
         v-if="
           !!(
             remoteVideosLoadingProgress < 1 &&
             (remoteVideosFiltered.length === 0 || remoteVideoFilter)
           )
         "
+        class="text-center row items-center justify-center"
       >
         <q-spinner color="primary" size="md" />
       </div>
@@ -44,15 +44,17 @@
           style="width: 100vw; height: 40vh"
         >
           <div class="row q-col-gutter-md">
-            <template :key="video.guid" v-for="video in remoteVideosFiltered">
+            <template v-for="video in remoteVideosFiltered" :key="video.guid">
               <div class="col-xs-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
                 <div
+                  v-ripple
                   :class="{
                     'cursor-pointer': true,
                     'rounded-borders-lg': true,
                     'full-height': true,
                     'bg-accent-100': hoveredRemoteVideo === video.guid,
                   }"
+                  flat
                   @click="
                     downloadAdditionalRemoteVideo(
                       video.files,
@@ -64,8 +66,6 @@
                   "
                   @mouseout="hoveredRemoteVideo = ''"
                   @mouseover="hoveredRemoteVideo = video.guid"
-                  flat
-                  v-ripple
                 >
                   <q-card-section class="q-pa-sm">
                     <q-img
@@ -100,14 +100,14 @@
       <div class="row items-center">
         <div class="col">
           <q-toggle
+            v-model="remoteVideosIncludeAudioDescription"
             :label="$t('include-audio-description')"
             checked-icon="mmm-check"
             color="primary"
-            v-model="remoteVideosIncludeAudioDescription"
           />
         </div>
         <div class="col text-right">
-          <q-btn color="negative" flat v-close-popup>{{ $t('cancel') }}</q-btn>
+          <q-btn v-close-popup color="negative" flat>{{ $t('cancel') }}</q-btn>
         </div>
       </div>
     </div>

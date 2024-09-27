@@ -1,5 +1,5 @@
 <template>
-  <q-toggle checked-icon="mmm-check" color="primary" v-model="localValue" />
+  <q-toggle v-model="localValue" checked-icon="mmm-check" color="primary" />
   <!-- unchecked-icon="clear" -->
 </template>
 

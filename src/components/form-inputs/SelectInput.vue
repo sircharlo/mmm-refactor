@@ -1,5 +1,6 @@
 <template>
   <q-select
+    v-model="localValue"
     :fill-input="useInput"
     :hide-selected="useInput"
     :options="
@@ -22,7 +23,6 @@
     "
     :rules="getRules(rules)"
     :use-input="useInput"
-    @filter="filterFn"
     class="bg-accent-100"
     clearable
     dense
@@ -31,10 +31,10 @@
     input-debounce="0"
     map-options
     outlined
-    v-model="localValue"
     v-bind="{ label: label || undefined }"
     spellcheck="false"
     style="width: 240px"
+    @filter="filterFn"
   >
   </q-select>
 </template>

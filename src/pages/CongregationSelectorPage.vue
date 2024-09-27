@@ -3,16 +3,16 @@
     <q-list v-if="Object.keys(congregations).length">
       <!-- @vue-ignore-->
       <div
+        v-for="(prefs, id) in congregations"
+        :key="id"
+        v-ripple
         :class="
           'media-section cursor-pointer congregation ' +
           (currentCongregation === id ? 'active' : '')
         "
-        :key="id"
         @click="chooseCongregation(id)"
         @mouseleave="hoveredCongregation = null"
         @mouseover="hoveredCongregation = id"
-        v-for="(prefs, id) in congregations"
-        v-ripple
       >
         <q-item class="items-center">
           <div class="col">
@@ -60,11 +60,11 @@
                 (hoveredCongregation !== id ? 'invisible' : '') + ' q-mr-lg'
               "
               :label="$t('delete')"
-              @click.stop="congToDelete = id"
               color="negative"
               flat
               icon="mmm-delete"
               size="md"
+              @click.stop="congToDelete = id"
             />
             <q-icon
               :class="
@@ -98,15 +98,15 @@
         }}
       </q-card-section>
       <q-card-actions align="right" class="text-primary">
-        <q-btn :label="$t('cancel')" @click="congToDelete = ''" flat />
+        <q-btn :label="$t('cancel')" flat @click="congToDelete = ''" />
         <q-btn
           :label="$t('delete')"
+          color="negative"
+          flat
           @click="
             deleteCongregation(congToDelete);
             congToDelete = '';
           "
-          color="negative"
-          flat
         />
       </q-card-actions>
     </q-card>

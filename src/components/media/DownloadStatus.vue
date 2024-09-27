@@ -5,10 +5,10 @@
         ? 'negative'
         : 'white-transparent'
     "
-    @click="localDownloadPopup = true"
     class="super-rounded position-relative"
     rounded
     unelevated
+    @click="localDownloadPopup = true"
   >
     <q-icon
       :name="
@@ -23,20 +23,20 @@
     >
     </q-icon>
     <q-spinner
+      v-if="
+        Object.values(downloadProgress).filter((item) => item.loaded).length > 0
+      "
       class="absolute"
       color="primary"
       size="8px"
       style="top: 14"
-      v-if="
-        Object.values(downloadProgress).filter((item) => item.loaded).length > 0
-      "
     />
     <q-tooltip
+      v-if="!localDownloadPopup"
       :delay="1000"
       :offset="[14, 22]"
       anchor="bottom left"
       self="top left"
-      v-if="!localDownloadPopup"
     >
       {{ $t('download-status') }}
     </q-tooltip>

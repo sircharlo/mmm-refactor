@@ -7,15 +7,15 @@
       <div class="row">{{ $t('add-a-song') }}</div>
       <div class="row">
         <q-input
+          v-model="filter"
           :label="$t('search')"
           class="col"
           clearable
           debounce="100"
           dense
           outlined
-          v-model="filter"
         >
-          <template v-slot:prepend>
+          <template #prepend>
             <q-icon name="mmm-search" />
           </template>
         </q-input>
@@ -26,13 +26,13 @@
           :thumb-style="thumbStyle()"
           style="height: 40vh; width: -webkit-fill-available"
         >
-          <template :key="song.url" v-for="song in filteredSongs">
+          <template v-for="song in filteredSongs" :key="song.url">
             <q-item
+              v-ripple
               :disable="loading"
-              @click="addSong(song.track)"
               class="items-center"
               clickable
-              v-ripple
+              @click="addSong(song.track)"
             >
               {{ song.title }}
             </q-item>
@@ -41,10 +41,10 @@
       </div>
       <div class="row">
         <div class="col">
-          <q-spinner color="primary" size="2em" v-if="loading" />
+          <q-spinner v-if="loading" color="primary" size="2em" />
         </div>
         <div class="col text-right">
-          <q-btn @click="dismissPopup" color="negative" flat>{{
+          <q-btn color="negative" flat @click="dismissPopup">{{
             $t('cancel')
           }}</q-btn>
         </div>

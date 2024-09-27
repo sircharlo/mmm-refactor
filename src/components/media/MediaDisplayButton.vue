@@ -1,23 +1,23 @@
 <template>
   <q-btn
+    v-if="currentSettings?.enableMediaDisplayButton"
     :color="!mediaWindowVisible ? 'negative' : 'white-transparent'"
     :icon="
       mediaWindowVisible
         ? 'mmm-media-display-active'
         : 'mmm-media-display-inactive'
     "
-    @click="mediaDisplayPopup = true"
     class="super-rounded"
     rounded
     unelevated
-    v-if="currentSettings?.enableMediaDisplayButton"
+    @click="mediaDisplayPopup = true"
   >
     <q-tooltip
+      v-if="!mediaDisplayPopup"
       :delay="1000"
       :offset="[14, 22]"
       anchor="bottom left"
       self="top left"
-      v-if="!mediaDisplayPopup"
     >
       {{ $t('media-display') }}
     </q-tooltip>
@@ -31,7 +31,7 @@
       self="bottom middle"
       v-if="!disabled"
     > -->
-    <q-dialog position="bottom" v-model="mediaDisplayPopup">
+    <q-dialog v-model="mediaDisplayPopup" position="bottom">
       <q-card flat>
         <q-card-section>
           <div class="card-title">
@@ -48,16 +48,16 @@
               </div>
               <div class="row items-center q-col-gutter-sm q-mb-md">
                 <template
-                  :key="screen.id"
                   v-for="(screen, index) in screenList"
+                  :key="screen.id"
                 >
                   <div class="col">
                     <q-btn
                       :disable="screen.mainWindow"
                       :outline="screen.mainWindow || !screen.mediaWindow"
-                      @click="screenPreferences.preferredScreenNumber = index"
                       class="full-width"
                       color="primary"
+                      @click="screenPreferences.preferredScreenNumber = index"
                     >
                       <q-icon
                         :name="
@@ -91,10 +91,10 @@
                   :outline="
                     screenList.length < 2 || screenPreferences.preferWindowed
                   "
-                  @click="screenPreferences.preferWindowed = false"
                   class="full-width"
                   color="primary"
                   unelevated
+                  @click="screenPreferences.preferWindowed = false"
                 >
                   <q-icon class="q-mr-sm" name="mmm-fullscreen" size="xs" />
                   {{ $t('full-screen') }}
@@ -111,10 +111,10 @@
                       ? ''
                       : 'primary'
                   "
-                  @click="screenPreferences.preferWindowed = true"
                   class="full-width"
                   color="primary"
                   unelevated
+                  @click="screenPreferences.preferWindowed = true"
                 >
                   <q-icon class="q-mr-sm" name="mmm-window" size="xs" />
                   {{ $t('windowed') }}
@@ -131,10 +131,10 @@
           <div class="col q-mb-md">
             <q-btn
               :outline="!mediaWindowCustomBackground"
-              @click="chooseCustomBackground(!!mediaWindowCustomBackground)"
               class="full-width"
               color="primary"
               unelevated
+              @click="chooseCustomBackground(!!mediaWindowCustomBackground)"
             >
               <q-icon
                 :name="
@@ -169,19 +169,19 @@
             </div>
             <div class="col-6">
               <q-btn
-                @click="showMediaWindow(false)"
+                v-if="mediaWindowVisible"
                 class="full-width"
                 color="primary"
                 unelevated
-                v-if="mediaWindowVisible"
+                @click="showMediaWindow(false)"
                 >{{ $t('hide-media-display') }}</q-btn
               >
               <q-btn
-                @click="showMediaWindow(true)"
+                v-else
                 class="full-width"
                 color="primary"
                 unelevated
-                v-else
+                @click="showMediaWindow(true)"
                 >{{ $t('show-media-display') }}</q-btn
               >
             </div>
@@ -205,21 +205,21 @@
         style="height: 40vh; width: -webkit-fill-available"
       >
         <template
-          :key="jwpubImage.FilePath"
           v-for="(jwpubImage, index) in jwpubImages"
+          :key="jwpubImage.FilePath"
         >
           <div class="col items-center q-pb-md">
             <div
-              @click="setMediaBackground(jwpubImage.FilePath)"
               class="row cursor-pointer items-center q-gutter-x-md"
+              @click="setMediaBackground(jwpubImage.FilePath)"
             >
               <div class="col-shrink">
                 <q-img
+                  v-ripple
                   :src="pathToFileURL(jwpubImage.FilePath)"
                   class="rounded-borders"
                   fit="contain"
                   style="width: 150px"
-                  v-ripple
                 />
               </div>
               <div class="col">
@@ -227,8 +227,8 @@
               </div>
             </div>
             <q-separator
-              class="bg-accent-200 q-mt-md"
               v-if="index < jwpubImages.length - 1"
+              class="bg-accent-200 q-mt-md"
             />
           </div>
         </template>
@@ -240,12 +240,12 @@
     </q-card> -->
       <div class="row justify-end">
         <q-btn
+          color="negative"
+          flat
           @click="
             jwpubImportFilePath = '';
             jwpubImages = [];
           "
-          color="negative"
-          flat
           >{{ $t('cancel') }}</q-btn
         >
       </div>

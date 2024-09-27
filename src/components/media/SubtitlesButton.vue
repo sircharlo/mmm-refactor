@@ -1,12 +1,12 @@
 <template>
   <q-btn
+    v-if="currentSettings?.enableSubtitles"
     :color="!subtitlesVisible ? 'negative' : 'white-transparent'"
     :icon="subtitlesVisible ? 'mmm-subtitles' : 'mmm-subtitles-off'"
-    @click="subtitlesVisible = !subtitlesVisible"
     class="super-rounded"
     rounded
     unelevated
-    v-if="currentSettings?.enableSubtitles"
+    @click="subtitlesVisible = !subtitlesVisible"
   >
     <q-tooltip :delay="1000" :offset="[14, 22]">{{
       $t('subtitles')

@@ -11,12 +11,12 @@
         {{ $t('are-you-sure-you-want-to-clear-the-cache') }}
       </q-card-section>
       <q-card-actions align="right" class="text-primary">
-        <q-btn :label="$t('cancel')" @click="open = false" flat />
+        <q-btn :label="$t('cancel')" flat @click="open = false" />
         <q-btn
           :label="$t('delete')"
-          @click="deleteCacheFiles(cacheClearType)"
           color="negative"
           flat
+          @click="deleteCacheFiles(cacheClearType)"
         />
       </q-card-actions>
     </q-card>

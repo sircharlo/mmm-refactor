@@ -1,6 +1,6 @@
 <template>
   <q-page padding>
-    <q-stepper animated color="primary" v-model="step" vertical>
+    <q-stepper v-model="step" animated color="primary" vertical>
       <!-- FIRST STAGE START -->
       <q-step
         :done="step > 0"
@@ -10,16 +10,16 @@
       >
         {{ $t('setupWizard.intro') }}
         <q-stepper-navigation>
-          <q-btn :label="$t('continue')" @click="step++" color="primary" />
+          <q-btn :label="$t('continue')" color="primary" @click="step++" />
           <q-btn
             :label="$t('cancel')"
+            class="q-ml-sm"
+            color="negative"
+            outline
             @click="
               deleteCongregation(currentCongregation);
               goToPage('/congregation-selector');
             "
-            class="q-ml-sm"
-            color="negative"
-            outline
           />
         </q-stepper-navigation>
       </q-step>
@@ -31,23 +31,23 @@
       >
         {{ $t('what-language-would-you-like-m-to-be-displayed-in') }}
         <SelectInput
+          v-model="currentSettings.localAppLang"
           :label="$t('localAppLang')"
           options="appLanguages"
-          v-model="currentSettings.localAppLang"
         />
         <q-stepper-navigation>
           <q-btn
             :disable="!currentSettings.localAppLang"
             :label="$t('continue')"
-            @click="step++"
             color="primary"
+            @click="step++"
           />
           <q-btn
             :label="$t('back')"
-            @click="step--"
             class="q-ml-sm"
             color="primary"
             flat
+            @click="step--"
           />
         </q-stepper-navigation>
       </q-step>
@@ -59,24 +59,24 @@
       >
         {{ $t('in-what-language-should-media-be-downloaded') }}
         <SelectInput
-          :label="$t('lang')"
-          :useInput="true"
-          options="jwLanguages"
           v-model="currentSettings.lang"
+          :label="$t('lang')"
+          :use-input="true"
+          options="jwLanguages"
         />
         <q-stepper-navigation>
           <q-btn
             :disable="!currentSettings.lang"
             :label="$t('continue')"
-            @click="step++"
             color="primary"
+            @click="step++"
           />
           <q-btn
             :label="$t('back')"
-            @click="step--"
             class="q-ml-sm"
             color="primary"
             flat
+            @click="step--"
           />
         </q-stepper-navigation>
       </q-step>
@@ -96,15 +96,15 @@
           <q-btn
             :disable="!currentSettings?.congregationName"
             :label="$t('continue')"
-            @click="step++"
             color="primary"
+            @click="step++"
           />
           <q-btn
             :label="$t('back')"
-            @click="step--"
             class="q-ml-sm"
             color="primary"
             flat
+            @click="step--"
           />
         </q-stepper-navigation>
       </q-step>
@@ -120,24 +120,24 @@
           )
         }}
         <SelectInput
+          v-model="currentSettings.mwDay"
           :label="$t('mwDay')"
           options="days"
-          v-model="currentSettings.mwDay"
         />
         <TimeInput
+          v-model="currentSettings.mwStartTime"
           :label="$t('mwStartTime')"
           :options="['meetingTime']"
-          v-model="currentSettings.mwStartTime"
         />
         <SelectInput
+          v-model="currentSettings.weDay"
           :label="$t('weDay')"
           options="days"
-          v-model="currentSettings.weDay"
         />
         <TimeInput
+          v-model="currentSettings.weStartTime"
           :label="$t('weStartTime')"
           :options="['meetingTime']"
-          v-model="currentSettings.weStartTime"
         />
         <q-stepper-navigation>
           <q-btn
@@ -148,15 +148,15 @@
               !currentSettings.weStartTime
             "
             :label="$t('continue')"
-            @click="step++"
             color="primary"
+            @click="step++"
           />
           <q-btn
             :label="$t('back')"
-            @click="step--"
             class="q-ml-sm"
             color="primary"
             flat
+            @click="step--"
           />
         </q-stepper-navigation>
       </q-step>
@@ -174,12 +174,12 @@
         <q-stepper-navigation>
           <q-btn
             :label="$t('continue')"
+            color="primary"
             @click="
               fetchMedia();
               downloadBackgroundMusic();
               step = 100;
             "
-            color="primary"
           />
         </q-stepper-navigation>
       </q-step>
@@ -195,13 +195,13 @@
           )
         }}
         <q-stepper-navigation>
-          <q-btn :label="$t('continue')" @click="step++" color="primary" />
+          <q-btn :label="$t('continue')" color="primary" @click="step++" />
           <q-btn
             :label="$t('back')"
-            @click="step = 5"
             class="q-ml-sm"
             color="primary"
             flat
+            @click="step = 5"
           />
         </q-stepper-navigation>
       </q-step>
@@ -237,13 +237,13 @@
           }}
         </p>
         <q-stepper-navigation>
-          <q-btn :label="$t('continue')" @click="step++" color="primary" />
+          <q-btn :label="$t('continue')" color="primary" @click="step++" />
           <q-btn
             :label="$t('back')"
-            @click="step--"
             class="q-ml-sm"
             color="primary"
             flat
+            @click="step--"
           />
         </q-stepper-navigation>
       </q-step>
@@ -271,13 +271,13 @@
           }}
         </p>
         <q-stepper-navigation>
-          <q-btn :label="$t('continue')" @click="step++" color="primary" />
+          <q-btn :label="$t('continue')" color="primary" @click="step++" />
           <q-btn
             :label="$t('back')"
-            @click="step--"
             class="q-ml-sm"
             color="primary"
             flat
+            @click="step--"
           />
         </q-stepper-navigation>
       </q-step>
@@ -300,14 +300,14 @@
         <q-stepper-navigation>
           <q-btn
             :label="$t('yes')"
+            class="q-ml-sm"
+            color="primary"
             @click="
               obsUsed = true;
               step++;
             "
-            class="q-ml-sm"
-            color="primary"
           />
-          <q-btn :label="$t('no')" @click="step = 200" class="q-ml-sm" flat />
+          <q-btn :label="$t('no')" class="q-ml-sm" flat @click="step = 200" />
         </q-stepper-navigation>
       </q-step>
       <template v-if="obsUsed">
@@ -330,15 +330,15 @@
           <q-stepper-navigation>
             <q-btn
               :label="$t('yes')"
+              class="q-ml-sm"
+              color="primary"
               @click="
                 obsIntegrate = true;
                 step++;
               "
-              class="q-ml-sm"
-              color="primary"
             />
-            <q-btn :label="$t('no')" @click="step = 200" class="q-ml-sm" flat />
-            <q-btn :label="$t('back')" @click="step--" class="q-ml-sm" flat />
+            <q-btn :label="$t('no')" class="q-ml-sm" flat @click="step = 200" />
+            <q-btn :label="$t('back')" class="q-ml-sm" flat @click="step--" />
           </q-stepper-navigation>
         </q-step>
         <template v-if="obsIntegrate">
@@ -361,15 +361,15 @@
             <q-stepper-navigation>
               <q-btn
                 :label="$t('continue')"
-                @click="step++"
                 class="q-ml-sm"
                 color="primary"
+                @click="step++"
               />
               <q-btn
                 :label="$t('skip-for-now')"
-                @click="step = 200"
                 class="q-ml-sm"
                 flat
+                @click="step = 200"
               />
             </q-stepper-navigation>
           </q-step>
@@ -387,14 +387,14 @@
               }}
             </p>
             <TextInput
+              v-model="currentSettings.obsPort"
               :actions="['obsConnect']"
               :label="$t('obsPort')"
-              v-model="currentSettings.obsPort"
             />
             <TextInput
+              v-model="currentSettings.obsPassword"
               :actions="['obsConnect']"
               :label="$t('obsPassword')"
-              v-model="currentSettings.obsPassword"
             />
             <q-stepper-navigation>
               <q-btn
@@ -402,11 +402,11 @@
                   !currentSettings.obsPort || !currentSettings.obsPassword
                 "
                 :label="$t('continue')"
-                @click="step++"
                 class="q-ml-sm"
                 color="primary"
+                @click="step++"
               />
-              <q-btn :label="$t('back')" @click="step--" class="q-ml-sm" flat />
+              <q-btn :label="$t('back')" class="q-ml-sm" flat @click="step--" />
             </q-stepper-navigation>
           </q-step>
           <q-step
@@ -422,19 +422,19 @@
             </p>
             <p>{{ $t('once-the-scene-has-been-created-select-it-here') }}</p>
             <SelectInput
+              v-model="currentSettings.obsCameraScene"
               :label="$t('obsCameraScene')"
               options="obsScenes"
-              v-model="currentSettings.obsCameraScene"
             />
             <q-stepper-navigation>
               <q-btn
                 :disable="!currentSettings.obsCameraScene"
                 :label="$t('continue')"
-                @click="step++"
                 class="q-ml-sm"
                 color="primary"
+                @click="step++"
               />
-              <q-btn :label="$t('back')" @click="step--" class="q-ml-sm" flat />
+              <q-btn :label="$t('back')" class="q-ml-sm" flat @click="step--" />
             </q-stepper-navigation>
           </q-step>
           <q-step
@@ -452,19 +452,19 @@
             </p>
             <p>{{ $t('once-the-scene-has-been-created-select-it-here') }}</p>
             <SelectInput
+              v-model="currentSettings.obsMediaScene"
               :label="$t('obsMediaScene')"
               options="obsAllScenes"
-              v-model="currentSettings.obsMediaScene"
             />
             <q-stepper-navigation>
               <q-btn
                 :disable="!currentSettings.obsMediaScene"
                 :label="$t('continue')"
-                @click="step = 200"
                 class="q-ml-sm"
                 color="primary"
+                @click="step = 200"
               />
-              <q-btn :label="$t('back')" @click="step--" class="q-ml-sm" flat />
+              <q-btn :label="$t('back')" class="q-ml-sm" flat @click="step--" />
             </q-stepper-navigation>
           </q-step>
         </template>
@@ -484,15 +484,15 @@
         <q-stepper-navigation>
           <q-btn
             :label="$t('yes')"
+            class="q-ml-sm"
+            color="primary"
             @click="
               currentSettings.enableExtraCache = true;
               downloadSongbookVideos();
               step = 300;
             "
-            class="q-ml-sm"
-            color="primary"
           />
-          <q-btn :label="$t('no')" @click="step = 300" class="q-ml-sm" flat />
+          <q-btn :label="$t('no')" class="q-ml-sm" flat @click="step = 300" />
         </q-stepper-navigation>
       </q-step>
       <q-step
@@ -512,21 +512,21 @@
         <q-stepper-navigation>
           <q-btn
             :label="$t('media-playback')"
-            @click="goToPage('/media-calendar')"
             class="q-ml-sm"
             color="primary"
+            @click="goToPage('/media-calendar')"
           />
           <q-btn
             :label="$t('titles.settings')"
-            @click="goToPage('/settings')"
             class="q-ml-sm"
             outlined
+            @click="goToPage('/settings')"
           />
           <q-btn
             :label="$t('start-over')"
-            @click="step = 0"
             class="q-ml-sm"
             flat
+            @click="step = 0"
           />
         </q-stepper-navigation>
       </q-step>

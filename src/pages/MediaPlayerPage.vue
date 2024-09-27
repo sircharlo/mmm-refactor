@@ -4,7 +4,7 @@
     padding
     style="align-content: center; height: 100vh"
   >
-    <q-resize-observer @resize="onResize" debounce="50" />
+    <q-resize-observer debounce="50" @resize="onResize" />
     <transition
       appear
       enter-active-class="animated fadeIn"
@@ -13,38 +13,38 @@
       name="fade"
     >
       <q-img
+        v-if="isImage(mediaPlayingUrl)"
+        id="mediaImage"
+        ref="mediaImage"
         :src="mediaPlayingUrl"
-        @load="initiatePanzoom()"
         class="fitSnugly"
         fit="contain"
-        id="mediaImage"
         no-spinner
-        ref="mediaImage"
-        v-if="isImage(mediaPlayingUrl)"
+        @load="initiatePanzoom()"
       />
       <video
-        @animationstart="playMedia()"
+        v-else-if="isVideo(mediaPlayingUrl) || videoStreaming"
+        ref="mediaElement"
         class="fitSnugly"
         preload="metadata"
-        ref="mediaElement"
-        v-else-if="isVideo(mediaPlayingUrl) || videoStreaming"
+        @animationstart="playMedia()"
       >
-        <source :src="mediaPlayingUrl" ref="mediaElementSource" />
+        <source ref="mediaElementSource" :src="mediaPlayingUrl" />
         <track
+          v-if="mediaPlayerSubtitlesUrl && subtitlesVisible"
           :src="mediaPlayerSubtitlesUrl"
           default
           kind="subtitles"
-          v-if="mediaPlayerSubtitlesUrl && subtitlesVisible"
         />
       </video>
       <div v-else>
         <audio
-          @loadedmetadata="playMedia()"
+          v-if="isAudio(mediaPlayingUrl)"
           ref="mediaElement"
           style="display: none"
-          v-if="isAudio(mediaPlayingUrl)"
+          @loadedmetadata="playMedia()"
         >
-          <source :src="mediaPlayingUrl" ref="mediaElementSource" />
+          <source ref="mediaElementSource" :src="mediaPlayingUrl" />
         </audio>
         <template v-if="mediaPlayerCustomBackground">
           <q-img
@@ -56,8 +56,8 @@
         </template>
         <template v-else>
           <div
-            class="q-pa-md center"
             id="yeartext"
+            class="q-pa-md center"
             v-html="
               (yeartexts[new Date().getFullYear()] &&
                 yeartexts[new Date().getFullYear()][currentSettings?.lang]) ??
@@ -65,8 +65,8 @@
             "
           />
           <div
-            id="yeartextLogoContainer"
             v-if="!currentSettings?.hideMediaLogo"
+            id="yeartextLogoContainer"
           >
             <p id="yeartextLogo"></p>
           </div>
@@ -267,9 +267,11 @@ const playMedia = () => {
     mediaElement.value.currentTime = customStartStop.min;
     mediaElement.value.play().catch((error: Error) => {
       if (
-        !(error.message.includes('removed from the document') ||
-        error.message.includes('new load request')  ||
-        error.message.includes('interrupted by a call to pause'))
+        !(
+          error.message.includes('removed from the document') ||
+          error.message.includes('new load request') ||
+          error.message.includes('interrupted by a call to pause')
+        )
       )
         errorCatcher(error);
     });

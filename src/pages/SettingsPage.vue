@@ -1,23 +1,19 @@
 <template>
   <q-page padding>
     <q-form
+      v-if="currentSettings"
+      ref="settingsFormDynamic"
       greedy
       no-error-focus
       novalidate
-      ref="settingsFormDynamic"
-      v-if="currentSettings"
     >
       <template
-        :key="groupId"
         v-for="[groupId, { name, description, icon }] in Object.entries(
           settingsGroups,
         )"
+        :key="groupId"
       >
         <q-expansion-item
-          :caption="$t(description)"
-          :icon="icon"
-          :label="$t(name)"
-          class="media-section text-subtitle2 text-weight-medium q-pr-md"
           v-if="
             !invalidSettingsLength ||
             !onlyShowInvalidSettings ||
@@ -29,12 +25,16 @@
               )
           "
           v-model="expansionState[groupId as keyof SettingsItems]"
+          :caption="$t(description)"
+          :icon="icon"
+          :label="$t(name)"
+          class="media-section text-subtitle2 text-weight-medium q-pr-md"
         >
           <template
-            :key="settingId"
             v-for="([settingId, item], index) in Object.entries(
               settingsDefinitions,
             ).filter(([settingId, item]) => item.group === groupId)"
+            :key="settingId"
           >
             <template
               v-if="
@@ -46,7 +46,7 @@
                     )[index - 1]?.[1].subgroup)
               "
             >
-              <q-separator class="bg-accent-200" spaced v-if="index > 0" />
+              <q-separator v-if="index > 0" class="bg-accent-200" spaced />
               <q-item-label
                 class="q-pl-xl q-ml-lg text-accent-400 text-uppercase"
                 header
@@ -54,6 +54,13 @@
               >
             </template>
             <q-item
+              v-if="
+                (!item.depends ||
+                  currentSettings[item.depends as keyof SettingsItems]) &&
+                (!onlyShowInvalidSettings ||
+                  !invalidSettingsLength ||
+                  invalidSettings.includes(settingId as keyof SettingsItems))
+              "
               :class="{
                 'bg-error': invalidSettings.includes(
                   settingId as keyof SettingsItems,
@@ -63,13 +70,6 @@
               }"
               :inset-level="1"
               tag="label"
-              v-if="
-                (!item.depends ||
-                  currentSettings[item.depends as keyof SettingsItems]) &&
-                (!onlyShowInvalidSettings ||
-                  !invalidSettingsLength ||
-                  invalidSettings.includes(settingId as keyof SettingsItems))
-              "
             >
               <q-item-section>
                 <q-item-label>{{ $t(settingId) }}</q-item-label>
@@ -79,61 +79,61 @@
               </q-item-section>
               <q-item-section side style="align-items: end">
                 <ToggleInput
-                  :actions="item.actions"
                   v-if="item.type === 'toggle'"
                   v-model="
                     currentSettings[settingId as keyof SettingsItems] as boolean
                   "
+                  :actions="item.actions"
                 />
                 <TextInput
-                  :actions="item.actions"
-                  :rules="item.rules"
                   v-else-if="item.type === 'text'"
                   v-model="
                     currentSettings[settingId as keyof SettingsItems] as string
                   "
+                  :actions="item.actions"
+                  :rules="item.rules"
                 />
                 <SliderInput
-                  :actions="item.actions"
-                  :max="item.max"
-                  :min="item.min"
-                  :step="item.step"
                   v-else-if="item.type === 'slider'"
                   v-model="
                     currentSettings[settingId as keyof SettingsItems] as number
                   "
+                  :actions="item.actions"
+                  :max="item.max"
+                  :min="item.min"
+                  :step="item.step"
                 />
                 <DateInput
-                  :options="item.options"
-                  :rules="item.rules"
                   v-else-if="item.type === 'date'"
                   v-model="
                     currentSettings[settingId as keyof SettingsItems] as string
                   "
-                />
-                <TimeInput
                   :options="item.options"
                   :rules="item.rules"
+                />
+                <TimeInput
                   v-else-if="item.type === 'time'"
                   v-model="
                     currentSettings[settingId as keyof SettingsItems] as string
                   "
+                  :options="item.options"
+                  :rules="item.rules"
                 />
                 <SelectInput
-                  :options="item.list"
-                  :rules="item.rules"
-                  :use-input="settingId.toLowerCase().includes('lang')"
                   v-else-if="item.type === 'list'"
                   v-model="
                     currentSettings[settingId as keyof SettingsItems] as string
                   "
+                  :options="item.list"
+                  :rules="item.rules"
+                  :use-input="settingId.toLowerCase().includes('lang')"
                 />
                 <ShortcutInput
-                  :shortcutName="settingId as keyof SettingsItems"
                   v-else-if="item.type === 'shortcut'"
                   v-model="
                     currentSettings[settingId as keyof SettingsItems] as string
                   "
+                  :shortcut-name="settingId as keyof SettingsItems"
                 />
                 <pre v-else>{{ item }}</pre>
               </q-item-section>

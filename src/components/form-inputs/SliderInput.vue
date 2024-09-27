@@ -1,5 +1,6 @@
 <template>
   <q-slider
+    v-model="localValue"
     :max="max"
     :min="min"
     :step="step"
@@ -7,7 +8,6 @@
     dense
     filled
     style="width: 240px"
-    v-model="localValue"
   />
 </template>
 

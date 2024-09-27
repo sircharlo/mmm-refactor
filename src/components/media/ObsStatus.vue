@@ -1,5 +1,6 @@
 <template>
   <q-btn
+    v-if="currentSettings.obsEnable"
     :color="
       obsConnectionState === 'connected'
         ? 'white-transparent'
@@ -8,11 +9,10 @@
           : 'warning'
     "
     :disable="obsConnectionState !== 'connected'"
-    @click="scenePicker = true"
     class="super-rounded"
     rounded
     unelevated
-    v-if="currentSettings.obsEnable"
+    @click="scenePicker = true"
   >
     <q-icon size="sm">
       <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
@@ -21,7 +21,7 @@
         />
       </svg>
     </q-icon>
-    <q-tooltip :delay="1000" :offset="[14, 22]" v-if="!scenePicker">
+    <q-tooltip v-if="!scenePicker" :delay="1000" :offset="[14, 22]">
       {{ $t(obsMessage ?? 'scene-selection') }}
     </q-tooltip>
     <!-- <q-popup-proxy
@@ -33,7 +33,7 @@
       flat
       self="bottom middle"
     > -->
-    <q-dialog position="bottom" v-model="scenePicker">
+    <q-dialog v-model="scenePicker" position="bottom">
       <q-card flat style="min-width: 50vw">
         <q-card-section>
           <div class="card-title">
@@ -46,20 +46,20 @@
           </div>
           <div class="row items-center q-col-gutter-sm">
             <template
-              :key="scene"
               v-for="scene in [
                 currentSettings?.obsCameraScene,
                 currentSettings?.obsMediaScene,
                 currentSettings?.obsImageScene,
               ].filter(Boolean)"
+              :key="scene"
             >
               <div class="col">
                 <q-btn
                   :outline="scene !== currentScene"
-                  @click="setObsScene(undefined, scene)"
                   class="full-width"
                   color="primary"
                   unelevated
+                  @click="setObsScene(undefined, scene)"
                 >
                   <q-icon
                     :name="
@@ -91,14 +91,14 @@
               </p>
             </div>
             <div class="row items-center q-col-gutter-sm q-mb-md">
-              <template :key="scene" v-for="scene in additionalScenes">
+              <template v-for="scene in additionalScenes" :key="scene">
                 <div class="col-4">
                   <q-btn
                     :outline="scene !== currentScene"
-                    @click="setObsScene(undefined, scene as string)"
                     class="full-width"
                     color="primary"
                     unelevated
+                    @click="setObsScene(undefined, scene as string)"
                   >
                     {{
                       isUUID(scene)

@@ -1,17 +1,17 @@
 <template>
   <q-input
+    v-model="localValue"
     :rules="getRules(rules)"
-    @focus="focusHandler($event)"
     class="q-pb-none bg-accent-100 date-time-input"
     dense
     hide-bottom-space
     mask="date"
     outlined
     style="width: 240px"
-    v-model="localValue"
     v-bind="{ label: label || undefined }"
+    @focus="focusHandler($event)"
   >
-    <template v-slot:append>
+    <template #append>
       <q-icon name="mmm-calendar-month" size="xs" />
     </template>
     <q-popup-proxy
@@ -20,20 +20,20 @@
       transition-show="scale"
     >
       <q-date
+        v-model="localValue"
         :options="getDateOptions(options)"
         :rules="rules"
         dense
-        v-model="localValue"
       >
         <div class="row items-center justify-end q-gutter-sm">
           <q-btn
+            v-close-popup
             :label="$t('clear')"
-            @click="clearDate"
             color="negative"
             flat
-            v-close-popup
+            @click="clearDate"
           />
-          <q-btn :label="$t('save')" color="primary" flat v-close-popup />
+          <q-btn v-close-popup :label="$t('save')" color="primary" flat />
         </div>
       </q-date>
     </q-popup-proxy>
