@@ -351,6 +351,7 @@ const getEventDayColor = (eventDate: string) => {
       additionalMediaMaps.value[currentCongregation.value];
     if (additionalDates) {
       const isAdditional = Object.keys(additionalDates)
+        .filter((day) => additionalDates[day].length > 0)
         .map((day) => date.formatDate(day, 'YYYY/MM/DD'))
         .includes(eventDate);
       if (isAdditional) return 'additional';

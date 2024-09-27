@@ -237,6 +237,7 @@ watch(
     currentSettings.value?.mwDay,
     currentSettings.value?.weDay,
     currentSettings.value?.coWeek,
+    currentSettings.value?.disableMediaFetching,
   ],
   (
     [newCurrentCongregation, , , , , , ,],
