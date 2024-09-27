@@ -33,7 +33,7 @@ export default [
   },
   ...compat.extends(
     'plugin:@typescript-eslint/recommended',
-    'plugin:vue/vue3-essential',
+    'plugin:vue/vue3-recommended',
     'plugin:perfectionist/recommended-natural-legacy',
     'prettier',
   ),

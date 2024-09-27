@@ -133,7 +133,7 @@
                   v-model="
                     currentSettings[settingId as keyof SettingsItems] as string
                   "
-                  :shortcutName="settingId as keyof SettingsItems"
+                  :shortcut-name="settingId as keyof SettingsItems"
                 />
                 <pre v-else>{{ item }}</pre>
               </q-item-section>

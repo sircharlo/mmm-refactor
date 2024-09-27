@@ -31,10 +31,10 @@
     input-debounce="0"
     map-options
     outlined
-    @filter="filterFn"
     v-bind="{ label: label || undefined }"
     spellcheck="false"
     style="width: 240px"
+    @filter="filterFn"
   >
   </q-select>
 </template>

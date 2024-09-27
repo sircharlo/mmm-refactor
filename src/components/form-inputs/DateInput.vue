@@ -8,10 +8,10 @@
     mask="date"
     outlined
     style="width: 240px"
-    @focus="focusHandler($event)"
     v-bind="{ label: label || undefined }"
+    @focus="focusHandler($event)"
   >
-    <template v-slot:append>
+    <template #append>
       <q-icon name="mmm-calendar-month" size="xs" />
     </template>
     <q-popup-proxy

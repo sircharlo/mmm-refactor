@@ -61,7 +61,7 @@
         <SelectInput
           v-model="currentSettings.lang"
           :label="$t('lang')"
-          :useInput="true"
+          :use-input="true"
           options="jwLanguages"
         />
         <q-stepper-navigation>

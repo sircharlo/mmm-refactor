@@ -20,7 +20,7 @@
             dense
             outlined
           >
-            <template v-slot:prepend>
+            <template #prepend>
               <q-icon name="mmm-search" />
             </template>
           </q-input>
