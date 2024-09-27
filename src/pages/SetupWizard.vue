@@ -84,8 +84,9 @@
         :done="step > 3"
         :name="3"
         :title="$t('congregationName')"
-        icon="mdi-label"
+        icon="mmm-rename"
       >
+        <!-- This icon is from the Material Design Icons collection -->
         {{
           $t(
             'the-name-of-your-congregation-or-group-will-be-used-to-quickly-switch-between-profiles-if-ever-you-decide-create-more-than-one-in-the-future',
@@ -187,8 +188,9 @@
         :done="step > 100"
         :name="100"
         :title="$t('yeartext')"
-        icon="mmm-check"
+        icon="mmm-yeartext"
       >
+        <!-- This icon is from the Material Design Icons collection -->
         {{
           $t(
             'notice-the-yeartext-is-now-being-displayed-on-the-external-monitor-but-lets-keep-going',
@@ -473,7 +475,7 @@
         :done="step > 200"
         :name="200"
         :title="$t('songbook-video-caching')"
-        icon="mdi-cloud-download"
+        icon="mmm-download"
       >
         <p class="text-subtitle1">
           {{ $t('would-you-like-to-enable-songbook-video-caching') }}
@@ -498,9 +500,10 @@
       <q-step
         :done="step > 105"
         :name="300"
-        icon="mdi-seal"
+        icon="mmm-congratulations"
         title="Congratulations!"
       >
+        <!-- This icon is from the Material Design Icons collection -->
         <p class="text-subtitle1">{{ $t('m-is-now-ready-to-be-used') }}</p>
         <p>
           {{
