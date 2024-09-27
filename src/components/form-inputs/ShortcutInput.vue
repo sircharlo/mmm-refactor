@@ -1,9 +1,9 @@
 <template>
-  <div @click="shortcutPicker = true" class="row" style="width: 240px">
+  <div class="row" style="width: 240px" @click="shortcutPicker = true">
     <template v-if="localValue">
       <template
-        :key="keyboardKey"
         v-for="(keyboardKey, index) in localValue.split('+')"
+        :key="keyboardKey"
       >
         <div :class="'col ' + (index > 0 ? 'q-ml-sm' : '')">
           <q-btn
@@ -17,18 +17,18 @@
       </template>
     </template>
     <q-btn
+      v-else
       :label="$t('enter-key-combination')"
-      @click="shortcutPicker = true"
       class="full-width col-12 text-smaller"
       color="primary"
       outline
-      v-else
+      @click="shortcutPicker = true"
     />
   </div>
   <q-dialog
+    v-model="shortcutPicker"
     @hide="stopListening()"
     @show="startListening()"
-    v-model="shortcutPicker"
   >
     <q-card class="modal-confirm">
       <q-card-section
@@ -41,7 +41,7 @@
       </q-card-section>
       <q-card-section class="q-pt-none text-center row">
         <template v-if="localValue.length > 0">
-          <template :key="key" v-for="(key, index) in localValue.split('+')">
+          <template v-for="(key, index) in localValue.split('+')" :key="key">
             <div
               :class="
                 'col text-uppercase bg-primary text-white q-pa-sm rounded-borders ' +
@@ -61,13 +61,13 @@
 
       <q-card-actions align="right" class="text-primary">
         <q-btn
+          v-close-popup
           :label="$t('clear')"
-          @click="localValue = ''"
           color="negative"
           flat
-          v-close-popup
+          @click="localValue = ''"
         />
-        <q-btn :label="$t('confirm')" flat v-close-popup />
+        <q-btn v-close-popup :label="$t('confirm')" flat />
       </q-card-actions>
     </q-card>
   </q-dialog>

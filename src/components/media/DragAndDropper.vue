@@ -49,7 +49,9 @@
           >
             <q-list>
               <q-item
+                v-for="jwpubImportDocument in localJwpubDocuments"
                 :key="jwpubImportDocument.DocumentId"
+                clickable
                 @click="
                   jwpubLoading = true;
                   addJwpubDocumentMediaToFiles(
@@ -78,8 +80,6 @@
                       );
                   });
                 "
-                clickable
-                v-for="jwpubImportDocument in localJwpubDocuments"
               >
                 <q-item-section>
                   {{ jwpubImportDocument.Title }}
@@ -91,13 +91,13 @@
       </template>
       <div class="row justify-end">
         <q-btn
+          color="negative"
+          flat
           @click="
             localJwpubDb = '';
             localValue = false;
             localFilesLoading = false;
           "
-          color="negative"
-          flat
           >{{ $t('cancel') }}</q-btn
         >
       </div>

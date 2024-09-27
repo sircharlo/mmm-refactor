@@ -14,13 +14,13 @@
               : $t('select-s34mp')
           }}
         </div>
-        <div class="col-grow text-caption" v-if="s34mpDb || s34mpFile">
+        <div v-if="s34mpDb || s34mpFile" class="col-grow text-caption">
           <template v-if="s34mpDb && filteredPublicTalks.length > 0">
             {{ s34mpInfo.Year }}, v{{ s34mpInfo.VersionNumber }}
           </template>
-          <q-spinner color="primary" size="sm" v-else />
+          <q-spinner v-else color="primary" size="sm" />
         </div>
-        <q-btn @click="browse" color="primary" outline>
+        <q-btn color="primary" outline @click="browse">
           <q-icon class="q-mr-sm" name="mmm-local-media" />
           {{ s34mpDb ? $t('replace') : $t('browse') }}
         </q-btn>
@@ -28,13 +28,13 @@
       <template v-if="s34mpDb">
         <div class="row">
           <q-input
+            v-model="filter"
             :label="$t('search')"
             class="col"
             clearable
             debounce="100"
             dense
             outlined
-            v-model="filter"
           >
             <template v-slot:prepend>
               <q-icon name="mmm-search" />
@@ -48,14 +48,14 @@
             style="height: 30vh; width: -webkit-fill-available"
           >
             <template
-              :key="publicTalk"
               v-for="publicTalk in filteredPublicTalks"
+              :key="publicTalk"
             >
               <q-item
-                @click="addPublicTalkMedia(publicTalk)"
+                v-ripple
                 class="items-center"
                 clickable
-                v-ripple
+                @click="addPublicTalkMedia(publicTalk)"
               >
                 {{ publicTalk.Title }}
               </q-item>
@@ -64,7 +64,7 @@
         </div>
       </template>
       <div class="row justify-end">
-        <q-btn @click="dismissPopup" color="negative" flat>{{
+        <q-btn color="negative" flat @click="dismissPopup">{{
           $t('cancel')
         }}</q-btn>
       </div>

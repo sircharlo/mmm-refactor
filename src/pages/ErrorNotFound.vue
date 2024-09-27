@@ -5,7 +5,9 @@
     <div>
       <div style="font-size: 30vh">404</div>
 
-      <div class="text-h2" style="opacity: 0.4">{{ $t('oops-nothing-here') }}</div>
+      <div class="text-h2" style="opacity: 0.4">
+        {{ $t('oops-nothing-here') }}
+      </div>
 
       <q-btn
         :label="$t('go-home')"

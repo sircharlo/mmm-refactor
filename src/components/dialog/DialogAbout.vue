@@ -22,12 +22,12 @@
       <div class="row q-gutter-x-md">
         <div class="col">
           <q-btn
-            @click="openExternalWebsite(githubLink)"
             class="q-pa-md full-width"
             color="accent-400"
             no-caps
             outline
             target="_blank"
+            @click="openExternalWebsite(githubLink)"
           >
             <div class="row q-gutter-x-md full-width items-center">
               <div class="col-shrink text-primary q-ml-none">
@@ -44,12 +44,12 @@
         </div>
         <div class="col">
           <q-btn
-            @click="openExternalWebsite(docsLink)"
             class="q-pa-md full-width"
             color="accent-400"
             no-caps
             outline
             target="_blank"
+            @click="openExternalWebsite(docsLink)"
           >
             <div class="row q-gutter-x-md full-width items-center">
               <div class="col-shrink text-primary q-ml-none">
@@ -71,7 +71,7 @@
         </div>
       </div>
       <div class="row justify-end">
-        <q-btn flat v-close-popup>{{ $t('close') }}</q-btn>
+        <q-btn v-close-popup flat>{{ $t('close') }}</q-btn>
       </div>
     </div>
   </q-dialog>

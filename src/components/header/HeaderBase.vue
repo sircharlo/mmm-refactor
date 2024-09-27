@@ -7,17 +7,17 @@
     <DialogAbout v-model="aboutModal" />
     <PublicTalkMediaPicker v-model="publicTalkMediaPopup" />
     <DialogCacheClear
+      v-model="cacheClearConfirmPopup"
+      v-model:cache-clear-type="cacheClearType"
       :cache-files="cacheFiles"
       :untouchable-directories="untouchableDirectories"
       :unused-parent-directories="unusedParentDirectories"
-      v-model="cacheClearConfirmPopup"
-      v-model:cache-clear-type="cacheClearType"
     />
     <div class="row items-center q-my-sm q-mr-md">
       <div
-        @click="aboutModal = true"
         class="row justify-center cursor-pointer"
         style="width: 56px"
+        @click="aboutModal = true"
       >
         <img src="logo-no-background.svg" />
       </div>
@@ -31,8 +31,8 @@
             {{ $t(route.meta.title as string) }}
           </div>
           <div
-            class="row text-congregation ellipsis-1-line"
             v-if="!route.fullPath.includes('congregation-selector')"
+            class="row text-congregation ellipsis-1-line"
           >
             {{
               congregationSettings?.congregations?.[currentCongregation]
@@ -45,18 +45,18 @@
         <template v-if="route.fullPath.includes('congregation-selector')">
           <q-btn
             :label="$t('new-profile')"
-            @click="createNewCongregation"
             color="white-transparent"
             icon="mmm-plus"
             unelevated
+            @click="createNewCongregation"
           />
         </template>
         <template v-else-if="route.fullPath === '/media-calendar'">
           <q-btn
             :disable="mediaPlaying || !mediaSortForDay"
-            @click="resetSort"
             color="white-transparent"
             unelevated
+            @click="resetSort"
           >
             <q-icon
               :class="{ 'q-mr-sm': $q.screen.gt.sm }"
@@ -68,7 +68,7 @@
               {{ $t('reset-sort-order') }}
             </q-tooltip>
           </q-btn>
-          <q-btn color="white-transparent" unelevated v-if="selectedDate">
+          <q-btn v-if="selectedDate" color="white-transparent" unelevated>
             <q-icon
               :class="{ 'q-mr-sm': $q.screen.gt.sm }"
               name="mmm-import-media"
@@ -78,14 +78,14 @@
             <q-tooltip :delay="1000">
               {{ $t('import-media') }}
             </q-tooltip>
-            <q-menu :offset="[0, 11]" class="top-menu" ref="importMenu">
+            <q-menu ref="importMenu" :offset="[0, 11]" class="top-menu">
               <q-list style="min-width: 100px">
                 <q-item-label header>{{ $t('from-jw-org') }}</q-item-label>
                 <q-item
-                  :disable="!online"
-                  @click="chooseSong = true"
-                  clickable
                   v-close-popup
+                  :disable="!online"
+                  clickable
+                  @click="chooseSong = true"
                 >
                   <q-item-section avatar>
                     <q-icon color="primary" name="mmm-music-note" />
@@ -98,13 +98,13 @@
                   </q-item-section>
                 </q-item>
                 <q-item
+                  v-close-popup
                   :disable="!online"
+                  clickable
                   @click="
                     remoteVideoPopup = true;
                     getJwVideos();
                   "
-                  clickable
-                  v-close-popup
                 >
                   <q-item-section avatar>
                     <q-icon color="primary" name="mmm-movie" />
@@ -117,9 +117,9 @@
                   </q-item-section>
                 </q-item>
                 <q-item
-                  @click="publicTalkMediaPopup = true"
-                  clickable
                   v-close-popup
+                  clickable
+                  @click="publicTalkMediaPopup = true"
                 >
                   <q-item-section avatar>
                     <q-icon color="primary" name="mmm-lectern" />
@@ -135,14 +135,14 @@
                   $t('from-local-computer')
                 }}</q-item-label>
                 <template
-                  :key="name"
                   v-for="[icon, name] in [
                     ['mmm-local-media', 'images-videos'],
                     ['mmm-jwpub', 'jwpub-file'],
                     ['mmm-jwlplaylist', 'jw-playlist'],
                   ]"
+                  :key="name"
                 >
-                  <q-item @click="dragging" clickable v-close-popup>
+                  <q-item v-close-popup clickable @click="dragging">
                     <q-item-section avatar>
                       <q-icon :name="icon" color="primary" />
                     </q-item-section>
@@ -172,38 +172,38 @@
                 : ''
             }}
             <!--dayjs-->
-            <q-popup-proxy :offset="[0, 11]" v-model="datePickerActive">
+            <q-popup-proxy v-model="datePickerActive" :offset="[0, 11]">
               <q-date
+                v-model="selectedDate"
                 :event-color="getEventDayColor"
                 :events="getEventDates()"
                 :navigation-max-year-month="maxDate()"
                 :navigation-min-year-month="minDate()"
                 :options="dateOptions"
                 landscape
-                v-model="selectedDate"
               >
                 <div class="row items-center justify-end q-gutter-sm">
                   <q-btn
+                    v-close-popup
                     :label="$t('close')"
                     color="primary"
                     outline
-                    v-close-popup
                   />
                 </div>
               </q-date>
             </q-popup-proxy>
           </q-btn>
           <DialogRemoteVideo
+            v-model="remoteVideoPopup"
             :remote-videos="remoteVideos"
             :remote-videos-loading-progress="remoteVideosLoadingProgress"
-            v-model="remoteVideoPopup"
           />
         </template>
         <template v-else-if="route.fullPath === '/settings'">
-          <q-btn color="white-transparent" unelevated v-if="selectedDate">
+          <q-btn v-if="selectedDate" color="white-transparent" unelevated>
             <q-icon class="q-mr-sm" name="mmm-tools" size="xs" />
             {{ $t('tools') }}
-            <q-tooltip :delay="1000" v-if="!moreOptionsMenuActive">
+            <q-tooltip v-if="!moreOptionsMenuActive" :delay="1000">
               {{ $t('tools') }}
             </q-tooltip>
             <q-menu
@@ -220,8 +220,8 @@
                     $t('invalid-settings')
                   }}</q-item-label>
                   <q-item
-                    @click="onlyShowInvalidSettings = !onlyShowInvalidSettings"
                     clickable
+                    @click="onlyShowInvalidSettings = !onlyShowInvalidSettings"
                   >
                     <q-item-section avatar>
                       <q-icon
@@ -246,10 +246,10 @@
                 </template>
                 <q-item-label header>{{ $t('cache') }}</q-item-label>
                 <q-item
-                  :disable="calculatingCacheSize"
-                  @click="confirmDeleteCacheFiles('smart')"
-                  clickable
                   v-close-popup
+                  :disable="calculatingCacheSize"
+                  clickable
+                  @click="confirmDeleteCacheFiles('smart')"
                 >
                   <q-item-section avatar>
                     <q-icon color="primary" name="mmm-delete-smart" />
@@ -264,10 +264,10 @@
                   </q-item-section>
                 </q-item>
                 <q-item
-                  :disable="calculatingCacheSize"
-                  @click="confirmDeleteCacheFiles('all')"
-                  clickable
                   v-close-popup
+                  :disable="calculatingCacheSize"
+                  clickable
+                  @click="confirmDeleteCacheFiles('all')"
                 >
                   <q-item-section avatar>
                     <q-icon color="primary" name="mmm-delete-all" />
@@ -285,61 +285,61 @@
           <template v-if="mediaPlayingAction == 'website'">
             <q-btn-group unelevated>
               <q-btn
-                @click="zoomWebsiteWindow('out')"
                 color="white-transparent"
+                @click="zoomWebsiteWindow('out')"
               >
                 <q-icon name="mmm-minus" size="xs" />
                 <q-tooltip :delay="1000">{{ $t('zoom-out') }}</q-tooltip>
               </q-btn>
-              <q-btn @click="zoomWebsiteWindow('in')" color="white-transparent">
+              <q-btn color="white-transparent" @click="zoomWebsiteWindow('in')">
                 <q-icon name="mmm-plus" size="xs" />
                 <q-tooltip :delay="1000">{{ $t('zoom-in') }}</q-tooltip>
               </q-btn>
             </q-btn-group>
             <q-btn-group unelevated>
               <q-btn
-                @click="navigateWebsiteWindow('back')"
                 color="white-transparent"
+                @click="navigateWebsiteWindow('back')"
               >
                 <q-icon name="mmm-arrow-back" size="xs" />
                 <q-tooltip :delay="1000">{{ $t('back') }}</q-tooltip>
               </q-btn>
               <q-btn
-                @click="navigateWebsiteWindow('forward')"
                 color="white-transparent"
+                @click="navigateWebsiteWindow('forward')"
               >
                 <q-icon name="mmm-arrow-forward" size="xs" />
                 <q-tooltip :delay="1000">{{ $t('forward') }}</q-tooltip>
               </q-btn>
               <q-btn
-                @click="navigateWebsiteWindow('refresh')"
                 color="white-transparent"
+                @click="navigateWebsiteWindow('refresh')"
               >
                 <q-icon name="mmm-refresh" size="xs" />
                 <q-tooltip :delay="1000">{{ $t('refresh') }}</q-tooltip>
               </q-btn>
             </q-btn-group>
             <q-btn
+              color="white-transparent"
+              unelevated
               @click="
                 closeWebsiteWindow();
                 mediaPlayingAction = '';
               "
-              color="white-transparent"
-              unelevated
             >
               <q-icon class="q-mr-sm" name="mmm-mirror" size="xs" />
               {{ $t('stop-mirroring') }}
             </q-btn>
           </template>
           <q-btn
+            v-else
             :disable="mediaPlaying"
+            color="white-transparent"
+            unelevated
             @click="
               openWebsiteWindow();
               mediaPlayingAction = 'website';
             "
-            color="white-transparent"
-            unelevated
-            v-else
           >
             <q-icon class="q-mr-sm" name="mmm-mirror" size="xs" />
             {{ $t('start-mirroring') }}

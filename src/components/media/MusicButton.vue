@@ -1,20 +1,20 @@
 <template>
   <q-btn
+    v-if="currentSettings?.enableMusicButton"
     :color="musicPlaying && musicStopping ? 'negative' : 'white-transparent'"
     :style="musicPlaying ? 'min-width: 110px;' : ''"
-    @click="musicPopup = true"
     class="super-rounded"
     no-caps
     rounded
     unelevated
-    v-if="currentSettings?.enableMusicButton"
+    @click="musicPopup = true"
   >
     <q-icon name="mmm-music-note" />
-    <div class="q-ml-sm" v-if="musicPlaying">
+    <div v-if="musicPlaying" class="q-ml-sm">
       {{ musicRemainingTime }}
     </div>
 
-    <q-tooltip :delay="1000" :offset="[14, 22]" v-if="!musicPopup">
+    <q-tooltip v-if="!musicPopup" :delay="1000" :offset="[14, 22]">
       {{ $t('setupWizard.backgroundMusic') }}
     </q-tooltip>
     <!-- <q-popup-proxy
@@ -27,7 +27,7 @@
       self="bottom middle"
       v-if="!disabled"
     > -->
-    <q-dialog position="bottom" v-model="musicPopup">
+    <q-dialog v-model="musicPopup" position="bottom">
       <q-card flat>
         <q-card-section>
           <div class="card-title">
@@ -57,7 +57,7 @@
                     :thumb-style="thumbStyle()"
                     style="height: 100px; max-width: 100%"
                   >
-                    <template :key="i" v-for="(song, i) in songList">
+                    <template v-for="(song, i) in songList" :key="i">
                       <div class="row q-my-sm">
                         <div class="col text-weight-medium">
                           {{ song.title }}
@@ -83,34 +83,34 @@
                 }}
               </div>
               <div
-                class="row text-dark-grey"
                 v-if="
                   musicPlaying &&
                   !musicStopping &&
                   meetingDay &&
                   timeRemainingBeforeMusicStop > 0
                 "
+                class="row text-dark-grey"
               >
                 {{ t('until-meeting-starts') }}
               </div>
             </div>
             <div class="col-6">
               <q-btn
+                v-if="!musicPlaying"
                 :disabled="mediaPlaying || musicStarting"
-                @click="playMusic"
                 class="full-width"
                 color="primary"
                 unelevated
-                v-if="!musicPlaying"
+                @click="playMusic"
                 >{{ $t('play-music') }}</q-btn
               >
               <q-btn
+                v-else
                 :disable="musicStopping"
-                @click="stopMusic"
                 class="full-width"
                 color="primary"
                 unelevated
-                v-else
+                @click="stopMusic"
                 >{{ $t('stop-music') }}</q-btn
               >
             </div>

@@ -2,13 +2,13 @@
   <q-item class="items-center justify-center">
     <div class="q-pr-none rounded-borders">
       <div
+        v-if="media.isAudio"
         class="bg-grey-9 rounded-borders text-white flex"
         style="width: 150px; height: 84px"
-        v-if="media.isAudio"
       >
         <q-icon name="mmm-music-note" size="lg" />
       </div>
-      <div class="q-pr-none rounded-borders relative-position bg-black" v-else>
+      <div v-else class="q-pr-none rounded-borders relative-position bg-black">
         <q-img
           :id="media.uniqueId"
           :ratio="16 / 9"
@@ -16,12 +16,13 @@
             thumbnailFromMetadata ||
             (media.isImage ? media.fileUrl : media.thumbnailUrl)
           "
-          @error="imageLoadingError"
           class="rounded-borders"
           fit="contain"
           width="150px"
+          @error="imageLoadingError"
         >
           <q-badge
+            v-if="media.isVideo"
             :class="
               'q-mt-sm q-ml-sm cursor-pointer rounded-borders-sm ' +
               (customDurations[currentCongregation]?.[selectedDate]?.[
@@ -36,9 +37,8 @@
                 ? 'negative'
                 : 'bg-semi-black')
             "
-            @click="showMediaDurationPopup(media)"
             style="padding: 5px !important"
-            v-if="media.isVideo"
+            @click="showMediaDurationPopup(media)"
           >
             <q-icon class="q-mr-xs" color="white" name="mmm-play" />
             {{
@@ -92,6 +92,11 @@
                   </div>
                   <div class="col">
                     <q-range
+                      v-model="
+                        customDurations[currentCongregation][selectedDate][
+                          media.uniqueId
+                        ]
+                      "
                       :left-label-value="
                         formatTime(
                           customDurations[currentCongregation]?.[
@@ -111,11 +116,6 @@
                       :step="0.1"
                       label
                       label-always
-                      v-model="
-                        customDurations[currentCongregation][selectedDate][
-                          media.uniqueId
-                        ]
-                      "
                     />
                   </div>
                   <div class="col-shrink q-pl-md time-duration">
@@ -126,15 +126,15 @@
               <q-card-actions align="right">
                 <q-btn
                   :label="$t('videoTimeSave')"
-                  @click="mediaDurationPopups[media.uniqueId] = false"
                   color="primary"
                   flat
+                  @click="mediaDurationPopups[media.uniqueId] = false"
                 />
                 <q-btn
                   :label="$t('reset')"
-                  @click="resetMediaDuration(media)"
                   color="negative"
                   flat
+                  @click="resetMediaDuration(media)"
                 />
               </q-card-actions>
             </q-card>
@@ -152,15 +152,15 @@
               class="absolute-bottom-right q-mr-xs q-mb-xs bg-semi-black row rounded-borders"
             >
               <q-badge
-                @click="zoomOut(media.uniqueId)"
                 style="background: transparent; padding: 5px !important"
+                @click="zoomOut(media.uniqueId)"
               >
                 <q-icon color="white" name="mmm-minus" />
               </q-badge>
               <q-separator class="bg-grey-8 q-my-xs" vertical />
               <q-badge
-                @click="zoomIn(media.uniqueId)"
                 style="background: transparent; padding: 5px !important"
+                @click="zoomIn(media.uniqueId)"
               >
                 <q-icon color="white" name="mmm-plus" />
               </q-badge>
@@ -175,9 +175,9 @@
           <div class="col">
             <div class="row items-center">
               <div
+                v-if="media.paragraph"
                 class="q-pl-md q-pr-none col-shrink"
                 side
-                v-if="media.paragraph"
               >
                 <q-chip
                   :clickable="false"
@@ -198,9 +198,9 @@
                 </q-chip>
               </div>
               <div
+                v-else-if="media.song"
                 class="q-pl-md q-pr-none col-shrink"
                 side
-                v-else-if="media.song"
               >
                 <q-chip
                   :clickable="false"
@@ -224,12 +224,12 @@
                 v-if="media.isAdditional && mediaPlayingUrl !== media.fileUrl"
               >
                 <q-btn
-                  @click="mediaToDelete = media.uniqueId"
                   class="q-mr-md"
                   color="negative"
                   flat
                   icon="mmm-delete"
                   rounded
+                  @click="mediaToDelete = media.uniqueId"
                 />
               </div>
             </div>
@@ -241,13 +241,14 @@
               name="fade"
             >
               <div
-                class="absolute duration-slider"
                 v-if="
                   [media.fileUrl, media.streamUrl].includes(mediaPlayingUrl) &&
                   media.isVideo
                 "
+                class="absolute duration-slider"
               >
                 <q-slider
+                  v-model="mediaPlayingCurrentPosition"
                   :inner-max="
                     customDurations?.[currentCongregation]?.[selectedDate]?.[
                       media.uniqueId
@@ -263,28 +264,30 @@
                   :min="0"
                   :readonly="mediaPlayingAction !== 'pause'"
                   :step="0.1"
-                  @update:model-value="seekTo"
                   inner-track-color="accent-300"
                   label
                   track-color="negative"
-                  v-model="mediaPlayingCurrentPosition"
+                  @update:model-value="seekTo"
                 />
               </div>
             </transition>
           </div>
           <div
-            class="col-shrink"
-            style="align-content: center"
             v-if="
               !(
                 mediaPlayingUrl === media.fileUrl ||
                 mediaPlayingUrl === media.streamUrl
               )
             "
+            class="col-shrink"
+            style="align-content: center"
           >
             <template v-if="!media.markers || media.markers.length === 0">
               <q-btn
                 :disable="mediaPlayingUrl !== '' && isVideo(mediaPlayingUrl)"
+                color="primary"
+                icon="mmm-play"
+                rounded
                 @click="
                   mediaPlayingUrl = fs.existsSync(fileUrlToPath(media.fileUrl))
                     ? media.fileUrl
@@ -295,9 +298,6 @@
                     initiatePanzoom(media.uniqueId);
                   }
                 "
-                color="primary"
-                icon="mmm-play"
-                rounded
               />
             </template>
             <template v-else>
@@ -311,6 +311,7 @@
                 <q-menu>
                   <q-list style="min-width: 100px">
                     <q-item
+                      clickable
                       @click="
                         customDurations[currentCongregation] ??= {};
                         customDurations[currentCongregation][selectedDate] ??=
@@ -330,13 +331,14 @@
                         mediaPlayingSubtitlesUrl = media.subtitlesUrl ?? '';
                         mediaPlayingAction = 'play';
                       "
-                      clickable
                     >
                       <q-item-section>{{ $t('entireFile') }}</q-item-section>
                     </q-item>
                     <q-separator />
                     <q-item
+                      v-for="marker in media.markers"
                       :key="marker.VideoMarkerId"
+                      clickable
                       @click="
                         customDurations[currentCongregation] ??= {};
                         customDurations[currentCongregation][selectedDate] ??=
@@ -367,8 +369,6 @@
                         mediaPlayingSubtitlesUrl = media.subtitlesUrl ?? '';
                         mediaPlayingAction = 'play';
                       "
-                      clickable
-                      v-for="marker in media.markers"
                     >
                       <q-item-section>{{ marker.Label }}</q-item-section>
                     </q-item>
@@ -380,18 +380,18 @@
           <template v-else>
             <div class="col-shrink items-center justify-center flex">
               <q-btn
-                :color="currentSceneType === 'media' ? 'negative' : 'primary'"
-                @click="
-                  sendObsSceneEvent(
-                    currentSceneType === 'media' ? 'camera' : 'media',
-                  )
+                v-if="
+                  isImage(mediaPlayingUrl) && obsConnectionState === 'connected'
                 "
+                :color="currentSceneType === 'media' ? 'negative' : 'primary'"
                 icon="
                     mmm-picture-for-zoom-participants
                 "
                 rounded
-                v-if="
-                  isImage(mediaPlayingUrl) && obsConnectionState === 'connected'
+                @click="
+                  sendObsSceneEvent(
+                    currentSceneType === 'media' ? 'camera' : 'media',
+                  )
                 "
               >
                 <q-tooltip :delay="1000">{{
@@ -403,33 +403,33 @@
                 }}</q-tooltip>
               </q-btn>
               <q-btn
-                @click="mediaPlayingAction = 'play'"
+                v-if="mediaPlayingAction === 'pause'"
                 color="primary"
                 icon="mmm-play"
                 outline
                 rounded
-                v-if="mediaPlayingAction === 'pause'"
+                @click="mediaPlayingAction = 'play'"
               />
               <q-btn
-                @click="mediaPlayingAction = 'pause'"
-                color="negative"
-                icon="mmm-pause"
-                outline
-                rounded
                 v-else-if="
                   media.isVideo &&
                   (mediaPlayingAction === 'play' || !mediaPlayingAction)
                 "
+                color="negative"
+                icon="mmm-pause"
+                outline
+                rounded
+                @click="mediaPlayingAction = 'pause'"
               />
               <q-btn
-                @click="
-                  media.isVideo ? (mediaToStop = media.uniqueId) : stopMedia()
-                "
+                v-if="mediaPlayingAction !== '' || mediaPlayingAction === ''"
                 class="q-ml-sm"
                 color="negative"
                 icon="mmm-stop"
                 rounded
-                v-if="mediaPlayingAction !== '' || mediaPlayingAction === ''"
+                @click="
+                  media.isVideo ? (mediaToStop = media.uniqueId) : stopMedia()
+                "
               />
             </div>
           </template>
@@ -449,8 +449,8 @@
         {{ $t('sureStopVideo') }}
       </q-card-section>
       <q-card-actions align="right" class="text-primary">
-        <q-btn :label="$t('cancel')" @click="mediaToStop = ''" flat />
-        <q-btn :label="$t('stop')" @click="stopMedia()" color="negative" flat />
+        <q-btn :label="$t('cancel')" flat @click="mediaToStop = ''" />
+        <q-btn :label="$t('stop')" color="negative" flat @click="stopMedia()" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -480,12 +480,12 @@
         }}
       </q-card-section>
       <q-card-actions align="right" class="text-primary">
-        <q-btn :label="$t('cancel')" @click="mediaToDelete = ''" flat />
+        <q-btn :label="$t('cancel')" flat @click="mediaToDelete = ''" />
         <q-btn
           :label="$t('delete')"
-          @click="deleteMedia()"
           color="negative"
           flat
+          @click="deleteMedia()"
         />
       </q-card-actions>
     </q-card>

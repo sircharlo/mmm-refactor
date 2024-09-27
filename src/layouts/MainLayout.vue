@@ -3,36 +3,36 @@
     <HeaderBase />
 
     <q-footer
-      :style="
-        'left: calc(50% + ' + (miniState ? '28' : '150') + 'px) !important'
-      "
-      class="q-pb-sm"
       v-if="
         currentSettings?.enableMediaDisplayButton ||
         currentSettings?.enableMusicButton
       "
+      :style="
+        'left: calc(50% + ' + (miniState ? '28' : '150') + 'px) !important'
+      "
+      class="q-pb-sm"
     >
       <ActionIsland />
     </q-footer>
 
     <q-drawer
+      v-model="drawer"
       :breakpoint="5"
       :mini="miniState"
       bordered
       class="column justify-between no-wrap bg-secondary-contrast text-weight-medium text-dark-grey"
-      v-model="drawer"
     >
       <q-item
-        @click="miniState = !miniState"
-        clickable
         v-if="$q.screen.gt.xs"
         v-ripple
+        clickable
+        @click="miniState = !miniState"
       >
         <q-tooltip
+          v-if="miniState"
           :delay="1000"
           anchor="center right"
           self="center left"
-          v-if="miniState"
         >
           {{ $t('expand-sidebar') }}
         </q-tooltip>
@@ -42,17 +42,17 @@
         <q-item-section>{{ $t('collapse-sidebar') }}</q-item-section>
       </q-item>
       <q-item
+        v-ripple
         :disable="!currentSettings || invalidSettings()"
         :to="{ path: '/media-calendar', exact: true }"
         active-class="bg-accent-100 text-primary blue-bar"
         clickable
-        v-ripple
       >
         <q-tooltip
+          v-if="miniState"
           :delay="1000"
           anchor="center right"
           self="center left"
-          v-if="miniState"
         >
           {{
             !currentSettings
@@ -66,17 +66,17 @@
         <q-item-section>{{ $t('titles.meetingMedia') }}</q-item-section>
       </q-item>
       <q-item
+        v-ripple
         :disable="!currentSettings || invalidSettings() || mediaPlaying"
         :to="{ path: '/present-website', exact: true }"
         active-class="bg-accent-100 text-primary blue-bar"
         clickable
-        v-ripple
       >
         <q-tooltip
+          v-if="miniState"
           :delay="1000"
           anchor="center right"
           self="center left"
-          v-if="miniState"
         >
           {{ $t('titles.presentWebsite') }}
         </q-tooltip>
@@ -86,17 +86,17 @@
         <q-item-section>{{ $t('titles.presentWebsite') }}</q-item-section>
       </q-item>
       <q-item
+        v-ripple
         :disable="mediaPlaying"
         :to="{ path: '/congregation-selector', exact: true }"
         active-class="bg-accent-100 text-primary blue-bar"
         clickable
-        v-ripple
       >
         <q-tooltip
+          v-if="miniState"
           :delay="1000"
           anchor="center right"
           self="center left"
-          v-if="miniState"
         >
           {{ $t('titles.profileSelection') }}
         </q-tooltip>
@@ -109,19 +109,19 @@
       </q-item>
       <q-space />
       <q-item
+        v-ripple
         :disable="
           !currentSettings || mediaPlaying || route.fullPath.includes('wizard')
         "
         :to="{ path: '/settings', exact: true }"
         active-class="bg-accent-100 text-primary blue-bar"
         clickable
-        v-ripple
       >
         <q-tooltip
+          v-if="miniState"
           :delay="1000"
           anchor="center right"
           self="center left"
-          v-if="miniState"
         >
           {{ $t('titles.settings') }}
         </q-tooltip>

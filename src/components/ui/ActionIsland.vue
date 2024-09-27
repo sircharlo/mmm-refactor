@@ -1,5 +1,5 @@
 <template>
-  <div class="flex" id="actionIsland" style="justify-content: center">
+  <div id="actionIsland" class="flex" style="justify-content: center">
     <!-- <div id="musicPopupAnchor" /> -->
     <!-- <div id="mediaDisplayPopupAnchor" />
     <div id="obsPopupAnchor" /> -->
@@ -24,7 +24,7 @@
         <MediaDisplayButton />
       </div>
     </q-chip>
-    <q-dialog position="bottom" v-model="downloadPopup">
+    <q-dialog v-model="downloadPopup" position="bottom">
       <q-card flat>
         <q-card-section>
           <div class="card-title">
@@ -44,21 +44,21 @@
               </template>
               <template v-else>
                 <template
-                  :key="statusObject.status"
                   v-for="statusObject in statusConfig"
+                  :key="statusObject.status"
                 >
                   <p
-                    class="card-section-title text-dark-grey q-mt-md"
                     v-if="hasStatus(downloadProgress, statusObject.status)"
+                    class="card-section-title text-dark-grey q-mt-md"
                   >
                     {{ $t(statusObject.label) }}
                   </p>
                   <template
-                    :key="url"
                     v-for="(item, url) in filteredDownloads(
                       downloadProgress,
                       statusObject.status,
                     )"
+                    :key="url"
                   >
                     <div class="row items-center q-py-sm">
                       <div class="col text-weight-medium text-dark-grey">
@@ -66,10 +66,10 @@
                       </div>
                       <div class="col-shrink">
                         <q-icon
+                          v-if="statusObject.icon"
                           :color="statusColor(statusObject.status)"
                           :name="statusObject.icon"
                           size="sm"
-                          v-if="statusObject.icon"
                         >
                           <q-tooltip v-if="statusObject.status === 'error'">
                             {{ $t('errorDownloadingMeetingMedia') }}.
@@ -77,11 +77,11 @@
                           </q-tooltip>
                         </q-icon>
                         <q-circular-progress
+                          v-else-if="showProgress(item)"
                           :thickness="0.3"
                           :value="progressValue(item)"
                           color="primary"
                           size="sm"
-                          v-else-if="showProgress(item)"
                         />
                       </div>
                     </div>

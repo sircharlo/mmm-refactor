@@ -1,14 +1,14 @@
 <template>
   <q-input
+    v-model="localValue"
     :rules="getRules(rules)"
-    @focus="focusHandler($event)"
     class="q-pb-none bg-accent-100 date-time-input"
     dense
     hide-bottom-space
     mask="time"
     outlined
     style="width: 240px"
-    v-model="localValue"
+    @focus="focusHandler($event)"
     v-bind="{ label: label || undefined }"
   >
     <template v-slot:append>
@@ -19,16 +19,16 @@
       transition-hide="scale"
       transition-show="scale"
     >
-      <q-time :options="getTimeOptions(options)" format24h v-model="localValue">
+      <q-time v-model="localValue" :options="getTimeOptions(options)" format24h>
         <div class="row items-center justify-end">
           <q-btn
+            v-close-popup
             :label="$t('clear')"
-            @click="clearTime"
             color="negative"
             flat
-            v-close-popup
+            @click="clearTime"
           />
-          <q-btn :label="$t('save')" color="primary" flat v-close-popup />
+          <q-btn v-close-popup :label="$t('save')" color="primary" flat />
         </div>
       </q-time>
     </q-popup-proxy>

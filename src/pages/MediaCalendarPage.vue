@@ -11,14 +11,13 @@
         ? 'flex'
         : ''
     "
+    padding
     @dragenter="dropActive"
     @dragover="dropActive"
     @dragstart="dropActive"
     @drop="dropEnd"
-    padding
   >
     <div
-      class="col content-center q-py-xl"
       v-if="
         (selectedDateObject?.meeting && !selectedDateObject?.complete) ||
         !(
@@ -29,24 +28,25 @@
           sortableLacMediaItems?.length
         )
       "
+      class="col content-center q-py-xl"
     >
       <div class="row justify-center">
         <div class="col-6 text-center">
           <div class="row items-center justify-center q-my-lg">
             <q-spinner
-              color="primary"
-              size="lg"
               v-if="
                 selectedDateObject?.meeting &&
                 !selectedDateObject?.complete &&
                 !selectedDateObject?.error
               "
+              color="primary"
+              size="lg"
             />
             <q-img
+              v-else
               fit="contain"
               src="images/no-media.svg"
               style="max-height: 30vh"
-              v-else
             />
           </div>
           <div
@@ -72,14 +72,14 @@
             }}
           </div>
           <div
-            class="row items-center justify-center q-mt-lg q-gutter-md"
             v-if="!selectedDateObject?.meeting || selectedDateObject?.error"
+            class="row items-center justify-center q-mt-lg q-gutter-md"
           >
-            <q-btn @click="goToNextMeeting()" color="primary" outline>
+            <q-btn color="primary" outline @click="goToNextMeeting()">
               <q-icon class="q-mr-sm" name="mmm-go-to-date" size="xs" />
               {{ $t('next-meeting') }}
             </q-btn>
-            <q-btn @click="openImportMenu()" color="primary">
+            <q-btn color="primary" @click="openImportMenu()">
               <q-icon class="q-mr-sm" name="mmm-import-media" size="xs" />
               {{ $t('import-media') }}
             </q-btn>
@@ -88,12 +88,12 @@
       </div>
     </div>
     <q-list
-      class="media-section additional"
       v-show="
         selectedDateObject?.meeting === 'we' &&
         selectedDateObject?.complete &&
         !sortableAdditionalMediaItems?.length
       "
+      class="media-section additional"
     >
       <q-item class="text-additional items-center">
         <q-avatar class="text-white bg-additional rounded-borders-sm" size="md">
@@ -104,10 +104,10 @@
         </div>
         <div class="text-bold text-uppercase text-spaced">
           <q-btn
-            @click="addOpeningSong()"
             class="q-ml-sm"
             color="primary"
             rounded
+            @click="addOpeningSong()"
           >
             <q-icon class="q-mr-sm" name="mmm-music-note" size="xs" />
             {{ $t('add-an-opening-song') }}
@@ -116,8 +116,8 @@
       </q-item>
     </q-list>
     <q-list
-      class="media-section additional"
       v-show="sortableAdditionalMediaItems?.length"
+      class="media-section additional"
     >
       <q-item class="text-additional items-center">
         <q-avatar class="text-white bg-additional rounded-borders-sm" size="md">
@@ -127,23 +127,23 @@
           {{ $t('imported-media') }}
         </div>
       </q-item>
-      <q-list class="list-droppable" ref="additionalList">
+      <q-list ref="additionalList" class="list-droppable">
         <MediaItem
+          v-for="media in sortableAdditionalMediaItems"
           :key="media.uniqueId"
           :list="sortableAdditionalMediaItems"
           :media="media"
-          v-for="media in sortableAdditionalMediaItems"
         />
       </q-list>
     </q-list>
     <q-list
-      class="media-section tgw"
       v-show="
         selectedDateObject?.complete &&
         (sortableTgwMediaItems.length ||
           sortableAyfmMediaItems.length ||
           sortableLacMediaItems.length)
       "
+      class="media-section tgw"
     >
       <q-item class="text-tgw items-center">
         <q-avatar class="text-white bg-tgw jw-icon" size="md"></q-avatar>
@@ -151,23 +151,23 @@
           {{ $t('tgw') }}
         </div>
       </q-item>
-      <q-list class="list-droppable" ref="tgwList">
+      <q-list ref="tgwList" class="list-droppable">
         <MediaItem
+          v-for="media in sortableTgwMediaItems"
           :key="media.uniqueId"
           :list="sortableTgwMediaItems"
           :media="media"
-          v-for="media in sortableTgwMediaItems"
         />
       </q-list>
     </q-list>
     <q-list
-      class="media-section ayfm"
       v-show="
         selectedDateObject?.complete &&
         (sortableTgwMediaItems.length ||
           sortableAyfmMediaItems.length ||
           sortableLacMediaItems.length)
       "
+      class="media-section ayfm"
     >
       <q-item class="text-ayfm items-center">
         <q-avatar class="text-white bg-ayfm jw-icon" size="lg"></q-avatar>
@@ -175,23 +175,23 @@
           {{ $t('ayfm') }}
         </div>
       </q-item>
-      <q-list class="list-droppable" ref="ayfmList">
+      <q-list ref="ayfmList" class="list-droppable">
         <MediaItem
+          v-for="media in sortableAyfmMediaItems"
           :key="media.uniqueId"
           :list="sortableAyfmMediaItems"
           :media="media"
-          v-for="media in sortableAyfmMediaItems"
         />
       </q-list>
     </q-list>
     <q-list
-      class="media-section lac"
       v-show="
         selectedDateObject?.complete &&
         (sortableTgwMediaItems.length ||
           sortableAyfmMediaItems.length ||
           sortableLacMediaItems.length)
       "
+      class="media-section lac"
     >
       <q-item class="text-lac items-center">
         <q-avatar class="text-white bg-lac jw-icon" size="lg"></q-avatar>
@@ -199,18 +199,18 @@
           {{ $t('lac') }}
         </div>
       </q-item>
-      <q-list class="list-droppable" ref="lacList">
+      <q-list ref="lacList" class="list-droppable">
         <MediaItem
+          v-for="media in sortableLacMediaItems"
           :key="media.uniqueId"
           :list="sortableLacMediaItems"
           :media="media"
-          v-for="media in sortableLacMediaItems"
         />
       </q-list>
     </q-list>
     <q-list
-      class="media-section wt"
       v-show="selectedDateObject?.complete && sortableWtMediaItems.length"
+      class="media-section wt"
     >
       <q-item class="text-wt items-center">
         <q-avatar class="text-white bg-wt jw-icon" size="lg"></q-avatar>
@@ -218,22 +218,22 @@
           {{ $t('wt') }}
         </div>
       </q-item>
-      <q-list class="list-droppable" ref="wtList">
+      <q-list ref="wtList" class="list-droppable">
         <MediaItem
+          v-for="media in sortableWtMediaItems"
           :key="media.uniqueId"
           :list="sortableWtMediaItems"
           :media="media"
-          v-for="media in sortableWtMediaItems"
         />
       </q-list>
     </q-list>
   </q-page>
   <DragAndDropper
+    v-model="dragging"
     :files-loading="filesLoading"
     :jwpub-db="jwpubImportDb"
     :jwpub-documents="jwpubImportDocuments"
     @drop="dropEnd"
-    v-model="dragging"
   />
 </template>
 
