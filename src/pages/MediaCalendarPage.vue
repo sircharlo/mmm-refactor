@@ -19,22 +19,32 @@
   >
     <div
       v-if="
-        (selectedDateObject?.meeting && !selectedDateObject?.complete) ||
-        !(
-          sortableAdditionalMediaItems?.length ||
-          sortableWtMediaItems?.length ||
-          sortableTgwMediaItems?.length ||
-          sortableAyfmMediaItems?.length ||
-          sortableLacMediaItems?.length
-        )
+        (currentSettings?.disableMediaFetching &&
+          sortableAdditionalMediaItems?.length < 1) ||
+        (!currentSettings?.disableMediaFetching &&
+          ((selectedDateObject?.meeting && !selectedDateObject?.complete) ||
+            !(
+              sortableAdditionalMediaItems?.length ||
+              sortableWtMediaItems?.length ||
+              sortableTgwMediaItems?.length ||
+              sortableAyfmMediaItems?.length ||
+              sortableLacMediaItems?.length
+            )))
       "
       class="col content-center q-py-xl"
     >
-      <div class="row justify-center">
+      <div
+        v-if="
+          !currentSettings?.disableMediaFetching ||
+          sortableAdditionalMediaItems?.length < 1
+        "
+        class="row justify-center"
+      >
         <div class="col-6 text-center">
           <div class="row items-center justify-center q-my-lg">
             <q-spinner
               v-if="
+                !currentSettings?.disableMediaFetching &&
                 selectedDateObject?.meeting &&
                 !selectedDateObject?.complete &&
                 !selectedDateObject?.error
@@ -55,7 +65,9 @@
             {{
               !selectedDate
                 ? $t('noDateSelected')
-                : selectedDateObject?.meeting && !selectedDateObject?.error
+                : !currentSettings?.disableMediaFetching &&
+                    selectedDateObject?.meeting &&
+                    !selectedDateObject?.error
                   ? $t('please-wait')
                   : $t('there-are-no-media-items-for-the-selected-date')
             }}
@@ -64,7 +76,9 @@
             {{
               !selectedDate
                 ? $t('select-a-date-to-begin')
-                : selectedDateObject?.meeting && !selectedDateObject?.error
+                : !currentSettings?.disableMediaFetching &&
+                    selectedDateObject?.meeting &&
+                    !selectedDateObject?.error
                   ? $t('currently-loading')
                   : $t(
                       'use-the-import-button-to-add-media-for-this-date-or-select-another-date-to-view-the-corresponding-meeting-media',
@@ -72,10 +86,19 @@
             }}
           </div>
           <div
-            v-if="!selectedDateObject?.meeting || selectedDateObject?.error"
+            v-if="
+              currentSettings?.disableMediaFetching ||
+              !selectedDateObject?.meeting ||
+              selectedDateObject?.error
+            "
             class="row items-center justify-center q-mt-lg q-gutter-md"
           >
-            <q-btn color="primary" outline @click="goToNextMeeting()">
+            <q-btn
+              v-if="!currentSettings?.disableMediaFetching"
+              color="primary"
+              outline
+              @click="goToNextMeeting()"
+            >
               <q-icon class="q-mr-sm" name="mmm-go-to-date" size="xs" />
               {{ $t('next-meeting') }}
             </q-btn>
