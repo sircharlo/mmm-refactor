@@ -181,6 +181,18 @@
           :list="sortableTgwMediaItems"
           :media="media"
         />
+        <div v-if="sortableTgwMediaItems.length === 0">
+          <q-item>
+            <q-item-section
+              class="align-center text-secondary text-grey text-subtitle2"
+            >
+              <div>
+                <q-icon class="q-mr-sm" name="mmm-info" size="sm" />
+                {{ $t('no-media-files-for-section') }}
+              </div>
+            </q-item-section>
+          </q-item>
+        </div>
       </q-list>
     </q-list>
     <q-list
@@ -205,6 +217,18 @@
           :list="sortableAyfmMediaItems"
           :media="media"
         />
+        <div v-if="sortableAyfmMediaItems.length === 0">
+          <q-item>
+            <q-item-section
+              class="align-center text-secondary text-grey text-subtitle2"
+            >
+              <div>
+                <q-icon class="q-mr-sm" name="mmm-info" size="sm" />
+                {{ $t('no-media-files-for-section') }}
+              </div>
+            </q-item-section>
+          </q-item>
+        </div>
       </q-list>
     </q-list>
     <q-list
@@ -229,6 +253,18 @@
           :list="sortableLacMediaItems"
           :media="media"
         />
+        <div v-if="sortableLacMediaItems.length === 0">
+          <q-item>
+            <q-item-section
+              class="align-center text-secondary text-grey text-subtitle2"
+            >
+              <div>
+                <q-icon class="q-mr-sm" name="mmm-info" size="sm" />
+                {{ $t('no-media-files-for-section') }}
+              </div>
+            </q-item-section>
+          </q-item>
+        </div>
       </q-list>
     </q-list>
     <q-list
@@ -248,6 +284,18 @@
           :list="sortableWtMediaItems"
           :media="media"
         />
+        <div v-if="sortableWtMediaItems.length === 0">
+          <q-item>
+            <q-item-section
+              class="align-center text-secondary text-grey text-subtitle2"
+            >
+              <div>
+                <q-icon class="q-mr-sm" name="mmm-info" size="sm" />
+                {{ $t('no-media-files-for-section') }}
+              </div>
+            </q-item-section>
+          </q-item>
+        </div>
       </q-list>
     </q-list>
   </q-page>

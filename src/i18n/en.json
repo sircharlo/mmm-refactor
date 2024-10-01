@@ -185,6 +185,7 @@
   "next-meeting": "Select date of next meeting",
   "no": "No",
   "no-key-combination": "Enter a key combination now using your keyboard.",
+  "no-media-files-for-section": "There are no media items for this meeting section.",
   "no-regular-meetings": "No regular meetings",
   "noDateSelected": "No date is currently selected.",
   "noDownloadsInProgress": "No downloads are currently in progress",
