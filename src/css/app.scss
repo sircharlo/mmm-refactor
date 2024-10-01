@@ -103,11 +103,11 @@ body.body--light {
     background: white;
     border-color: $accent-300;
     border: 1px solid $accent-300;
-    & .q-list {
-      & .q-item {
-        margin-left: 0.25em;
-      }
-    }
+    // & .q-list {
+    //   & .q-item {
+    //     // margin-left: 0.25em;
+    //   }
+    // }
   }
 
   .bg-secondary-contrast {
