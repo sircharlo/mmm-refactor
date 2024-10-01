@@ -39,8 +39,21 @@
             "
             style="padding: 5px !important"
             @click="showMediaDurationPopup(media)"
+            @mouseleave="hoveredBadges[media.uniqueId] = false"
+            @mouseover="hoveredBadges[media.uniqueId] = true"
           >
-            <q-icon class="q-mr-xs" color="white" name="mmm-play" />
+            <q-icon
+              :name="
+                !!hoveredBadges[media.uniqueId] ||
+                customDurations[currentCongregation]?.[selectedDate]?.[
+                  media.uniqueId
+                ]
+                  ? 'mmm-edit'
+                  : 'mmm-play'
+              "
+              class="q-mr-xs"
+              color="white"
+            />
             {{
               customDurations[currentCongregation]?.[selectedDate]?.[
                 media.uniqueId
@@ -313,15 +326,18 @@
                     <q-item
                       clickable
                       @click="
-                        customDurations[currentCongregation] ??= {};
-                        customDurations[currentCongregation][selectedDate] ??=
-                          {};
-                        customDurations[currentCongregation][selectedDate][
-                          media.uniqueId
-                        ] = {
-                          min: 0,
-                          max: media.duration,
-                        };
+                        // customDurations[currentCongregation] ??= {};
+                        // customDurations[currentCongregation][selectedDate] ??=
+                        //   {};
+                        // customDurations[currentCongregation][selectedDate][
+                        //   media.uniqueId
+                        // ] = {
+                        //   min: 0,
+                        //   max: media.duration,
+                        // };
+                        delete customDurations.value?.[
+                          currentCongregation.value
+                        ]?.[selectedDate.value]?.[media.uniqueId];
                         mediaPlayingUrl = fs.existsSync(
                           fileUrlToPath(media.fileUrl),
                         )
@@ -523,6 +539,7 @@ const bc = new BroadcastChannel('mediaPlayback');
 const jwStore = useJwStore();
 const { removeFromAdditionMediaMap } = jwStore;
 const { customDurations } = storeToRefs(jwStore);
+const hoveredBadges = ref({} as { [key: string]: boolean });
 
 const obsState = useObsStateStore();
 const { currentSceneType, obsConnectionState } = storeToRefs(obsState);
@@ -585,14 +602,17 @@ const showMediaDurationPopup = (media: DynamicMediaObject) => {
 
 const resetMediaDuration = (media: DynamicMediaObject) => {
   try {
-    customDurations.value[currentCongregation.value] ??= {};
-    customDurations.value[currentCongregation.value][selectedDate.value] ??= {};
-    customDurations.value[currentCongregation.value][selectedDate.value][
-      media.uniqueId
-    ] = {
-      max: media.duration,
-      min: 0,
-    };
+    // customDurations.value[currentCongregation.value] ??= {};
+    // customDurations.value[currentCongregation.value][selectedDate.value] ??= {};
+    // customDurations.value[currentCongregation.value][selectedDate.value][
+    //   media.uniqueId
+    // ] = {
+    //   max: media.duration,
+    //   min: 0,
+    // };
+    delete customDurations.value?.[currentCongregation.value]?.[
+      selectedDate.value
+    ]?.[media.uniqueId];
   } catch (error) {
     errorCatcher(error);
   }
