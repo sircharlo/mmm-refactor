@@ -153,7 +153,7 @@
             </q-card>
           </q-dialog>
         </q-img>
-        <template v-if="mediaPlayingUrl === media.fileUrl">
+        <template v-if="mediaPlayingUrl === media.fileUrl && media.isImage">
           <transition
             appear
             enter-active-class="animated fadeIn"
