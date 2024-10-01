@@ -400,17 +400,17 @@ body.body--dark {
   border-radius: 0.75em !important;
 }
 
-.q-expansion-item__content > label:first-child::before,
-.q-expansion-item__content > div:first-child::before {
-  content: '';
-  height: 1px;
-  width: 100%;
-  display: block;
-  position: absolute;
-  background: $accent-200;
-  top: 0;
-  left: 0;
-}
+// .q-expansion-item__content > label:first-child::before,
+// .q-expansion-item__content > div:first-child::before {
+//   content: '';
+//   height: 1px;
+//   width: 100%;
+//   display: block;
+//   position: absolute;
+//   background: $accent-200;
+//   top: 0;
+//   left: 0;
+// }
 
 .q-field {
   border-radius: $generic-border-radius;

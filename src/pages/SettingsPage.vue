@@ -46,13 +46,18 @@
                     )[index - 1]?.[1].subgroup)
               "
             >
-              <q-separator v-if="index > 0" class="bg-accent-200" spaced />
+              <q-separator class="bg-accent-200" spaced />
               <q-item-label
                 class="q-pl-xl q-ml-lg text-accent-400 text-uppercase"
                 header
                 >{{ $t(item.subgroup) }}</q-item-label
               >
             </template>
+            <q-separator
+              v-if="index === 0 && !item.subgroup"
+              class="bg-accent-200"
+              spaced
+            />
             <q-item
               v-if="
                 (!item.depends ||
