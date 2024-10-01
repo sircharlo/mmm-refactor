@@ -15,8 +15,8 @@ const thumbStyle = () => {
       : 'rgba(0, 0, 0, 0.9)',
     borderRadius: '5px',
     opacity: '0.75',
-    right: '4px',
-    width: '6px',
+    // right: '100px',
+    width: '8px',
   };
 };
 
@@ -27,8 +27,8 @@ const barStyle = () => {
       : 'rgba(0, 0, 0, 0.75)',
     borderRadius: '9px',
     opacity: '0.2',
-    right: '2px',
-    width: '10px',
+    // right: '2px',
+    width: '8px',
   };
 };
 
