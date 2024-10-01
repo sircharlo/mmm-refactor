@@ -97,10 +97,10 @@
               v-if="!currentSettings?.disableMediaFetching"
               color="primary"
               outline
-              @click="goToNextMeeting()"
+              @click="goToNextDayWithMedia()"
             >
               <q-icon class="q-mr-sm" name="mmm-go-to-date" size="xs" />
-              {{ $t('next-meeting') }}
+              {{ $t('next-day-with-media') }}
             </q-btn>
             <q-btn color="primary" @click="openImportMenu()">
               <q-icon class="q-mr-sm" name="mmm-import-media" size="xs" />
@@ -662,18 +662,22 @@ const startDragging = () => {
   dragging.value = true;
 };
 
-const goToNextMeeting = () => {
+const goToNextDayWithMedia = () => {
   try {
     if (
       currentCongregation.value &&
-      lookupPeriod.value[currentCongregation.value]
+      (lookupPeriod.value?.[currentCongregation.value] ||
+        additionalMediaMaps.value?.[currentCongregation.value])
     ) {
-      selectedDate.value = date.formatDate(
-        lookupPeriod.value[currentCongregation.value]
+      selectedDate.value = [
+        ...lookupPeriod.value?.[currentCongregation.value]
           ?.filter((day) => day.meeting)
-          .map((day) => day.date)[0],
-        'YYYY/MM/DD',
-      );
+          .map((day) => day.date) ?? [],
+        ...Object.keys(additionalMediaMaps.value?.[currentCongregation.value] ?? {}),
+      ]
+        .filter(Boolean)
+        .map((mediaDate) => date.formatDate(mediaDate, 'YYYY/MM/DD'))
+        .sort()[0];
     }
   } catch (e) {
     errorCatcher(e);
@@ -702,7 +706,7 @@ onMounted(async () => {
     }
   });
   generateMediaList();
-  goToNextMeeting();
+  goToNextDayWithMedia();
   sendObsSceneEvent('camera');
   fetchMedia();
 });
