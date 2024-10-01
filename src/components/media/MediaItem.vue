@@ -335,9 +335,9 @@
                         //   min: 0,
                         //   max: media.duration,
                         // };
-                        delete customDurations.value?.[
-                          currentCongregation.value
-                        ]?.[selectedDate.value]?.[media.uniqueId];
+                        delete customDurations?.[currentCongregation]?.[
+                          selectedDate
+                        ]?.[media.uniqueId];
                         mediaPlayingUrl = fs.existsSync(
                           fileUrlToPath(media.fileUrl),
                         )
