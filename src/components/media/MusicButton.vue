@@ -215,7 +215,7 @@ function stopMusic() {
   try {
     if (!musicPlayer.value) return;
     musicStopping.value = true;
-    fadeToVolumeLevel(0, 7.5);
+    fadeToVolumeLevel(0, 5);
   } catch (error) {
     errorCatcher(error);
   }
