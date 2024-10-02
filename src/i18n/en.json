@@ -53,7 +53,7 @@
   "configure-the-websocket-plugin-in-obs-studio-the-virtual-camera-plugin-is-also-required-so-make-sure-its-installed-and-configured-as-well": "You'll need to configure the Websocket plugin in OBS Studio. The Virtual Camera plugin is also required, so make sure it's installed and configured as well.",
   "confirm": "Confirm",
   "congregation-lookup": "Congregation lookup",
-  "congregation-lookup-explain": "Enter keywords such as your congregation's name as well as the city or area in which it is located. This infomation will be used to attempt to automatically retrieve the meeting schedule and language.",
+  "congregation-lookup-explain": "Enter keywords such as your congregation's name as well as the city or area in which it is located. This information will be used to attempt to automatically retrieve the meeting schedule and language.",
   "congregationMeetings": "Congregation meetings",
   "congregationMeetingsDescription": "Settings relating to your congregation and meeting schedule",
   "congregationName": "Congregation name",
