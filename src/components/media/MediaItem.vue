@@ -138,16 +138,16 @@
               </q-card-section>
               <q-card-actions align="right">
                 <q-btn
-                  :label="$t('videoTimeSave')"
-                  color="primary"
-                  flat
-                  @click="mediaDurationPopups[media.uniqueId] = false"
-                />
-                <q-btn
                   :label="$t('reset')"
                   color="negative"
                   flat
                   @click="resetMediaDuration(media)"
+                />
+                <q-btn
+                  :label="$t('save')"
+                  color="primary"
+                  flat
+                  @click="mediaDurationPopups[media.uniqueId] = false"
                 />
               </q-card-actions>
             </q-card>
@@ -613,6 +613,7 @@ const resetMediaDuration = (media: DynamicMediaObject) => {
     delete customDurations.value?.[currentCongregation.value]?.[
       selectedDate.value
     ]?.[media.uniqueId];
+    mediaDurationPopups.value[media.uniqueId] = false;
   } catch (error) {
     errorCatcher(error);
   }
