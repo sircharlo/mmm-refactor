@@ -74,7 +74,7 @@
             </div>
           </q-slide-transition>
           <div class="row items-center">
-            <div class="col-6">
+            <div class="col">
               <div class="row text-subtitle1 text-weight-medium">
                 {{
                   musicPlaying || musicStarting
@@ -94,7 +94,7 @@
                 {{ t('until-meeting-starts') }}
               </div>
             </div>
-            <div class="col-6">
+            <div class="col-grow">
               <q-btn
                 v-if="!musicPlaying"
                 :disabled="mediaPlaying || musicStarting"
