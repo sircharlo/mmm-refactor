@@ -153,7 +153,7 @@
           </div>
           <q-separator class="bg-accent-200 q-mb-md" />
           <div class="row items-center">
-            <div class="col-6">
+            <div class="col">
               <div class="row text-subtitle1 text-weight-medium">
                 {{ mediaWindowVisible ? $t('projecting') : $t('inactive') }}
               </div>
@@ -167,7 +167,7 @@
                 }}
               </div>
             </div>
-            <div class="col-6">
+            <div class="col-grow">
               <q-btn
                 v-if="mediaWindowVisible"
                 class="full-width"
