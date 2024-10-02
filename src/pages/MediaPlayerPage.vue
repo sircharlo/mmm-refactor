@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-html -->
 <template>
   <q-page-container
     class="q-electron-drag vertical-middle overflow-hidden"
