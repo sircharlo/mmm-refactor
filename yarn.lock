@@ -311,7 +311,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron/rebuild@npm:3.6.0, @electron/rebuild@npm:^3.6.0":
+"@electron/rebuild@npm:3.6.0":
   version: 3.6.0
   resolution: "@electron/rebuild@npm:3.6.0"
   dependencies:
@@ -332,6 +332,30 @@ __metadata:
   bin:
     electron-rebuild: lib/cli.js
   checksum: 10c0/3af22cc2e048f27d7055b85b50d5c5de4312f9cd5d72bc7ba96de67f735035acf813f9f39faf3781404759b82c5e5a43e9d1d2695d99c0ade9e0f339c32feff2
+  languageName: node
+  linkType: hard
+
+"@electron/rebuild@npm:^3.6.1":
+  version: 3.6.1
+  resolution: "@electron/rebuild@npm:3.6.1"
+  dependencies:
+    "@malept/cross-spawn-promise": "npm:^2.0.0"
+    chalk: "npm:^4.0.0"
+    debug: "npm:^4.1.1"
+    detect-libc: "npm:^2.0.1"
+    fs-extra: "npm:^10.0.0"
+    got: "npm:^11.7.0"
+    node-abi: "npm:^3.45.0"
+    node-api-version: "npm:^0.2.0"
+    node-gyp: "npm:^9.0.0"
+    ora: "npm:^5.1.0"
+    read-binary-file-arch: "npm:^1.0.6"
+    semver: "npm:^7.3.5"
+    tar: "npm:^6.0.5"
+    yargs: "npm:^17.0.1"
+  bin:
+    electron-rebuild: lib/cli.js
+  checksum: 10c0/7d72ea5a0ab656b356cfe300ccdfdb25c06292a31e1729142243460aebe1a9b4c2a50469c6fb114b756575f8713a0532ec6b128e16eb944e8df446a5786ec581
   languageName: node
   linkType: hard
 
@@ -5833,10 +5857,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:^15.9.0":
-  version: 15.9.0
-  resolution: "globals@npm:15.9.0"
-  checksum: 10c0/de4b553e412e7e830998578d51b605c492256fb2a9273eaeec6ec9ee519f1c5aa50de57e3979911607fd7593a4066420e01d8c3d551e7a6a236e96c521aee36c
+"globals@npm:^15.10.0":
+  version: 15.10.0
+  resolution: "globals@npm:15.10.0"
+  checksum: 10c0/fef8f320e88f01f1492fef1b04b056908e1f6726eeaffe3bca03247237300c2d86e71585ee641b62ba71460a6eaff0d6ca7fca284e61bd1b3f833c7ad68b160a
   languageName: node
   linkType: hard
 
@@ -7842,7 +7866,7 @@ __metadata:
   resolution: "mmm-v2@workspace:."
   dependencies:
     "@daipeng7/rollup-plugin-iconfont": "npm:^3.0.6"
-    "@electron/rebuild": "npm:^3.6.0"
+    "@electron/rebuild": "npm:^3.6.1"
     "@electron/remote": "npm:^2.1.2"
     "@formkit/drag-and-drop": "npm:^0.1.6"
     "@intlify/vite-plugin-vue-i18n": "npm:^7.0.0"
@@ -7878,7 +7902,7 @@ __metadata:
     eslint-plugin-perfectionist: "npm:^3.8.0"
     eslint-plugin-vue: "npm:^9.28.0"
     fs-extra: "npm:^11.2.0"
-    globals: "npm:^15.9.0"
+    globals: "npm:^15.10.0"
     heic-convert: "npm:^2.1.0"
     is-online: "npm:^11.0.0"
     jszip: "npm:^3.10.1"
@@ -7887,7 +7911,7 @@ __metadata:
     obs-websocket-js: "npm:^5.0.6"
     p-queue: "npm:^8.0.1"
     pdfjs-dist: "npm:^4.6.82"
-    pinia: "npm:^2.2.3"
+    pinia: "npm:^2.2.4"
     pinia-shared-state: "npm:^0.5.1"
     postcss: "npm:^8.4.47"
     prettier: "npm:^3.3.3"
@@ -8757,9 +8781,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pinia@npm:^2.2.3":
-  version: 2.2.3
-  resolution: "pinia@npm:2.2.3"
+"pinia@npm:^2.2.4":
+  version: 2.2.4
+  resolution: "pinia@npm:2.2.4"
   dependencies:
     "@vue/devtools-api": "npm:^6.6.3"
     vue-demi: "npm:^0.14.10"
@@ -8772,7 +8796,7 @@ __metadata:
       optional: true
     typescript:
       optional: true
-  checksum: 10c0/ffa4af7f58313bd4c7cd4c5f42f4a6048baf28086dc371303c405ab0ad08c3599413fe7d34295ca216d21e98f138cba8af6221207456727d177a8b54a17215b1
+  checksum: 10c0/d4eea590e19f8b499488664d28c280292f1821990ba9d3021408093b253acfba260ab6405c33dafe761a761469d108e9c11ebe0f877ce99f19658d6a3eeb0578
   languageName: node
   linkType: hard
 
