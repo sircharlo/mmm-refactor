@@ -9,10 +9,9 @@
         icon="mmm-media-settings"
       >
         {{ $t('setupWizard.intro') }}
-        <q-stepper-navigation>
+        <q-stepper-navigation class="q-gutter-sm">
           <q-btn
             :label="$t('cancel')"
-            class="q-ml-sm"
             color="negative"
             flat
             @click="
@@ -35,14 +34,8 @@
           :label="$t('localAppLang')"
           options="appLanguages"
         />
-        <q-stepper-navigation>
-          <q-btn
-            :label="$t('back')"
-            class="q-ml-sm"
-            color="primary"
-            flat
-            @click="step--"
-          />
+        <q-stepper-navigation class="q-gutter-sm">
+          <q-btn :label="$t('back')" color="negative" flat @click="step--" />
           <q-btn
             :disable="!currentSettings.localAppLang"
             :label="$t('continue')"
@@ -54,36 +47,38 @@
       <q-step
         :done="step > 2"
         :name="2"
-        :title="$t('lang')"
-        icon="mmm-media-language"
+        :title="$t('how-will-the-app-be-used')"
+        icon="mmm-lectern"
       >
-        {{ $t('in-what-language-should-media-be-downloaded') }}
-        <SelectInput
-          v-model="currentSettings.lang"
-          :label="$t('lang')"
-          :use-input="true"
-          options="jwLanguages"
-        />
-        <q-stepper-navigation>
+        <p>{{ $t('what-kind-of-profile-is-this') }}</p>
+        <p>{{ $t('profile-type-regular') }}</p>
+        <p>{{ $t('profile-type-special') }}</p>
+        <p>{{ $t('profile-type-choose-regular') }}</p>
+        <q-stepper-navigation class="q-gutter-sm">
+          <q-btn :label="$t('back')" color="negative" flat @click="step--" />
           <q-btn
-            :label="$t('back')"
-            class="q-ml-sm"
+            :label="$t('other')"
             color="primary"
             flat
-            @click="step--"
+            @click="
+              regularProfile = false;
+              step++;
+            "
           />
           <q-btn
-            :disable="!currentSettings.lang"
-            :label="$t('continue')"
+            :label="$t('regular')"
             color="primary"
-            @click="step++"
+            @click="
+              regularProfile = true;
+              step++;
+            "
           />
         </q-stepper-navigation>
       </q-step>
       <q-step
         :done="step > 3"
         :name="3"
-        :title="$t('congregationName')"
+        :title="$t('profile-name')"
         icon="mmm-rename"
       >
         <!-- This icon is from the Material Design Icons collection -->
@@ -93,14 +88,8 @@
           )
         }}
         <TextInput v-model="currentSettings.congregationName" />
-        <q-stepper-navigation>
-          <q-btn
-            :label="$t('back')"
-            class="q-ml-sm"
-            color="primary"
-            flat
-            @click="step--"
-          />
+        <q-stepper-navigation class="q-gutter-sm">
+          <q-btn :label="$t('back')" color="negative" flat @click="step--" />
           <q-btn
             :disable="!currentSettings?.congregationName"
             :label="$t('continue')"
@@ -112,6 +101,30 @@
       <q-step
         :done="step > 4"
         :name="4"
+        :title="$t('lang')"
+        icon="mmm-media-language"
+      >
+        {{ $t('in-what-language-should-media-be-downloaded') }}
+        <SelectInput
+          v-model="currentSettings.lang"
+          :label="$t('lang')"
+          :use-input="true"
+          options="jwLanguages"
+        />
+        <q-stepper-navigation class="q-gutter-sm">
+          <q-btn :label="$t('back')" color="negative" flat @click="step--" />
+          <q-btn
+            :disable="!currentSettings.lang"
+            :label="$t('continue')"
+            color="primary"
+            @click="regularProfile ? step++ : (step = 103)"
+          />
+        </q-stepper-navigation>
+      </q-step>
+      <q-step
+        v-if="regularProfile"
+        :done="step > 5"
+        :name="5"
         :title="$t('setupWizard.meetingDaysTimes')"
         icon="mmm-calendar-month"
       >
@@ -140,14 +153,8 @@
           :label="$t('weStartTime')"
           :options="['meetingTime']"
         />
-        <q-stepper-navigation>
-          <q-btn
-            :label="$t('back')"
-            class="q-ml-sm"
-            color="primary"
-            flat
-            @click="step--"
-          />
+        <q-stepper-navigation class="q-gutter-sm">
+          <q-btn :label="$t('back')" color="negative" flat @click="step--" />
           <q-btn
             :disable="
               !currentSettings.mwDay ||
@@ -162,8 +169,9 @@
         </q-stepper-navigation>
       </q-step>
       <q-step
-        :done="step > 5"
-        :name="5"
+        v-if="regularProfile"
+        :done="step > 6"
+        :name="6"
         :title="$t('almost-done')"
         icon="mmm-almost-done"
       >
@@ -172,7 +180,7 @@
             'well-start-fetching-media-while-we-wrap-up-with-our-initial-setup',
           )
         }}
-        <q-stepper-navigation>
+        <q-stepper-navigation class="q-gutter-sm">
           <q-btn
             :label="$t('continue')"
             color="primary"
@@ -185,6 +193,7 @@
         </q-stepper-navigation>
       </q-step>
       <q-step
+        v-if="regularProfile"
         :done="step > 100"
         :name="100"
         :title="$t('yeartext')"
@@ -196,19 +205,14 @@
             'notice-the-yeartext-is-now-being-displayed-on-the-external-monitor-but-lets-keep-going',
           )
         }}
-        <q-stepper-navigation>
-          <q-btn
-            :label="$t('back')"
-            class="q-ml-sm"
-            color="primary"
-            flat
-            @click="step = 5"
-          />
+        <q-stepper-navigation class="q-gutter-sm">
+          <q-btn :label="$t('back')" color="negative" flat @click="step = 6" />
           <q-btn :label="$t('continue')" color="primary" @click="step++" />
         </q-stepper-navigation>
       </q-step>
 
       <q-step
+        v-if="regularProfile"
         :done="step > 101"
         :name="101"
         :title="$t('media-display')"
@@ -238,18 +242,13 @@
             )
           }}
         </p>
-        <q-stepper-navigation>
-          <q-btn
-            :label="$t('back')"
-            class="q-ml-sm"
-            color="primary"
-            flat
-            @click="step--"
-          />
+        <q-stepper-navigation class="q-gutter-sm">
+          <q-btn :label="$t('back')" color="negative" flat @click="step--" />
           <q-btn :label="$t('continue')" color="primary" @click="step++" />
         </q-stepper-navigation>
       </q-step>
       <q-step
+        v-if="regularProfile"
         :done="step > 102"
         :name="102"
         :title="$t('setupWizard.backgroundMusic')"
@@ -272,14 +271,8 @@
             )
           }}
         </p>
-        <q-stepper-navigation>
-          <q-btn
-            :label="$t('back')"
-            class="q-ml-sm"
-            color="primary"
-            flat
-            @click="step--"
-          />
+        <q-stepper-navigation class="q-gutter-sm">
+          <q-btn :label="$t('back')" color="negative" flat @click="step--" />
           <q-btn :label="$t('continue')" color="primary" @click="step++" />
         </q-stepper-navigation>
       </q-step>
@@ -299,11 +292,14 @@
             )
           }}
         </p>
-        <q-stepper-navigation>
-          <q-btn :label="$t('no')" class="q-ml-sm" flat @click="step = 200" />
+        <q-stepper-navigation class="q-gutter-sm">
+          <q-btn
+            :label="$t('no')"
+            flat
+            @click="step = regularProfile ? 200 : 300"
+          />
           <q-btn
             :label="$t('yes')"
-            class="q-ml-sm"
             color="primary"
             @click="
               obsUsed = true;
@@ -329,12 +325,11 @@
               )
             }}
           </p>
-          <q-stepper-navigation>
-            <q-btn :label="$t('back')" class="q-ml-sm" flat @click="step--" />
-            <q-btn :label="$t('no')" class="q-ml-sm" flat @click="step = 200" />
+          <q-stepper-navigation class="q-gutter-sm">
+            <q-btn :label="$t('back')" flat @click="step--" />
+            <q-btn :label="$t('no')" flat @click="step = regularProfile ? 200 : 300" />
             <q-btn
               :label="$t('yes')"
-              class="q-ml-sm"
               color="primary"
               @click="
                 obsIntegrate = true;
@@ -360,19 +355,9 @@
                 )
               }}
             </p>
-            <q-stepper-navigation>
-              <q-btn
-                :label="$t('skip-for-now')"
-                class="q-ml-sm"
-                flat
-                @click="step = 200"
-              />
-              <q-btn
-                :label="$t('continue')"
-                class="q-ml-sm"
-                color="primary"
-                @click="step++"
-              />
+            <q-stepper-navigation class="q-gutter-sm">
+              <q-btn :label="$t('skip-for-now')" flat @click="step = regularProfile ? 200 : 300" />
+              <q-btn :label="$t('continue')" color="primary" @click="step++" />
             </q-stepper-navigation>
           </q-step>
           <q-step
@@ -398,14 +383,13 @@
               :actions="['obsConnect']"
               :label="$t('obsPassword')"
             />
-            <q-stepper-navigation>
-              <q-btn :label="$t('back')" class="q-ml-sm" flat @click="step--" />
+            <q-stepper-navigation class="q-gutter-sm">
+              <q-btn :label="$t('back')" flat @click="step--" />
               <q-btn
                 :disable="
                   !currentSettings.obsPort || !currentSettings.obsPassword
                 "
                 :label="$t('continue')"
-                class="q-ml-sm"
                 color="primary"
                 @click="step++"
               />
@@ -428,12 +412,11 @@
               :label="$t('obsCameraScene')"
               options="obsScenes"
             />
-            <q-stepper-navigation>
-              <q-btn :label="$t('back')" class="q-ml-sm" flat @click="step--" />
+            <q-stepper-navigation class="q-gutter-sm">
+              <q-btn :label="$t('back')" flat @click="step--" />
               <q-btn
                 :disable="!currentSettings.obsCameraScene"
                 :label="$t('continue')"
-                class="q-ml-sm"
                 color="primary"
                 @click="step++"
               />
@@ -458,20 +441,20 @@
               :label="$t('obsMediaScene')"
               options="obsAllScenes"
             />
-            <q-stepper-navigation>
-              <q-btn :label="$t('back')" class="q-ml-sm" flat @click="step--" />
+            <q-stepper-navigation class="q-gutter-sm">
+              <q-btn :label="$t('back')" flat @click="step--" />
               <q-btn
                 :disable="!currentSettings.obsMediaScene"
                 :label="$t('continue')"
-                class="q-ml-sm"
                 color="primary"
-                @click="step = 200"
+                @click="step = step = regularProfile ? 200 : 300"
               />
             </q-stepper-navigation>
           </q-step>
         </template>
       </template>
       <q-step
+        v-if="regularProfile"
         :done="step > 200"
         :name="200"
         :title="$t('songbook-video-caching')"
@@ -483,11 +466,10 @@
         <p>
           {{ $t('this-will-speed-up-media-retrieval-for-meetings') }}
         </p>
-        <q-stepper-navigation>
-          <q-btn :label="$t('no')" class="q-ml-sm" flat @click="step = 300" />
+        <q-stepper-navigation class="q-gutter-sm">
+          <q-btn :label="$t('no')" flat @click="step = 300" />
           <q-btn
             :label="$t('yes')"
-            class="q-ml-sm"
             color="primary"
             @click="
               currentSettings.enableExtraCache = true;
@@ -512,24 +494,21 @@
             )
           }}
         </p>
-        <q-stepper-navigation>
+        <q-stepper-navigation class="q-gutter-sm">
           <q-btn
             :label="$t('start-over')"
-            class="q-ml-sm"
             color="negative"
             flat
             @click="step = 0"
           />
           <q-btn
             :label="$t('titles.settings')"
-            class="q-ml-sm"
             color="primary"
             flat
             @click="goToPage('/settings')"
           />
           <q-btn
             :label="$t('media-playback')"
-            class="q-ml-sm"
             color="primary"
             @click="goToPage('/media-calendar')"
           />
@@ -562,6 +541,8 @@ const { currentCongregation, currentSettings } = storeToRefs(currentState);
 const congregationSettings = useCongregationSettingsStore();
 const { deleteCongregation } = congregationSettings;
 
+const regularProfile = ref(true);
+
 // const usingAtKh = ref(false);
 const obsUsed = ref(false);
 const obsIntegrate = ref(false);
@@ -575,16 +556,27 @@ if (currentSettings.value) {
   currentSettings.value.autoStartMusic = true;
 }
 
-watch(obsIntegrate, (newObsIntegrate) => {
-  if (newObsIntegrate && obsUsed.value && currentSettings.value) {
-    currentSettings.value.obsEnable = true;
-  }
-});
+watch(
+  () => obsIntegrate.value,
+  (newObsIntegrate) => {
+    if (newObsIntegrate && obsUsed.value && currentSettings.value) {
+      currentSettings.value.obsEnable = true;
+    }
+  },
+);
 
 watch(
   () => currentSettings.value?.lang,
   (newLang) => {
     if (newLang) updateYeartext();
+  },
+);
+
+watch(
+  () => regularProfile.value,
+  (newRegularProfile) => {
+    if (currentSettings.value)
+      currentSettings.value.disableMediaFetching = !newRegularProfile;
   },
 );
 

@@ -69,7 +69,7 @@ export type SettingsItemType =
 
 export type SettingsItemAction = 'obsConnect' | 'setBackgroundMusicVolume';
 export type SettingsItemOption = 'coTuesdays' | 'meetingTime';
-export type SettingsItemRule = 'notEmpty' | 'portNumber';
+export type SettingsItemRule = 'notEmpty' | 'portNumber' | 'regular';
 
 export interface SettingsItem {
   actions?: SettingsItemAction[];

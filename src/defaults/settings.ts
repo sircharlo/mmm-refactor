@@ -69,25 +69,25 @@ export const settingsDefinitions: SettingsItems = {
   mwDay: {
     group: 'congregationMeetings',
     list: 'days',
-    rules: ['notEmpty'],
+    rules: ['notEmpty', 'regular'],
     type: 'list',
   },
   mwStartTime: {
     group: 'congregationMeetings',
     options: ['meetingTime'],
-    rules: ['notEmpty'],
+    rules: ['notEmpty', 'regular'],
     type: 'time',
   },
   weDay: {
     group: 'congregationMeetings',
     list: 'days',
-    rules: ['notEmpty'],
+    rules: ['notEmpty', 'regular'],
     type: 'list',
   },
   weStartTime: {
     group: 'congregationMeetings',
     options: ['meetingTime'],
-    rules: ['notEmpty'],
+    rules: ['notEmpty', 'regular'],
     type: 'time',
   },
   coWeek: {

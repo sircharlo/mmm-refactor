@@ -4,6 +4,7 @@ import { getSpecificWeekday } from 'src/helpers/date';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { configuredScenesAreAllUUIDs } from 'src/helpers/obs';
 import { localeOptions } from 'src/i18n';
+import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { useObsStateStore } from 'src/stores/obs-state';
 import {
@@ -19,6 +20,9 @@ const filteredJwLanguages = ref(jwLanguages.value?.list || []);
 
 const obsState = useObsStateStore();
 const { scenes } = storeToRefs(obsState);
+
+const currentState = useCurrentStateStore();
+const { currentSettings } = storeToRefs(currentState);
 
 const filteredLocaleAppLang = ref(localeOptions);
 
@@ -70,7 +74,10 @@ const getRules = (rules: SettingsItemRule[] | undefined) => {
     const filteredRules = rules
       ?.map((rule) => {
         if (rule == 'notEmpty') {
-          return requiredRule;
+          return !rules.includes('regular') ||
+            !currentSettings.value?.disableMediaFetching
+            ? requiredRule
+            : undefined;
         } else if (rule == 'portNumber') {
           return portNumberRule;
         } else {
