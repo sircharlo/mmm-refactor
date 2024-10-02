@@ -6,6 +6,7 @@
     dense
     hide-bottom-space
     outlined
+    spellcheck="false"
     v-bind="{ label: label || undefined }"
     style="width: 240px"
   />

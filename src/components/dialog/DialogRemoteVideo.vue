@@ -19,6 +19,7 @@
             clearable
             dense
             outlined
+            spellcheck="false"
           >
             <template #prepend>
               <q-icon name="mmm-search" />

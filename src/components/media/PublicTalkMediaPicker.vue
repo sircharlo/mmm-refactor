@@ -35,6 +35,7 @@
             debounce="100"
             dense
             outlined
+            spellcheck="false"
           >
             <template #prepend>
               <q-icon name="mmm-search" />

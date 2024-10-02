@@ -436,8 +436,8 @@ body.body--dark {
   max-height: 75vh;
 }
 
-.q-dialog > .q-list,
-.q-menu > .q-list {
+.q-dialog .q-list,
+.q-menu .q-list {
   width: 300px;
 }
 

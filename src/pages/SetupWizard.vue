@@ -1,4 +1,5 @@
 <template>
+  <DialogCongregationLookup v-model="showCongregationLookup" />
   <q-page padding>
     <q-stepper v-model="step" animated color="primary" vertical>
       <!-- FIRST STAGE START -->
@@ -8,7 +9,7 @@
         :title="$t('setupWizard.welcome')"
         icon="mmm-media-settings"
       >
-        {{ $t('setupWizard.intro') }}
+        <p>{{ $t('setupWizard.intro') }}</p>
         <q-stepper-navigation class="q-gutter-sm">
           <q-btn
             :label="$t('cancel')"
@@ -28,7 +29,7 @@
         :title="$t('localAppLang')"
         icon="mmm-ui-language"
       >
-        {{ $t('what-language-would-you-like-m-to-be-displayed-in') }}
+        <p>{{ $t('what-language-would-you-like-m-to-be-displayed-in') }}</p>
         <SelectInput
           v-model="currentSettings.localAppLang"
           :label="$t('localAppLang')"
@@ -82,12 +83,24 @@
         icon="mmm-rename"
       >
         <!-- This icon is from the Material Design Icons collection -->
-        {{
-          $t(
-            'the-name-of-your-congregation-or-group-will-be-used-to-quickly-switch-between-profiles-if-ever-you-decide-create-more-than-one-in-the-future',
-          )
-        }}
-        <TextInput v-model="currentSettings.congregationName" />
+        <p>
+          {{
+            $t(
+              'the-name-of-your-congregation-or-group-will-be-used-to-quickly-switch-between-profiles-if-ever-you-decide-create-more-than-one-in-the-future',
+            )
+          }}
+        </p>
+        <div class="q-gutter-sm row">
+          <TextInput v-model="currentSettings.congregationName" />
+          <q-btn
+            v-if="regularProfile"
+            :label="$t('congregation-lookup')"
+            color="primary"
+            icon="mmm-search"
+            outline
+            @click="showCongregationLookup = true"
+          />
+        </div>
         <q-stepper-navigation class="q-gutter-sm">
           <q-btn :label="$t('back')" color="negative" flat @click="step--" />
           <q-btn
@@ -104,7 +117,7 @@
         :title="$t('lang')"
         icon="mmm-media-language"
       >
-        {{ $t('in-what-language-should-media-be-downloaded') }}
+        <p>{{ $t('in-what-language-should-media-be-downloaded') }}</p>
         <SelectInput
           v-model="currentSettings.lang"
           :label="$t('lang')"
@@ -128,31 +141,39 @@
         :title="$t('setupWizard.meetingDaysTimes')"
         icon="mmm-calendar-month"
       >
-        {{
-          $t(
-            'what-are-your-meeting-days-and-times-well-use-this-info-to-display-the-media-calendar',
-          )
-        }}
-        <SelectInput
-          v-model="currentSettings.mwDay"
-          :label="$t('mwDay')"
-          options="days"
-        />
-        <TimeInput
-          v-model="currentSettings.mwStartTime"
-          :label="$t('mwStartTime')"
-          :options="['meetingTime']"
-        />
-        <SelectInput
-          v-model="currentSettings.weDay"
-          :label="$t('weDay')"
-          options="days"
-        />
-        <TimeInput
-          v-model="currentSettings.weStartTime"
-          :label="$t('weStartTime')"
-          :options="['meetingTime']"
-        />
+        <p>
+          {{
+            $t(
+              'what-are-your-meeting-days-and-times-well-use-this-info-to-display-the-media-calendar',
+            )
+          }}
+        </p>
+        <p class="text-subtitle2">{{ $t('midweek-meeting') }}</p>
+        <p class="q-gutter-sm row">
+          <SelectInput
+            v-model="currentSettings.mwDay"
+            :label="$t('mwDay')"
+            options="days"
+          />
+          <TimeInput
+            v-model="currentSettings.mwStartTime"
+            :label="$t('mwStartTime')"
+            :options="['meetingTime']"
+          />
+        </p>
+        <p class="text-subtitle2">{{ $t('weekend-meeting') }}</p>
+        <p class="q-gutter-sm row">
+          <SelectInput
+            v-model="currentSettings.weDay"
+            :label="$t('weDay')"
+            options="days"
+          />
+          <TimeInput
+            v-model="currentSettings.weStartTime"
+            :label="$t('weStartTime')"
+            :options="['meetingTime']"
+          />
+        </p>
         <q-stepper-navigation class="q-gutter-sm">
           <q-btn :label="$t('back')" color="negative" flat @click="step--" />
           <q-btn
@@ -175,12 +196,15 @@
         :title="$t('almost-done')"
         icon="mmm-almost-done"
       >
-        {{
-          $t(
-            'well-start-fetching-media-while-we-wrap-up-with-our-initial-setup',
-          )
-        }}
+        <p>
+          {{
+            $t(
+              'well-start-fetching-media-while-we-wrap-up-with-our-initial-setup',
+            )
+          }}
+        </p>
         <q-stepper-navigation class="q-gutter-sm">
+          <q-btn :label="$t('back')" color="negative" flat @click="step--" />
           <q-btn
             :label="$t('continue')"
             color="primary"
@@ -200,11 +224,13 @@
         icon="mmm-yeartext"
       >
         <!-- This icon is from the Material Design Icons collection -->
-        {{
-          $t(
-            'notice-the-yeartext-is-now-being-displayed-on-the-external-monitor-but-lets-keep-going',
-          )
-        }}
+        <p>
+          {{
+            $t(
+              'notice-the-yeartext-is-now-being-displayed-on-the-external-monitor-but-lets-keep-going',
+            )
+          }}
+        </p>
         <q-stepper-navigation class="q-gutter-sm">
           <q-btn :label="$t('back')" color="negative" flat @click="step = 6" />
           <q-btn :label="$t('continue')" color="primary" @click="step++" />
@@ -327,7 +353,11 @@
           </p>
           <q-stepper-navigation class="q-gutter-sm">
             <q-btn :label="$t('back')" flat @click="step--" />
-            <q-btn :label="$t('no')" flat @click="step = regularProfile ? 200 : 300" />
+            <q-btn
+              :label="$t('no')"
+              flat
+              @click="step = regularProfile ? 200 : 300"
+            />
             <q-btn
               :label="$t('yes')"
               color="primary"
@@ -356,7 +386,11 @@
               }}
             </p>
             <q-stepper-navigation class="q-gutter-sm">
-              <q-btn :label="$t('skip-for-now')" flat @click="step = regularProfile ? 200 : 300" />
+              <q-btn
+                :label="$t('skip-for-now')"
+                flat
+                @click="step = regularProfile ? 200 : 300"
+              />
               <q-btn :label="$t('continue')" color="primary" @click="step++" />
             </q-stepper-navigation>
           </q-step>
@@ -520,6 +554,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
+import DialogCongregationLookup from 'src/components/dialog/DialogCongregationLookup.vue';
 import SelectInput from 'src/components/form-inputs/SelectInput.vue';
 import TextInput from 'src/components/form-inputs/TextInput.vue';
 import TimeInput from 'src/components/form-inputs/TimeInput.vue';
@@ -589,4 +624,5 @@ const goToPage = (path: string) => {
 };
 
 const step = ref(0);
+const showCongregationLookup = ref(false);
 </script>
