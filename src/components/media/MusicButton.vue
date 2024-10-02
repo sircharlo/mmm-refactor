@@ -380,8 +380,12 @@ async function playMusic() {
           1,
         );
       })
-      .catch((error) => {
-        errorCatcher(error);
+      .catch((error: Error) => {
+        if (
+          !error.message.includes('removed from the document') &&
+          !error.message.includes('new load request')
+        )
+          errorCatcher(error);
       })
       .finally(() => {
         musicStarting.value = false;
@@ -392,8 +396,12 @@ async function playMusic() {
       if (!nextSongUrl) return;
       musicPlayerSource.value.src = nextSongUrl;
       musicPlayer.value.load();
-      musicPlayer.value.play().catch((error) => {
-        errorCatcher(error);
+      musicPlayer.value.play().catch((error: Error) => {
+        if (
+          !error.message.includes('removed from the document') &&
+          !error.message.includes('new load request')
+        )
+          errorCatcher(error);
       });
     };
     musicPlayer.value.ontimeupdate = () => {

@@ -6,7 +6,10 @@ const get = async (url: string, params?: AxiosRequestConfig) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let returnVal: { data: any | undefined } = { data: undefined };
   returnVal = await axios.get(url, { params }).catch((error) => {
-    if (!(error instanceof AxiosError) || error.status !== 400)
+    if (
+      !(error instanceof AxiosError) ||
+      (error.status !== 400 && error.status !== 404)
+    )
       errorCatcher(error);
     return { data: undefined };
   });
