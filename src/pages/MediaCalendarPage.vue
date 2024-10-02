@@ -94,7 +94,6 @@
             class="row items-center justify-center q-mt-lg q-gutter-md"
           >
             <q-btn
-              v-if="!currentSettings?.disableMediaFetching"
               color="primary"
               outline
               @click="goToNextDayWithMedia()"
