@@ -1,8 +1,9 @@
+import { extend } from 'quasar';
 import { defaultSettings } from 'src/defaults/settings';
 import { electronApi } from 'src/helpers/electron-api';
+import { errorCatcher } from 'src/helpers/error-catcher';
 import { OldAppConfig, SettingsValues } from 'src/types/settings';
 
-import { errorCatcher } from './error-catcher';
 const { fs, getAppDataPath, klawSync, path } = electronApi;
 
 const getOldVersionPath = () => {
@@ -103,7 +104,7 @@ const buildNewPrefsObject = (oldPrefs: OldAppConfig) => {
     return newPrefsObject;
   } catch (error) {
     errorCatcher(error);
-    return defaultSettings;
+    return extend(true, {}, defaultSettings);
   }
 };
 
