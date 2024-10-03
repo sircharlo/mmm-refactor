@@ -63,6 +63,7 @@ import {
   registerAllCustomShortcuts,
   unregisterAllCustomShortcuts,
 } from 'src/helpers/keyboardShortcuts';
+import { showMediaWindow } from 'src/helpers/mediaPlayback';
 import { createTemporaryNotification } from 'src/helpers/notifications';
 
 // Stores
@@ -157,6 +158,7 @@ watch(currentCongregation, (newCongregation, oldCongregation) => {
       queues.meetings[oldCongregation].pause();
     }
     if (!newCongregation) {
+      showMediaWindow(false);
       navigateToCongregationSelector();
     } else {
       downloadProgress.value = {};

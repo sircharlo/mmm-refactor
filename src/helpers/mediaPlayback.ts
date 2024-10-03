@@ -354,7 +354,7 @@ const showMediaWindow = (state?: boolean) => {
   try {
     const currentState = useCurrentStateStore();
     const { mediaWindowVisible } = storeToRefs(currentState);
-    if (!state) {
+    if (typeof state === 'undefined') {
       state = !mediaWindowVisible.value;
     }
     mediaWindowVisible.value = state;

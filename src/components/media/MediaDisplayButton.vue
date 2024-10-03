@@ -285,7 +285,7 @@ const {
 } = electronApi;
 
 const currentState = useCurrentStateStore();
-const { currentSettings, mediaWindowCustomBackground, mediaWindowVisible } =
+const { currentCongregation, currentSettings, mediaWindowCustomBackground, mediaWindowVisible } =
   storeToRefs(currentState);
 const mediaDisplayPopup = ref();
 const appSettings = useAppSettingsStore();
@@ -386,9 +386,9 @@ const chooseCustomBackground = async (reset?: boolean) => {
 };
 
 watch(
-  () => currentSettings.value?.enableMediaDisplayButton,
-  (newMediaDisplayEnabled) => {
-    showMediaWindow(newMediaDisplayEnabled);
+  () => [currentSettings.value?.enableMediaDisplayButton, currentCongregation.value],
+  ([newMediaDisplayEnabled, newCongregation]) => {
+    showMediaWindow(!!newCongregation && !!newMediaDisplayEnabled);
   },
   { immediate: true },
 );

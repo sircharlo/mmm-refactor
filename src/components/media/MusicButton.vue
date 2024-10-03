@@ -516,9 +516,14 @@ onMounted(() => {
   );
 
   watch(
-    () => currentSettings.value?.enableMusicButton,
-    (newMusicButtonEnabled) => {
-      if (!newMusicButtonEnabled) stopMusic();
+    () => [currentSettings.value?.enableMusicButton, currentCongregation.value],
+    ([newMusicButtonEnabled, newCongregation], [, oldCongregation]) => {
+      if (
+        !newMusicButtonEnabled ||
+        !newCongregation ||
+        oldCongregation !== newCongregation
+      )
+        stopMusic();
     },
   );
 });
