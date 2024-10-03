@@ -802,7 +802,8 @@ const getWeMedia = async (lookupDate: Date) => {
          INNER JOIN Multimedia
            ON DocumentMultimedia.MultimediaId = Multimedia.MultimediaId
          INNER JOIN DocumentParagraph
-           ON DocumentMultimedia.BeginParagraphOrdinal = DocumentParagraph.ParagraphIndex
+           ON DocumentMultimedia.DocumentId = DocumentParagraph.DocumentId
+    		  AND DocumentMultimedia.BeginParagraphOrdinal = DocumentParagraph.ParagraphIndex
          LEFT JOIN Question
            ON Question.DocumentId = DocumentMultimedia.DocumentId
            AND Question.TargetParagraphOrdinal = DocumentMultimedia.BeginParagraphOrdinal
