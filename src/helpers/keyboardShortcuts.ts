@@ -39,6 +39,12 @@ const getCurrentShortcuts = () => {
   }
 };
 
+// See: https://www.electronjs.org/docs/latest/api/accelerator#available-key-codes
+const isKeyCode = (key: string) =>
+  /^([0-9A-Z)!@#%^&*(:+<_>?~{|}";=,\-./`[\\\]']|F1*[1-9]|F10|F2[0-4]|Plus|Space|Tab|Backspace|Delete|Insert|Return|Enter|Up|Down|Left|Right|Home|End|PageUp|PageDown|Escape|Esc|VolumeUp|VolumeDown|VolumeMute|MediaNextTrack|MediaPreviousTrack|MediaStop|MediaPlayPause|PrintScreen)$/.test(
+    key,
+  );
+
 const registerCustomShortcut = (
   shortcutName: Partial<keyof SettingsValues>,
   keySequence?: string,
@@ -93,6 +99,7 @@ const unregisterAllCustomShortcuts = () => {
 
 export {
   getCurrentShortcuts,
+  isKeyCode,
   registerAllCustomShortcuts,
   registerCustomShortcut,
   unregisterAllCustomShortcuts,
