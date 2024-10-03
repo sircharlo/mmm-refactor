@@ -77,6 +77,7 @@
 import { errorCatcher } from 'src/helpers/error-catcher';
 import {
   getCurrentShortcuts,
+  isKeyCode,
   registerCustomShortcut,
   unregisterShortcut,
 } from 'src/helpers/keyboardShortcuts';
@@ -113,17 +114,28 @@ const handleKeyPress = (event: KeyboardEvent) => {
   try {
     const { altKey, code, ctrlKey, key, metaKey, shiftKey } = event;
     const keys = [];
+
+    // Press a combination of modifier keys
     if (ctrlKey) keys.push('Ctrl');
     if (shiftKey) keys.push('Shift');
     if (altKey) keys.push('Alt');
     if (metaKey) keys.push('Meta');
-    if (key?.length < 3 && keys.length > 0) {
-      if (code.startsWith('Key')) {
-        keys.push(code.slice(3).toLowerCase());
-      } else {
-        keys.push(key);
+
+    // Press a key
+    if (keys.length > 0) {
+      let pressed = code;
+
+      if (code.startsWith('Digit')) pressed = key;
+      if (code.startsWith('Key')) pressed = code.slice(3);
+      if (code.startsWith('Arrow')) pressed = key.slice(5);
+      if (code.startsWith('MediaTrack')) {
+        pressed = `Media${code.slice(10)}Track`;
       }
-      localValue.value = keys.join('+');
+
+      if (isKeyCode(pressed)) {
+        keys.push(pressed);
+        localValue.value = keys.join('+');
+      }
     }
   } catch (e) {
     errorCatcher(e);
