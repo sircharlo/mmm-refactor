@@ -61,7 +61,7 @@ export const useCurrentStateStore = defineStore('current-state', {
     currentSettings(state) {
       const congregationSettingsStore = useCongregationSettingsStore();
       const { congregations } = storeToRefs(congregationSettingsStore);
-      return Object.keys(congregations).length > 0
+      return Object.keys(congregations.value).length > 0
         ? congregations.value[state.currentCongregation]
         : ({} as SettingsValues);
     },
