@@ -72,6 +72,8 @@ const refreshDateLocale = async (locale: string) => {
 
   const loadLang = async (locale: string) => {
     try {
+      if (!langList[`../../node_modules/quasar/lang/${locale}.js`])
+        locale = 'en-US';
       await langList[`../../node_modules/quasar/lang/${locale}.js`]().then(
         (lang) => {
           Lang.set(lang.default);
@@ -88,7 +90,7 @@ const refreshDateLocale = async (locale: string) => {
   let loaded = await loadLang(quasarLocale);
   if (!loaded) {
     // Fallback to a more general locale if specific one doesn't exist
-    loaded = await loadLang('en');
+    loaded = await loadLang('en-US');
   }
 };
 let i18n: ReturnType<typeof createI18n> = createI18n({});
