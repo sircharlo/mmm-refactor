@@ -28,17 +28,17 @@
           style="height: 25vh; width: -webkit-fill-available"
         >
           <q-list class="full-width" padding separator>
-            <q-item v-if="!results.length">
+            <q-item v-if="!results?.length">
               <q-item-section>
                 <q-item-label
                   >{{
-                    congregationName.length > 2
+                    congregationName?.length > 2
                       ? $t('no-results')
                       : $t('no-results-short')
                   }}
                 </q-item-label>
                 <q-item-label caption>{{
-                  congregationName.length > 2
+                  congregationName?.length > 2
                     ? $t('no-results-explain')
                     : $t('no-results-short-explain')
                 }}</q-item-label>
@@ -111,7 +111,7 @@ import { errorCatcher } from 'src/helpers/error-catcher';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { GeoRecord } from 'src/types/congregation-lookups';
-import { Ref, ref } from 'vue';
+import { Ref, ref, watch } from 'vue';
 
 const jwStore = useJwStore();
 const { jwLanguages } = storeToRefs(jwStore);
@@ -123,6 +123,14 @@ const open = defineModel<boolean>({ default: false });
 const congregationName = ref('');
 const results: Ref<GeoRecord[]> = ref([]);
 
+watch(open, (newOpen) => {
+  if (newOpen) {
+    congregationName.value = currentSettings.value?.congregationName || '';
+    results.value = [];
+    lookupCongregation();
+  }
+});
+
 const lookupCongregation = async () => {
   try {
     if (congregationName.value?.length > 2) {
@@ -131,7 +139,6 @@ const lookupCongregation = async () => {
           encodeURIComponent(congregationName.value) +
           '&latitude=0&longitude=0&searchLanguageCode=',
       ).then((response) => {
-        console.log(response.geoLocationList);
         results.value = response.geoLocationList || [];
       });
     } else {
@@ -145,21 +152,37 @@ const lookupCongregation = async () => {
 
 const selectCongregation = (congregation: GeoRecord) => {
   try {
-    if (currentSettings.value) {
-      currentSettings.value.lang = congregation.properties.languageCode;
-      currentSettings.value.langSubtitles =
-        congregation.properties.languageCode;
-      currentSettings.value.mwDay = (
-        congregation.properties.schedule.current.midweek.weekday - 1
-      )?.toString();
-      currentSettings.value.mwStartTime =
-        congregation.properties.schedule.current.midweek.time;
-      currentSettings.value.weDay = (
-        congregation.properties.schedule.current.weekend.weekday - 1
-      )?.toString();
-      currentSettings.value.weStartTime =
-        congregation.properties.schedule.current.weekend.time;
-      currentSettings.value.congregationName = congregation.properties.orgName;
+    if (!currentSettings.value) return;
+
+    const { properties } = congregation;
+
+    // Language
+    if (properties.languageCode) {
+      currentSettings.value.lang = properties.languageCode;
+      currentSettings.value.langSubtitles = properties.languageCode;
+    }
+
+    // Midweek day & time
+    const { midweek, weekend } = properties.schedule.current;
+
+    if (Number.isInteger(midweek?.weekday)) {
+      currentSettings.value.mwDay = (midweek.weekday - 1).toString();
+    }
+    if (midweek?.time) {
+      currentSettings.value.mwStartTime = midweek.time;
+    }
+
+    // Weekend day & time
+    if (Number.isInteger(weekend?.weekday)) {
+      currentSettings.value.weDay = (weekend.weekday - 1).toString();
+    }
+    if (weekend?.time) {
+      currentSettings.value.weStartTime = weekend.time;
+    }
+
+    // Congregation name
+    if (properties.orgName) {
+      currentSettings.value.congregationName = properties.orgName;
     }
   } catch (error) {
     errorCatcher(error);
