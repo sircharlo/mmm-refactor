@@ -91,10 +91,10 @@ localeOptions.push({
 }); // Pangasinan
 import pt from 'src/i18n/pt.json';
 localeOptions.push({
-  englishName: 'Portuguese',
-  label: 'Português',
+  englishName: 'Portuguese - Brazil',
+  label: 'Português - Brasil',
   value: 'pt',
-}); // Portuguese
+}); // Portuguese (Brazil)
 import ptPt from 'src/i18n/pt-pt.json';
 localeOptions.push({
   englishName: 'Portuguese - Portugal',
