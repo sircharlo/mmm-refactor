@@ -93,11 +93,7 @@
             "
             class="row items-center justify-center q-mt-lg q-gutter-md"
           >
-            <q-btn
-              color="primary"
-              outline
-              @click="goToNextDayWithMedia()"
-            >
+            <q-btn color="primary" outline @click="goToNextDayWithMedia()">
               <q-icon class="q-mr-sm" name="mmm-go-to-date" size="xs" />
               {{ $t('next-day-with-media') }}
             </q-btn>
@@ -669,10 +665,16 @@ const goToNextDayWithMedia = () => {
         additionalMediaMaps.value?.[currentCongregation.value])
     ) {
       selectedDate.value = [
-        ...lookupPeriod.value?.[currentCongregation.value]
+        ...(lookupPeriod.value?.[currentCongregation.value]
           ?.filter((day) => day.meeting)
-          .map((day) => day.date) ?? [],
-        ...Object.keys(additionalMediaMaps.value?.[currentCongregation.value] ?? {}),
+          .map((day) => day.date) ?? []),
+        ...Object.keys(
+          additionalMediaMaps.value?.[currentCongregation.value] || {},
+        ).filter(
+          (day) =>
+            additionalMediaMaps.value?.[currentCongregation.value][day].length >
+            0,
+        ),
       ]
         .filter(Boolean)
         .map((mediaDate) => date.formatDate(mediaDate, 'YYYY/MM/DD'))

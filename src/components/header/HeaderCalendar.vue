@@ -207,9 +207,9 @@ const getEventDates = () => {
     const additionalMedia =
       additionalMediaMaps.value[currentCongregation.value];
     const additionalMediaDates = additionalMedia
-      ? Object.keys(additionalMedia).map((day) =>
-          date.formatDate(day, 'YYYY/MM/DD'),
-        )
+      ? Object.keys(additionalMedia)
+          .filter((day) => additionalMedia[day].length > 0)
+          .map((day) => date.formatDate(day, 'YYYY/MM/DD'))
       : [];
     return meetingDates.concat(additionalMediaDates);
   } catch (error) {
