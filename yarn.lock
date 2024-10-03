@@ -311,7 +311,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron/rebuild@npm:3.6.1, @electron/rebuild@npm:^3.6.1":
+"@electron/rebuild@npm:3.6.1":
   version: 3.6.1
   resolution: "@electron/rebuild@npm:3.6.1"
   dependencies:
@@ -332,6 +332,30 @@ __metadata:
   bin:
     electron-rebuild: lib/cli.js
   checksum: 10c0/7d72ea5a0ab656b356cfe300ccdfdb25c06292a31e1729142243460aebe1a9b4c2a50469c6fb114b756575f8713a0532ec6b128e16eb944e8df446a5786ec581
+  languageName: node
+  linkType: hard
+
+"@electron/rebuild@npm:^3.6.2":
+  version: 3.6.2
+  resolution: "@electron/rebuild@npm:3.6.2"
+  dependencies:
+    "@malept/cross-spawn-promise": "npm:^2.0.0"
+    chalk: "npm:^4.0.0"
+    debug: "npm:^4.1.1"
+    detect-libc: "npm:^2.0.1"
+    fs-extra: "npm:^10.0.0"
+    got: "npm:^11.7.0"
+    node-abi: "npm:^3.45.0"
+    node-api-version: "npm:^0.2.0"
+    node-gyp: "npm:^9.0.0"
+    ora: "npm:^5.1.0"
+    read-binary-file-arch: "npm:^1.0.6"
+    semver: "npm:^7.3.5"
+    tar: "npm:^6.0.5"
+    yargs: "npm:^17.0.1"
+  bin:
+    electron-rebuild: lib/cli.js
+  checksum: 10c0/60c2418338ae92c080b2997fe1c443d5a42b278791a89fd5592be01940ba90c79904d27c243719997351902c7dabc31f31b77913cc0df4cdc2380f0f5dcf306c
   languageName: node
   linkType: hard
 
@@ -7828,7 +7852,7 @@ __metadata:
   resolution: "mmm-v2@workspace:."
   dependencies:
     "@daipeng7/rollup-plugin-iconfont": "npm:^3.0.6"
-    "@electron/rebuild": "npm:^3.6.1"
+    "@electron/rebuild": "npm:^3.6.2"
     "@electron/remote": "npm:^2.1.2"
     "@formkit/drag-and-drop": "npm:^0.1.6"
     "@intlify/vite-plugin-vue-i18n": "npm:^7.0.0"
