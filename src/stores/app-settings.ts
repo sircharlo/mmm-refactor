@@ -20,6 +20,10 @@ export const useAppSettingsStore = defineStore('app-settings', {
           const oldVersionPath = getOldVersionPath();
           if (!oldVersionPath) return false;
           const oldPrefsPaths = getOldPrefsPaths(oldVersionPath);
+          if (!oldPrefsPaths.length) {
+            this.migrations.push(type);
+            return false;
+          }
           for (const oldPrefsPath of oldPrefsPaths) {
             try {
               const oldPrefs: OldAppConfig = parsePrefsFile(oldPrefsPath.path);
