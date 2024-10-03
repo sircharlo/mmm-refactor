@@ -147,7 +147,11 @@
           </p>
           <q-stepper-navigation class="q-gutter-sm">
             <q-btn :label="$t('back')" color="negative" flat @click="step--" />
-            <q-btn :label="$t('continue')" color="primary" @click="step++" />
+            <q-btn
+              :label="$t('continue')"
+              color="primary"
+              @click="step = regularProfile ? step + 1 : 103"
+            />
           </q-stepper-navigation>
         </q-step>
 
@@ -202,6 +206,32 @@
         </q-step>
         <q-step
           :disable="!regularProfile"
+          :done="step > 7"
+          :name="7"
+          :title="$t('songbook-video-caching')"
+          icon="mmm-download"
+        >
+          <p class="text-subtitle1">
+            {{ $t('would-you-like-to-enable-songbook-video-caching') }}
+          </p>
+          <p>
+            {{ $t('this-will-speed-up-media-retrieval-for-meetings') }}
+          </p>
+          <q-stepper-navigation class="q-gutter-sm">
+            <q-btn :label="$t('no')" flat @click="step = 101" />
+            <q-btn
+              :label="$t('yes')"
+              color="primary"
+              @click="
+                currentSettings.enableExtraCache = true;
+                downloadSongbookVideos();
+                step = 101;
+              "
+            />
+          </q-stepper-navigation>
+        </q-step>
+        <q-step
+          :disable="!regularProfile"
           :done="step > 8"
           :name="8"
           :title="$t('almost-done')"
@@ -223,32 +253,6 @@
                 fetchMedia();
                 downloadBackgroundMusic();
                 step++;
-              "
-            />
-          </q-stepper-navigation>
-        </q-step>
-        <q-step
-          :disable="!regularProfile"
-          :done="step > 7"
-          :name="7"
-          :title="$t('songbook-video-caching')"
-          icon="mmm-download"
-        >
-          <p class="text-subtitle1">
-            {{ $t('would-you-like-to-enable-songbook-video-caching') }}
-          </p>
-          <p>
-            {{ $t('this-will-speed-up-media-retrieval-for-meetings') }}
-          </p>
-          <q-stepper-navigation class="q-gutter-sm">
-            <q-btn :label="$t('no')" flat @click="step = 101" />
-            <q-btn
-              :label="$t('yes')"
-              color="primary"
-              @click="
-                currentSettings.enableExtraCache = true;
-                downloadSongbookVideos();
-                step = 101;
               "
             />
           </q-stepper-navigation>
