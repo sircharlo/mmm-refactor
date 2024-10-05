@@ -33,12 +33,9 @@
       </q-time>
     </q-popup-proxy>
   </q-input>
-  <!-- {{ localValue }}
-  </q-btn> -->
 </template>
 
 <script setup lang="ts">
-// import { getTimeOptions } from 'src/helpers/settings';
 import { getRules, getTimeOptions } from 'src/helpers/settings';
 import { SettingsItemOption, SettingsItemRule } from 'src/types/settings';
 import { ref, watch } from 'vue';

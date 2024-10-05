@@ -118,7 +118,6 @@
         </q-card-section>
       </q-card>
     </q-dialog>
-    <!-- </q-popup-proxy> -->
   </q-btn>
   <audio ref="musicPlayer" style="display: none" />
 </template>
@@ -316,11 +315,6 @@ const getNextSong = async () => {
   }
 };
 
-/**
- * Calculates the remaining time before the meeting starts based on the selected meeting day and start time settings.
- *
- * @return {string|null} The remaining time in hours and minutes, optionally formatted, or null if there is no meeting day selected.
- */
 const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
   try {
     if (meetingDay.value) {
@@ -375,10 +369,7 @@ async function playMusic() {
       .play()
       .then(() => {
         musicPlaying.value = true;
-        fadeToVolumeLevel(
-          (currentSettings.value?.musicVolume ?? 100) / 100 ?? 1,
-          1,
-        );
+        fadeToVolumeLevel((currentSettings.value?.musicVolume ?? 100) / 100, 1);
       })
       .catch((error: Error) => {
         if (
@@ -463,7 +454,7 @@ const toggleMusicListener = () => {
 
 const muteBackgroundMusic = () => fadeToVolumeLevel(0.001, 1);
 const unmuteBackgroundMusic = () =>
-  fadeToVolumeLevel((currentSettings?.value?.musicVolume ?? 100) / 100 ?? 1, 1);
+  fadeToVolumeLevel((currentSettings?.value?.musicVolume ?? 100) / 100, 1);
 
 watch(
   () => [mediaPlayingAction.value, mediaPlayingUrl.value],

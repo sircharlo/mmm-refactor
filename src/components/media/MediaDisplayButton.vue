@@ -189,7 +189,6 @@
         </q-card-section>
       </q-card>
     </q-dialog>
-    <!-- </q-popup-proxy> -->
   </q-btn>
   <q-dialog v-model="showCustomBackgroundPicker">
     <div
@@ -236,8 +235,6 @@
           :showing="!!jwpubImportFilePath && !jwpubImages.length"
         />
       </q-scroll-area>
-      <!-- </q-card-section>
-    </q-card> -->
       <div class="row justify-end">
         <q-btn
           color="negative"
@@ -285,8 +282,12 @@ const {
 } = electronApi;
 
 const currentState = useCurrentStateStore();
-const { currentCongregation, currentSettings, mediaWindowCustomBackground, mediaWindowVisible } =
-  storeToRefs(currentState);
+const {
+  currentCongregation,
+  currentSettings,
+  mediaWindowCustomBackground,
+  mediaWindowVisible,
+} = storeToRefs(currentState);
 const mediaDisplayPopup = ref();
 const appSettings = useAppSettingsStore();
 const { screenPreferences } = storeToRefs(appSettings);
@@ -386,7 +387,10 @@ const chooseCustomBackground = async (reset?: boolean) => {
 };
 
 watch(
-  () => [currentSettings.value?.enableMediaDisplayButton, currentCongregation.value],
+  () => [
+    currentSettings.value?.enableMediaDisplayButton,
+    currentCongregation.value,
+  ],
   ([newMediaDisplayEnabled, newCongregation]) => {
     showMediaWindow(!!newCongregation && !!newMediaDisplayEnabled);
   },

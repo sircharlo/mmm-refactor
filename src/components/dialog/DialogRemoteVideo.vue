@@ -6,11 +6,11 @@
       <div class="text-h6 row">{{ $t('add-video-jw-org') }}</div>
       <div class="row">{{ $t('add-a-video-explain') }}</div>
       <!-- <div class="row">
-                  <q-linear-progress
-                    :value="remoteVideosLoadingProgress"
-                    class="q-mt-md"
-                  />
-                </div> -->
+        <q-linear-progress
+          :value="remoteVideosLoadingProgress"
+          class="q-mt-md"
+        />
+      </div> -->
       <div class="row">
         <div class="col-grow">
           <q-input

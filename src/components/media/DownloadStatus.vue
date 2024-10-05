@@ -47,17 +47,13 @@
 import isOnline from 'is-online';
 import { storeToRefs } from 'pinia';
 import { errorCatcher } from 'src/helpers/error-catcher';
-// import { electronApi } from 'src/helpers/electron-api';
 import { useCurrentStateStore } from 'src/stores/current-state';
-// import { DownloadProgressItems } from 'src/types/media';
 import { onMounted, ref, watch } from 'vue';
 
 const emit = defineEmits(['update:download']);
 
 const currentState = useCurrentStateStore();
 const { downloadProgress, online } = storeToRefs(currentState);
-// const { path } = electronApi;
-// const downloadPopup = ref(false);
 
 const props = defineProps<{
   download: boolean;

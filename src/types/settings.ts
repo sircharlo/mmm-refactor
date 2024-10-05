@@ -1,17 +1,10 @@
 import type { MessageSchema } from 'src/boot/i18n';
 
 export interface SettingsValues {
-  // autoOpenFolderWhenDone: boolean;
-  // autoPlayFirst: boolean;
-  // autoPlayFirstTime: number;
-  // autoQuitWhenDone: boolean;
   autoStartAtLogin: boolean;
   autoStartMusic: boolean;
-  // betaUpdates: boolean;
   congregationName: string;
-  // autoStartSync: boolean;
   coWeek: string;
-  // disableAutoUpdate: boolean;
   darkMode: string;
   disableMediaFetching: boolean;
   // enablePp: boolean;
@@ -19,33 +12,23 @@ export interface SettingsValues {
   enableKeyboardShortcuts: boolean;
   // disableHardwareAcceleration: boolean;
   enableMediaDisplayButton: boolean;
-  // enableMp4Conversion: boolean;
   enableMusicButton: boolean;
-  // enableMusicFadeOut: boolean;
   enableSubtitles: boolean;
-  // enableVlcPlaylistCreation: boolean;
   excludeFootnotes: boolean;
-  // excludeLffImages: boolean;
   excludeTh: boolean;
   hideMediaLogo: boolean;
   includePrinted: boolean;
-  // keepOriginalsAfterConversion: boolean;
   lang: string;
   langFallback: string;
-  // musicFadeOutTime: number;
   langSubtitles: string;
   localAppLang: string;
   maxRes: string;
   musicVolume: number;
-  // mediaWinShortcut: string;
   mwDay: string;
   mwStartTime: string;
   obsCameraScene: string;
   obsEnable: boolean;
   obsImageScene: string;
-  // outputFolderDateFormat: string;
-  // presentShortcut: string;
-  // shuffleShortcut: string;
   obsMediaScene: string;
   obsPassword: string;
   obsPort: string;
@@ -53,7 +36,6 @@ export interface SettingsValues {
   // shortcutMediaPrevious: string;
   shortcutMediaWindow: string;
   shortcutMusic: string;
-  // [key: string]: unknown;
   weDay: string;
   weStartTime: string;
 }

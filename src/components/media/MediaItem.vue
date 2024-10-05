@@ -84,7 +84,6 @@
               <q-card-section
                 class="row items-center text-bigger text-semibold q-pb-none"
               >
-                <!-- <q-icon class="q-mr-sm" name="mmm-edit" /> -->
                 {{ $t('set-custom-durations') }}
               </q-card-section>
               <q-card-section>
@@ -96,10 +95,7 @@
               </q-card-section>
               <q-card-section>
                 <div class="text-subtitle1 q-pb-sm">{{ media.title }}</div>
-                <!-- </q-card-section>
-              <q-card-section class="q-pr-sm" horizontal> -->
                 <div class="row items-center q-mt-lg">
-                  <!-- {{ media.duration }} -->
                   <div class="col-shrink q-pr-md time-duration">
                     {{ formatTime(0) }}
                   </div>
@@ -326,15 +322,6 @@
                     <q-item
                       clickable
                       @click="
-                        // customDurations[currentCongregation] ??= {};
-                        // customDurations[currentCongregation][selectedDate] ??=
-                        //   {};
-                        // customDurations[currentCongregation][selectedDate][
-                        //   media.uniqueId
-                        // ] = {
-                        //   min: 0,
-                        //   max: media.duration,
-                        // };
                         delete customDurations?.[currentCongregation]?.[
                           selectedDate
                         ]?.[media.uniqueId];
@@ -602,14 +589,6 @@ const showMediaDurationPopup = (media: DynamicMediaObject) => {
 
 const resetMediaDuration = (media: DynamicMediaObject) => {
   try {
-    // customDurations.value[currentCongregation.value] ??= {};
-    // customDurations.value[currentCongregation.value][selectedDate.value] ??= {};
-    // customDurations.value[currentCongregation.value][selectedDate.value][
-    //   media.uniqueId
-    // ] = {
-    //   max: media.duration,
-    //   min: 0,
-    // };
     delete customDurations.value?.[currentCongregation.value]?.[
       selectedDate.value
     ]?.[media.uniqueId];
@@ -646,7 +625,6 @@ const zoomReset = (elemId: string, forced = false, animate = true) => {
 };
 
 function stopMedia() {
-  // mediaPlayingAction.value = 'stop';
   destroyPanzoom(mediaPlayingUniqueId.value);
   mediaPlayingAction.value = 'pause';
   mediaPlayingUrl.value = '';

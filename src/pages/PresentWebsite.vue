@@ -24,9 +24,6 @@
             )
           }}
         </q-item>
-        <!-- <q-item>
-          <iframe src="https://www.jw.org/"></iframe>
-        </q-item> -->
       </div>
     </q-list>
   </q-page>

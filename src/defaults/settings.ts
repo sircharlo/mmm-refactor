@@ -112,12 +112,6 @@ export const settingsDefinitions: SettingsItems = {
     type: 'toggle',
   },
 
-  // excludeLffImages: {
-  //   type: 'toggle',
-  //   group: 'mediaRetrievalPlayback',
-  //   depends: 'enableMediaDisplayButton',
-  // },
-
   // Integrations
   obsEnable: {
     actions: ['obsConnect'],

@@ -1,6 +1,5 @@
 <template>
   <q-toggle v-model="localValue" checked-icon="mmm-check" color="primary" />
-  <!-- unchecked-icon="clear" -->
 </template>
 
 <script setup lang="ts">

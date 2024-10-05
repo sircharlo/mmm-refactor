@@ -16,4 +16,4 @@ const errorCatcher = (error: Error | string | unknown) => {
 //   }
 // };
 
-export { errorCatcher /*warningCatcher*/ };
+export { errorCatcher };

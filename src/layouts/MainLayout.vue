@@ -1,6 +1,6 @@
 <template>
   <q-layout class="non-selectable column no-wrap" view="hHh LpR lFr">
-    <!-- Topbar -->
+    <!-- Top bar -->
     <HeaderBase />
 
     <!-- Side navigation -->

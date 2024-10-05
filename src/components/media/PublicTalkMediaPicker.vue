@@ -76,7 +76,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { barStyle, thumbStyle } from 'src/boot/globals';
-// import { errorCatcher } from 'src/helpers/error-catcher';
 import { electronApi } from 'src/helpers/electron-api';
 import { getPublicationsPath } from 'src/helpers/fs';
 import { addJwpubDocumentMediaToFiles } from 'src/helpers/jw-media';

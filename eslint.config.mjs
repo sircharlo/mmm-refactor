@@ -2,7 +2,6 @@ import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
-// import perfectionist from 'eslint-plugin-perfectionist';
 import vue from 'eslint-plugin-vue';
 import globals from 'globals';
 import path from 'node:path';

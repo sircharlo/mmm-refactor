@@ -223,8 +223,7 @@ const minDate = () => {
     const dateArray: Date[] = lookupPeriod.value[
       currentCongregation.value
     ]?.map((day) => day.date);
-    // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
-    const minDate = date.getMinDate(...dateArray);
+    const minDate = date.getMinDate(dateArray[0], ...dateArray.slice(1));
     return date.formatDate(minDate, 'YYYY/MM');
   } catch (error) {
     errorCatcher(error);
@@ -238,8 +237,7 @@ const maxDate = () => {
     const dateArray: Date[] = lookupPeriod.value[
       currentCongregation.value
     ]?.map((day) => day.date);
-    // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
-    const maxDate = date.getMaxDate(...dateArray);
+    const maxDate = date.getMaxDate(dateArray[0], ...dateArray.slice(1));
     return date.formatDate(maxDate, 'YYYY/MM');
   } catch (error) {
     errorCatcher(error);
@@ -258,10 +256,8 @@ const dateOptions = (lookupDate: string) => {
     const dateArray: Date[] = lookupPeriod.value[
       currentCongregation.value
     ]?.map((day) => day.date);
-    // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
-    const minDate = date.getMinDate(...dateArray);
-    // @ts-expect-error "A spread argument must either have a tuple type or be passed to a rest parameter."
-    const maxDate = date.getMaxDate(...dateArray);
+    const minDate = date.getMinDate(dateArray[0], ...dateArray.slice(1));
+    const maxDate = date.getMaxDate(dateArray[0], ...dateArray.slice(1));
     return (
       date.getDateDiff(lookupDate, minDate, 'days') >= 0 &&
       date.getDateDiff(lookupDate, maxDate, 'days') <= 0

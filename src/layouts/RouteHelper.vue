@@ -1,5 +1,4 @@
 <template>
-  <!-- not used -->
   <p></p>
 </template>
 

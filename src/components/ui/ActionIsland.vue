@@ -1,9 +1,5 @@
 <template>
   <div id="actionIsland" class="flex" style="justify-content: center">
-    <!-- <div id="musicPopupAnchor" /> -->
-    <!-- <div id="mediaDisplayPopupAnchor" />
-    <div id="obsPopupAnchor" /> -->
-
     <q-chip
       :ripple="false"
       class="action-island"
@@ -17,7 +13,6 @@
           @update:download="downloadPopup = $event"
         />
         <q-separator class="bg-semi-white-24" vertical />
-        <!-- <MusicButton :music="musicPopup" @update:music="musicPopup = $event" /> -->
         <MusicButton />
         <SubtitlesButton />
         <ObsStatus />
@@ -113,7 +108,6 @@ const { path } = electronApi;
 const currentState = useCurrentStateStore();
 const { downloadProgress } = storeToRefs(currentState);
 const downloadPopup = ref(false);
-// const musicPopup = ref(false);
 
 const filteredDownloads = (
   obj: DownloadProgressItems,

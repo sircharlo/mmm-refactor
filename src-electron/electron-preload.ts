@@ -122,17 +122,14 @@ const openWebsiteWindow = () => {
   websiteWindow.on('close', () => stopStream());
 
   const source = {
-    id: websiteWindow.getMediaSourceId(), // for testing
+    id: websiteWindow.getMediaSourceId(),
     name: websiteWindow.getTitle(),
   };
 
   mainWindow.webContents.session.setDisplayMediaRequestHandler(
     (request, callback) => {
-      // const frames = mainWindow.webContents.mainFrame.framesInSubtree;
-      // const lastFrame = frames[frames.length - 1];
       callback({
         audio: 'loopback',
-        // video: lastFrame,
         video: source as Electron.Video,
       } as Electron.Streams);
     },
@@ -458,7 +455,6 @@ contextBridge.exposeInMainWorld('electronApi', {
         }
       });
     });
-    // unzip(inputZip, { target: outputFolder });
   },
   executeQuery: (dbPath: string, query: string) => {
     try {
@@ -522,12 +518,6 @@ contextBridge.exposeInMainWorld('electronApi', {
         name: 'All files',
       },
     ];
-    // if (filter?.includes('images')) {
-    //   filesFilter.push({
-    //     extensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'heic', 'svg'],
-    //     name: 'Images',
-    //   });
-    // }
     if (filter?.includes('jwpub')) {
       filesFilter.push({
         extensions: ['jwpub'],

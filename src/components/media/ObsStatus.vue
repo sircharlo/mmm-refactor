@@ -113,7 +113,6 @@
         </q-card-section>
       </q-card>
     </q-dialog>
-    <!-- </q-popup-proxy> -->
   </q-btn>
 </template>
 
@@ -272,7 +271,6 @@ const fetchSceneList = async (retryInterval = 2000, maxRetries = 5) => {
         await new Promise((resolve) => setTimeout(resolve, retryInterval));
       } else {
         errorCatcher(error);
-        // throw error;
       }
     }
   }

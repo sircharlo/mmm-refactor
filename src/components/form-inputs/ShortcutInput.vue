@@ -52,11 +52,6 @@
             </div>
           </template>
         </template>
-        <!-- <template v-else>
-          <div
-            class="col text-uppercase bg-primary q-px-sm q-py-md rounded-borders"
-          ></div>
-        </template> -->
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary">
