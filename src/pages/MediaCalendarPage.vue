@@ -319,6 +319,7 @@ import { storeToRefs } from 'pinia';
 import { date, uid } from 'quasar';
 import DragAndDropper from 'src/components/media/DragAndDropper.vue';
 import MediaItem from 'src/components/media/MediaItem.vue';
+import { getDateLocaleFormatted } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import {
@@ -631,25 +632,30 @@ watch(
   },
 );
 
+const seenErrors = new Set();
 watch(
   () =>
     lookupPeriod.value[currentCongregation.value]
       ?.filter((d) => d.error)
       .map((d) => date.formatDate(d.date, 'YYYY/MM/DD')),
-  (newVal) => {
-    newVal.forEach(() => {
+  (errorVals) => {
+    errorVals?.forEach((errorVal) => {
+      if (seenErrors.has(currentCongregation + errorVal)) return;
       createTemporaryNotification({
-        caption: !currentSettings.value?.langFallback
-          ? t('tryConfiguringFallbackLanguage')
-          : '',
+        caption: getDateLocaleFormatted(
+          currentSettings.value?.localAppLang,
+          errorVal,
+        ),
         group: 'meetingMediaDownloadError',
         icon: 'mmm-error',
         message: t('errorDownloadingMeetingMedia'),
         timeout: 15000,
         type: 'negative',
       });
+      seenErrors.add(currentCongregation + errorVal);
     });
   },
+  { immediate: true },
 );
 
 const startDragging = () => {

@@ -223,9 +223,14 @@ const getLocaleDayName = (lang: string, day: number) => {
 };
 
 const getDateLocaleFormatted = (lang: string, date: Date | string) => {
-  dayjs.extend(localizedFormat);
-  if (!date || !lang) return '';
-  return dayjs(date).locale(lang).format('LL');
+  try {
+    dayjs.extend(localizedFormat);
+    if (!date || !lang) return (date || '') as string;
+    return dayjs(date).locale(lang).format('LL');
+  } catch (error) {
+    errorCatcher(error);
+    return (date || '') as string;
+  }
 };
 
 export {

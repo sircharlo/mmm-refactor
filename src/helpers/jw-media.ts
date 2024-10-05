@@ -218,7 +218,8 @@ const fetchMedia = async () => {
       return (
         (day.meeting && !day.complete) ||
         day.dynamicMedia.some(
-          (media) => !fs.existsSync(fileUrlToPath(media.fileUrl)),
+          (media) =>
+            !media?.fileUrl || !fs.existsSync(fileUrlToPath(media?.fileUrl)),
         )
       );
     });
@@ -251,7 +252,7 @@ const fetchMedia = async () => {
             if (fetchResult) {
               day.dynamicMedia = fetchResult.media;
               day.error = fetchResult.error;
-              day.complete = !fetchResult.error;
+              day.complete = true;
             } else {
               day.error = true;
               day.complete = false;
@@ -1054,10 +1055,10 @@ const getMwMedia = async (lookupDate: Date) => {
         if (mepsLang) media.AlternativeLanguage = mepsLang;
       }
     }
-    await processMissingMediaInfo(allMedia);
+    const errors = (await processMissingMediaInfo(allMedia)) || [];
     const dynamicMediaForDay = await dynamicMediaMapper(allMedia, lookupDate);
     return {
-      error: false,
+      error: errors.length > 0,
       media: dynamicMediaForDay,
     };
   } catch (e) {

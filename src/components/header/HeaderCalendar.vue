@@ -106,7 +106,6 @@
           $t('select-a-date')
         : ''
     }}
-    <!--dayjs-->
     <q-popup-proxy v-model="datePickerActive" :offset="[0, 11]">
       <q-date
         v-model="selectedDate"
@@ -338,10 +337,10 @@ const getEventDayColor = (eventDate: string) => {
     const lookupDate = lookupPeriod.value[currentCongregation.value]?.find(
       (d) => date.getDateDiff(eventDate, d.date, 'days') === 0,
     );
-    if (lookupDate?.complete) {
-      return 'primary';
-    } else if (lookupDate?.error) {
+    if (lookupDate?.error) {
       return 'negative';
+    } else if (lookupDate?.complete) {
+      return 'primary';
     }
     const additionalDates =
       additionalMediaMaps.value[currentCongregation.value];
