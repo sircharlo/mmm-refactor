@@ -218,14 +218,14 @@
             {{ $t('this-will-speed-up-media-retrieval-for-meetings') }}
           </p>
           <q-stepper-navigation class="q-gutter-sm">
-            <q-btn :label="$t('no')" flat @click="step = 101" />
+            <q-btn :label="$t('no')" flat @click="step++" />
             <q-btn
               :label="$t('yes')"
               color="primary"
               @click="
                 currentSettings.enableExtraCache = true;
                 downloadSongbookVideos();
-                step = 101;
+                step++;
               "
             />
           </q-stepper-navigation>
@@ -252,7 +252,7 @@
               @click="
                 fetchMedia();
                 downloadBackgroundMusic();
-                step++;
+                step = 101;
               "
             />
           </q-stepper-navigation>
@@ -289,7 +289,12 @@
             }}
           </p>
           <q-stepper-navigation class="q-gutter-sm">
-            <q-btn :label="$t('back')" color="negative" flat @click="step--" />
+            <q-btn
+              :label="$t('back')"
+              color="negative"
+              flat
+              @click="step = 8"
+            />
             <q-btn :label="$t('continue')" color="primary" @click="step++" />
           </q-stepper-navigation>
         </q-step>
@@ -401,28 +406,6 @@
             />
           </q-stepper-navigation>
         </q-step>
-        <!-- <q-step
-        :disable="!obsUsed || !obsIntegrate"
-        :done="step > 105"
-        :name="105"
-        :title="$t('obs-studio-configuration')"
-        icon="mmm-obs-configured"
-      >
-        <p class="text-subtitle1">
-          {{ $t('is-obs-studio-configured-correctly') }}
-        </p>
-        <p>
-          {{
-            $t(
-              'configure-the-websocket-plugin-in-obs-studio-the-virtual-camera-plugin-is-also-required-so-make-sure-its-installed-and-configured-as-well',
-            )
-          }}
-        </p>
-        <q-stepper-navigation class="q-gutter-sm">
-          <q-btn :label="$t('skip-for-now')" flat @click="step = 300" />
-          <q-btn :label="$t('continue')" color="primary" @click="step++" />
-        </q-stepper-navigation>
-      </q-step> -->
         <q-step
           :disable="!obsUsed || !obsIntegrate"
           :done="step > 105"
