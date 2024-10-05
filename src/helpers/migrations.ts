@@ -4,17 +4,7 @@ import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { OldAppConfig, SettingsValues } from 'src/types/settings';
 
-const { fs, getAppDataPath, klawSync, path } = electronApi;
-
-const getOldVersionPath = () => {
-  try {
-    const oldVersionPath = path.join(getAppDataPath(), 'meeting-media-manager');
-    return fs.existsSync(oldVersionPath) ? oldVersionPath : false;
-  } catch (error) {
-    errorCatcher(error);
-    return false;
-  }
-};
+const { fs, klawSync, path } = electronApi;
 
 const oldPrefsFilterFn = (item: { path: string }) => {
   try {
@@ -108,9 +98,4 @@ const buildNewPrefsObject = (oldPrefs: OldAppConfig) => {
   }
 };
 
-export {
-  buildNewPrefsObject,
-  getOldPrefsPaths,
-  getOldVersionPath,
-  parsePrefsFile,
-};
+export { buildNewPrefsObject, getOldPrefsPaths, parsePrefsFile };

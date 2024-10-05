@@ -102,28 +102,6 @@ const router = useRouter();
 const { locale, t } = useI18n({ useScope: 'global' });
 
 // Store initializations
-const appSettings = useAppSettingsStore();
-const { migrations } = storeToRefs(appSettings);
-const { runMigration } = appSettings;
-
-if (!migrations.value?.includes('firstRun')) {
-  const migrationResult = runMigration('firstRun');
-  if (migrationResult) {
-    createTemporaryNotification({
-      caption: t('successfully-migrated-from-the-previous-version'),
-      icon: 'mmm-info',
-      message: t('welcome-to-mmm'),
-      timeout: 15000,
-      type: 'positive',
-    });
-  }
-}
-
-appSettings.$subscribe((_, state) => {
-  LocalStorage.set('migrations', state.migrations);
-  LocalStorage.set('screenPreferences', state.screenPreferences);
-});
-
 const congregationSettings = useCongregationSettingsStore();
 congregationSettings.$subscribe((_, state) => {
   LocalStorage.set('congregations', state.congregations);
@@ -139,6 +117,29 @@ jwStore.$subscribe((_, state) => {
   LocalStorage.set('additionalMediaMaps', state.additionalMediaMaps);
   LocalStorage.set('lookupPeriod', state.lookupPeriod);
 });
+
+const appSettings = useAppSettingsStore();
+
+appSettings.$subscribe((_, state) => {
+  LocalStorage.set('migrations', state.migrations);
+  LocalStorage.set('screenPreferences', state.screenPreferences);
+});
+
+const { migrations } = storeToRefs(appSettings);
+const { runMigration } = appSettings;
+
+if (!migrations.value?.includes('firstRun')) {
+  const migrationResult = runMigration('firstRun');
+  if (migrationResult) {
+    createTemporaryNotification({
+      caption: t('successfully-migrated-from-the-previous-version'),
+      icon: 'mmm-info',
+      message: t('welcome-to-mmm'),
+      timeout: 15000,
+      type: 'positive',
+    });
+  }
+}
 
 const { updateJwLanguages } = jwStore;
 updateJwLanguages();
