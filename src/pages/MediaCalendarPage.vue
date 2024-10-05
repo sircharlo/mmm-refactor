@@ -319,7 +319,11 @@ import { storeToRefs } from 'pinia';
 import { date, uid } from 'quasar';
 import DragAndDropper from 'src/components/media/DragAndDropper.vue';
 import MediaItem from 'src/components/media/MediaItem.vue';
-import { getDateLocaleFormatted } from 'src/helpers/date';
+import {
+  dateFromString,
+  getDateLocaleFormatted,
+  isInPast,
+} from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import {
@@ -683,6 +687,7 @@ const goToNextDayWithMedia = () => {
         ),
       ]
         .filter(Boolean)
+        .filter((mediaDate) => !isInPast(dateFromString(mediaDate)))
         .map((mediaDate) => date.formatDate(mediaDate, 'YYYY/MM/DD'))
         .sort()[0];
     }
