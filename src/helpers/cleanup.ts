@@ -1,6 +1,6 @@
 import { storeToRefs } from 'pinia';
 import { LocalStorage } from 'quasar';
-import { isInPast } from 'src/helpers/date';
+import { dateFromString, isInPast } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { getAdditionalMediaPath, removeEmptyDirs } from 'src/helpers/fs';
@@ -21,8 +21,7 @@ const cleanLocalStorage = () => {
         // @ts-expect-error LocalStorage typing mishap here
         const datesObj = data[uid];
         Object.keys(datesObj).forEach((dateKey) => {
-          const dateValue = new Date(dateKey);
-          if (isInPast(dateValue)) {
+          if (isInPast(dateFromString(dateKey))) {
             delete datesObj[dateKey];
           }
         });
