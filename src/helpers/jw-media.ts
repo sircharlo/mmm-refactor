@@ -1375,19 +1375,21 @@ const getJwMediaInfo = async (publication: PublicationFetcher) => {
     else if (publication.fileformat?.toLowerCase().includes('mp3'))
       url += '_AUDIO';
     const responseObject: MediaItemsMediator = await get(url);
-    if (!responseObject.media || responseObject.media.length === 0)
+    if (responseObject?.media?.length > 0) {
+      return {
+        duration: responseObject.media[0].duration ?? undefined,
+        subtitles:
+          (
+            findBestResolution(
+              responseObject.media[0].files,
+            ) as MediaItemsMediatorFile
+          )?.subtitles?.url ?? '',
+        thumbnail: getBestImageUrl(responseObject.media[0].images),
+        title: responseObject.media[0].title,
+      };
+    } else {
       return emptyResponse;
-    return {
-      duration: responseObject.media[0].duration ?? undefined,
-      subtitles:
-        (
-          findBestResolution(
-            responseObject.media[0].files,
-          ) as MediaItemsMediatorFile
-        )?.subtitles?.url ?? '',
-      thumbnail: getBestImageUrl(responseObject.media[0].images),
-      title: responseObject.media[0].title,
-    };
+    }
   } catch (error) {
     errorCatcher(error);
     return emptyResponse;
