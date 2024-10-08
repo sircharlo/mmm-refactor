@@ -306,12 +306,7 @@
 <script setup lang="ts">
 import type { DNDPlugin } from '@formkit/drag-and-drop';
 
-import {
-  animations,
-  multiDrag,
-  parents,
-  selections,
-} from '@formkit/drag-and-drop';
+import { animations, parents } from '@formkit/drag-and-drop';
 import { useDragAndDrop } from '@formkit/drag-and-drop/vue';
 import { Buffer } from 'buffer';
 import DOMPurify from 'dompurify';
@@ -550,12 +545,12 @@ const updateMediaSortPlugin: DNDPlugin = (parent) => {
 
   return {
     setupNode(data) {
-      data.node.addEventListener('dragover', dragover);
-      data.node.addEventListener('dragend', dragend);
+      data.node.el.addEventListener('dragover', dragover);
+      data.node.el.addEventListener('dragend', dragend);
     },
     tearDownNode(data) {
-      data.node.removeEventListener('dragover', dragover);
-      data.node.removeEventListener('dragend', dragend);
+      data.node.el.removeEventListener('dragover', dragover);
+      data.node.el.removeEventListener('dragend', dragend);
     },
   };
 };
@@ -727,17 +722,8 @@ const [tgwList, sortableTgwMediaItems] = useDragAndDrop(
   [] as DynamicMediaObject[],
   {
     group: 'sortableMedia',
-    plugins: [
-      updateMediaSortPlugin,
-      animations(),
-      multiDrag({
-        plugins: [
-          selections({
-            // selectedClass: 'selected-to-drag',
-          }),
-        ],
-      }),
-    ],
+    multiDrag: true,
+    plugins: [updateMediaSortPlugin, animations()],
   },
 );
 
@@ -745,17 +731,8 @@ const [ayfmList, sortableAyfmMediaItems] = useDragAndDrop(
   [] as DynamicMediaObject[],
   {
     group: 'sortableMedia',
-    plugins: [
-      updateMediaSortPlugin,
-      animations(),
-      multiDrag({
-        plugins: [
-          selections({
-            // selectedClass: 'selected-to-drag',
-          }),
-        ],
-      }),
-    ],
+    multiDrag: true,
+    plugins: [updateMediaSortPlugin, animations()],
   },
 );
 
@@ -763,17 +740,8 @@ const [lacList, sortableLacMediaItems] = useDragAndDrop(
   [] as DynamicMediaObject[],
   {
     group: 'sortableMedia',
-    plugins: [
-      updateMediaSortPlugin,
-      animations(),
-      multiDrag({
-        plugins: [
-          selections({
-            // selectedClass: 'selected-to-drag',
-          }),
-        ],
-      }),
-    ],
+    multiDrag: true,
+    plugins: [updateMediaSortPlugin, animations()],
   },
 );
 
@@ -781,17 +749,8 @@ const [wtList, sortableWtMediaItems] = useDragAndDrop(
   [] as DynamicMediaObject[],
   {
     group: 'sortableMedia',
-    plugins: [
-      updateMediaSortPlugin,
-      animations(),
-      multiDrag({
-        plugins: [
-          selections({
-            // selectedClass: 'selected-to-drag',
-          }),
-        ],
-      }),
-    ],
+    multiDrag: true,
+    plugins: [updateMediaSortPlugin, animations()],
   },
 );
 
@@ -799,17 +758,8 @@ const [additionalList, sortableAdditionalMediaItems] = useDragAndDrop(
   [] as DynamicMediaObject[],
   {
     group: 'sortableMedia',
-    plugins: [
-      updateMediaSortPlugin,
-      animations(),
-      multiDrag({
-        plugins: [
-          selections({
-            // selectedClass: 'selected-to-drag',
-          }),
-        ],
-      }),
-    ],
+    multiDrag: true,
+    plugins: [updateMediaSortPlugin, animations()],
   },
 );
 watch(
