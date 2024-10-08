@@ -1362,6 +1362,7 @@ function getBestImageUrl(images: ImageTypeSizes, minSize?: keyof ImageSizes) {
 }
 
 const getJwMediaInfo = async (publication: PublicationFetcher) => {
+  const emptyResponse = { subtitles: '', thumbnail: '', title: '' };
   try {
     let url = 'https://b.jw-cdn.org/apis/mediator/v1/media-items/';
     url += publication.langwritten + '/';
@@ -1375,7 +1376,7 @@ const getJwMediaInfo = async (publication: PublicationFetcher) => {
       url += '_AUDIO';
     const responseObject: MediaItemsMediator = await get(url);
     if (!responseObject.media || responseObject.media.length === 0)
-      throw new Error('No thumbnail found:' + url);
+      return emptyResponse;
     return {
       duration: responseObject.media[0].duration ?? undefined,
       subtitles:
@@ -1389,7 +1390,7 @@ const getJwMediaInfo = async (publication: PublicationFetcher) => {
     };
   } catch (error) {
     errorCatcher(error);
-    return { subtitles: '', thumbnail: '', title: '' };
+    return emptyResponse;
   }
 };
 
