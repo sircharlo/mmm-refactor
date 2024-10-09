@@ -22,7 +22,11 @@
         </q-input>
       </div>
       <div class="row">
+        <div v-if="filteredSongs?.length === 0" class="col-grow text-center">
+          <q-spinner color="primary" size="2em" />
+        </div>
         <q-scroll-area
+          v-else
           :bar-style="barStyle()"
           :thumb-style="thumbStyle()"
           style="height: 40vh; width: -webkit-fill-available"
@@ -64,6 +68,7 @@ import {
   getPubMediaLinks,
 } from 'src/helpers/jw-media';
 import { useCurrentStateStore } from 'src/stores/current-state';
+import { useJwStore } from 'src/stores/jw';
 import { MediaLink, PublicationFetcher } from 'src/types/publications';
 import { computed, ComputedRef, ref, watch } from 'vue';
 
@@ -78,6 +83,9 @@ const emit = defineEmits(['update:modelValue']);
 const currentState = useCurrentStateStore();
 const { currentSettings, currentSongbook, currentSongs } =
   storeToRefs(currentState);
+
+const jwStore = useJwStore();
+const { updateJwSongs } = jwStore;
 
 const localValue = ref(props.modelValue);
 const loading = ref(false);
@@ -126,6 +134,7 @@ const addSong = async (songTrack: number) => {
 
 watch(localValue, (newValue) => {
   emit('update:modelValue', newValue);
+  if (newValue) updateJwSongs();
 });
 
 watch(

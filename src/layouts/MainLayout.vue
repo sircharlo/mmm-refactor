@@ -165,7 +165,6 @@ watch(currentCongregation, (newCongregation, oldCongregation) => {
       downloadProgress.value = {};
       updateLookupPeriod();
       registerAllCustomShortcuts();
-      downloadSongbookVideos();
       if (queues.meetings[newCongregation]) {
         queues.meetings[newCongregation].start();
       }
@@ -271,9 +270,14 @@ watch(
 
 watch(
   () => currentSettings.value?.enableExtraCache,
-  (newEnableExtraCache) => {
+  (newEnableExtraCache, oldEnableExtraCache) => {
     try {
-      if (newEnableExtraCache) downloadSongbookVideos();
+      if (
+        newEnableExtraCache &&
+        oldEnableExtraCache !== undefined &&
+        oldEnableExtraCache !== newEnableExtraCache
+      )
+        downloadSongbookVideos();
     } catch (error) {
       errorCatcher(error);
     }

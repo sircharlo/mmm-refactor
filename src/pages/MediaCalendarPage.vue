@@ -376,7 +376,7 @@ watch(
 const { t } = useI18n();
 
 const jwStore = useJwStore();
-const { addToAdditionMediaMap, removeFromAdditionMediaMap, updateJwSongs } =
+const { addToAdditionMediaMap, removeFromAdditionMediaMap } =
   jwStore;
 const { additionalMediaMaps, customDurations, lookupPeriod, mediaSort } =
   storeToRefs(jwStore);
@@ -396,7 +396,6 @@ const {
   selectedDate,
   selectedDateObject,
 } = storeToRefs(currentState);
-updateJwSongs();
 const {
   convertPdfToImages,
   decompress,

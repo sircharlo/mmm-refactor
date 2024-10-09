@@ -117,6 +117,7 @@
 import { storeToRefs } from 'pinia';
 import { getLocaleDayName } from 'src/helpers/date';
 import { errorCatcher } from 'src/helpers/error-catcher';
+import { downloadSongbookVideos } from 'src/helpers/jw-media';
 import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
@@ -147,6 +148,7 @@ function chooseCongregation(
     const invalidSettings = setCongregation(congregation);
     if (congregation) {
       updateYeartext();
+      downloadSongbookVideos();
       if (initialLoad) {
         // if (initialLoad || invalidSettings)
         router.push('/setup-wizard');
