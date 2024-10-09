@@ -80,7 +80,17 @@
                         />
                       </div>
                     </div>
-                    <q-separator class="bg-accent-200" />
+                    <q-separator
+                      v-if="
+                        Object.keys(
+                          filteredDownloads(
+                            downloadProgress,
+                            statusObject.status,
+                          ) || {},
+                        )?.length > 1
+                      "
+                      class="bg-accent-200"
+                    />
                   </template>
                 </template>
               </template>
