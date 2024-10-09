@@ -4054,6 +4054,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"electron-window-state@npm:^5.0.3":
+  version: 5.0.3
+  resolution: "electron-window-state@npm:5.0.3"
+  dependencies:
+    jsonfile: "npm:^4.0.0"
+    mkdirp: "npm:^0.5.1"
+  checksum: 10c0/10d01f3bcb1e4024a61f9b7116a251b6caf3e21f9d5e50f1b842758d93161b40b790be2efdbeb65dbbb611f4e58c4107aa785a2dbcfdefa8a6b80ad4a8d914e2
+  languageName: node
+  linkType: hard
+
 "electron@npm:^32.1.2":
   version: 32.1.2
   resolution: "electron@npm:32.1.2"
@@ -7070,7 +7080,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsonfile@npm:^6.0.1, jsonfile@npm:^6.1.0":
+"jsonfile@npm:^6.0.1":
   version: 6.1.0
   resolution: "jsonfile@npm:6.1.0"
   dependencies:
@@ -7777,21 +7787,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mkdirp@npm:^0.5.1":
+  version: 0.5.6
+  resolution: "mkdirp@npm:0.5.6"
+  dependencies:
+    minimist: "npm:^1.2.6"
+  bin:
+    mkdirp: bin/cmd.js
+  checksum: 10c0/e2e2be789218807b58abced04e7b49851d9e46e88a2f9539242cc8a92c9b5c3a0b9bab360bd3014e02a140fc4fbc58e31176c408b493f8a2a6f4986bd7527b01
+  languageName: node
+  linkType: hard
+
 "mkdirp@npm:^1.0.3, mkdirp@npm:^1.0.4":
   version: 1.0.4
   resolution: "mkdirp@npm:1.0.4"
   bin:
     mkdirp: bin/cmd.js
   checksum: 10c0/46ea0f3ffa8bc6a5bc0c7081ffc3907777f0ed6516888d40a518c5111f8366d97d2678911ad1a6882bf592fa9de6c784fea32e1687bb94e1f4944170af48a5cf
-  languageName: node
-  linkType: hard
-
-"mkdirp@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "mkdirp@npm:3.0.1"
-  bin:
-    mkdirp: dist/cjs/src/bin.js
-  checksum: 10c0/9f2b975e9246351f5e3a40dcfac99fcd0baa31fbfab615fe059fb11e51f10e4803c63de1f384c54d656e4db31d000e4767e9ef076a22e12a641357602e31d57d
   languageName: node
   linkType: hard
 
@@ -7830,6 +7842,7 @@ __metadata:
     electron: "npm:^32.1.2"
     electron-builder: "npm:^25.1.7"
     electron-updater: "npm:^6.3.9"
+    electron-window-state: "npm:^5.0.3"
     eslint: "npm:^9.12.0"
     eslint-config-prettier: "npm:^9.1.0"
     eslint-plugin-perfectionist: "npm:^3.8.0"
@@ -7852,7 +7865,6 @@ __metadata:
     process: "npm:^0.11.10"
     quasar: "npm:^2.17.0"
     sanitize-filename: "npm:^1.6.3"
-    stateful-electron-window: "npm:^1.0.0"
     typescript: "npm:~5.6.3"
     upath: "npm:^2.0.1"
     vue: "npm:^3.5.11"
@@ -9952,16 +9964,6 @@ __metadata:
   version: 1.0.0
   resolution: "stat-mode@npm:1.0.0"
   checksum: 10c0/89b66a538dbfd45038fefdaf5b2104dc6e911605af1c201793e9629592ed9fdc7bdd1bca42806d0d4167c6d9cacac1f3fda41ddfe334a5c1f898113da38fae74
-  languageName: node
-  linkType: hard
-
-"stateful-electron-window@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "stateful-electron-window@npm:1.0.0"
-  dependencies:
-    jsonfile: "npm:^6.1.0"
-    mkdirp: "npm:^3.0.1"
-  checksum: 10c0/4b91554984addaea22e1a7a45915cab1efa416a884fb3132cd2c3e8ced1b38ad52fc5772c51fb47786782746296b86e1c0e873429a85206dfc327468258b379d
   languageName: node
   linkType: hard
 

@@ -1,10 +1,12 @@
 import { enable, initialize } from '@electron/remote/main';
 import { app, BrowserWindow, Menu, session } from 'electron';
 import { autoUpdater } from 'electron-updater';
+import windowStateKeeper from 'electron-window-state';
+import { readFileSync, writeFileSync } from 'fs-extra';
 import os from 'os';
 import path from 'path';
 import { errorCatcher } from 'src/helpers/error-catcher';
-import { StatefullBrowserWindow } from 'stateful-electron-window';
+import { join } from 'upath';
 
 initialize();
 autoUpdater.checkForUpdatesAndNotify();
@@ -143,19 +145,48 @@ function createWindow() {
   /**
    * Initial window options
    */
-  // const mainWindowState = windowStateKeeper({
-  //   defaultHeight: 600,
-  //   defaultWidth: 1000,
-  // });
-  mainWindow = new StatefullBrowserWindow({
+
+  try {
+    const windowStateFilePath = join(
+      app.getPath('userData'),
+      'window-state.json',
+    );
+    const mainWindowState = JSON.parse(
+      readFileSync(windowStateFilePath, 'utf8'),
+    );
+
+    const maximumThreshold = 30;
+    const { displayBounds, height, width, x, y } = mainWindowState;
+    const overflowX = x + width - displayBounds.width - displayBounds.x;
+    const overflowY = y + height - displayBounds.height - displayBounds.y;
+
+    if (0 < overflowX && overflowX < maximumThreshold)
+      mainWindowState.width -= overflowX;
+    if (0 < overflowY && overflowY < maximumThreshold)
+      mainWindowState.height -= overflowY;
+
+    if (x < displayBounds.x && x > displayBounds.x - maximumThreshold)
+      mainWindowState.x = displayBounds.x;
+    if (y < displayBounds.y && y > displayBounds.y - maximumThreshold)
+      mainWindowState.y = displayBounds.y;
+
+    writeFileSync(windowStateFilePath, JSON.stringify(mainWindowState));
+  } catch (error) {
+    errorCatcher(error);
+  }
+
+  const mainWindowState = windowStateKeeper({
+    defaultHeight: 600,
+    defaultWidth: 1000,
+  });
+
+  mainWindow = new BrowserWindow({
     backgroundColor: 'grey',
-    height: 800,
+    height: mainWindowState.height,
     icon: path.resolve(path.join(__dirname, 'icons', 'icon.png')),
     minHeight: 400,
     minWidth: 500,
     show: false,
-    supportMaximize: true,
-    useContentSize: true,
     webPreferences: {
       backgroundThrottling: false,
       nodeIntegration: true,
@@ -163,7 +194,9 @@ function createWindow() {
       sandbox: false,
       webSecurity: false,
     },
-    width: 600,
+    width: mainWindowState.width,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
   });
 
   Menu.setApplicationMenu(Menu.buildFromTemplate([]));
@@ -210,6 +243,7 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     if (mainWindow) {
       mainWindow.show();
+      mainWindowState.manage(mainWindow);
     }
   });
 
