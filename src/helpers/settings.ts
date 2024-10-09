@@ -30,7 +30,10 @@ const requiredRule: ValidationRule = (val: string) =>
   (val && val.length > 0) || '';
 
 export const portNumberValidator = (val: string) =>
-  val && Number.isInteger(Number(val)) && Number(val) > 0 ? true : false;
+  val &&
+  Number.isInteger(Number(val)) &&
+  Number(val) > 0 &&
+  Number(val) < 65536;
 
 const portNumberRule: ValidationRule = (val: string) =>
   portNumberValidator(val) || '';
