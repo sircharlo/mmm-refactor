@@ -110,7 +110,10 @@ import { getLocaleDayName } from 'src/helpers/date';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
-import { GeoRecord } from 'src/types/congregation-lookups';
+import {
+  CongregationLanguage,
+  GeoRecord,
+} from 'src/types/congregation-lookups';
 import { Ref, ref, watch } from 'vue';
 
 const jwStore = useJwStore();
@@ -139,7 +142,15 @@ const lookupCongregation = async () => {
           encodeURIComponent(congregationName.value) +
           '&latitude=0&longitude=0&searchLanguageCode=',
       ).then((response) => {
-        results.value = response.geoLocationList || [];
+        results.value = ((response.geoLocationList as GeoRecord[]) || []).map(
+          (location) => {
+            location.properties.languageCode =
+              congregationLookupLanguages.value.find(
+                (l) => l.languageCode === location.properties.languageCode,
+              )?.writtenLanguageCode[0] || location.properties.languageCode;
+            return location;
+          },
+        );
       });
     } else {
       results.value = [];
@@ -150,6 +161,16 @@ const lookupCongregation = async () => {
   }
 };
 
+const congregationLookupLanguages: Ref<CongregationLanguage[]> = ref([]);
+get('https://apps.jw.org/api/public/meeting-search/languages')
+  .then((response) => {
+    congregationLookupLanguages.value = response || [];
+  })
+  .catch((error) => {
+    congregationLookupLanguages.value = [];
+    errorCatcher(error);
+  });
+
 const selectCongregation = (congregation: GeoRecord) => {
   try {
     if (!currentSettings.value) return;
@@ -158,8 +179,12 @@ const selectCongregation = (congregation: GeoRecord) => {
 
     // Language
     if (properties.languageCode) {
-      currentSettings.value.lang = properties.languageCode;
-      currentSettings.value.langSubtitles = properties.languageCode;
+      const resolvedLangCode =
+        jwLanguages.value?.list.find(
+          (l) => l.langcode === properties.languageCode,
+        )?.langcode || '';
+      currentSettings.value.lang = resolvedLangCode;
+      currentSettings.value.langSubtitles = resolvedLangCode;
     }
 
     // Midweek day & time

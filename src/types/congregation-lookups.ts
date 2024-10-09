@@ -47,3 +47,11 @@ export type GeoRecord = {
   properties: Properties;
   type: string;
 };
+
+export type CongregationLanguage = {
+  isSignLanguage: boolean;
+  languageCode: string;
+  languageName: string;
+  scriptDirection: 'ltr' | 'rtl'; // Left-to-right or right-to-left script
+  writtenLanguageCode: string[];
+};

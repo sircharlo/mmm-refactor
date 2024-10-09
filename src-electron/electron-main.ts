@@ -1,10 +1,10 @@
 import { enable, initialize } from '@electron/remote/main';
 import { app, BrowserWindow, Menu, session } from 'electron';
 import { autoUpdater } from 'electron-updater';
-import windowStateKeeper from 'electron-window-state';
 import os from 'os';
 import path from 'path';
 import { errorCatcher } from 'src/helpers/error-catcher';
+import { StatefullBrowserWindow } from 'stateful-electron-window';
 
 initialize();
 autoUpdater.checkForUpdatesAndNotify();
@@ -143,17 +143,18 @@ function createWindow() {
   /**
    * Initial window options
    */
-  const mainWindowState = windowStateKeeper({
-    defaultHeight: 600,
-    defaultWidth: 1000,
-  });
-  mainWindow = new BrowserWindow({
+  // const mainWindowState = windowStateKeeper({
+  //   defaultHeight: 600,
+  //   defaultWidth: 1000,
+  // });
+  mainWindow = new StatefullBrowserWindow({
     backgroundColor: 'grey',
-    height: mainWindowState.height,
+    height: 800,
     icon: path.resolve(path.join(__dirname, 'icons', 'icon.png')),
     minHeight: 400,
     minWidth: 500,
     show: false,
+    supportMaximize: true,
     useContentSize: true,
     webPreferences: {
       backgroundThrottling: false,
@@ -162,9 +163,7 @@ function createWindow() {
       sandbox: false,
       webSecurity: false,
     },
-    width: mainWindowState.width,
-    x: mainWindowState.x,
-    y: mainWindowState.y,
+    width: 600,
   });
 
   Menu.setApplicationMenu(Menu.buildFromTemplate([]));
@@ -211,7 +210,6 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     if (mainWindow) {
       mainWindow.show();
-      mainWindowState.manage(mainWindow);
     }
   });
 
