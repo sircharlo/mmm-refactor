@@ -370,5 +370,7 @@ watch(
 onMounted(() => {
   document.title = 'Meeting Media Manager';
   if (!currentSettings.value) navigateToCongregationSelector();
+  // add overflow hidden to body
+  document.body.style.overflow = 'hidden';
 });
 </script>
