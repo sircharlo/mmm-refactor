@@ -639,7 +639,8 @@ watch(
       .map((d) => date.formatDate(d.date, 'YYYY/MM/DD')),
   (errorVals) => {
     errorVals?.forEach((errorVal) => {
-      if (seenErrors.has(currentCongregation + errorVal)) return;
+      const daysUntilError = date.getDateDiff(errorVal, new Date(), 'days');
+      if (seenErrors.has(currentCongregation + errorVal) || daysUntilError > 7) return;
       createTemporaryNotification({
         caption: getDateLocaleFormatted(
           currentSettings.value?.localAppLang,

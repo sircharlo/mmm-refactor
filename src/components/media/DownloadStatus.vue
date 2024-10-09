@@ -1,10 +1,6 @@
 <template>
   <q-btn
-    :color="
-      !online || Object.values(downloadProgress).find((item) => item.error)
-        ? 'negative'
-        : 'white-transparent'
-    "
+    :color="!online ? 'negative' : 'white-transparent'"
     class="super-rounded position-relative"
     rounded
     unelevated
