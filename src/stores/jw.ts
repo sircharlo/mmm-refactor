@@ -124,58 +124,55 @@ export const useJwStore = defineStore('jw-store', {
           !currentState.currentSongbook?.pub
         ) {
           errorCatcher('No current settings or songbook defined');
-          return [];
+          return;
         }
-        const langwritten = currentState.currentSettings.lang as string;
-        const songbook = {
-          langwritten,
-          pub: currentState.currentSongbook.pub,
-        } as PublicationFetcher;
-        const pubMediaLinks = await getPubMediaLinks(songbook);
-        if (!pubMediaLinks) {
-          return [];
-        }
-        songbook.fileformat = Object.keys(
-          pubMediaLinks.files[songbook.langwritten],
-        )
-          .sort()
-          .pop();
-        if (!songbook.fileformat) {
-          errorCatcher('No fileformat defined');
-          return [];
-        }
-        const now = new Date();
-        if (!this.jwSongs[langwritten]) {
-          this.jwSongs[langwritten] = {
-            list: [],
-            updated: oldDate,
-          };
-        }
-        const monthsSinceUpdated = date.getDateDiff(
-          now,
-          this.jwSongs[langwritten].updated,
-          'months',
-        );
-        if (monthsSinceUpdated > 1) {
-          const mediaItemLinks = (
-            pubMediaLinks.files[songbook.langwritten][
-              songbook.fileformat
-            ] as MediaLink[]
-          ).filter((mediaLink: MediaLink) => mediaLink.track < MAX_SONGS);
-          const filteredMediaItemLinks = [] as MediaLink[];
-          for (const mediaItemLink of mediaItemLinks) {
-            const currentTrack = mediaItemLink.track;
-            if (!filteredMediaItemLinks.some((m) => m.track === currentTrack)) {
-              const bestItem = findBestResolution(
-                mediaItemLinks.filter((m) => m.track === currentTrack),
-              ) as MediaLink;
-              if (bestItem) filteredMediaItemLinks.push(bestItem);
+        for (const fileformat of ['MP4', 'MP3']) {
+          try {
+            const langwritten = currentState.currentSettings.lang as string;
+            const songbook = {
+              fileformat,
+              langwritten,
+              pub: currentState.currentSongbook.pub,
+            } as PublicationFetcher;
+            const pubMediaLinks = await getPubMediaLinks(songbook);
+            if (!pubMediaLinks || !pubMediaLinks.files) {
+              continue;
             }
+            const now = new Date();
+            this.jwSongs[langwritten] ??= { list: [], updated: oldDate };
+            const monthsSinceUpdated = date.getDateDiff(
+              now,
+              this.jwSongs[langwritten].updated,
+              'months',
+            );
+            if (monthsSinceUpdated > 1) {
+              const mediaItemLinks = (
+                pubMediaLinks.files[songbook.langwritten][
+                  fileformat
+                ] as MediaLink[]
+              ).filter((mediaLink: MediaLink) => mediaLink.track < MAX_SONGS);
+              const filteredMediaItemLinks = mediaItemLinks.reduce(
+                (acc: MediaLink[], mediaLink: MediaLink) => {
+                  if (!acc.some((m) => m.track === mediaLink.track)) {
+                    const bestItem = findBestResolution(
+                      mediaItemLinks.filter((m) => m.track === mediaLink.track),
+                    ) as MediaLink;
+                    if (bestItem) acc.push(bestItem);
+                  }
+                  return acc;
+                },
+                [],
+              );
+              this.jwSongs[langwritten] = {
+                list: filteredMediaItemLinks,
+                updated: now,
+              };
+            }
+          } catch (error) {
+            errorCatcher(error);
+            continue;
           }
-          this.jwSongs[langwritten] = {
-            list: filteredMediaItemLinks,
-            updated: now,
-          };
+          break;
         }
       } catch (error) {
         errorCatcher(error);
