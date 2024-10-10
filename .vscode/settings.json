@@ -1,4 +1,20 @@
 {
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": ["source.fixAll.eslint"],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "cSpell.ignorePaths": [
+    ".github/workflows/*",
+    ".vscode/*",
+    "node_modules",
+    "src/i18n/*",
+    "!src/i18n/en.json",
+    "LICENSE.md",
+    "yarn.lock"
+  ],
   "cSpell.words": [
     "akamaihd",
     "alllangs",
@@ -90,8 +106,6 @@
   "prettier.useTabs": false,
   "prettier.configPath": ".prettierrc",
 
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true,
   "notebook.formatOnSave.enabled": true,
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"

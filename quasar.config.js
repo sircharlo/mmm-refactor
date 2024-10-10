@@ -71,6 +71,7 @@ module.exports = configure(function (/* ctx */) {
           );
         }
       },
+      // eslint-disable-next-line no-empty-pattern
       extendWebpack(cfg, {}) {
         cfg.externals = ['better-sqlite3'];
       },

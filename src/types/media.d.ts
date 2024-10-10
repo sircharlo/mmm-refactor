@@ -29,14 +29,15 @@ export interface DownloadedFile {
   path: string;
 }
 
-export interface DownloadProgressItems {
-  [key: string]: {
+export type DownloadProgressItems = Record<
+  string,
+  {
     complete?: boolean;
     error?: boolean;
     loaded?: number;
     total?: number;
-  };
-}
+  }
+>;
 
 export interface FileDownloader {
   dir: string;

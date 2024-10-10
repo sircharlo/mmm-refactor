@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-dynamic-delete */
 import type { DynamicMediaObject } from 'src/types';
 
 import { storeToRefs } from 'pinia';
@@ -10,32 +11,32 @@ import { useJwStore } from 'src/stores/jw';
 
 const { fileUrlToPath, fs, klawSync, path } = electronApi;
 
+function cleanUpPastDatesFromLocalStorage(key: string) {
+  const data = LocalStorage.getItem(key);
+  if (!data) {
+    return;
+  }
+
+  Object.keys(data).forEach((uid) => {
+    // @ts-expect-error LocalStorage typing mishap here
+    const datesObj = data[uid];
+    Object.keys(datesObj).forEach((dateKey) => {
+      if (isInPast(dateFromString(dateKey))) {
+        delete datesObj[dateKey];
+      }
+    });
+
+    if (Object.keys(datesObj).length === 0) {
+      // @ts-expect-error LocalStorage typing mishap here
+      delete data[uid];
+    }
+  });
+
+  LocalStorage.set(key, data);
+}
+
 const cleanLocalStorage = () => {
   try {
-    function cleanUpPastDatesFromLocalStorage(key: string) {
-      const data = LocalStorage.getItem(key);
-      if (!data) {
-        return;
-      }
-
-      Object.keys(data).forEach((uid) => {
-        // @ts-expect-error LocalStorage typing mishap here
-        const datesObj = data[uid];
-        Object.keys(datesObj).forEach((dateKey) => {
-          if (isInPast(dateFromString(dateKey))) {
-            delete datesObj[dateKey];
-          }
-        });
-
-        if (Object.keys(datesObj).length === 0) {
-          // @ts-expect-error LocalStorage typing mishap here
-          delete data[uid];
-        }
-      });
-
-      LocalStorage.set(key, data);
-    }
-
     ['customDurations', 'additionalMediaMaps', 'mediaSort'].forEach((key) => {
       cleanUpPastDatesFromLocalStorage(key);
     });

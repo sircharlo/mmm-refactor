@@ -180,6 +180,7 @@ const fadeToVolumeLevel = (targetVolume: number, fadeOutSeconds: number) => {
     const volumeChange = targetVolume - initialVolume;
     const startTime = performance.now();
 
+    // eslint-disable-next-line no-inner-declarations
     function updateVolume(currentTime: number) {
       try {
         if (!musicPlayer.value) return;

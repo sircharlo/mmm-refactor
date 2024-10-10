@@ -26,11 +26,11 @@ export interface MediaLink {
       duration: string;
       startTime: string;
     };
-    markers: Array<{
+    markers: {
       duration: string;
       mepsParagraphId: number;
       startTime: string;
-    }>;
+    }[];
     mepsLanguageSpoken: string;
     mepsLanguageWritten: string;
     type: string;
@@ -96,21 +96,18 @@ export interface MediaItemsMediator {
 export interface Publication {
   booknum: null | number;
   fileformat: string[];
-  files: {
-    [key: string]: {
-      [key: string]: MediaItemsMediatorFile[] | MediaLink[];
-    };
-  };
+  files: Record<string, Record<string, MediaItemsMediatorFile[] | MediaLink[]>>;
   formattedDate: string;
   issue: string;
-  languages: {
-    [key: string]: {
+  languages: Record<
+    string,
+    {
       direction: string;
       locale: string;
       name: string;
       script: string;
-    };
-  };
+    }
+  >;
   parentPubName: string;
   pub: string;
   pubImage: {
