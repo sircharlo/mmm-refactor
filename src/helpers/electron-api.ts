@@ -53,7 +53,4 @@ export interface ElectronApi {
   zoomWebsiteWindow: (action: string) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-export const electronApi: ElectronApi = (window as { electronApi: ElectronApi })
-  .electronApi;
+export const electronApi: ElectronApi = window.electronApi;

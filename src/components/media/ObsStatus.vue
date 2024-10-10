@@ -188,9 +188,14 @@ const obsConnect = async (setup?: boolean) => {
     const timeBetweenAttempts = 5000;
     while (attempt < maxAttempts && obsConnectionState.value !== 'connected') {
       try {
-        const { negotiatedRpcVersion, obsWebSocketVersion } =
-          await obsWebSocket?.connect('ws://127.0.0.1:' + obsPort, obsPassword);
-        if (negotiatedRpcVersion && obsWebSocketVersion) {
+        const connection = await obsWebSocket?.connect(
+          'ws://127.0.0.1:' + obsPort,
+          obsPassword,
+        );
+        if (
+          connection?.negotiatedRpcVersion &&
+          connection?.obsWebSocketVersion
+        ) {
           break;
         }
       } catch (err) {
@@ -246,9 +251,7 @@ const setObsScene = async (
       if (sceneType === 'camera') newProgramScene = cameraScene;
     }
     if (newProgramScene) {
-      const hasSceneUuid = scenes.value?.every((scene) =>
-        scene.hasOwnProperty('sceneUuid'),
-      );
+      const hasSceneUuid = scenes.value?.every((scene) => 'sceneUuid' in scene);
       const currentScenesAreUuids = configuredScenesAreAllUUIDs();
 
       if (sceneExists(newProgramScene)) {

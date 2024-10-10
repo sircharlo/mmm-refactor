@@ -527,15 +527,15 @@ const bc = new BroadcastChannel('mediaPlayback');
 const jwStore = useJwStore();
 const { removeFromAdditionMediaMap } = jwStore;
 const { customDurations } = storeToRefs(jwStore);
-const hoveredBadges = ref({} as { [key: string]: boolean });
+const hoveredBadges = ref({} as Record<string, boolean>);
 
 const obsState = useObsStateStore();
 const { currentSceneType, obsConnectionState } = storeToRefs(obsState);
 
 const { fileUrlToPath, fs, path } = electronApi;
 
-const mediaDurationPopups = ref({} as { [key: string]: boolean });
-const panzooms: { [key: string]: PanzoomObject } = {};
+const mediaDurationPopups = ref({} as Record<string, boolean>);
+const panzooms: Record<string, PanzoomObject> = {};
 const mediaToStop = ref('');
 const mediaStopPending = computed(() => !!mediaToStop.value);
 const mediaToDelete = ref('');
@@ -641,6 +641,7 @@ const destroyPanzoom = (elemId: string) => {
     panzooms[elemId].resetStyle();
     panzooms[elemId].reset({ animate: false });
     panzooms[elemId].destroy();
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete panzooms[elemId];
   } catch (e) {
     errorCatcher(e);

@@ -15,6 +15,7 @@ export const useCongregationSettingsStore = defineStore(
       },
       deleteCongregation(id: number | string) {
         if (!id) return;
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete this.congregations[id];
       },
     },
@@ -26,9 +27,10 @@ export const useCongregationSettingsStore = defineStore(
 
     state: () => {
       return {
-        congregations: (LocalStorage.getItem('congregations') || {}) as {
-          [key: string]: SettingsValues;
-        },
+        congregations: (LocalStorage.getItem('congregations') || {}) as Record<
+          string,
+          SettingsValues
+        >,
       };
     },
   },

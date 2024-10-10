@@ -92,7 +92,7 @@ export interface SettingsGroup {
   order?: number;
 }
 
-export type OldAppConfig = {
+export interface OldAppConfig {
   __internal__: {
     migrations: {
       version: string;
@@ -183,4 +183,4 @@ export type OldAppConfig = {
     weDay: number;
     weStartTime: string;
   };
-};
+}

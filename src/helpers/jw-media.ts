@@ -1339,7 +1339,7 @@ function getBestImageUrl(images: ImageTypeSizes, minSize?: keyof ImageSizes) {
     const startIndex = minSize ? sizeOrder.indexOf(minSize) : 0;
     const sizesToConsider = sizeOrder.slice(startIndex);
     for (const key of preferredOrder) {
-      if (images.hasOwnProperty(key)) {
+      if (images[key] !== undefined) {
         for (const size of sizesToConsider) {
           if (size in images[key]) return images[key][size];
         }

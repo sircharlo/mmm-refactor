@@ -882,6 +882,7 @@ const addToFiles = async (
 ) => {
   if (!files) return;
   filesLoading.value = true;
+  // eslint-disable-next-line @typescript-eslint/prefer-for-of
   for (let i = 0; i < files.length; i++) {
     let filepath = files[i]?.path;
     try {

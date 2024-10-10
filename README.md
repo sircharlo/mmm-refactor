@@ -1,4 +1,4 @@
-# Meeting Media Manager (M³) 
+# Meeting Media Manager (M³)
 
 A cross platform app to download and present media (pictures and videos) for congregation meetings of Jehovah’s Witnesses in any language. Features include recurring and custom media management, congregation sync, and media presentation tools for hybrid, in-person or fully remote Zoom meetings.
 

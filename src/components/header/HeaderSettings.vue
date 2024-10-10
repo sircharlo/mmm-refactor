@@ -176,11 +176,11 @@ const unusedParentDirectories = computed(() => {
         }
         return acc;
       },
-      {} as { [parentPath: string]: number },
+      {} as Record<string, number>,
     );
   } catch (error) {
     errorCatcher(error);
-    return {} as { [parentPath: string]: number };
+    return {} as Record<string, number>;
   }
 });
 
@@ -195,7 +195,7 @@ const usedParentDirectories = computed(() => {
         }
         return acc;
       },
-      {} as { [parentPath: string]: number },
+      {} as Record<string, number>,
     );
   } catch (error) {
     errorCatcher(error);

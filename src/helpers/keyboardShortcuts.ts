@@ -62,7 +62,7 @@ const registerCustomShortcut = (
       return;
     if (!keySequence)
       keySequence = currentSettings.value[shortcutName] as string;
-    registerShortcut(keySequence, shortcutCallbacks[shortcutName]!);
+    registerShortcut(keySequence, shortcutCallbacks[shortcutName]);
   } catch (error) {
     errorCatcher(error);
   }
