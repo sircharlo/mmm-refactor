@@ -471,11 +471,15 @@ contextBridge.exposeInMainWorld('electronApi', {
         attempts++;
         sleepSync(delay);
       }
-
-      return {};
+      throw new Error(
+        fs.existsSync(dbPath)
+          ? 'could not connect to database'
+          : 'database file not found',
+      );
     } catch (error) {
-      errorCatcher(error + '\n' + query + '\n' + dbPath);
-      return {};
+      errorCatcher(error);
+      errorCatcher(query + '\n' + dbPath);
+      return [];
     }
   },
   fileUrlToPath: (fileurl: string) => {
