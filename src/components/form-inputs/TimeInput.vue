@@ -36,8 +36,9 @@
 </template>
 
 <script setup lang="ts">
+import type { SettingsItemOption, SettingsItemRule } from 'src/types';
+
 import { getRules, getTimeOptions } from 'src/helpers/settings';
-import { SettingsItemOption, SettingsItemRule } from 'src/types/settings';
 import { ref, watch } from 'vue';
 
 const props = defineProps<{

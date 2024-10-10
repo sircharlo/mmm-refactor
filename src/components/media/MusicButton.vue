@@ -123,6 +123,8 @@
 </template>
 
 <script setup lang="ts">
+import type { SongItem } from 'src/types';
+
 import { storeToRefs } from 'pinia';
 import { date } from 'quasar';
 import { barStyle, thumbStyle } from 'src/boot/globals';
@@ -137,7 +139,6 @@ import { downloadBackgroundMusic } from 'src/helpers/jw-media';
 import { formatTime, isVideo } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
-import { SongItem } from 'src/types/media';
 import { computed, onMounted, onUnmounted, Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 

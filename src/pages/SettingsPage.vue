@@ -151,6 +151,8 @@
 </template>
 
 <script setup lang="ts">
+import type { SettingsItems } from 'src/types';
+
 import { storeToRefs } from 'pinia';
 import DateInput from 'src/components/form-inputs/DateInput.vue';
 import SelectInput from 'src/components/form-inputs/SelectInput.vue';
@@ -163,7 +165,6 @@ import { settingsDefinitions, settingsGroups } from 'src/defaults/settings';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
-import { SettingsItems } from 'src/types/settings';
 import { computed, onMounted, ref, watch } from 'vue';
 
 // Store initializations

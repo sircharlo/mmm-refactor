@@ -251,6 +251,8 @@
 </template>
 
 <script setup lang="ts">
+import type { MultimediaItem } from 'src/types';
+
 import { storeToRefs } from 'pinia';
 import { barStyle, thumbStyle } from 'src/boot/globals';
 import { electronApi } from 'src/helpers/electron-api';
@@ -267,7 +269,6 @@ import {
 import { createTemporaryNotification } from 'src/helpers/notifications';
 import { useAppSettingsStore } from 'src/stores/app-settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
-import { MultimediaItem } from 'src/types/sqlite';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 

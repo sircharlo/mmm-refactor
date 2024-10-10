@@ -42,7 +42,7 @@ import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 
 // Types
-import { CacheFile } from 'src/types/media';
+import type { CacheFile } from 'src/types';
 
 // Props
 const props = defineProps<{

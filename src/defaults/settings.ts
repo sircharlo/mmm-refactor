@@ -1,10 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 
-import {
-  SettingsGroups,
-  SettingsItems,
-  SettingsValues,
-} from 'src/types/settings';
+import type { SettingsGroups, SettingsItems, SettingsValues } from 'src/types';
 
 export const settingsGroups: SettingsGroups = {
   app: {

@@ -129,7 +129,7 @@ import {
 import { formatTime } from 'src/helpers/mediaPlayback';
 
 // Types
-import { MediaItemsMediatorItem } from 'src/types/publications';
+import type { MediaItemsMediatorItem } from 'src/types';
 
 // Props
 const props = defineProps<{

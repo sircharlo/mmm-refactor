@@ -1,3 +1,10 @@
+import type {
+  DateInfo,
+  DownloadedFile,
+  DownloadProgressItems,
+  SettingsValues,
+} from 'src/types';
+
 import { defineStore, storeToRefs } from 'pinia';
 import { date } from 'quasar';
 import { settingsDefinitions } from 'src/defaults/settings';
@@ -6,9 +13,6 @@ import { errorCatcher } from 'src/helpers/error-catcher';
 import { getAdditionalMediaPath } from 'src/helpers/fs';
 import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
 import { useJwStore } from 'src/stores/jw';
-import { DateInfo } from 'src/types/dates';
-import { DownloadedFile, DownloadProgressItems } from 'src/types/media';
-import { SettingsValues } from 'src/types/settings';
 
 const { fs, path } = electronApi;
 

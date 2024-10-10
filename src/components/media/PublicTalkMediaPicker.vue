@@ -74,6 +74,8 @@
 </template>
 
 <script setup lang="ts">
+import type { DocumentItem, PublicationInfo } from 'src/types';
+
 import { storeToRefs } from 'pinia';
 import { barStyle, thumbStyle } from 'src/boot/globals';
 import { electronApi } from 'src/helpers/electron-api';
@@ -82,7 +84,6 @@ import { addJwpubDocumentMediaToFiles } from 'src/helpers/jw-media';
 import { decompressJwpub, findDb } from 'src/helpers/mediaPlayback';
 import { createTemporaryNotification } from 'src/helpers/notifications';
 import { useCurrentStateStore } from 'src/stores/current-state';
-import { DocumentItem, PublicationInfo } from 'src/types/sqlite';
 import { computed, ComputedRef, Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 

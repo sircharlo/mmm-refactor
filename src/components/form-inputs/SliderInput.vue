@@ -12,7 +12,8 @@
 </template>
 
 <script setup lang="ts">
-import { SettingsItemAction } from 'src/types/settings';
+import type { SettingsItemAction } from 'src/types';
+
 import { ref, watch } from 'vue';
 
 const emit = defineEmits(['update:modelValue']);

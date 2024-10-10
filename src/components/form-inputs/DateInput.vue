@@ -41,8 +41,9 @@
 </template>
 
 <script setup lang="ts">
+import type { SettingsItemOption, SettingsItemRule } from 'src/types';
+
 import { getDateOptions, getRules } from 'src/helpers/settings';
-import { SettingsItemOption, SettingsItemRule } from 'src/types/settings';
 import { ref, watch } from 'vue';
 
 const emit = defineEmits(['update:modelValue']);

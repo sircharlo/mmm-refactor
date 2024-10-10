@@ -1,5 +1,7 @@
+import type { PathLike } from 'fs-extra';
+import type { MultimediaItem, PublicationFetcher } from 'src/types';
+
 import { Buffer } from 'buffer';
-import { PathLike } from 'fs-extra';
 import { Item } from 'klaw-sync';
 import { storeToRefs } from 'pinia';
 import { FULL_HD } from 'src/helpers/converters';
@@ -7,8 +9,6 @@ import { electronApi } from 'src/helpers/electron-api';
 import { downloadFileIfNeeded, getJwMediaInfo } from 'src/helpers/jw-media';
 import { isImage, isVideo } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
-import { PublicationFetcher } from 'src/types/publications';
-import { MultimediaItem } from 'src/types/sqlite';
 
 import { errorCatcher } from './error-catcher';
 

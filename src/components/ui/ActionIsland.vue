@@ -103,6 +103,8 @@
 </template>
 
 <script setup lang="ts">
+import type { DownloadProgressItems } from 'src/types';
+
 import { storeToRefs } from 'pinia';
 import DownloadStatus from 'src/components/media/DownloadStatus.vue';
 import MediaDisplayButton from 'src/components/media/MediaDisplayButton.vue';
@@ -111,7 +113,6 @@ import ObsStatus from 'src/components/media/ObsStatus.vue';
 import SubtitlesButton from 'src/components/media/SubtitlesButton.vue';
 import { electronApi } from 'src/helpers/electron-api';
 import { useCurrentStateStore } from 'src/stores/current-state';
-import { DownloadProgressItems } from 'src/types/media';
 import { ref } from 'vue';
 
 const { path } = electronApi;

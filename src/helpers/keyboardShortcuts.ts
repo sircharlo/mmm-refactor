@@ -1,8 +1,9 @@
+import type { SettingsValues } from 'src/types';
+
 import { storeToRefs } from 'pinia';
 import { electronApi } from 'src/helpers/electron-api';
 import { showMediaWindow } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
-import { SettingsValues } from 'src/types/settings';
 
 import { errorCatcher } from './error-catcher';
 const { registerShortcut, unregisterShortcut } = electronApi;

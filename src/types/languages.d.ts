@@ -1,4 +1,4 @@
-export interface jwLanguage {
+export interface JwLanguage {
   altSpellings: string[];
   direction: string;
   hasWebContent: boolean;

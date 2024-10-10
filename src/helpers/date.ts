@@ -1,11 +1,11 @@
+import type { DateInfo, DynamicMediaObject } from 'src/types';
+
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { storeToRefs } from 'pinia';
 import { date } from 'quasar';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
-import { DateInfo } from 'src/types/dates';
-import { DynamicMediaObject } from 'src/types/media';
 
 import { errorCatcher } from './error-catcher';
 

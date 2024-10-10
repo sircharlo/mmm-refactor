@@ -59,6 +59,8 @@
 </template>
 
 <script setup lang="ts">
+import type { MediaLink, PublicationFetcher } from 'src/types';
+
 import { storeToRefs } from 'pinia';
 import { barStyle, thumbStyle } from 'src/boot/globals';
 import { errorCatcher } from 'src/helpers/error-catcher';
@@ -69,7 +71,6 @@ import {
 } from 'src/helpers/jw-media';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
-import { MediaLink, PublicationFetcher } from 'src/types/publications';
 import { computed, ComputedRef, ref, watch } from 'vue';
 
 // Define props and emits

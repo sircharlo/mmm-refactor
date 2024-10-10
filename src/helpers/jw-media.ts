@@ -1,4 +1,25 @@
-import axios, { AxiosError } from 'axios';
+import type {
+  DatedTextItem,
+  DocumentItem,
+  DownloadedFile,
+  DynamicMediaObject,
+  FileDownloader,
+  ImageSizes,
+  ImageTypeSizes,
+  MediaItemsMediator,
+  MediaItemsMediatorFile,
+  MediaLink,
+  MultimediaExtractItem,
+  MultimediaItem,
+  MultimediaItemsFetcher,
+  Publication,
+  PublicationFetcher,
+  PublicationItem,
+  TableItem,
+  VideoMarker,
+} from 'src/types';
+
+import axios, { type AxiosError } from 'axios';
 import { Buffer } from 'buffer';
 import PQueue from 'p-queue';
 import { storeToRefs } from 'pinia';
@@ -32,30 +53,6 @@ import {
 } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { MAX_SONGS, useJwStore } from 'src/stores/jw';
-import {
-  DownloadedFile,
-  DynamicMediaObject,
-  FileDownloader,
-} from 'src/types/media';
-import {
-  ImageSizes,
-  ImageTypeSizes,
-  MediaItemsMediator,
-  MediaItemsMediatorFile,
-  MediaLink,
-  Publication,
-  PublicationFetcher,
-} from 'src/types/publications';
-import {
-  DatedTextItem,
-  DocumentItem,
-  MultimediaExtractItem,
-  MultimediaItem,
-  MultimediaItemsFetcher,
-  PublicationItem,
-  TableItem,
-  VideoMarker,
-} from 'src/types/sqlite';
 
 import { errorCatcher } from './error-catcher';
 
@@ -1362,7 +1359,12 @@ function getBestImageUrl(images: ImageTypeSizes, minSize?: keyof ImageSizes) {
 }
 
 const getJwMediaInfo = async (publication: PublicationFetcher) => {
-  const emptyResponse = { subtitles: '', thumbnail: '', title: '' };
+  const emptyResponse = {
+    duration: 0,
+    subtitles: '',
+    thumbnail: '',
+    title: '',
+  };
   try {
     let url = 'https://b.jw-cdn.org/apis/mediator/v1/media-items/';
     url += publication.langwritten + '/';

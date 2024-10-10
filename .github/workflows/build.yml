@@ -98,7 +98,6 @@ jobs:
           yarn -v
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
-
       # - uses: actions/setup-python@v5
       #   if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
       #   with:
@@ -121,7 +120,7 @@ jobs:
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - name: Build and Publish Electron App
-        run: yarn quasar build -m electron
+        run: yarn build
         if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
