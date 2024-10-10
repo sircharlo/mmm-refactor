@@ -1,3 +1,9 @@
+import type {
+  SettingsItemAction,
+  SettingsItemOption,
+  SettingsItemRule,
+} from 'src/types';
+
 import { storeToRefs } from 'pinia';
 import { date, ValidationRule } from 'quasar';
 import { getSpecificWeekday } from 'src/helpers/date';
@@ -7,11 +13,6 @@ import { localeOptions } from 'src/i18n';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { useObsStateStore } from 'src/stores/obs-state';
-import {
-  SettingsItemAction,
-  SettingsItemOption,
-  SettingsItemRule,
-} from 'src/types/settings';
 import { ref } from 'vue';
 
 const jwStore = useJwStore();

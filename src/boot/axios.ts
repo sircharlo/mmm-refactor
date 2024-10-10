@@ -1,6 +1,7 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import type { JwLanguage } from 'src/types';
+
+import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 import { errorCatcher } from 'src/helpers/error-catcher';
-import { jwLanguage } from 'src/types/languages';
 
 const get = async (url: string, params?: AxiosRequestConfig) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -16,7 +17,7 @@ const get = async (url: string, params?: AxiosRequestConfig) => {
   return returnVal?.data ?? undefined;
 };
 
-const getLanguages = async (): Promise<jwLanguage[]> => {
+const getLanguages = async (): Promise<JwLanguage[]> => {
   const req = await get('https://www.jw.org/en/languages/');
   return req?.languages || [];
 };

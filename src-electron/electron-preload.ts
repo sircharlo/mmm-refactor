@@ -1,3 +1,7 @@
+import type { IOptions } from 'music-metadata';
+import type { RenderParameters } from 'pdfjs-dist/types/src/display/api';
+import type { ScreenPreferences } from 'src/types';
+
 import {
   app,
   BrowserWindow,
@@ -17,12 +21,9 @@ import {
 import fs from 'fs-extra';
 import convert from 'heic-convert';
 import klawSync from 'klaw-sync';
-import { IOptions } from 'music-metadata';
-import { RenderParameters } from 'pdfjs-dist/types/src/display/api';
 import { throttle } from 'quasar';
 import { FULL_HD } from 'src/helpers/converters';
 import { errorCatcher } from 'src/helpers/error-catcher';
-import { ScreenPreferences } from 'src/types/settings';
 import path from 'upath';
 
 const getMainWindow = () =>

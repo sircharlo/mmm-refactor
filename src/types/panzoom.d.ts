@@ -1,4 +1,4 @@
-import { PanzoomEventDetail } from '@panzoom/panzoom';
+import type { PanzoomEventDetail } from '@panzoom/panzoom';
 
 export type PanzoomEvent = CustomEvent<PanzoomEventDetail>;
 

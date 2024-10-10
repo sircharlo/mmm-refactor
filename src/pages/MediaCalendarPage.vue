@@ -305,6 +305,7 @@
 
 <script setup lang="ts">
 import type { DNDPlugin } from '@formkit/drag-and-drop';
+import type { DocumentItem, DynamicMediaObject, TableItem } from 'src/types';
 
 import { animations, parents } from '@formkit/drag-and-drop';
 import { useDragAndDrop } from '@formkit/drag-and-drop/vue';
@@ -355,8 +356,6 @@ import { createTemporaryNotification } from 'src/helpers/notifications';
 import { sendObsSceneEvent } from 'src/helpers/obs';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
-import { DynamicMediaObject } from 'src/types/media';
-import { DocumentItem, TableItem } from 'src/types/sqlite';
 import { computed, onMounted, onUnmounted, Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -376,8 +375,7 @@ watch(
 const { t } = useI18n();
 
 const jwStore = useJwStore();
-const { addToAdditionMediaMap, removeFromAdditionMediaMap } =
-  jwStore;
+const { addToAdditionMediaMap, removeFromAdditionMediaMap } = jwStore;
 const { additionalMediaMaps, customDurations, lookupPeriod, mediaSort } =
   storeToRefs(jwStore);
 const currentState = useCurrentStateStore();
@@ -639,7 +637,8 @@ watch(
   (errorVals) => {
     errorVals?.forEach((errorVal) => {
       const daysUntilError = date.getDateDiff(errorVal, new Date(), 'days');
-      if (seenErrors.has(currentCongregation + errorVal) || daysUntilError > 7) return;
+      if (seenErrors.has(currentCongregation + errorVal) || daysUntilError > 7)
+        return;
       createTemporaryNotification({
         caption: getDateLocaleFormatted(
           currentSettings.value?.localAppLang,

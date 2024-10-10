@@ -1,5 +1,6 @@
-import { Item } from 'klaw-sync';
-import { VideoMarker } from 'src/types/sqlite';
+import type { Item } from 'klaw-sync';
+
+import type { VideoMarker } from './sqlite';
 
 export interface DynamicMediaObject {
   customDuration?: { max: number; min: number };

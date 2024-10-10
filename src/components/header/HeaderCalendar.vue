@@ -151,10 +151,7 @@ import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 
 // Types
-import {
-  JwVideoCategory,
-  MediaItemsMediatorItem,
-} from 'src/types/publications';
+import type { JwVideoCategory, MediaItemsMediatorItem } from 'src/types';
 
 const jwStore = useJwStore();
 const { resetSort } = jwStore;

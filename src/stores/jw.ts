@@ -5,11 +5,13 @@ import { date } from 'quasar';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { findBestResolution, getPubMediaLinks } from 'src/helpers/jw-media';
 import { useCurrentStateStore } from 'src/stores/current-state';
-import { DateInfo } from 'src/types/dates';
-import { jwLanguage } from 'src/types/languages';
-import { DynamicMediaObject } from 'src/types/media';
-import { MediaLink, PublicationFetcher } from 'src/types/publications';
-
+import {
+  DateInfo,
+  DynamicMediaObject,
+  JwLanguage,
+  MediaLink,
+  PublicationFetcher,
+} from 'src/types';
 export const MAX_SONGS = 500;
 
 export function uniqueById<T extends { uniqueId: string }>(array: T[]): T[] {
@@ -213,7 +215,7 @@ export const useJwStore = defineStore('jw-store', {
       jwLanguages: (LocalStorage.getItem('jwLanguages') || {
         list: [],
         updated: oldDate,
-      }) as { list: jwLanguage[]; updated: Date },
+      }) as { list: JwLanguage[]; updated: Date },
       jwSongs: (LocalStorage.getItem('jwSongs') || {}) as {
         [lang: string]: {
           list: MediaLink[];

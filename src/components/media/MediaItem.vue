@@ -496,7 +496,9 @@
 </template>
 
 <script setup lang="ts">
-import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
+import type { DynamicMediaObject } from 'src/types';
+
+import Panzoom, { type PanzoomObject } from '@panzoom/panzoom';
 import { storeToRefs } from 'pinia';
 import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
@@ -506,7 +508,6 @@ import { sendObsSceneEvent } from 'src/helpers/obs';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { useObsStateStore } from 'src/stores/obs-state';
-import { DynamicMediaObject } from 'src/types/media';
 import { computed, onUnmounted, ref } from 'vue';
 
 const currentState = useCurrentStateStore();

@@ -1,8 +1,9 @@
+import type { OldAppConfig, SettingsValues } from 'src/types';
+
 import { extend } from 'quasar';
 import { defaultSettings } from 'src/defaults/settings';
 import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
-import { OldAppConfig, SettingsValues } from 'src/types/settings';
 
 const { fs, klawSync, path } = electronApi;
 

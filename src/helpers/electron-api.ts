@@ -1,7 +1,7 @@
-import { ShortcutDetails } from 'electron';
-import { PathLike } from 'fs';
-import { IAudioMetadata, IOptions } from 'music-metadata';
-import { QueryResponseItem } from 'src/types/sqlite';
+import type { ShortcutDetails } from 'electron';
+import type { PathLike } from 'fs';
+import type { IAudioMetadata, IOptions } from 'music-metadata';
+import type { QueryResponseItem } from 'src/types';
 
 export interface ElectronFileFilter {
   extensions: string[];

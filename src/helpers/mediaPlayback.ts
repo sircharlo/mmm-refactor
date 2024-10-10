@@ -1,3 +1,9 @@
+import type {
+  JwPlaylistItem,
+  MultimediaItem,
+  PlaylistTagItem,
+} from 'src/types';
+
 import { Buffer } from 'buffer';
 import mime from 'mime';
 import { storeToRefs } from 'pinia';
@@ -10,11 +16,6 @@ import {
   processMissingMediaInfo,
 } from 'src/helpers/jw-media';
 import { useCurrentStateStore } from 'src/stores/current-state';
-import {
-  JwPlaylistItem,
-  MultimediaItem,
-  PlaylistTagItem,
-} from 'src/types/sqlite';
 
 import { errorCatcher } from './error-catcher';
 

@@ -69,6 +69,8 @@
 </template>
 
 <script setup lang="ts">
+import type { SettingsValues } from 'src/types';
+
 import { errorCatcher } from 'src/helpers/error-catcher';
 import {
   getCurrentShortcuts,
@@ -76,7 +78,6 @@ import {
   registerCustomShortcut,
   unregisterShortcut,
 } from 'src/helpers/keyboardShortcuts';
-import { SettingsValues } from 'src/types/settings';
 import { ref, watch } from 'vue';
 
 // Define props and emits

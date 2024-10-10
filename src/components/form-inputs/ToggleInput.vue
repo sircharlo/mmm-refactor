@@ -3,8 +3,9 @@
 </template>
 
 <script setup lang="ts">
+import type { SettingsItemAction } from 'src/types';
+
 import { getActions } from 'src/helpers/settings';
-import { SettingsItemAction } from 'src/types/settings';
 import { ref, watch } from 'vue';
 
 // Define props and emits

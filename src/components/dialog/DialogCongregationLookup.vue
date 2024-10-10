@@ -103,6 +103,8 @@
   </q-dialog>
 </template>
 <script setup lang="ts">
+import type { CongregationLanguage, GeoRecord } from 'src/types';
+
 import { storeToRefs } from 'pinia';
 import { get } from 'src/boot/axios';
 import { barStyle, thumbStyle } from 'src/boot/globals';
@@ -110,10 +112,6 @@ import { getLocaleDayName } from 'src/helpers/date';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
-import {
-  CongregationLanguage,
-  GeoRecord,
-} from 'src/types/congregation-lookups';
 import { Ref, ref, watch } from 'vue';
 
 const jwStore = useJwStore();

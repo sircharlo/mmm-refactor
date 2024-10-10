@@ -1,3 +1,5 @@
+import type { DynamicMediaObject } from 'src/types';
+
 import { storeToRefs } from 'pinia';
 import { LocalStorage } from 'quasar';
 import { dateFromString, isInPast } from 'src/helpers/date';
@@ -5,7 +7,6 @@ import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { getAdditionalMediaPath, removeEmptyDirs } from 'src/helpers/fs';
 import { useJwStore } from 'src/stores/jw';
-import { DynamicMediaObject } from 'src/types/media';
 
 const { fileUrlToPath, fs, klawSync, path } = electronApi;
 

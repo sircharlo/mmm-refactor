@@ -1,3 +1,5 @@
+import type { OldAppConfig, ScreenPreferences } from 'src/types';
+
 import { defineStore, storeToRefs } from 'pinia';
 import { LocalStorage, uid } from 'quasar';
 import { electronApi } from 'src/helpers/electron-api';
@@ -8,7 +10,6 @@ import {
   parsePrefsFile,
 } from 'src/helpers/migrations';
 import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
-import { OldAppConfig, ScreenPreferences } from 'src/types/settings';
 
 const { fs, getAppDataPath, path } = electronApi;
 

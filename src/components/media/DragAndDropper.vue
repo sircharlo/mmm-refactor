@@ -106,12 +106,13 @@
 </template>
 
 <script setup lang="ts">
+import type { DocumentItem } from 'src/types';
+
 import { barStyle, thumbStyle } from 'src/boot/globals';
 import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { addJwpubDocumentMediaToFiles } from 'src/helpers/jw-media';
 import { createTemporaryNotification } from 'src/helpers/notifications';
-import { DocumentItem } from 'src/types/sqlite';
 import { ref, watch } from 'vue';
 
 const { openFileDialog } = electronApi;
