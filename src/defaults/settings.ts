@@ -1,11 +1,7 @@
 import type { SettingsGroups, SettingsItems, SettingsValues } from 'src/types';
 
+/* eslint-disable perfectionist/sort-objects */
 export const settingsGroups: SettingsGroups = {
-  advanced: {
-    description: 'advancedDescription',
-    icon: 'mmm-advanced-settings',
-    name: 'advanced',
-  },
   app: {
     description: 'applicationConfigurationDescription',
     icon: 'mmm-configuration',
@@ -16,19 +12,23 @@ export const settingsGroups: SettingsGroups = {
     icon: 'mmm-lectern',
     name: 'congregationMeetings',
   },
-  integrations: {
-    description: 'integrationsDescription',
-    icon: 'mmm-integrations',
-    name: 'integrations',
-  },
   mediaRetrievalPlayback: {
     description: 'mediaRetrievalAndPlaybackDescription',
     icon: 'mmm-media-settings',
     name: 'mediaRetrievalAndPlayback',
   },
+  integrations: {
+    description: 'integrationsDescription',
+    icon: 'mmm-integrations',
+    name: 'integrations',
+  },
+  advanced: {
+    description: 'advancedDescription',
+    icon: 'mmm-advanced-settings',
+    name: 'advanced',
+  },
 };
 
-/* eslint-disable perfectionist/sort-objects */
 export const settingsDefinitions: SettingsItems = {
   // App
   localAppLang: {
