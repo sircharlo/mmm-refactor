@@ -1359,7 +1359,12 @@ function getBestImageUrl(images: ImageTypeSizes, minSize?: keyof ImageSizes) {
 }
 
 const getJwMediaInfo = async (publication: PublicationFetcher) => {
-  const emptyResponse = { subtitles: '', thumbnail: '', title: '' };
+  const emptyResponse = {
+    duration: 0,
+    subtitles: '',
+    thumbnail: '',
+    title: '',
+  };
   try {
     let url = 'https://b.jw-cdn.org/apis/mediator/v1/media-items/';
     url += publication.langwritten + '/';
