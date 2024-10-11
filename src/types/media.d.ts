@@ -12,7 +12,7 @@ export interface DynamicMediaObject {
   isImage: boolean;
   isVideo: boolean;
   markers?: VideoMarker[];
-  paragraph?: number;
+  paragraph?: number | string;
   section: string;
   sectionOriginal: string;
   song?: boolean | string;
