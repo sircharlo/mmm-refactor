@@ -16,6 +16,7 @@ import type {
   PublicationFetcher,
   PublicationItem,
   TableItem,
+  TableItemCount,
   VideoMarker,
 } from 'src/types';
 
@@ -419,11 +420,16 @@ const getDocumentMultimediaItems = (source: MultimediaItemsFetcher) => {
       (column) => column.name === 'BeginParagraphOrdinal',
     );
 
-    const targetParNrExists = (
-      executeQuery(source.db, "PRAGMA table_info('Question')") as TableItem[]
-    )
-      .map((item) => item.name)
-      .includes('TargetParagraphNumberLabel');
+    const targetParNrExists =
+      (
+        executeQuery(source.db, "PRAGMA table_info('Question')") as TableItem[]
+      ).some((item) => item.name === 'TargetParagraphNumberLabel') &&
+      (
+        executeQuery(
+          source.db,
+          'SELECT COUNT(*) FROM Question',
+        ) as TableItemCount[]
+      )[0].count > 0;
 
     const suppressZoomExists = (
       executeQuery(source.db, "PRAGMA table_info('Multimedia')") as TableItem[]
@@ -654,6 +660,38 @@ const getWtIssue = async (
   }
 };
 
+const getParagraphNumbers = (
+  paragraphLabel: number | string,
+  caption: string,
+) => {
+  try {
+    if (!paragraphLabel) return '';
+    if (!caption) return paragraphLabel;
+
+    const numbers = [...caption.matchAll(/\d+/g)].map((match) =>
+      parseInt(match[0]),
+    ); // Find all numbers in the line
+
+    if (!numbers.length) return paragraphLabel;
+    if (numbers.length === 1) return numbers[0];
+
+    const max = numbers[numbers.length - 1]; // Find the last number
+
+    // Find the first number less than or equal to max
+    const firstNumber = numbers.find((n) => n <= max);
+    if (!firstNumber) return paragraphLabel;
+
+    const regex = new RegExp(`${firstNumber}.*${max}`);
+    const match = caption.match(regex);
+    if (match && match[0]?.length <= 15) return match[0];
+
+    return paragraphLabel;
+  } catch (e) {
+    errorCatcher(e);
+    return paragraphLabel || '';
+  }
+};
+
 const dynamicMediaMapper = async (
   allMedia: MultimediaItem[],
   lookupDate: Date,
@@ -714,7 +752,7 @@ const dynamicMediaMapper = async (
         isImage: isImage(m.FilePath),
         isVideo: video,
         markers: m.VideoMarkers,
-        paragraph: m.TargetParagraphNumberLabel,
+        paragraph: getParagraphNumbers(m.TargetParagraphNumberLabel, m.Caption),
         section, // if is we: wt; else, if >= middle song: LAC; >= (middle song - 8???): AYFM; else: TGW
         sectionOriginal: section, // to enable restoring the original section after custom sorting
         song: mediaIsSong,
