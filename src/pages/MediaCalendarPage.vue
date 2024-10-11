@@ -316,11 +316,8 @@ import { storeToRefs } from 'pinia';
 import { date, uid } from 'quasar';
 import DragAndDropper from 'src/components/media/DragAndDropper.vue';
 import MediaItem from 'src/components/media/MediaItem.vue';
-import {
-  dateFromString,
-  getDateLocaleFormatted,
-  isInPast,
-} from 'src/helpers/date';
+import { useLocale } from 'src/composables/useLocale';
+import { dateFromString, getLocalDate, isInPast } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import {
@@ -363,6 +360,8 @@ import { useI18n } from 'vue-i18n';
 const dragging = ref(false);
 const jwpubImportDb = ref('');
 const jwpubImportDocuments = ref<DocumentItem[]>([]);
+
+const { dateLocale } = useLocale();
 
 watch(
   () => [jwpubImportDb.value, jwpubImportDocuments.value],
@@ -641,10 +640,7 @@ watch(
       if (seenErrors.has(currentCongregation + errorVal) || daysUntilError > 7)
         return;
       createTemporaryNotification({
-        caption: getDateLocaleFormatted(
-          currentSettings.value?.localAppLang,
-          errorVal,
-        ),
+        caption: getLocalDate(errorVal, dateLocale.value),
         group: 'meetingMediaDownloadError',
         icon: 'mmm-error',
         message: t('errorDownloadingMeetingMedia'),

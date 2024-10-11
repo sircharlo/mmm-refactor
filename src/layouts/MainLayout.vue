@@ -43,7 +43,6 @@ import { useRoute, useRouter } from 'vue-router';
 
 // Globals
 import { barStyle, queues, thumbStyle } from 'src/boot/globals';
-import { refreshDateLocale } from 'src/boot/i18n';
 
 // Components
 import HeaderBase from 'src/components/header/HeaderBase.vue';
@@ -224,7 +223,6 @@ watch(
     if (newAppLang) {
       if (newAppLang.includes('-')) newAppLang = newAppLang.split('-')[0];
       locale.value = newAppLang;
-      refreshDateLocale(newAppLang);
     }
   },
 );

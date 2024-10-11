@@ -21,6 +21,7 @@
     >
       <q-date
         v-model="localValue"
+        :locale="dateLocale"
         :options="getDateOptions(options)"
         :rules="rules"
         dense
@@ -43,8 +44,11 @@
 <script setup lang="ts">
 import type { SettingsItemOption, SettingsItemRule } from 'src/types';
 
+import { useLocale } from 'src/composables/useLocale';
 import { getDateOptions, getRules } from 'src/helpers/settings';
 import { ref, watch } from 'vue';
+
+const { dateLocale } = useLocale();
 
 const emit = defineEmits(['update:modelValue']);
 

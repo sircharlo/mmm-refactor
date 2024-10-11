@@ -12,10 +12,11 @@
               options === 'jwLanguages' || options?.startsWith('obs')
                 ? option.label
                 : options === 'days'
-                  ? getLocaleDayName(
-                      currentSettings?.localAppLang,
-                      parseInt(option.label),
-                    )
+                  ? dateLocale.days[
+                      parseInt(option.label) === 6
+                        ? 0
+                        : parseInt(option.label) + 1
+                    ]
                   : $t(option.label),
           };
         },
@@ -42,14 +43,11 @@
 <script setup lang="ts">
 import type { SettingsItemRule } from 'src/types';
 
-import { storeToRefs } from 'pinia';
-import { getLocaleDayName } from 'src/helpers/date';
+import { useLocale } from 'src/composables/useLocale';
 import { filterFn, getListOptions, getRules } from 'src/helpers/settings';
-import { useCurrentStateStore } from 'src/stores/current-state';
 import { ref, watch } from 'vue';
 
-const currentState = useCurrentStateStore();
-const { currentSettings } = storeToRefs(currentState);
+const { dateLocale } = useLocale();
 
 const emit = defineEmits(['update:modelValue']);
 

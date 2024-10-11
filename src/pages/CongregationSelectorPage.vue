@@ -35,17 +35,19 @@
                 "
               >
                 {{
-                  getLocaleDayName(
-                    congregations[id]?.localAppLang,
-                    parseInt(congregations[id]?.mwDay),
-                  )
+                  dateLocale.days[
+                    parseInt(congregations[id]?.mwDay) === 6
+                      ? 0
+                      : parseInt(congregations[id]?.mwDay) + 1
+                  ]
                 }}
                 {{ congregations[id]?.mwStartTime }} |
                 {{
-                  getLocaleDayName(
-                    congregations[id]?.localAppLang,
-                    parseInt(congregations[id]?.weDay),
-                  )
+                  dateLocale.days[
+                    parseInt(congregations[id]?.weDay) === 6
+                      ? 0
+                      : parseInt(congregations[id]?.weDay) + 1
+                  ]
                 }}
                 {{ congregations[id]?.weStartTime }}
               </template>
@@ -115,7 +117,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { getLocaleDayName } from 'src/helpers/date';
+import { useLocale } from 'src/composables/useLocale';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { downloadSongbookVideos } from 'src/helpers/jw-media';
 import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
@@ -123,6 +125,8 @@ import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+
+const { dateLocale } = useLocale();
 
 const congregationSettings = useCongregationSettingsStore();
 const currentState = useCurrentStateStore();
