@@ -32,9 +32,4 @@ updates:
         applies-to: version-updates
         patterns:
           - '@vueuse/*'
-      minor-dependencies:
-        applies-to: version-updates
-        update-types:
-          - minor
-          - patch
     open-pull-requests-limit: 15
