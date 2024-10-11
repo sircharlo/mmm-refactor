@@ -1,7 +1,10 @@
 import type { ShortcutDetails } from 'electron';
-import type { PathLike } from 'fs';
+import type FsExtra from 'fs-extra';
+import type HeicConvert from 'heic-convert';
+import type KlawSync from 'klaw-sync';
 import type { IAudioMetadata, IOptions } from 'music-metadata';
 import type { QueryResponseItem } from 'src/types';
+import type Path from 'upath';
 
 export interface ElectronFileFilter {
   extensions: string[];
@@ -10,15 +13,15 @@ export interface ElectronFileFilter {
 
 export interface ElectronApi {
   closeWebsiteWindow: () => void;
-  convert: typeof import('heic-convert');
+  convert: typeof HeicConvert;
   convertPdfToImages: (
     pdfPath: string,
     outputFolder: string,
   ) => Promise<string[]>;
   decompress: (inputZip: string, outputFolder: string) => Promise<void>;
   executeQuery: (dbPath: string, query: string) => QueryResponseItem[];
-  fileUrlToPath: (url: PathLike) => string;
-  fs: typeof import('fs-extra');
+  fileUrlToPath: (url: string) => string;
+  fs: typeof FsExtra;
   getAllScreens: (
     type?: string,
   ) => ({ mainWindow?: boolean; mediaWindow?: boolean } & Electron.Display)[];
@@ -28,7 +31,7 @@ export interface ElectronApi {
   getUserDataPath: () => string;
   getUserDesktopPath: () => string;
   isFileUrl: (url: string) => boolean;
-  klawSync: typeof import('klaw-sync');
+  klawSync: typeof KlawSync;
   moveMediaWindow: (
     targetScreenNumber?: number,
     windowedMode?: boolean,
@@ -39,21 +42,19 @@ export interface ElectronApi {
   openFileDialog: (
     single?: boolean,
     filter?: string[],
-  ) => Promise<Electron.OpenDialogReturnValue>;
+  ) => Promise<Electron.OpenDialogReturnValue | undefined>;
   openWebsiteWindow: () => void;
   parseFile: (filePath: string, options?: IOptions) => Promise<IAudioMetadata>;
-  path: typeof import('path');
+  path: typeof Path;
   pathToFileURL: (path: string) => string;
   readShortcutLink: (shortcutPath: string) => ShortcutDetails;
   registerShortcut: (shortcut: string, callback: () => void) => void;
   setAutoStartAtLogin: (value: boolean) => void;
+  setMediaWindowPosition: (x: number, y: number) => void;
   toggleMediaWindow: (action: string) => void;
   unregisterShortcut: (shortcut: string) => void;
   writeShortcutLink: (shortcutPath: string, details: ShortcutDetails) => void;
   zoomWebsiteWindow: (action: string) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-export const electronApi: ElectronApi = (window as { electronApi: ElectronApi })
-  .electronApi;
+export const electronApi: ElectronApi = window.electronApi;

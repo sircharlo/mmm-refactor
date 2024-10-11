@@ -139,7 +139,7 @@ import { downloadBackgroundMusic } from 'src/helpers/jw-media';
 import { formatTime, isVideo } from 'src/helpers/mediaPlayback';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
-import { computed, onMounted, onUnmounted, Ref, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -168,7 +168,7 @@ const musicPlaying = ref(false);
 const musicStopping = ref(false);
 const musicStarting = ref(false);
 const musicStoppedAutomatically = ref(false);
-const songList: Ref<SongItem[]> = ref([]);
+const songList = ref<SongItem[]>([]);
 const currentSongRemainingTime = ref('..:..');
 const timeRemainingBeforeMusicStop = ref();
 
@@ -180,6 +180,7 @@ const fadeToVolumeLevel = (targetVolume: number, fadeOutSeconds: number) => {
     const volumeChange = targetVolume - initialVolume;
     const startTime = performance.now();
 
+    // eslint-disable-next-line no-inner-declarations
     function updateVolume(currentTime: number) {
       try {
         if (!musicPlayer.value) return;
@@ -238,7 +239,9 @@ const getNextSong = async () => {
           break;
         }
         attempts++;
-        await new Promise((resolve) => setTimeout(resolve, 5000));
+        await new Promise((resolve) => {
+          setTimeout(resolve, 5000);
+        });
       }
       for (const queuedSong of songList.value) {
         const metadata = await getMetadataFromMediaPath(queuedSong.path);

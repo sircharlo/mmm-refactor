@@ -71,7 +71,7 @@ import {
 } from 'src/helpers/jw-media';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
-import { computed, ComputedRef, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 // Define props and emits
 const props = defineProps<{
@@ -92,7 +92,7 @@ const localValue = ref(props.modelValue);
 const loading = ref(false);
 
 const filter = ref('');
-const filteredSongs: ComputedRef<MediaLink[]> = computed(() => {
+const filteredSongs = computed((): MediaLink[] => {
   return filter.value
     ? currentSongs.value?.filter((s) =>
         s.title.toLowerCase().includes(filter.value.toLowerCase()),

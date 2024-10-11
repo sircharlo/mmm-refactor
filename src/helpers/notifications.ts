@@ -1,4 +1,4 @@
-import { Notify, QNotifyCreateOptions } from 'quasar';
+import { Notify, type QNotifyCreateOptions } from 'quasar';
 
 import { errorCatcher } from './error-catcher';
 

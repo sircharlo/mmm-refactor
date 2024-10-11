@@ -1,8 +1,8 @@
 import type { PathLike } from 'fs-extra';
+import type { Item } from 'klaw-sync';
 import type { MultimediaItem, PublicationFetcher } from 'src/types';
 
 import { Buffer } from 'buffer';
-import { Item } from 'klaw-sync';
 import { storeToRefs } from 'pinia';
 import { FULL_HD } from 'src/helpers/converters';
 import { electronApi } from 'src/helpers/electron-api';

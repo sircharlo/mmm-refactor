@@ -1,17 +1,17 @@
-import { getLanguages, getYeartext } from 'boot/axios';
-import { defineStore, storeToRefs } from 'pinia';
-import { LocalStorage } from 'quasar';
-import { date } from 'quasar';
-import { errorCatcher } from 'src/helpers/error-catcher';
-import { findBestResolution, getPubMediaLinks } from 'src/helpers/jw-media';
-import { useCurrentStateStore } from 'src/stores/current-state';
-import {
+import type {
   DateInfo,
   DynamicMediaObject,
   JwLanguage,
   MediaLink,
   PublicationFetcher,
 } from 'src/types';
+
+import { getLanguages, getYeartext } from 'boot/axios';
+import { defineStore, storeToRefs } from 'pinia';
+import { date, LocalStorage } from 'quasar';
+import { errorCatcher } from 'src/helpers/error-catcher';
+import { findBestResolution, getPubMediaLinks } from 'src/helpers/jw-media';
+import { useCurrentStateStore } from 'src/stores/current-state';
 export const MAX_SONGS = 500;
 
 export function uniqueById<T extends { uniqueId: string }>(array: T[]): T[] {
@@ -205,35 +205,34 @@ export const useJwStore = defineStore('jw-store', {
     return {
       additionalMediaMaps: (LocalStorage.getItem('additionalMediaMaps') ||
         {}) as Record<string, Record<string, DynamicMediaObject[]>>,
-      customDurations: (LocalStorage.getItem('customDurations') || {}) as {
-        [key: string]: {
-          [key: string]: {
-            [key: string]: { max: number; min: number };
-          };
-        };
-      },
+      customDurations: (LocalStorage.getItem('customDurations') ||
+        {}) as Record<
+        string,
+        Record<string, Record<string, { max: number; min: number }>>
+      >,
       jwLanguages: (LocalStorage.getItem('jwLanguages') || {
         list: [],
         updated: oldDate,
       }) as { list: JwLanguage[]; updated: Date },
-      jwSongs: (LocalStorage.getItem('jwSongs') || {}) as {
-        [lang: string]: {
+      jwSongs: (LocalStorage.getItem('jwSongs') || {}) as Record<
+        string,
+        {
           list: MediaLink[];
           updated: Date;
-        };
-      },
+        }
+      >,
       lookupPeriod: (LocalStorage.getItem('lookupPeriod') || {}) as Record<
         string,
         DateInfo[]
       >,
-      mediaSort: (LocalStorage.getItem('mediaSort') || {}) as {
-        [key: string]: {
-          [key: string]: string[];
-        };
-      },
-      yeartexts: (LocalStorage.getItem('yeartexts') || {}) as {
-        [year: number]: { [langcode: string]: string };
-      },
+      mediaSort: (LocalStorage.getItem('mediaSort') || {}) as Record<
+        string,
+        Record<string, string[]>
+      >,
+      yeartexts: (LocalStorage.getItem('yeartexts') || {}) as Record<
+        number,
+        Record<string, string>
+      >,
     };
   },
 });

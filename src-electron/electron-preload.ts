@@ -1,6 +1,11 @@
+import type * as MusicMetadata from 'music-metadata';
 import type { IOptions } from 'music-metadata';
+import type * as PdfJs from 'pdfjs-dist';
+import type { PDFPageProxy } from 'pdfjs-dist';
 import type { RenderParameters } from 'pdfjs-dist/types/src/display/api';
-import type { ScreenPreferences } from 'src/types';
+import type { ElectronApi } from 'src/helpers/electron-api';
+import type { QueryResponseItem, ScreenPreferences } from 'src/types';
+import type Url from 'url';
 
 import {
   app,
@@ -15,7 +20,7 @@ import {
   contextBridge,
   ipcRenderer,
   shell,
-  ShortcutDetails,
+  type ShortcutDetails,
   webUtils,
 } from 'electron';
 import fs from 'fs-extra';
@@ -371,17 +376,26 @@ ipcRenderer.on('attemptedClose', () => {
   bcClose.postMessage({ attemptedClose: true });
 });
 
-const convertPdfToImages = async (pdfPath: string, outputFolder: string) => {
+const convertPdfToImages = async (
+  pdfPath: string,
+  outputFolder: string,
+): Promise<string[]> => {
   const outputImages: string[] = [];
   try {
     const data = [];
     const { getDocument } = (await import(
       'pdfjs-dist/webpack.mjs'
-    )) as typeof import('pdfjs-dist');
+    )) as typeof PdfJs;
 
     const loadingTask = getDocument(pdfPath);
     const pdfDocument = await loadingTask.promise;
     const numPages = pdfDocument.numPages;
+
+    const promises: Promise<PDFPageProxy>[] = [];
+
+    for (let i = 1; i <= numPages; i++) {
+      promises.push(pdfDocument.getPage(i));
+    }
 
     for (let i = 1; i <= numPages; i++) {
       try {
@@ -389,7 +403,7 @@ const convertPdfToImages = async (pdfPath: string, outputFolder: string) => {
         const viewport = page.getViewport({ scale: 1 });
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
-        if (!context) return;
+        if (!context) return [];
 
         const scale = Math.min(
           (2 * FULL_HD.width) / viewport.width,
@@ -440,7 +454,7 @@ const isFileUrl = (path: string) => {
   }
 };
 
-contextBridge.exposeInMainWorld('electronApi', {
+const electronApi: ElectronApi = {
   closeWebsiteWindow,
   convert,
   convertPdfToImages,
@@ -457,7 +471,7 @@ contextBridge.exposeInMainWorld('electronApi', {
       });
     });
   },
-  executeQuery: (dbPath: string, query: string) => {
+  executeQuery: (dbPath: string, query: string): QueryResponseItem[] => {
     try {
       let attempts = 0;
       const maxAttempts = 10;
@@ -466,7 +480,7 @@ contextBridge.exposeInMainWorld('electronApi', {
       while (attempts < maxAttempts) {
         if (isWritable(dbPath)) {
           const db = sqlite3.default(dbPath);
-          return db.prepare(query).all();
+          return db.prepare(query).all() as QueryResponseItem[];
         }
         attempts++;
         sleepSync(delay);
@@ -486,7 +500,7 @@ contextBridge.exposeInMainWorld('electronApi', {
     if (!fileurl) return '';
     if (!isFileUrl(fileurl)) return fileurl;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const url: typeof import('url') = require('node:url');
+    const url: typeof Url = require('node:url');
     return url.fileURLToPath(fileurl);
   },
   fs,
@@ -513,7 +527,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   openExternalWebsite: (url: string) => {
     shell.openExternal(url);
   },
-  openFileDialog: (single?: boolean, filter?: string[]) => {
+  openFileDialog: async (single?: boolean, filter?: string[]) => {
     const mainWindow = getMainWindow();
     if (!mainWindow) return;
 
@@ -552,9 +566,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   },
   openWebsiteWindow,
   parseFile: async (filePath: string, options?: IOptions) => {
-    const musicMetadata: typeof import('music-metadata') = await import(
-      'music-metadata'
-    );
+    const musicMetadata: typeof MusicMetadata = await import('music-metadata');
     return musicMetadata.parseFile(filePath, options);
   },
   path,
@@ -562,15 +574,15 @@ contextBridge.exposeInMainWorld('electronApi', {
     if (!path) return '';
     if (isFileUrl(path)) return path;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const url: typeof import('url') = require('node:url');
+    const url: typeof Url = require('node:url');
     return url.pathToFileURL(path).href;
   },
-  readShortcutLink: (path: string) => {
+  readShortcutLink: (path: string): ShortcutDetails => {
     try {
       return shell.readShortcutLink(path);
     } catch (error) {
       errorCatcher(error);
-      return {};
+      return { target: '' };
     }
   },
   registerShortcut,
@@ -603,4 +615,6 @@ contextBridge.exposeInMainWorld('electronApi', {
     }
   },
   zoomWebsiteWindow,
-});
+};
+
+contextBridge.exposeInMainWorld('electronApi', electronApi);

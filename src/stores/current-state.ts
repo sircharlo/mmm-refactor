@@ -147,13 +147,12 @@ export const useCurrentStateStore = defineStore('current-state', {
   state: () => {
     return {
       currentCongregation: '' as string,
-      downloadedFiles: {} as {
-        [key: string]: DownloadedFile | Promise<DownloadedFile>;
-      },
+      downloadedFiles: {} as Record<
+        string,
+        DownloadedFile | Promise<DownloadedFile>
+      >,
       downloadProgress: {} as DownloadProgressItems,
-      extractedFiles: {} as {
-        [key: string]: Promise<string>;
-      },
+      extractedFiles: {} as Record<string, Promise<string>>,
       mediaPlayingAction: '',
       mediaPlayingCurrentPosition: 0,
       mediaPlayingPanzoom: { scale: 1, x: 0, y: 0 },

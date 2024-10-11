@@ -132,7 +132,7 @@
 // Packages
 import { storeToRefs } from 'pinia';
 import { date, QMenu } from 'quasar';
-import { computed, onBeforeUnmount, onMounted, Ref, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
 // Globals
 import { get } from 'src/boot/axios';
@@ -170,7 +170,7 @@ const publicTalkMediaPopup = ref(false);
 const datePickerActive = ref(false);
 const remoteVideoPopup = ref(false);
 const remoteVideosLoadingProgress = ref(0);
-const remoteVideos: Ref<MediaItemsMediatorItem[]> = ref([]);
+const remoteVideos = ref<MediaItemsMediatorItem[]>([]);
 
 const dragging = () => {
   window.dispatchEvent(new Event('draggingSomething'));
@@ -242,7 +242,7 @@ const maxDate = () => {
   }
 };
 
-const importMenu: Ref<QMenu | undefined> = ref();
+const importMenu = ref<QMenu | undefined>();
 const openImportMenu = () => {
   importMenu.value?.show();
 };

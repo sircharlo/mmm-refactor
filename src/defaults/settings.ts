@@ -1,32 +1,31 @@
-/* eslint-disable perfectionist/sort-objects */
-
 import type { SettingsGroups, SettingsItems, SettingsValues } from 'src/types';
 
+/* eslint-disable perfectionist/sort-objects */
 export const settingsGroups: SettingsGroups = {
   app: {
     description: 'applicationConfigurationDescription',
-    name: 'applicationConfiguration',
     icon: 'mmm-configuration',
+    name: 'applicationConfiguration',
   },
   congregationMeetings: {
     description: 'congregationMeetingsDescription',
-    name: 'congregationMeetings',
     icon: 'mmm-lectern',
+    name: 'congregationMeetings',
   },
   mediaRetrievalPlayback: {
     description: 'mediaRetrievalAndPlaybackDescription',
-    name: 'mediaRetrievalAndPlayback',
     icon: 'mmm-media-settings',
+    name: 'mediaRetrievalAndPlayback',
   },
   integrations: {
     description: 'integrationsDescription',
-    name: 'integrations',
     icon: 'mmm-integrations',
+    name: 'integrations',
   },
   advanced: {
-    name: 'advanced',
     description: 'advancedDescription',
     icon: 'mmm-advanced-settings',
+    name: 'advanced',
   },
 };
 
@@ -249,12 +248,13 @@ export const settingsDefinitions: SettingsItems = {
     type: 'toggle',
   },
 };
+/* eslint-enable perfectionist/sort-objects */
 
 export const defaultSettings: SettingsValues = {
   autoStartAtLogin: false,
   autoStartMusic: true,
-  coWeek: '',
   congregationName: '',
+  coWeek: '',
   darkMode: 'auto',
   disableMediaFetching: false,
   enableExtraCache: false,
@@ -266,10 +266,6 @@ export const defaultSettings: SettingsValues = {
   excludeTh: true,
   hideMediaLogo: false,
   includePrinted: true,
-  // shortcutMediaNext: '',
-  // shortcutMediaPrevious: '',
-  shortcutMediaWindow: '',
-  shortcutMusic: '',
   lang: 'E',
   langFallback: '',
   langSubtitles: '',
@@ -284,6 +280,10 @@ export const defaultSettings: SettingsValues = {
   obsMediaScene: '',
   obsPassword: '',
   obsPort: '',
+  // shortcutMediaNext: '',
+  // shortcutMediaPrevious: '',
+  shortcutMediaWindow: '',
+  shortcutMusic: '',
   weDay: '',
   weStartTime: '',
 };

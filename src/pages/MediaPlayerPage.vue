@@ -77,7 +77,7 @@
   </q-page-container>
 </template>
 <script setup lang="ts">
-import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
+import Panzoom, { type PanzoomObject } from '@panzoom/panzoom';
 import { storeToRefs } from 'pinia';
 import { useQuasar } from 'quasar';
 import { errorCatcher } from 'src/helpers/error-catcher';
@@ -90,7 +90,7 @@ import {
 import { createTemporaryNotification } from 'src/helpers/notifications';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
-import { Ref, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 
 const currentState = useCurrentStateStore();
 const {
@@ -103,7 +103,7 @@ const {
 const jwStore = useJwStore();
 const { customDurations, yeartexts } = storeToRefs(jwStore);
 
-const panzoom: Ref<PanzoomObject | undefined> = ref();
+const panzoom = ref<PanzoomObject | undefined>();
 
 const initiatePanzoom = () => {
   try {
@@ -115,8 +115,8 @@ const initiatePanzoom = () => {
   }
 };
 
-let mediaElement: Ref<HTMLVideoElement | undefined> = ref();
-const mediaImage: Ref<HTMLImageElement | undefined> = ref();
+let mediaElement = ref<HTMLVideoElement | undefined>();
+const mediaImage = ref<HTMLImageElement | undefined>();
 const panzoomOptions = { animate: true, duration: 1000 };
 
 const bc = new BroadcastChannel('mediaPlayback');
@@ -141,7 +141,9 @@ bc.onmessage = (event) => {
           .then(async (stream) => {
             let timeouts = 0;
             while (!mediaElement.value) {
-              await new Promise((resolve) => setTimeout(resolve, 100));
+              await new Promise((resolve) => {
+                setTimeout(resolve, 100);
+              });
               if (++timeouts > 10) break;
             }
             if (!mediaElement.value) return;

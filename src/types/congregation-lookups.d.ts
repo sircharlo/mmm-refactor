@@ -1,30 +1,30 @@
-type GeoLocation = {
+interface GeoLocation {
   latitude: number;
   longitude: number;
-};
+}
 
-type Schedule = {
+interface Schedule {
   time: string;
   weekday: number;
-};
+}
 
-type CurrentSchedule = {
+interface CurrentSchedule {
   midweek: Schedule;
   weekend: Schedule;
-};
+}
 
-type ScheduleDetails = {
+interface ScheduleDetails {
   changeStamp: null | string;
   current: CurrentSchedule;
   futureDate: null | string;
-};
+}
 
-type PhoneDetails = {
+interface PhoneDetails {
   ext: string;
   phone: string;
-};
+}
 
-type Properties = {
+interface Properties {
   address: string;
   isPrivateMtgPlace: boolean;
   languageCode: string;
@@ -38,20 +38,20 @@ type Properties = {
   relatedLanguageCodes: string[];
   schedule: ScheduleDetails;
   transliteratedAddress: string;
-};
+}
 
-export type GeoRecord = {
+export interface GeoRecord {
   geoId: string;
   isPrimary: boolean;
   location: GeoLocation;
   properties: Properties;
   type: string;
-};
+}
 
-export type CongregationLanguage = {
+export interface CongregationLanguage {
   isSignLanguage: boolean;
   languageCode: string;
   languageName: string;
   scriptDirection: 'ltr' | 'rtl'; // Left-to-right or right-to-left script
   writtenLanguageCode: string[];
-};
+}
