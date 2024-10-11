@@ -142,7 +142,10 @@ const {
 } = storeToRefs(obsState);
 
 const scenePicker = ref(false);
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const sleep = (ms: number) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 
 const obsCloseHandler = () => {
   obsConnectionState.value = 'disconnected';
@@ -271,7 +274,9 @@ const fetchSceneList = async (retryInterval = 2000, maxRetries = 5) => {
         error.message.includes('OBS is not ready')
       ) {
         console.log(`Retrying... (${attempts}/${maxRetries})`);
-        await new Promise((resolve) => setTimeout(resolve, retryInterval));
+        await new Promise((resolve) => {
+          setTimeout(resolve, retryInterval);
+        });
       } else {
         errorCatcher(error);
       }

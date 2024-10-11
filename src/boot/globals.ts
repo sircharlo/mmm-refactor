@@ -1,5 +1,6 @@
+import type PQueue from 'p-queue';
+
 import OBSWebSocket from 'obs-websocket-js';
-import PQueue from 'p-queue';
 import { Dark } from 'quasar';
 const obsWebSocket = new OBSWebSocket();
 

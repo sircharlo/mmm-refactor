@@ -5,7 +5,7 @@ import type {
 } from 'src/types';
 
 import { storeToRefs } from 'pinia';
-import { date, ValidationRule } from 'quasar';
+import { date, type ValidationRule } from 'quasar';
 import { getSpecificWeekday } from 'src/helpers/date';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { configuredScenesAreAllUUIDs } from 'src/helpers/obs';

@@ -1,6 +1,10 @@
+import type * as MusicMetadata from 'music-metadata';
 import type { IOptions } from 'music-metadata';
+import type * as PdfJs from 'pdfjs-dist';
+import type { PDFPageProxy } from 'pdfjs-dist';
 import type { RenderParameters } from 'pdfjs-dist/types/src/display/api';
 import type { ScreenPreferences } from 'src/types';
+import type Url from 'url';
 
 import {
   app,
@@ -15,7 +19,7 @@ import {
   contextBridge,
   ipcRenderer,
   shell,
-  ShortcutDetails,
+  type ShortcutDetails,
   webUtils,
 } from 'electron';
 import fs from 'fs-extra';
@@ -377,11 +381,17 @@ const convertPdfToImages = async (pdfPath: string, outputFolder: string) => {
     const data = [];
     const { getDocument } = (await import(
       'pdfjs-dist/webpack.mjs'
-    )) as typeof import('pdfjs-dist');
+    )) as typeof PdfJs;
 
     const loadingTask = getDocument(pdfPath);
     const pdfDocument = await loadingTask.promise;
     const numPages = pdfDocument.numPages;
+
+    const promises: Promise<PDFPageProxy>[] = [];
+
+    for (let i = 1; i <= numPages; i++) {
+      promises.push(pdfDocument.getPage(i));
+    }
 
     for (let i = 1; i <= numPages; i++) {
       try {
@@ -486,7 +496,7 @@ contextBridge.exposeInMainWorld('electronApi', {
     if (!fileurl) return '';
     if (!isFileUrl(fileurl)) return fileurl;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const url: typeof import('url') = require('node:url');
+    const url: typeof Url = require('node:url');
     return url.fileURLToPath(fileurl);
   },
   fs,
@@ -552,9 +562,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   },
   openWebsiteWindow,
   parseFile: async (filePath: string, options?: IOptions) => {
-    const musicMetadata: typeof import('music-metadata') = await import(
-      'music-metadata'
-    );
+    const musicMetadata: typeof MusicMetadata = await import('music-metadata');
     return musicMetadata.parseFile(filePath, options);
   },
   path,
@@ -562,7 +570,7 @@ contextBridge.exposeInMainWorld('electronApi', {
     if (!path) return '';
     if (isFileUrl(path)) return path;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const url: typeof import('url') = require('node:url');
+    const url: typeof Url = require('node:url');
     return url.pathToFileURL(path).href;
   },
   readShortcutLink: (path: string) => {

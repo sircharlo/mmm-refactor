@@ -15,6 +15,7 @@
     "LICENSE.md",
     "yarn.lock"
   ],
+  "cSpell.ignoreWords": ["shorthand"],
   "cSpell.words": [
     "akamaihd",
     "alllangs",

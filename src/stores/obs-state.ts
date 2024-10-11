@@ -1,4 +1,5 @@
-import { JsonObject } from 'obs-websocket-js/node_modules/type-fest';
+import type { JsonObject } from 'obs-websocket-js/node_modules/type-fest';
+
 import { defineStore } from 'pinia';
 import { configuredScenesAreAllUUIDs } from 'src/helpers/obs';
 import { useCurrentStateStore } from 'src/stores/current-state';

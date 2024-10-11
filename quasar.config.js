@@ -139,6 +139,7 @@ module.exports = configure(function (/* ctx */) {
     electron: {
       builder: {
         appId: 'sircharlo.meeting-media-manager',
+        // eslint-disable-next-line no-template-curly-in-string
         artifactName: 'meeting-media-manager-${version}.${ext}',
         // buildDependenciesFromSource: true,
         // files: [
@@ -162,6 +163,7 @@ module.exports = configure(function (/* ctx */) {
           },
         },
         nsis: {
+          // eslint-disable-next-line no-template-curly-in-string
           artifactName: 'meeting-media-manager-${version}-${arch}.${ext}',
           oneClick: false,
         },

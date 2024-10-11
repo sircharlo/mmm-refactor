@@ -84,7 +84,7 @@ import { addJwpubDocumentMediaToFiles } from 'src/helpers/jw-media';
 import { decompressJwpub, findDb } from 'src/helpers/mediaPlayback';
 import { createTemporaryNotification } from 'src/helpers/notifications';
 import { useCurrentStateStore } from 'src/stores/current-state';
-import { computed, ComputedRef, Ref, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { executeQuery, fs, openFileDialog, path } = electronApi;
@@ -101,8 +101,8 @@ const { currentSettings } = storeToRefs(currentState);
 const localValue = ref(props.modelValue);
 
 const filter = ref('');
-const publicTalks: Ref<DocumentItem[]> = ref([]);
-const filteredPublicTalks: ComputedRef<DocumentItem[]> = computed(() => {
+const publicTalks = ref<DocumentItem[]>([]);
+const filteredPublicTalks = computed((): DocumentItem[] => {
   return filter.value
     ? publicTalks.value.filter((s) =>
         s.Title.toLowerCase().includes(filter.value.toLowerCase()),

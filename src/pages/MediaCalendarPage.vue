@@ -307,6 +307,7 @@
 import type { DNDPlugin } from '@formkit/drag-and-drop';
 import type { DocumentItem, DynamicMediaObject, TableItem } from 'src/types';
 
+// eslint-disable-next-line no-duplicate-imports
 import { animations, parents } from '@formkit/drag-and-drop';
 import { useDragAndDrop } from '@formkit/drag-and-drop/vue';
 import { Buffer } from 'buffer';
@@ -356,12 +357,12 @@ import { createTemporaryNotification } from 'src/helpers/notifications';
 import { sendObsSceneEvent } from 'src/helpers/obs';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
-import { computed, onMounted, onUnmounted, Ref, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const dragging = ref(false);
 const jwpubImportDb = ref('');
-const jwpubImportDocuments: Ref<DocumentItem[]> = ref([] as DocumentItem[]);
+const jwpubImportDocuments = ref<DocumentItem[]>([]);
 
 watch(
   () => [jwpubImportDb.value, jwpubImportDocuments.value],

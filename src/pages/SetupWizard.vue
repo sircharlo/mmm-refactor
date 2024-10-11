@@ -114,8 +114,8 @@
           <p>{{ $t('in-what-language-should-media-be-downloaded') }}</p>
           <SelectInput
             v-model="currentSettings.lang"
-            :use-input="true"
             options="jwLanguages"
+            use-input
           />
           <!-- :label="$t('lang')" -->
           <q-stepper-navigation class="q-gutter-sm">

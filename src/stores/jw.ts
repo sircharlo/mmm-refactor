@@ -1,17 +1,17 @@
-import { getLanguages, getYeartext } from 'boot/axios';
-import { defineStore, storeToRefs } from 'pinia';
-import { LocalStorage } from 'quasar';
-import { date } from 'quasar';
-import { errorCatcher } from 'src/helpers/error-catcher';
-import { findBestResolution, getPubMediaLinks } from 'src/helpers/jw-media';
-import { useCurrentStateStore } from 'src/stores/current-state';
-import {
+import type {
   DateInfo,
   DynamicMediaObject,
   JwLanguage,
   MediaLink,
   PublicationFetcher,
 } from 'src/types';
+
+import { getLanguages, getYeartext } from 'boot/axios';
+import { defineStore, storeToRefs } from 'pinia';
+import { date, LocalStorage } from 'quasar';
+import { errorCatcher } from 'src/helpers/error-catcher';
+import { findBestResolution, getPubMediaLinks } from 'src/helpers/jw-media';
+import { useCurrentStateStore } from 'src/stores/current-state';
 export const MAX_SONGS = 500;
 
 export function uniqueById<T extends { uniqueId: string }>(array: T[]): T[] {

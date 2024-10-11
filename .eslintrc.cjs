@@ -67,7 +67,31 @@ module.exports = {
 
   // add your custom rules here
   rules: {
+    // eslint rules
+    'array-callback-return': 'error',
+    'no-constant-binary-expression': 'error',
+    'no-constructor-return': 'error',
+    'no-template-curly-in-string': 'error',
+    'no-unreachable-loop': 'error',
+    'no-unmodified-loop-condition': 'error',
+    'no-duplicate-imports': 'error',
+    'no-self-compare': 'error',
+    'no-new-native-nonconstructor': 'error',
+    'no-promise-executor-return': 'error',
     'prefer-promise-reject-errors': 'off',
+
+    // vue rules
+    'vue/block-lang': ['error', { script: { lang: 'ts' } }],
+    'vue/block-order': 'error',
+    'vue/component-api-style': ['error', ['script-setup']],
+    'vue/define-props-declaration': 'error',
+    'vue/enforce-style-attribute': 'error',
+    'vue/no-boolean-default': 'error',
+    'vue/prefer-true-attribute-shorthand': 'error',
+
+    // typescript-eslint rules
+    '@typescript-eslint/consistent-type-imports': 'error',
+    '@typescript-eslint/no-import-type-side-effects': 'error',
 
     quotes: ['warn', 'single', { avoidEscape: true }],
 

@@ -82,7 +82,7 @@
 import { storeToRefs } from 'pinia';
 import prettyBytes from 'pretty-bytes';
 import { QMenu } from 'quasar';
-import { computed, Ref, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 // Components
 import DialogCacheClear from 'src/components/dialog/DialogCacheClear.vue';
@@ -123,7 +123,7 @@ const moreOptionsMenuActive = ref(false);
 const calculatingCacheSize = ref(false);
 const cacheClearConfirmPopup = ref(false);
 const cacheClearType = ref<'' | 'all' | 'smart'>('');
-const cacheFiles: Ref<CacheFile[]> = ref([]);
+const cacheFiles = ref<CacheFile[]>([]);
 
 const frequentlyUsedDirectories = computed(() => {
   const getDirectory = (pub: string, issue?: number) => {
