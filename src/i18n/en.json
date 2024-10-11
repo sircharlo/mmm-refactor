@@ -255,6 +255,8 @@
   "reset-custom-background": "Remove custom background",
   "reset-sort-order": "Reset order",
   "save": "Save",
+  "scene-not-found": "A problem occurred while activating a scene in OBS Studio.",
+  "scene-not-found-explain": "Please validate the configured scenes in the settings.",
   "scene-selection": "OBS Scene selection",
   "search": "Search",
   "select-a-congregation-to-enable": "Select a profile first",

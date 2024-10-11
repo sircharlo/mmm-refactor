@@ -8,19 +8,23 @@ export const useObsStateStore = defineStore('obs-state', {
   getters: {
     additionalScenes: (state) => {
       const currentState = useCurrentStateStore();
+      const { currentSettings } = currentState;
       return state.scenes
         .filter(
           (scene) =>
-            scene.sceneUuid !== currentState.currentSettings?.obsCameraScene &&
-            scene.sceneName !== currentState.currentSettings?.obsCameraScene &&
-            scene.sceneUuid !== currentState.currentSettings?.obsMediaScene &&
-            scene.sceneName !== currentState.currentSettings?.obsMediaScene &&
-            scene.sceneUuid !== currentState.currentSettings?.obsImageScene &&
-            scene.sceneName !== currentState.currentSettings?.obsImageScene,
+            ![
+              currentSettings?.obsCameraScene,
+              currentSettings?.obsMediaScene,
+              currentSettings?.obsImageScene,
+            ]
+              .filter(Boolean)
+              .includes(
+                (scene.sceneUuid as string) || (scene.sceneName as string),
+              ),
         )
         .map(
           (scene) =>
-            (configuredScenesAreAllUUIDs()
+            (configuredScenesAreAllUUIDs() && scene.sceneUuid
               ? scene.sceneUuid
               : scene.sceneName) as string,
         );

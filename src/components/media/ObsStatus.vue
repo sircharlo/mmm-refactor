@@ -55,9 +55,9 @@
             >
               <div class="col">
                 <q-btn
+                  :color="sceneExists(scene) ? 'primary' : 'negative'"
                   :outline="scene !== currentScene"
                   class="full-width"
-                  color="primary"
                   unelevated
                   @click="setObsScene(undefined, scene)"
                 >
@@ -117,16 +117,20 @@
 </template>
 
 <script setup lang="ts">
+import type { JsonObject } from 'obs-websocket-js/node_modules/type-fest';
+
 import { OBSWebSocketError } from 'obs-websocket-js';
 import { storeToRefs } from 'pinia';
 import { obsWebSocket } from 'src/boot/globals';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { isImage } from 'src/helpers/mediaPlayback';
+import { createTemporaryNotification } from 'src/helpers/notifications';
 import { configuredScenesAreAllUUIDs, isUUID } from 'src/helpers/obs';
 import { portNumberValidator } from 'src/helpers/settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useObsStateStore } from 'src/stores/obs-state';
 import { onMounted, onUnmounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const currentState = useCurrentStateStore();
 const { currentSettings, mediaPlayingUrl } = storeToRefs(currentState);
@@ -211,6 +215,26 @@ const obsConnect = async (setup?: boolean) => {
   }
 };
 
+const sceneExists = (sceneToCheck: string) => {
+  if (!scenes.value || !sceneToCheck) return false;
+  const matchScene = isUUID(sceneToCheck)
+    ? (scene: JsonObject) => scene.sceneUuid === sceneToCheck
+    : (scene: JsonObject) => scene.sceneName === sceneToCheck;
+  return scenes.value?.some(matchScene);
+};
+
+const { t } = useI18n();
+
+const notifySceneNotFound = () =>
+  createTemporaryNotification({
+    caption: t('scene-not-found-explain'),
+    group: 'scene-not-found',
+    icon: 'mmm-obs-studio',
+    message: t('scene-not-found'),
+    timeout: 10000,
+    type: 'negative',
+  });
+
 const setObsScene = async (
   sceneType: 'camera' | 'media' | undefined,
   desiredScene?: string,
@@ -232,13 +256,18 @@ const setObsScene = async (
     if (newProgramScene) {
       const hasSceneUuid = scenes.value?.every((scene) => 'sceneUuid' in scene);
       const currentScenesAreUuids = configuredScenesAreAllUUIDs();
-      obsWebSocket?.call('SetCurrentProgramScene', {
-        ...(hasSceneUuid &&
-          currentScenesAreUuids && { sceneUuid: newProgramScene }),
-        ...((!hasSceneUuid || !currentScenesAreUuids) && {
-          sceneName: newProgramScene,
-        }),
-      });
+
+      if (sceneExists(newProgramScene)) {
+        obsWebSocket?.call('SetCurrentProgramScene', {
+          ...(hasSceneUuid &&
+            currentScenesAreUuids && { sceneUuid: newProgramScene }),
+          ...((!hasSceneUuid || !currentScenesAreUuids) && {
+            sceneName: newProgramScene,
+          }),
+        });
+      } else {
+        notifySceneNotFound();
+      }
     }
   } catch (error) {
     errorCatcher(error);
@@ -262,9 +291,19 @@ const fetchSceneList = async (retryInterval = 2000, maxRetries = 5) => {
       const sceneList = await obsWebSocket?.call('GetSceneList');
       if (sceneList) {
         scenes.value = sceneList.scenes.reverse();
-        currentScene.value = configuredScenesAreAllUUIDs()
-          ? sceneList.currentProgramSceneUuid
-          : sceneList.currentProgramSceneName;
+        currentScene.value =
+          configuredScenesAreAllUUIDs() && sceneList.currentProgramSceneUuid
+            ? sceneList.currentProgramSceneUuid
+            : sceneList.currentProgramSceneName;
+        [
+          currentSettings.value?.obsCameraScene,
+          currentSettings.value?.obsMediaScene,
+          currentSettings.value?.obsImageScene,
+        ]
+          .filter(Boolean)
+          .forEach((scene) => {
+            if (!sceneExists(scene)) notifySceneNotFound();
+          });
         return;
       }
     } catch (error) {
@@ -297,9 +336,10 @@ onMounted(() => {
     obsWebSocket.on(
       'CurrentProgramSceneChanged',
       (data: { sceneName: string; sceneUuid: string }) => {
-        currentScene.value = configuredScenesAreAllUUIDs()
-          ? data.sceneUuid
-          : data.sceneName;
+        currentScene.value =
+          configuredScenesAreAllUUIDs() && data.sceneUuid
+            ? data.sceneUuid
+            : data.sceneName;
       },
     );
     obsWebSocket.on('Identified', async () => {
