@@ -96,6 +96,7 @@ function createMediaWindow() {
 }
 
 function createWindow() {
+  if (platform === 'win32') app.setAppUserModelId(app.getName());
   session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
     const parsedUrl = new URL(details.url);
     if (isValidHostname(parsedUrl.hostname)) {
