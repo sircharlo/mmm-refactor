@@ -454,7 +454,7 @@ const isFileUrl = (path: string) => {
   }
 };
 
-contextBridge.exposeInMainWorld('electronApi', {
+const electronApi: ElectronApi = {
   closeWebsiteWindow,
   convert,
   convertPdfToImages,
@@ -615,4 +615,6 @@ contextBridge.exposeInMainWorld('electronApi', {
     }
   },
   zoomWebsiteWindow,
-} satisfies ElectronApi);
+};
+
+contextBridge.exposeInMainWorld('electronApi', electronApi);
