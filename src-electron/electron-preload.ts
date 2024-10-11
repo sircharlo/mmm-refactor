@@ -3,7 +3,8 @@ import type { IOptions } from 'music-metadata';
 import type * as PdfJs from 'pdfjs-dist';
 import type { PDFPageProxy } from 'pdfjs-dist';
 import type { RenderParameters } from 'pdfjs-dist/types/src/display/api';
-import type { ScreenPreferences } from 'src/types';
+import type { ElectronApi } from 'src/helpers/electron-api';
+import type { QueryResponseItem, ScreenPreferences } from 'src/types';
 import type Url from 'url';
 
 import {
@@ -375,7 +376,10 @@ ipcRenderer.on('attemptedClose', () => {
   bcClose.postMessage({ attemptedClose: true });
 });
 
-const convertPdfToImages = async (pdfPath: string, outputFolder: string) => {
+const convertPdfToImages = async (
+  pdfPath: string,
+  outputFolder: string,
+): Promise<string[]> => {
   const outputImages: string[] = [];
   try {
     const data = [];
@@ -399,7 +403,7 @@ const convertPdfToImages = async (pdfPath: string, outputFolder: string) => {
         const viewport = page.getViewport({ scale: 1 });
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
-        if (!context) return;
+        if (!context) return [];
 
         const scale = Math.min(
           (2 * FULL_HD.width) / viewport.width,
@@ -467,7 +471,7 @@ contextBridge.exposeInMainWorld('electronApi', {
       });
     });
   },
-  executeQuery: (dbPath: string, query: string) => {
+  executeQuery: (dbPath: string, query: string): QueryResponseItem[] => {
     try {
       let attempts = 0;
       const maxAttempts = 10;
@@ -476,7 +480,7 @@ contextBridge.exposeInMainWorld('electronApi', {
       while (attempts < maxAttempts) {
         if (isWritable(dbPath)) {
           const db = sqlite3.default(dbPath);
-          return db.prepare(query).all();
+          return db.prepare(query).all() as QueryResponseItem[];
         }
         attempts++;
         sleepSync(delay);
@@ -523,7 +527,7 @@ contextBridge.exposeInMainWorld('electronApi', {
   openExternalWebsite: (url: string) => {
     shell.openExternal(url);
   },
-  openFileDialog: (single?: boolean, filter?: string[]) => {
+  openFileDialog: async (single?: boolean, filter?: string[]) => {
     const mainWindow = getMainWindow();
     if (!mainWindow) return;
 
@@ -573,12 +577,12 @@ contextBridge.exposeInMainWorld('electronApi', {
     const url: typeof Url = require('node:url');
     return url.pathToFileURL(path).href;
   },
-  readShortcutLink: (path: string) => {
+  readShortcutLink: (path: string): ShortcutDetails => {
     try {
       return shell.readShortcutLink(path);
     } catch (error) {
       errorCatcher(error);
-      return {};
+      return { target: '' };
     }
   },
   registerShortcut,
@@ -611,4 +615,4 @@ contextBridge.exposeInMainWorld('electronApi', {
     }
   },
   zoomWebsiteWindow,
-});
+} satisfies ElectronApi);

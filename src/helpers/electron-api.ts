@@ -1,11 +1,10 @@
 import type { ShortcutDetails } from 'electron';
-import type { PathLike } from 'fs';
-import type fs from 'fs-extra';
-import type heicConvert from 'heic-convert';
-import type klawSync from 'klaw-sync';
+import type FsExtra from 'fs-extra';
+import type HeicConvert from 'heic-convert';
+import type KlawSync from 'klaw-sync';
 import type { IAudioMetadata, IOptions } from 'music-metadata';
-import type path from 'path';
 import type { QueryResponseItem } from 'src/types';
+import type Path from 'upath';
 
 export interface ElectronFileFilter {
   extensions: string[];
@@ -14,15 +13,15 @@ export interface ElectronFileFilter {
 
 export interface ElectronApi {
   closeWebsiteWindow: () => void;
-  convert: typeof heicConvert;
+  convert: typeof HeicConvert;
   convertPdfToImages: (
     pdfPath: string,
     outputFolder: string,
   ) => Promise<string[]>;
   decompress: (inputZip: string, outputFolder: string) => Promise<void>;
   executeQuery: (dbPath: string, query: string) => QueryResponseItem[];
-  fileUrlToPath: (url: PathLike) => string;
-  fs: typeof fs;
+  fileUrlToPath: (url: string) => string;
+  fs: typeof FsExtra;
   getAllScreens: (
     type?: string,
   ) => ({ mainWindow?: boolean; mediaWindow?: boolean } & Electron.Display)[];
@@ -32,7 +31,7 @@ export interface ElectronApi {
   getUserDataPath: () => string;
   getUserDesktopPath: () => string;
   isFileUrl: (url: string) => boolean;
-  klawSync: typeof klawSync;
+  klawSync: typeof KlawSync;
   moveMediaWindow: (
     targetScreenNumber?: number,
     windowedMode?: boolean,
@@ -43,14 +42,15 @@ export interface ElectronApi {
   openFileDialog: (
     single?: boolean,
     filter?: string[],
-  ) => Promise<Electron.OpenDialogReturnValue>;
+  ) => Promise<Electron.OpenDialogReturnValue | undefined>;
   openWebsiteWindow: () => void;
   parseFile: (filePath: string, options?: IOptions) => Promise<IAudioMetadata>;
-  path: typeof path;
+  path: typeof Path;
   pathToFileURL: (path: string) => string;
   readShortcutLink: (shortcutPath: string) => ShortcutDetails;
   registerShortcut: (shortcut: string, callback: () => void) => void;
   setAutoStartAtLogin: (value: boolean) => void;
+  setMediaWindowPosition: (x: number, y: number) => void;
   toggleMediaWindow: (action: string) => void;
   unregisterShortcut: (shortcut: string) => void;
   writeShortcutLink: (shortcutPath: string, details: ShortcutDetails) => void;
