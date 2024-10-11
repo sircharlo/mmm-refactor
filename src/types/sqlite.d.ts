@@ -159,6 +159,10 @@ export interface TableItem {
   name: string;
 }
 
+export interface TableItemCount {
+  count: number;
+}
+
 export interface PlaylistTagItem {
   Name: string;
 }
@@ -174,4 +178,5 @@ export type QueryResponseItem =
   | PublicationInfo
   | PublicationItem
   | TableItem
+  | TableItemCount
   | VideoMarker;
