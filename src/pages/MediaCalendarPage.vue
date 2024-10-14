@@ -386,9 +386,10 @@ import { storeToRefs } from 'pinia';
 import { date, uid } from 'quasar';
 import DragAndDropper from 'src/components/media/DragAndDropper.vue';
 import MediaItem from 'src/components/media/MediaItem.vue';
+import { useLocale } from 'src/composables/useLocale';
 import {
   dateFromString,
-  getDateLocaleFormatted,
+  getLocalDate,
   isCoWeek,
   isInPast,
   isWeMeetingDay,
@@ -435,6 +436,8 @@ import { useI18n } from 'vue-i18n';
 const dragging = ref(false);
 const jwpubImportDb = ref('');
 const jwpubImportDocuments = ref<DocumentItem[]>([]);
+
+const { dateLocale } = useLocale();
 
 watch(
   () => [jwpubImportDb.value, jwpubImportDocuments.value],
@@ -717,10 +720,7 @@ watch(
       if (seenErrors.has(currentCongregation + errorVal) || daysUntilError > 7)
         return;
       createTemporaryNotification({
-        caption: getDateLocaleFormatted(
-          currentSettings.value?.localAppLang,
-          errorVal,
-        ),
+        caption: getLocalDate(errorVal, dateLocale.value),
         group: 'meetingMediaDownloadError',
         icon: 'mmm-error',
         message: t('errorDownloadingMeetingMedia'),

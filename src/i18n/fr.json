@@ -1,4 +1,9 @@
 {
+  "days-long": "Dimanche_Lundi_Mardi_Mercredi_Jeudi_Vendredi_Samedi",
+  "days-short": "Dim_Lun_Mar_Mer_Jeu_Ven_Sam",
+  "months-long": "Janvier_Février_Mars_Avril_Mai_Juin_Juillet_Aout_Septembre_Octobre_Novembre_Décembre",
+  "months-short": "Jan_Fév_Mar_Avr_Mai_Juin_Juil_Aout_Sep_Oct_Nov_Déc",
+  "days-plural": "jours",
   "add-a-song": "Ajoutez un cantique à la liste des médias pour cette réunion.",
   "add-a-video-explain": "Ajoutez l'une des vidéos de JW.org à la liste des médias. Les dernières vidéos sont affichées ici, mais vous pouvez également rechercher toutes les vidéos si nécessaire.",
   "add-an-opening-song": "Ajouter un cantique d'ouverture",
