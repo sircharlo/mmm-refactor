@@ -35,7 +35,10 @@
                 "
               >
                 {{
-                  dateLocale.days[
+                  (congregations[id]
+                    ? getDateLocale(congregations[id].localAppLang)
+                    : dateLocale
+                  ).days[
                     parseInt(congregations[id]?.mwDay) === 6
                       ? 0
                       : parseInt(congregations[id]?.mwDay) + 1
@@ -43,7 +46,10 @@
                 }}
                 {{ congregations[id]?.mwStartTime }} |
                 {{
-                  dateLocale.days[
+                  (congregations[id]
+                    ? getDateLocale(congregations[id].localAppLang)
+                    : dateLocale
+                  ).days[
                     parseInt(congregations[id]?.weDay) === 6
                       ? 0
                       : parseInt(congregations[id]?.weDay) + 1
@@ -126,7 +132,7 @@ import { useJwStore } from 'src/stores/jw';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-const { dateLocale } = useLocale();
+const { dateLocale, getDateLocale } = useLocale();
 
 const congregationSettings = useCongregationSettingsStore();
 const currentState = useCurrentStateStore();
