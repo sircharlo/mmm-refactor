@@ -80,6 +80,7 @@
   "doing-so-will-greatly-simplify-and-facilitate-sharing-media-during-hybrid-meetings": "Doing so will greatly simplify and facilitate sharing media during hybrid meetings.",
   "dont-forget-add-circuit-overseer-media": "Don't forget to add the circuit overseer's media and concluding song.",
   "dont-forget-add-opening-song": "Don't forget to add an opening song.",
+  "dont-forget-to-add-circuit-overseer-date": "For best results, add the date of the circuit overseer's visit to the \"{ congregationMeetings }\" section in { settings }.",
   "download-status": "Download status",
   "drag-and-drop-or ": "Drag and drop files here or",
   "enableExtraCache": "Cache songbook video files",
@@ -193,6 +194,7 @@
   "next-day-with-media": "Go to the first day with media",
   "next-meeting": "Select date of next meeting",
   "no": "No",
+  "no-circuit-overseer-date-set": "The date of the circuit overseer's visit is not set",
   "no-key-combination": "Enter a key combination now using your keyboard.",
   "no-media-files-for-section": "There are no media items for this meeting section.",
   "no-regular-meetings": "No regular meetings",
@@ -344,7 +346,5 @@
   "yes": "Yes",
   "you-can-also-use-the-button-below-to-browse-for-files": "You can also browse for files manually if you prefer.",
   "zoom-in": "Zoom in",
-  "zoom-out": "Zoom out",
-  "no-circuit-overseer-date-set": "The date of the circuit overseer's visit is not set",
-  "dont-forget-to-add-circuit-overseer-date": "For best results, add the date of the circuit overseer's visit to the \"{ congregationMeetings }\" section in { settings }."
+  "zoom-out": "Zoom out"
 }
