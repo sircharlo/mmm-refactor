@@ -283,12 +283,16 @@ watch(
 );
 
 watch(
-  () => currentSettings.value?.enableKeyboardShortcuts,
-  (newEnableKeyboardShortcuts) => {
+  () => [
+    currentCongregation.value,
+    currentSettings.value?.enableKeyboardShortcuts,
+  ],
+  ([newCongregation, newEnableKeyboardShortcuts], [oldCongregation]) => {
+    if (newCongregation !== oldCongregation || !newEnableKeyboardShortcuts) {
+      unregisterAllCustomShortcuts();
+    }
     if (newEnableKeyboardShortcuts) {
       registerAllCustomShortcuts();
-    } else {
-      unregisterAllCustomShortcuts();
     }
   },
 );
