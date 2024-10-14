@@ -193,19 +193,18 @@ module.exports = configure(function (/* ctx */) {
       },
       extendPackageJson(pkg) {
         const electronDeps = [
+          '@electron/remote',
+          'adm-zip',
+          'better-sqlite3',
+          'electron-updater',
           'electron-window-state',
           'fs-extra',
-          'music-metadata',
-          'pdfjs-dist',
-          'electron',
-          'adm-zip',
-          '@electron/remote',
-          'better-sqlite3',
           'heic-convert',
           'klaw-sync',
+          'music-metadata',
+          'pdfjs-dist',
           'quasar',
           'upath',
-          'electron-updater',
         ];
 
         // Remove UI dependencies from production build
