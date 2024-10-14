@@ -3,10 +3,11 @@
     :class="
       !(
         sortableAdditionalMediaItems?.length ||
-        sortableWtMediaItems.length ||
+        sortableWtMediaItems?.length ||
         sortableTgwMediaItems?.length ||
         sortableAyfmMediaItems?.length ||
-        sortableLacMediaItems?.length
+        sortableLacMediaItems?.length ||
+        sortableCircuitOverseerMediaItems?.length
       )
         ? 'flex'
         : ''
@@ -28,7 +29,8 @@
               sortableWtMediaItems?.length ||
               sortableTgwMediaItems?.length ||
               sortableAyfmMediaItems?.length ||
-              sortableLacMediaItems?.length
+              sortableLacMediaItems?.length ||
+              sortableCircuitOverseerMediaItems?.length
             )))
       "
       class="col content-center q-py-xl"
@@ -105,44 +107,79 @@
         </div>
       </div>
     </div>
-    <q-list
-      v-show="
+    <q-banner
+      v-if="
         selectedDateObject?.meeting === 'we' &&
         selectedDateObject?.complete &&
         !sortableAdditionalMediaItems?.length
       "
-      class="media-section additional"
+      class="bg-additional text-white"
+      inline-actions
+      rounded
     >
-      <q-item class="text-additional items-center">
-        <q-avatar class="text-white bg-additional rounded-borders-sm" size="md">
+      {{ $t('dont-forget-add-opening-song') }}
+      <template #avatar>
+        <q-avatar class="bg-white text-additional" size="lg">
           <q-icon name="mmm-music-note" size="sm" />
         </q-avatar>
-        <div class="col text-bold text-uppercase text-spaced">
-          {{ $t('opening-song') }}
-        </div>
-        <div class="text-bold text-uppercase text-spaced">
-          <q-btn
-            class="q-ml-sm"
-            color="primary"
-            rounded
-            @click="addOpeningSong()"
-          >
-            <q-icon class="q-mr-sm" name="mmm-music-note" size="xs" />
-            {{ $t('add-an-opening-song') }}
-          </q-btn>
-        </div>
-      </q-item>
-    </q-list>
+      </template>
+      <template #action>
+        <q-btn flat @click="addOpeningSong()">
+          {{ $t('add-an-opening-song') }}
+        </q-btn>
+      </template>
+    </q-banner>
+    <q-banner
+      v-if="
+        selectedDateObject?.meeting &&
+        !sortableCircuitOverseerMediaItems?.length &&
+        coWeek
+      "
+      class="bg-additional text-white"
+      inline-actions
+      rounded
+    >
+      {{ $t('dont-forget-add-circuit-overseer-media') }}
+      <template #avatar>
+        <q-avatar class="bg-white text-additional jw-icon" size="lg">
+          
+        </q-avatar>
+      </template>
+      <template #action>
+        <q-btn flat @click="openImportMenu()">
+          {{ $t('add-missing-media') }}
+        </q-btn>
+      </template>
+    </q-banner>
     <q-list
       v-show="sortableAdditionalMediaItems?.length"
       class="media-section additional"
     >
       <q-item class="text-additional items-center">
-        <q-avatar class="text-white bg-additional rounded-borders-sm" size="md">
-          <q-icon name="mmm-additional-media" size="md" />
+            <!-- :class="
+              isWeMeetingDay(selectedDateObject?.date)
+                ? 'bg-white text-additional jw-icon'
+                : 'text-white bg-additional rounded-borders-sm'
+            " -->
+        <q-avatar
+        :size="isWeMeetingDay(selectedDateObject?.date) ? 'lg' : 'md'"
+          class="text-white bg-additional jw-icon"
+        >
+          <template v-if="isWeMeetingDay(selectedDateObject?.date)">
+            
+          </template>
+          <template v-else>
+            <q-icon name="mmm-additional-media" size="md" />
+          </template>
         </q-avatar>
         <div class="text-bold text-uppercase text-spaced">
-          {{ $t('imported-media') }}
+          {{
+            $t(
+              isWeMeetingDay(selectedDateObject?.date)
+                ? 'public-talk'
+                : 'imported-media',
+            )
+          }}
         </div>
       </q-item>
       <q-list ref="additionalList" class="list-droppable">
@@ -293,6 +330,39 @@
         </div>
       </q-list>
     </q-list>
+    <q-list
+      v-show="selectedDateObject?.complete && coWeek"
+      class="media-section additional"
+    >
+      <q-item class="text-additional items-center">
+        <q-avatar class="text-white bg-additional jw-icon" size="lg"
+          ></q-avatar
+        >
+        <div class="text-bold text-uppercase text-spaced">
+          {{ $t('co') }}
+        </div>
+      </q-item>
+      <q-list ref="circuitOverseerList" class="list-droppable">
+        <MediaItem
+          v-for="media in sortableCircuitOverseerMediaItems"
+          :key="media.uniqueId"
+          :list="sortableCircuitOverseerMediaItems"
+          :media="media"
+        />
+        <div v-if="sortableCircuitOverseerMediaItems.length === 0">
+          <q-item>
+            <q-item-section
+              class="align-center text-secondary text-grey text-subtitle2"
+            >
+              <div>
+                <q-icon class="q-mr-sm" name="mmm-info" size="sm" />
+                {{ $t('no-media-files-for-section') }}
+              </div>
+            </q-item-section>
+          </q-item>
+        </div>
+      </q-list>
+    </q-list>
   </q-page>
   <DragAndDropper
     v-model="dragging"
@@ -317,7 +387,13 @@ import { date, uid } from 'quasar';
 import DragAndDropper from 'src/components/media/DragAndDropper.vue';
 import MediaItem from 'src/components/media/MediaItem.vue';
 import { useLocale } from 'src/composables/useLocale';
-import { dateFromString, getLocalDate, isInPast } from 'src/helpers/date';
+import {
+  dateFromString,
+  getLocalDate,
+  isCoWeek,
+  isInPast,
+  isWeMeetingDay,
+} from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import {
@@ -526,6 +602,9 @@ const updateMediaSortPlugin: DNDPlugin = (parent) => {
     for (const media of sortableWtMediaItems.value) {
       updateMediaSection(media.uniqueId, 'wt');
     }
+    for (const media of sortableCircuitOverseerMediaItems.value) {
+      updateMediaSection(media.uniqueId, 'circuitOverseer');
+    }
   }
 
   function dragend() {
@@ -537,6 +616,7 @@ const updateMediaSortPlugin: DNDPlugin = (parent) => {
       ...sortableAyfmMediaItems.value,
       ...sortableLacMediaItems.value,
       ...sortableWtMediaItems.value,
+      ...sortableCircuitOverseerMediaItems.value,
     ].map((item: DynamicMediaObject) => item.uniqueId);
   }
 
@@ -687,9 +767,7 @@ const goToNextDayWithMedia = () => {
   }
 };
 
-const openImportMenu = () => {
-  window.dispatchEvent(new CustomEvent('openImportMenu'));
-};
+const coWeek = ref(false);
 
 onMounted(async () => {
   window.addEventListener('draggingSomething', startDragging);
@@ -704,6 +782,7 @@ onMounted(async () => {
       const durations = (customDurations.value[currentCongregation.value] ||=
         {});
       durations[newVal] ||= {};
+      coWeek.value = isCoWeek(dateFromString(newVal));
     } catch (e) {
       errorCatcher(e);
     }
@@ -720,6 +799,7 @@ const [tgwList, sortableTgwMediaItems] = useDragAndDrop(
     group: 'sortableMedia',
     multiDrag: true,
     plugins: [updateMediaSortPlugin, animations()],
+    selectedClass: 'selected-to-drag',
   },
 );
 
@@ -729,6 +809,7 @@ const [ayfmList, sortableAyfmMediaItems] = useDragAndDrop(
     group: 'sortableMedia',
     multiDrag: true,
     plugins: [updateMediaSortPlugin, animations()],
+    selectedClass: 'selected-to-drag',
   },
 );
 
@@ -738,6 +819,7 @@ const [lacList, sortableLacMediaItems] = useDragAndDrop(
     group: 'sortableMedia',
     multiDrag: true,
     plugins: [updateMediaSortPlugin, animations()],
+    selectedClass: 'selected-to-drag',
   },
 );
 
@@ -747,6 +829,7 @@ const [wtList, sortableWtMediaItems] = useDragAndDrop(
     group: 'sortableMedia',
     multiDrag: true,
     plugins: [updateMediaSortPlugin, animations()],
+    selectedClass: 'selected-to-drag',
   },
 );
 
@@ -756,8 +839,20 @@ const [additionalList, sortableAdditionalMediaItems] = useDragAndDrop(
     group: 'sortableMedia',
     multiDrag: true,
     plugins: [updateMediaSortPlugin, animations()],
+    selectedClass: 'selected-to-drag',
   },
 );
+
+const [circuitOverseerList, sortableCircuitOverseerMediaItems] = useDragAndDrop(
+  [] as DynamicMediaObject[],
+  {
+    group: 'sortableMedia',
+    multiDrag: true,
+    plugins: [updateMediaSortPlugin, animations()],
+    selectedClass: 'selected-to-drag',
+  },
+);
+
 watch(
   () => sortableMediaItems.value,
   (newVal) => {
@@ -767,6 +862,9 @@ watch(
     sortableWtMediaItems.value = newVal.filter((m) => m.section === 'wt');
     sortableAdditionalMediaItems.value = newVal.filter(
       (m) => m.section === 'additional',
+    );
+    sortableCircuitOverseerMediaItems.value = newVal.filter(
+      (m) => m.section === 'circuitOverseer',
     );
   },
   { deep: true, immediate: true },
@@ -1055,6 +1153,10 @@ const addToFiles = async (
 
 const addOpeningSong = () => {
   window.dispatchEvent(new CustomEvent('openSongPicker'));
+};
+
+const openImportMenu = () => {
+  window.dispatchEvent(new CustomEvent('openImportMenu'));
 };
 
 const dropActive = (event: DragEvent) => {

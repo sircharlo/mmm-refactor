@@ -780,7 +780,7 @@ const getWeMedia = async (lookupDate: Date) => {
     const { currentSongbook } = storeToRefs(currentState);
     const { currentSettings } = storeToRefs(currentState);
     lookupDate = dateFromString(lookupDate);
-    const monday = getSpecificWeekday(lookupDate, 1);
+    const monday = getSpecificWeekday(lookupDate, 0);
 
     const getIssue = async (monday: Date, lang: string, lastChance = false) => {
       let result = await getWtIssue(monday, 8, lang);
@@ -1005,7 +1005,7 @@ const getMwMedia = async (lookupDate: Date) => {
     const { currentSongbook } = storeToRefs(currentState);
     lookupDate = dateFromString(lookupDate);
     // if not monday, get the previous monday
-    const monday = getSpecificWeekday(lookupDate, 1);
+    const monday = getSpecificWeekday(lookupDate, 0);
     const issue = date.subtractFromDate(monday, {
       months: (monday.getMonth() + 1) % 2 === 0 ? 1 : 0,
     });
