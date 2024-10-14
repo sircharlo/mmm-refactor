@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitepress';
 import { mapLocales, mapSearch } from './../utils/locales';
-import { GH_REPO, GH_REPO_URL } from './../utils/constants';
+import { CANONICAL_URL, GH_REPO, GH_REPO_URL } from './../utils/constants';
 
 const base = `/${GH_REPO}/`;
 
@@ -57,7 +57,28 @@ export default defineConfig({
         href: `${base}logo-no-background.svg`,
       },
     ],
+    ['meta', { content: `${CANONICAL_URL}icon.png`, name: 'og:image' }],
   ],
+  transformPageData(pageData) {
+    const canonicalUrl = `${CANONICAL_URL}${pageData.relativePath}`
+      .replace(/index\.md$/, '')
+      .replace(/\.md$/, '');
+
+    pageData.frontmatter.head ??= [];
+    pageData.frontmatter.head.push(
+      ['link', { rel: 'canonical', href: canonicalUrl }],
+      [
+        'meta',
+        {
+          name: 'og:title',
+          content:
+            pageData.frontmatter.layout === 'home'
+              ? `M³ docs`
+              : `${pageData.title} | M³ docs`,
+        },
+      ],
+    );
+  },
   locales: mapLocales(),
   themeConfig: {
     externalLinkIcon: true,

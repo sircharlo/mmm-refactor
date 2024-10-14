@@ -1,4 +1,8 @@
-import type { DefaultTheme, LocaleConfig } from 'vitepress';
+import type {
+  DefaultTheme,
+  LocaleConfig,
+  LocaleSpecificConfig,
+} from 'vitepress';
 import type { LocalSearchTranslations } from 'vitepress/types/local-search';
 
 import pkg from './../../package.json';
@@ -9,15 +13,25 @@ import { camelToKebabCase } from './general';
 export type MessageLanguages = keyof typeof messages;
 export type MessageSchema = (typeof messages)['en'];
 
+const mapLocale = (
+  lang: string,
+  label: string,
+  msg: MessageSchema,
+): {
+  label: string;
+  link?: string;
+} & LocaleSpecificConfig<DefaultTheme.Config> => ({
+  description: msg.description,
+  head: [['meta', { content: msg.description, name: 'og:description' }]],
+  label,
+  lang,
+  themeConfig: mapThemeConfig(lang, msg),
+  title: msg.title,
+});
+
 export const mapLocales = (): LocaleConfig<DefaultTheme.Config> => {
   const locales: LocaleConfig<DefaultTheme.Config> = {
-    root: {
-      description: messages.en.description,
-      label: 'English',
-      lang: 'en',
-      themeConfig: mapThemeConfig('', messages.en),
-      title: messages.en.title,
-    },
+    root: mapLocale('en', 'English', messages.en),
   };
 
   localeOptions
@@ -25,13 +39,7 @@ export const mapLocales = (): LocaleConfig<DefaultTheme.Config> => {
     .forEach((locale) => {
       const lang = camelToKebabCase(locale.value);
       const msg = messages[locale.value as MessageLanguages];
-      locales[lang] = {
-        description: msg.description,
-        label: locale.label,
-        lang,
-        themeConfig: mapThemeConfig(lang, msg),
-        title: msg.title,
-      };
+      locales[lang] = mapLocale(lang, locale.label, msg);
     });
 
   return locales;
