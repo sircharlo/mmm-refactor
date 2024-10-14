@@ -188,6 +188,7 @@ module.exports = configure(function (/* ctx */) {
           'fs-extra',
           'music-metadata',
           'pdfjs-dist',
+          'electron',
           'adm-zip',
           '@electron/remote',
           'better-sqlite3',
