@@ -62,7 +62,7 @@ const dateFromString = (lookupDate?: Date | string | undefined) => {
 
 const isInPast = (lookupDate: Date) => {
   try {
-    if (!lookupDate) throw new Error('No lookup date');
+    if (!lookupDate) return false;
     const now = dateFromString();
     return date.getDateDiff(lookupDate, now, 'days') < 0;
   } catch (error) {
@@ -73,7 +73,7 @@ const isInPast = (lookupDate: Date) => {
 
 const getWeekDay = (lookupDate: Date) => {
   try {
-    if (!lookupDate) throw new Error('No lookup date');
+    if (!lookupDate) return '0';
     const currentState = useCurrentStateStore();
     const { selectedDateObject } = storeToRefs(currentState);
     if (!lookupDate) lookupDate = selectedDateObject.value?.date || new Date();
@@ -90,7 +90,7 @@ const getWeekDay = (lookupDate: Date) => {
 
 function getSpecificWeekday(lookupDate: Date | string, desiredWeekday: number) {
   try {
-    if (!lookupDate) throw new Error('No date');
+    if (!lookupDate) return new Date();
     if (desiredWeekday == null) throw new Error('No desired weekday');
     lookupDate = dateFromString(lookupDate);
     desiredWeekday++;
@@ -117,7 +117,7 @@ function datesAreSame(date1: Date, date2: Date) {
 
 function isCoWeek(lookupDate: Date) {
   try {
-    if (!lookupDate) throw new Error('No lookup date');
+    if (!lookupDate) return false;
     lookupDate = dateFromString(lookupDate);
     const currentState = useCurrentStateStore();
     const { currentSettings } = storeToRefs(currentState);
@@ -135,7 +135,7 @@ function isCoWeek(lookupDate: Date) {
 
 const isMwMeetingDay = (lookupDate: Date) => {
   try {
-    if (!lookupDate) throw new Error('No lookup date');
+    if (!lookupDate) return false;
     lookupDate = dateFromString(lookupDate);
     const currentState = useCurrentStateStore();
     const { currentSettings } = storeToRefs(currentState);
@@ -154,7 +154,7 @@ const isMwMeetingDay = (lookupDate: Date) => {
 
 const isWeMeetingDay = (lookupDate: Date) => {
   try {
-    if (!lookupDate) throw new Error('No lookup date');
+    if (!lookupDate) return false;
     lookupDate = dateFromString(lookupDate);
     const currentState = useCurrentStateStore();
     const { currentSettings } = storeToRefs(currentState);
