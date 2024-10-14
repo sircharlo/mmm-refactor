@@ -116,7 +116,7 @@ import { useLocale } from 'src/composables/useLocale';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
-import { ref, watch } from 'vue';
+import { type Ref, ref, watch } from 'vue';
 
 const jwStore = useJwStore();
 const { jwLanguages } = storeToRefs(jwStore);
