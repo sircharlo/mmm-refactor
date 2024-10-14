@@ -8,8 +8,8 @@
     "type": "git",
     "url": "https://github.com/sircharlo/mmm-refactor.git"
   },
-  "private": true,
   "author": "Olivier Savignac",
+  "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
