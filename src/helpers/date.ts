@@ -1,9 +1,7 @@
 import type { DateInfo, DynamicMediaObject } from 'src/types';
 
-import dayjs from 'dayjs';
-import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { storeToRefs } from 'pinia';
-import { date } from 'quasar';
+import { date, type DateLocale } from 'quasar';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 
@@ -213,36 +211,19 @@ function updateLookupPeriod(reset = false) {
   }
 }
 
-const getLocaleDayName = (lang: string, day: number) => {
-  if (!day) day = 0;
-  day++;
-  if (!lang) return dayjs().day(day).format('dddd');
-  try {
-    return dayjs().locale(lang).day(day).format('dddd');
-  } catch (error) {
-    // warningCatcher(lang + ' / ' + day);
-    errorCatcher(error);
-    return dayjs().day(day).format('dddd');
-  }
-};
-
-const getDateLocaleFormatted = (lang: string, date: Date | string) => {
-  try {
-    dayjs.extend(localizedFormat);
-    if (!date || !lang) return (date || '') as string;
-    return dayjs(date).locale(lang).format('LL');
-  } catch (error) {
-    errorCatcher(error);
-    return (date || '') as string;
-  }
+const getLocalDate = (dateObj: Date | string, locale: DateLocale) => {
+  const parsedDate =
+    typeof dateObj === 'string'
+      ? date.extractDate(dateObj, 'YYYY/MM/DD')
+      : dateObj;
+  return date.formatDate(parsedDate, 'D MMMM YYYY', locale);
 };
 
 export {
   dateFromString,
   datesAreSame,
   daysInFuture,
-  getDateLocaleFormatted,
-  getLocaleDayName,
+  getLocalDate,
   getSpecificWeekday,
   isCoWeek,
   isInPast,

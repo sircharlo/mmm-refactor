@@ -102,8 +102,7 @@
     />
     {{
       $q.screen.gt.xs
-        ? getDateLocaleFormatted(currentSettings?.localAppLang, selectedDate) ||
-          $t('select-a-date')
+        ? getLocalDate(selectedDate, dateLocale) || $t('select-a-date')
         : ''
     }}
     <q-popup-proxy v-model="datePickerActive" :offset="[0, 11]">
@@ -111,15 +110,16 @@
         v-model="selectedDate"
         :event-color="getEventDayColor"
         :events="getEventDates()"
+        :locale="dateLocale"
         :navigation-max-year-month="maxDate()"
         :navigation-min-year-month="minDate()"
         :options="dateOptions"
-        landscape
-      >
-        <div class="row items-center justify-end q-gutter-sm">
+        minimal
+      />
+        <!-- <div class="row items-center justify-end q-gutter-sm">
           <q-btn v-close-popup :label="$t('close')" color="primary" outline />
-        </div>
-      </q-date>
+        </div> -->
+      <!-- </q-date> -->
     </q-popup-proxy>
   </q-btn>
   <DialogRemoteVideo
@@ -137,13 +137,16 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 // Globals
 import { get } from 'src/boot/axios';
 
+// Composables
+import { useLocale } from 'src/composables/useLocale';
+
 // Components
 import DialogRemoteVideo from 'src/components/dialog/DialogRemoteVideo.vue';
 import PublicTalkMediaPicker from 'src/components/media/PublicTalkMediaPicker.vue';
 import SongPicker from 'src/components/media/SongPicker.vue';
 
 // Helpers
-import { getDateLocaleFormatted } from 'src/helpers/date';
+import { getLocalDate } from 'src/helpers/date';
 import { errorCatcher } from 'src/helpers/error-catcher';
 
 // Stores
@@ -156,6 +159,8 @@ import type { JwVideoCategory, MediaItemsMediatorItem } from 'src/types';
 const jwStore = useJwStore();
 const { resetSort } = jwStore;
 const { additionalMediaMaps, lookupPeriod, mediaSort } = storeToRefs(jwStore);
+
+const { dateLocale } = useLocale();
 
 const currentState = useCurrentStateStore();
 const {

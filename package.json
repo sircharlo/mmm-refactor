@@ -32,7 +32,6 @@
     "adm-zip": "^0.5.16",
     "axios": "^1.7.7",
     "better-sqlite3": "^11.3.0",
-    "dayjs": "^1.11.13",
     "dompurify": "^3.1.7",
     "electron-updater": "^6.3.9",
     "electron-window-state": "^5.0.3",

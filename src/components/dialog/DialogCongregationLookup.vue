@@ -50,22 +50,26 @@
                   <q-item-label>{{
                     congregation.properties.orgName
                   }}</q-item-label>
-                  <q-item-label caption
-                    >{{
-                      getLocaleDayName(
-                        currentSettings.localAppLang,
+                  <q-item-label caption>
+                    {{
+                      dateLocale.days[
                         congregation.properties.schedule.current.midweek
-                          .weekday - 1,
-                      )
+                          .weekday === 7
+                          ? 0
+                          : congregation.properties.schedule.current.midweek
+                              .weekday
+                      ]
                     }}
                     {{ congregation.properties.schedule.current.midweek.time }}
                     |
                     {{
-                      getLocaleDayName(
-                        currentSettings.localAppLang,
+                      dateLocale.days[
                         congregation.properties.schedule.current.weekend
-                          .weekday - 1,
-                      )
+                          .weekday === 7
+                          ? 0
+                          : congregation.properties.schedule.current.weekend
+                              .weekday
+                      ]
                     }}
                     {{
                       congregation.properties.schedule.current.weekend.time
@@ -108,7 +112,7 @@ import type { CongregationLanguage, GeoRecord } from 'src/types';
 import { storeToRefs } from 'pinia';
 import { get } from 'src/boot/axios';
 import { barStyle, thumbStyle } from 'src/boot/globals';
-import { getLocaleDayName } from 'src/helpers/date';
+import { useLocale } from 'src/composables/useLocale';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
@@ -119,6 +123,8 @@ const { jwLanguages } = storeToRefs(jwStore);
 
 const currentState = useCurrentStateStore();
 const { currentSettings } = storeToRefs(currentState);
+
+const { dateLocale } = useLocale();
 
 const open = defineModel<boolean>({ default: false });
 const congregationName = ref('');
