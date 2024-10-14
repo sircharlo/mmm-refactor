@@ -851,10 +851,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formkit/drag-and-drop@npm:^0.2.2":
-  version: 0.2.2
-  resolution: "@formkit/drag-and-drop@npm:0.2.2"
-  checksum: 10c0/6d439ae41762aa785c60f3bb2351dfddca7c25660fe9056882d2afac9efa23240084915055740524346ac45b7627719846f47c4590f454022a54f838788a1505
+"@formkit/drag-and-drop@npm:^0.2.3":
+  version: 0.2.3
+  resolution: "@formkit/drag-and-drop@npm:0.2.3"
+  checksum: 10c0/d073e6ca3335a069c41e12d1313dc62854c836ee2730130a0d4bbe882929f35b66d873594b896b4867146683eee04d9bd3505b812a16da6d33484fb513f71f86
   languageName: node
   linkType: hard
 
@@ -2649,19 +2649,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vue/compiler-core@npm:3.5.11":
-  version: 3.5.11
-  resolution: "@vue/compiler-core@npm:3.5.11"
-  dependencies:
-    "@babel/parser": "npm:^7.25.3"
-    "@vue/shared": "npm:3.5.11"
-    entities: "npm:^4.5.0"
-    estree-walker: "npm:^2.0.2"
-    source-map-js: "npm:^1.2.0"
-  checksum: 10c0/1f6859dcbb12b59e2f53ddbf42f1d549cc0f871ab3bef5d913b4f1071764cd3e80f652df2815fec59b9cffda7022c0e774504efbaa72c97bccbceb97e8c91b18
-  languageName: node
-  linkType: hard
-
 "@vue/compiler-core@npm:3.5.12":
   version: 3.5.12
   resolution: "@vue/compiler-core@npm:3.5.12"
@@ -2675,23 +2662,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vue/compiler-dom@npm:3.5.12":
+"@vue/compiler-dom@npm:3.5.12, @vue/compiler-dom@npm:^3.4.0":
   version: 3.5.12
   resolution: "@vue/compiler-dom@npm:3.5.12"
   dependencies:
     "@vue/compiler-core": "npm:3.5.12"
     "@vue/shared": "npm:3.5.12"
   checksum: 10c0/48a67cd28c25e94dccff3c1e18bf2f79b073e486a856e5b30661e89e50d08cd49ababc43de94626c948da77c8dad859909e32d3ab678079e90dfa5d3e1ddc344
-  languageName: node
-  linkType: hard
-
-"@vue/compiler-dom@npm:^3.4.0":
-  version: 3.5.11
-  resolution: "@vue/compiler-dom@npm:3.5.11"
-  dependencies:
-    "@vue/compiler-core": "npm:3.5.11"
-    "@vue/shared": "npm:3.5.11"
-  checksum: 10c0/41bb6bd370300ae8ff6d3bc468a20e467fd10338dc8eb056726ca4cef6a33067812dd11ed8813ffdc435357e8174cb05c5a1459853e3fe8bb9275bd2956e1efd
   languageName: node
   linkType: hard
 
@@ -2836,17 +2813,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vue/shared@npm:3.5.11, @vue/shared@npm:^3.4.0":
-  version: 3.5.11
-  resolution: "@vue/shared@npm:3.5.11"
-  checksum: 10c0/9f39e183ff350729a463f3748465b3f4f86577ff6e60e65f74bd857376e326c0a41541a97fbf28d128381b2083636b56d8aded0b55791fd7b0e741fcb611a5e6
-  languageName: node
-  linkType: hard
-
 "@vue/shared@npm:3.5.12, @vue/shared@npm:^3.5.12":
   version: 3.5.12
   resolution: "@vue/shared@npm:3.5.12"
   checksum: 10c0/48f94406c42921901b21a57a7ebb401bbceb497152baf0554e5d5a11cbaa79958f966042e9d95614c0b02e8681b7e1b6c010fcb8b28c6bda1b090f2ddd7540d8
+  languageName: node
+  linkType: hard
+
+"@vue/shared@npm:^3.4.0":
+  version: 3.5.11
+  resolution: "@vue/shared@npm:3.5.11"
+  checksum: 10c0/9f39e183ff350729a463f3748465b3f4f86577ff6e60e65f74bd857376e326c0a41541a97fbf28d128381b2083636b56d8aded0b55791fd7b0e741fcb611a5e6
   languageName: node
   linkType: hard
 
@@ -5045,7 +5022,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron-builder@npm:^25.1.7":
+"electron-builder@npm:^25.1.8":
   version: 25.1.8
   resolution: "electron-builder@npm:25.1.8"
   dependencies:
@@ -5896,7 +5873,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-vue@npm:^9.28.0":
+"eslint-plugin-vue@npm:^9.29.0":
   version: 9.29.0
   resolution: "eslint-plugin-vue@npm:9.29.0"
   dependencies:
@@ -6353,15 +6330,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"file-type@npm:^19.5.0":
-  version: 19.5.0
-  resolution: "file-type@npm:19.5.0"
+"file-type@npm:^19.6.0":
+  version: 19.6.0
+  resolution: "file-type@npm:19.6.0"
   dependencies:
     get-stream: "npm:^9.0.1"
-    strtok3: "npm:^8.1.0"
+    strtok3: "npm:^9.0.1"
     token-types: "npm:^6.0.0"
     uint8array-extras: "npm:^1.3.0"
-  checksum: 10c0/725a9dc71782afa9013db395205400256aa2ab059de9d859a17626ac3fa06218419accf1cbc887af36c009c4d658bda0313428d684a3932ea3f68323d5f75c27
+  checksum: 10c0/ae90ab618d0e759f26806024eb25ade851406301d2deae4b2dca6e9df0de13b4be575114a5f8129e73f6de537644a45fc4eb7cfa8b7dad63316b01b0e6f3bd2e
   languageName: node
   linkType: hard
 
@@ -8064,9 +8041,9 @@ __metadata:
   linkType: hard
 
 "isbinaryfile@npm:^5.0.0":
-  version: 5.0.2
-  resolution: "isbinaryfile@npm:5.0.2"
-  checksum: 10c0/9696f20cf995e375ba8bfdba3ff7d1c0435346f6fc5dd9c049a55514c56e9f49342bbf8c240dc9f56e104bd3a69176c0421922bcb34d72b3c943f4117ade3f53
+  version: 5.0.3
+  resolution: "isbinaryfile@npm:5.0.3"
+  checksum: 10c0/b27ff6f4018f8189e810e78cc20c2bee0d301e359e763182ea3b5b1abfc41afa3e0f85c2d32c0d5c9f2dd5c777793998e782678a4b37c78ba084de22f4e64f0e
   languageName: node
   linkType: hard
 
@@ -8357,9 +8334,9 @@ __metadata:
   linkType: hard
 
 "libheif-js@npm:^1.17.1":
-  version: 1.18.0
-  resolution: "libheif-js@npm:1.18.0"
-  checksum: 10c0/010b5200b85078d120ae8ca42d4847d6679b7b1eb78e02ab72b5c67be0c0acc370ce9e30257682cbfc5d4cb4fb30b977e2b77bb7a0a8c7554cc0179a928d5fa4
+  version: 1.18.2
+  resolution: "libheif-js@npm:1.18.2"
+  checksum: 10c0/82d3f12ab730ca2737c50e473bfbf7b6ae37c300296f6ab8e25ce6ec5bc88615f210e684ca7315aa970b1bd87b3b62c607dfb52d126596ed06a46441f2a5a379
   languageName: node
   linkType: hard
 
@@ -9060,7 +9037,7 @@ __metadata:
     "@daipeng7/rollup-plugin-iconfont": "npm:^3.0.6"
     "@electron/rebuild": "npm:^3.7.0"
     "@electron/remote": "npm:^2.1.2"
-    "@formkit/drag-and-drop": "npm:^0.2.2"
+    "@formkit/drag-and-drop": "npm:^0.2.3"
     "@intlify/vite-plugin-vue-i18n": "npm:^7.0.0"
     "@panzoom/panzoom": "npm:^4.5.1"
     "@quasar/app-vite": "npm:^1.10.0"
@@ -9087,20 +9064,20 @@ __metadata:
     dayjs: "npm:^1.11.13"
     dompurify: "npm:^3.1.7"
     electron: "npm:^32.2.0"
-    electron-builder: "npm:^25.1.7"
+    electron-builder: "npm:^25.1.8"
     electron-updater: "npm:^6.3.9"
     electron-window-state: "npm:^5.0.3"
     eslint: "npm:^8.57.1"
     eslint-config-prettier: "npm:^9.1.0"
     eslint-plugin-perfectionist: "npm:^3.8.0"
-    eslint-plugin-vue: "npm:^9.28.0"
+    eslint-plugin-vue: "npm:^9.29.0"
     fs-extra: "npm:^11.2.0"
     globals: "npm:^15.11.0"
     heic-convert: "npm:^2.1.0"
     is-online: "npm:^11.0.0"
     jszip: "npm:^3.10.1"
     klaw-sync: "npm:^6.0.0"
-    music-metadata: "npm:^10.5.0"
+    music-metadata: "npm:^10.5.1"
     obs-websocket-js: "npm:^5.0.6"
     p-queue: "npm:^8.0.1"
     pdfjs-dist: "npm:^4.7.76"
@@ -9143,19 +9120,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"music-metadata@npm:^10.5.0":
-  version: 10.5.0
-  resolution: "music-metadata@npm:10.5.0"
+"music-metadata@npm:^10.5.1":
+  version: 10.5.1
+  resolution: "music-metadata@npm:10.5.1"
   dependencies:
     "@tokenizer/token": "npm:^0.3.0"
     content-type: "npm:^1.0.5"
     debug: "npm:^4.3.7"
-    file-type: "npm:^19.5.0"
+    file-type: "npm:^19.6.0"
     media-typer: "npm:^1.1.0"
-    strtok3: "npm:^9.0.0"
+    strtok3: "npm:^9.0.1"
     token-types: "npm:^6.0.0"
     uint8array-extras: "npm:^1.4.0"
-  checksum: 10c0/154dcf6249ff47d5e7435a4858495bbf7c66e8ed3239ddbb6966ed7ba110a8afe3d29975a50ec1363a4f3caf06c241124110a14899993d35d19353295968591f
+  checksum: 10c0/8fe06ccfe7605144cd3b64ef82dde3a760d82de45f00550c3d63c9bce2b54ee0f7953eaf89b7d99ad918bbe310876ea78429c680e1fbf8557689d00d432b03fd
   languageName: node
   linkType: hard
 
@@ -9953,10 +9930,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"peek-readable@npm:^5.1.4, peek-readable@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "peek-readable@npm:5.2.0"
-  checksum: 10c0/7647d56786c94fc7f5f39923ef5f6ed1da7be92a2c221b743db74f1517821b1e944cc965d8f018a7e6984d969b6ced8a0c421aece7996c0b1981eac9daa4c323
+"peek-readable@npm:^5.3.1":
+  version: 5.3.1
+  resolution: "peek-readable@npm:5.3.1"
+  checksum: 10c0/49f628e4728887230c158699e422ebb10747f5e02aee930ec10634fa7142e74e67d3fb3a780e7a9b9f092c61bf185f07d167c099b2359b22a58cee3dbfe0e43b
   languageName: node
   linkType: hard
 
@@ -11542,23 +11519,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"strtok3@npm:^8.1.0":
-  version: 8.1.0
-  resolution: "strtok3@npm:8.1.0"
+"strtok3@npm:^9.0.1":
+  version: 9.0.1
+  resolution: "strtok3@npm:9.0.1"
   dependencies:
     "@tokenizer/token": "npm:^0.3.0"
-    peek-readable: "npm:^5.1.4"
-  checksum: 10c0/e999dda4ea423773c7da01f19bd156f07ce3d88fe1fc92557d18a5c95cd56e1223d0cd501e743de88db047d58c71b8e52af28b1a465b501ab28c719bf26ed4ff
-  languageName: node
-  linkType: hard
-
-"strtok3@npm:^9.0.0":
-  version: 9.0.0
-  resolution: "strtok3@npm:9.0.0"
-  dependencies:
-    "@tokenizer/token": "npm:^0.3.0"
-    peek-readable: "npm:^5.2.0"
-  checksum: 10c0/7d7cde9c5a3b195131f3652c8b0cb20d96e80b10d30a19294379e4302d0d4952bdc24a516c8a6cfa82bcb96f5b47e49ec917e8cc23c81052044a2ec41d15fb30
+    peek-readable: "npm:^5.3.1"
+  checksum: 10c0/ab96030c3d30899fc885ed87b305086b6421d64c1a2b9f5240c6ecffde7b819e174d67bd3b1ecc14a10f539c7a818a0ac47386b4bbb2fa913f673b6ed1c0eb78
   languageName: node
   linkType: hard
 

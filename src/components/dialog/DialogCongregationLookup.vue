@@ -159,7 +159,7 @@ const lookupCongregation = async () => {
   }
 };
 
-const congregationLookupLanguages: Ref<CongregationLanguage[]> = ref([]);
+const congregationLookupLanguages = ref<CongregationLanguage[]>([]);
 get('https://apps.jw.org/api/public/meeting-search/languages')
   .then((response) => {
     congregationLookupLanguages.value = response || [];
