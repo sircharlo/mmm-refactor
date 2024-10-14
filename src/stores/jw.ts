@@ -9,10 +9,12 @@ import type {
 import { getLanguages, getYeartext } from 'boot/axios';
 import { defineStore, storeToRefs } from 'pinia';
 import { date, LocalStorage } from 'quasar';
+import sanitizeHtml from 'sanitize-html';
 import { isCoWeek, isMwMeetingDay } from 'src/helpers/date';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { findBestResolution, getPubMediaLinks } from 'src/helpers/jw-media';
 import { useCurrentStateStore } from 'src/stores/current-state';
+
 export const MAX_SONGS = 500;
 
 export function uniqueById<T extends { uniqueId: string }>(array: T[]): T[] {
@@ -128,7 +130,7 @@ export const useJwStore = defineStore('jw-store', {
         errorCatcher(e);
       }
     },
-    async updateJwSongs() {
+    async updateJwSongs(force = false) {
       try {
         const currentState = useCurrentStateStore();
         if (
@@ -141,27 +143,30 @@ export const useJwStore = defineStore('jw-store', {
         for (const fileformat of ['MP4', 'MP3']) {
           try {
             const langwritten = currentState.currentSettings.lang as string;
-            const songbook = {
-              fileformat,
-              langwritten,
-              pub: currentState.currentSongbook.pub,
-            } as PublicationFetcher;
-            const pubMediaLinks = await getPubMediaLinks(songbook);
-            if (!pubMediaLinks || !pubMediaLinks.files) {
-              continue;
-            }
-            const now = new Date();
             this.jwSongs[langwritten] ??= { list: [], updated: oldDate };
+
+            // Check if the song list has been updated in the last month
+            const now = new Date();
             const monthsSinceUpdated = date.getDateDiff(
               now,
               this.jwSongs[langwritten].updated,
               'months',
             );
-            if (monthsSinceUpdated > 1) {
+
+            // Fetch media links only if the song list hasn't been updated in over a month or if force is true
+            if (monthsSinceUpdated > 1 || force) {
+              const songbook = {
+                fileformat,
+                langwritten,
+                pub: currentState.currentSongbook.pub,
+              } as PublicationFetcher;
+              const pubMediaLinks = await getPubMediaLinks(songbook);
+              if (!pubMediaLinks || !pubMediaLinks.files) {
+                continue;
+              }
+
               const mediaItemLinks = (
-                pubMediaLinks.files[songbook.langwritten][
-                  fileformat
-                ] as MediaLink[]
+                pubMediaLinks.files[langwritten][fileformat] as MediaLink[]
               ).filter((mediaLink: MediaLink) => mediaLink.track < MAX_SONGS);
               const filteredMediaItemLinks = mediaItemLinks.reduce(
                 (acc: MediaLink[], mediaLink: MediaLink) => {
@@ -197,13 +202,22 @@ export const useJwStore = defineStore('jw-store', {
           (currentState.currentSettings.lang as string) || (lang as string);
         if (!currentLang) return;
         const currentYear = new Date().getFullYear();
-        if (!this.yeartexts[currentYear]) {
-          this.yeartexts[currentYear] = {};
-        }
-        if (currentLang && !this.yeartexts[currentYear][currentLang]) {
-          const yeartextRequest = await getYeartext(currentLang, currentYear);
+        this.yeartexts[currentYear] ??= {};
+        if (!this.yeartexts[currentYear][currentLang]) {
+          const yeartextRequest = await getYeartext(
+            currentLang,
+            currentYear + 1,
+          );
           if (yeartextRequest?.content) {
-            this.yeartexts[currentYear][currentLang] = yeartextRequest.content;
+            this.yeartexts[currentYear][currentLang] = sanitizeHtml(
+              yeartextRequest.content,
+              {
+                allowedAttributes: {
+                  p: ['class'],
+                },
+                allowedTags: ['b', 'i', 'em', 'strong', 'p'],
+              },
+            );
           }
         }
       } catch (error) {

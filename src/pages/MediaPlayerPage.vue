@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/no-v-html -->
 <template>
   <q-page-container
     class="q-electron-drag vertical-middle overflow-hidden"
@@ -56,15 +55,8 @@
           />
         </template>
         <template v-else>
-          <div
-            id="yeartext"
-            class="q-pa-md center"
-            v-html="
-              (yeartexts[new Date().getFullYear()] &&
-                yeartexts[new Date().getFullYear()][currentSettings?.lang]) ??
-              ''
-            "
-          />
+          <!-- eslint-disable next-line vue/no-v-html -->
+          <div id="yeartext" class="q-pa-md center" v-html="yeartextHtml" />
           <div
             v-if="!currentSettings?.hideMediaLogo"
             id="yeartextLogoContainer"
@@ -90,7 +82,7 @@ import {
 import { createTemporaryNotification } from 'src/helpers/notifications';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const currentState = useCurrentStateStore();
 const {
@@ -102,6 +94,12 @@ const {
 
 const jwStore = useJwStore();
 const { customDurations, yeartexts } = storeToRefs(jwStore);
+
+const yeartextHtml = computed(() => {
+  const currentYear = new Date().getFullYear();
+  const yearText = yeartexts.value[currentYear]?.[currentSettings.value?.lang];
+  return yearText ?? '';
+});
 
 const panzoom = ref<PanzoomObject | undefined>();
 

@@ -46,7 +46,18 @@
       </div>
       <div class="row">
         <div class="col">
-          <q-spinner v-if="loading" color="primary" size="2em" />
+          <q-spinner v-if="loading || filteredSongs?.length === 0" color="primary" size="1.5em" />
+          <q-btn
+            v-else
+            color="primary"
+            flat
+            icon="mmm-refresh"
+            round
+            @click="
+              loading = true;
+              updateJwSongs(true).then(() => (loading = false));
+            "
+          />
         </div>
         <div class="col text-right">
           <q-btn color="negative" flat @click="dismissPopup">{{
