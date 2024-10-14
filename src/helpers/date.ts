@@ -97,6 +97,11 @@ function getSpecificWeekday(lookupDate: Date, desiredWeekday: number): Date {
     // Get the day of the week for the lookupDate (0 = Sunday, 6 = Saturday)
     const currentWeekday = lookupDate.getDay();
 
+    // If Sunday, subtract one week
+    if (currentWeekday === 0) {
+      lookupDate.setDate(lookupDate.getDate() - 7);
+    }
+
     // Calculate difference between current day and desired day in the same week
     const difference = desiredWeekday - currentWeekday;
 
@@ -130,6 +135,16 @@ function isCoWeek(lookupDate: Date) {
     const coWeekTuesday = dateFromString(currentSettings.value?.coWeek);
     const coMonday = getSpecificWeekday(coWeekTuesday, 1);
     const lookupWeekMonday = getSpecificWeekday(lookupDate, 1);
+    console.debug(
+      'lookupDate',
+      lookupDate,
+      'coWeekTuesday',
+      coWeekTuesday,
+      'coMonday',
+      coMonday,
+      'lookupWeekMonday',
+      lookupWeekMonday,
+    );
     return datesAreSame(coMonday, lookupWeekMonday);
   } catch (error) {
     errorCatcher(error);
