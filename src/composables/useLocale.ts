@@ -16,13 +16,15 @@ export function useLocale() {
     };
   });
 
-  const getDateLocale = (locale: string): Required<DateLocale> => {
-    return {
-      days: t('days-long', {}, { locale }).split('_'),
-      daysShort: t('days-short', {}, { locale }).split('_'),
-      months: t('months-long', {}, { locale }).split('_'),
-      monthsShort: t('months-short', {}, { locale }).split('_'),
-    };
+  const getDateLocale = (locale?: string): Required<DateLocale> => {
+    return locale
+      ? {
+          days: t('days-long', {}, { locale }).split('_'),
+          daysShort: t('days-short', {}, { locale }).split('_'),
+          months: t('months-long', {}, { locale }).split('_'),
+          monthsShort: t('months-short', {}, { locale }).split('_'),
+        }
+      : dateLocale.value;
   };
 
   return { dateLocale, getDateLocale };
