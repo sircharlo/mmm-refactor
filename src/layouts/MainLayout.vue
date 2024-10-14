@@ -36,7 +36,7 @@
 <script setup lang="ts">
 // Packages
 import { storeToRefs } from 'pinia';
-import { Dark, LocalStorage, useQuasar } from 'quasar';
+import { Dark, date, LocalStorage, useQuasar } from 'quasar';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -168,6 +168,7 @@ watch(currentCongregation, (newCongregation, oldCongregation) => {
       if (queues.meetings[newCongregation]) {
         queues.meetings[newCongregation].start();
       }
+      checkCoDate();
     }
   } catch (error) {
     errorCatcher(error);
@@ -341,6 +342,25 @@ try {
 } catch (error) {
   errorCatcher(error);
 }
+
+const checkCoDate = () => {
+  if (!currentSettings.value) return;
+  if (
+    !currentSettings.value?.coWeek ||
+    date.getDateDiff(new Date(), currentSettings.value?.coWeek, 'months') > 2
+  ) {
+    createTemporaryNotification({
+      caption: t('dont-forget-to-add-circuit-overseer-date', {
+        congregationMeetings: t('congregationMeetings'),
+        settings: t('titles.settings'),
+      }),
+      icon: 'mmm-error',
+      message: t('no-circuit-overseer-date-set'),
+      timeout: 10000,
+      type: 'info',
+    });
+  }
+};
 
 cleanLocalStorage();
 cleanAdditionalMediaFolder();

@@ -108,6 +108,10 @@ body.body--light {
     //     // margin-left: 0.25em;
     //   }
     // }
+
+    & .q-item.selected-to-drag {
+      background-color: $accent-200;
+    }
   }
 
   .bg-secondary-contrast {
@@ -163,14 +167,23 @@ body.body--dark {
       0 2px 2px $shadow,
       0 3px 1px -2px $shadow;
   }
+
+  & .q-item.selected-to-drag {
+    background-color: $accent-200-dark  ;
+  }
+
 }
 
 .list-droppable {
   min-height: 3em;
 }
 
+.q-banner {
+  margin-bottom: 1em;
+}
+
 .media-section {
-  padding-left: 1em;
+  padding-left: 1.25em;
   border-radius: 0.5em;
   padding-top: 1em;
   padding-bottom: 1em;
@@ -193,6 +206,7 @@ body.body--dark {
 
   & .q-avatar {
     border-radius: 4px;
+    padding-left: 0.5px;
   }
 
   &.tgw:before {

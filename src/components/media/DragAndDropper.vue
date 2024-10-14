@@ -176,7 +176,7 @@ watch(
 const getLocalFiles = async () => {
   openFileDialog()
     .then((result) => {
-      if (result.filePaths.length > 0) {
+      if (result && result.filePaths.length > 0) {
         window.dispatchEvent(
           new CustomEvent('localFiles-browsed', {
             detail: result.filePaths.map((path) => {
