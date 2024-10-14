@@ -9,6 +9,7 @@ import type {
 import { getLanguages, getYeartext } from 'boot/axios';
 import { defineStore, storeToRefs } from 'pinia';
 import { date, LocalStorage } from 'quasar';
+import { isCoWeek, isMwMeetingDay } from 'src/helpers/date';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { findBestResolution, getPubMediaLinks } from 'src/helpers/jw-media';
 import { useCurrentStateStore } from 'src/stores/current-state';
@@ -31,6 +32,15 @@ export const useJwStore = defineStore('jw-store', {
       try {
         if (!mediaArray.length) return;
         const currentState = useCurrentStateStore();
+        const coWeek = isCoWeek(currentState.selectedDateObject?.date);
+        if (coWeek) {
+          if (isMwMeetingDay(currentState.selectedDateObject?.date)) {
+            mediaArray.forEach((media) => {
+              media.section = 'circuitOverseer';
+              media.sectionOriginal = 'circuitOverseer';
+            });
+          }
+        }
         if (!this.additionalMediaMaps[currentState.currentCongregation])
           this.additionalMediaMaps[currentState.currentCongregation] = {};
         if (
