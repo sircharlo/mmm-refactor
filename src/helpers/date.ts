@@ -120,6 +120,7 @@ function datesAreSame(date1: Date, date2: Date) {
 function isCoWeek(lookupDate: Date) {
   try {
     if (!lookupDate) throw new Error('No lookup date');
+    lookupDate = dateFromString(lookupDate);
     const currentState = useCurrentStateStore();
     const { currentSettings } = storeToRefs(currentState);
     const coWeekSet = !!currentSettings.value?.coWeek;
@@ -137,6 +138,7 @@ function isCoWeek(lookupDate: Date) {
 const isMwMeetingDay = (lookupDate: Date) => {
   try {
     if (!lookupDate) throw new Error('No lookup date');
+    lookupDate = dateFromString(lookupDate);
     const currentState = useCurrentStateStore();
     const { currentSettings } = storeToRefs(currentState);
     const coWeek = isCoWeek(lookupDate);
@@ -155,6 +157,7 @@ const isMwMeetingDay = (lookupDate: Date) => {
 const isWeMeetingDay = (lookupDate: Date) => {
   try {
     if (!lookupDate) throw new Error('No lookup date');
+    lookupDate = dateFromString(lookupDate);
     const currentState = useCurrentStateStore();
     const { currentSettings } = storeToRefs(currentState);
     return currentSettings.value?.weDay == getWeekDay(lookupDate);
