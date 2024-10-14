@@ -25,6 +25,7 @@
         :options="getDateOptions(options)"
         :rules="rules"
         dense
+        minimal
       >
         <div class="row items-center justify-end q-gutter-sm">
           <q-btn

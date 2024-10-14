@@ -114,12 +114,12 @@
         :navigation-max-year-month="maxDate()"
         :navigation-min-year-month="minDate()"
         :options="dateOptions"
-        landscape
-      >
-        <div class="row items-center justify-end q-gutter-sm">
+        minimal
+      />
+        <!-- <div class="row items-center justify-end q-gutter-sm">
           <q-btn v-close-popup :label="$t('close')" color="primary" outline />
-        </div>
-      </q-date>
+        </div> -->
+      <!-- </q-date> -->
     </q-popup-proxy>
   </q-btn>
   <DialogRemoteVideo
