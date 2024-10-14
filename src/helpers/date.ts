@@ -90,14 +90,15 @@ const getWeekDay = (lookupDate: Date) => {
   }
 };
 
-function getSpecificWeekday(date: Date, desiredWeekday: number) {
+function getSpecificWeekday(lookupDate: Date | string, desiredWeekday: number) {
   try {
-    if (!date) throw new Error('No date');
+    if (!lookupDate) throw new Error('No date');
     if (desiredWeekday == null) throw new Error('No desired weekday');
+    lookupDate = dateFromString(lookupDate);
     desiredWeekday++;
     desiredWeekday = desiredWeekday === 7 ? 0 : desiredWeekday;
-    const difference = (date.getDay() - desiredWeekday + 7) % 7;
-    const newDate = new Date(date.valueOf());
+    const difference = (lookupDate.getDay() - desiredWeekday + 7) % 7;
+    const newDate = new Date(lookupDate.valueOf());
     newDate.setDate(newDate.getDate() - difference);
     return newDate;
   } catch (error) {
