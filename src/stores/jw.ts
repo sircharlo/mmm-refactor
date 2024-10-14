@@ -204,10 +204,7 @@ export const useJwStore = defineStore('jw-store', {
         const currentYear = new Date().getFullYear();
         this.yeartexts[currentYear] ??= {};
         if (!this.yeartexts[currentYear][currentLang]) {
-          const yeartextRequest = await getYeartext(
-            currentLang,
-            currentYear + 1,
-          );
+          const yeartextRequest = await getYeartext(currentLang, currentYear);
           if (yeartextRequest?.content) {
             this.yeartexts[currentYear][currentLang] = sanitizeHtml(
               yeartextRequest.content,
