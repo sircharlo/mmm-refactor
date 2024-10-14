@@ -1,7 +1,7 @@
-export const GH_PROFILE = 'sircharlo';
-export const GH_REPO = 'mmm-refactor';
+import pkg from './../../package.json';
 
-export const GH_PROFILE_URL = `https://github.com/${GH_PROFILE}`;
-export const GH_REPO_URL = `${GH_PROFILE_URL}/${GH_REPO}`;
-
-export const CANONICAL_URL = `https://${GH_PROFILE}.github.io/${GH_REPO}/`;
+export const CANONICAL_URL = pkg.homepage;
+export const GH_REPO_URL = pkg.repository.url.replace('.git', '');
+export const GH_REPO = GH_REPO_URL.replace('https://github.com/', '').split(
+  '/',
+)[1];
