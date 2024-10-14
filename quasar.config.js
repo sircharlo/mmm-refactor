@@ -25,14 +25,6 @@ module.exports = configure(function (/* ctx */) {
     // https://v2.quasar.dev/options/animations
     animations: ['fadeIn', 'fadeOut'],
 
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex
-    bex: {
-      contentScripts: ['my-content-script'],
-
-      // extendBexScriptsConf (esbuildConf) {}
-      // extendBexManifestJson (json) {}
-    },
-
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
     boot: ['sentry', 'i18n', 'axios', 'globals'],
 
@@ -67,20 +59,14 @@ module.exports = configure(function (/* ctx */) {
               release: {
                 name: version,
               },
+              telemetry: false,
             }),
           );
         }
       },
-      // eslint-disable-next-line no-empty-pattern
-      extendWebpack(cfg, {}) {
-        cfg.externals = ['better-sqlite3'];
-      },
       sourcemap: true,
-      target: {
-        // browser: ['esnext', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
-        browser: ['esnext'],
-        node: 'node22',
-      },
+      // See: https://www.electronjs.org/docs/latest/tutorial/electron-timelines#timeline
+      target: { browser: ['chrome128'], node: 'node20' },
       vitePlugins: [
         [
           '@intlify/vite-plugin-vue-i18n',
@@ -102,16 +88,6 @@ module.exports = configure(function (/* ctx */) {
         // ],
       ],
       vueRouterMode: 'hash', // available values: 'hash', 'history'
-    },
-
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-capacitor-apps/configuring-capacitor
-    capacitor: {
-      hideSplashscreen: true,
-    },
-
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-cordova-apps/configuring-cordova
-    cordova: {
-      // noIosLegacyBuildFlag: true, // uncomment only if you know what you are doing
     },
 
     // animations: 'all', // --- includes all animations
@@ -180,8 +156,41 @@ module.exports = configure(function (/* ctx */) {
           ],
         },
       },
-
       bundler: 'builder', // 'packager' or 'builder'
+      extendElectronMainConf: (esbuildConf) => {
+        if (!devMode) {
+          esbuildConf.sourcemap = true;
+          if (!esbuildConf.plugins) esbuildConf.plugins = [];
+          esbuildConf.plugins.push(
+            sentryEsbuildPlugin({
+              authToken: process.env.SENTRY_AUTH_TOKEN,
+              org: 'jw-projects',
+              project: 'mmm-v2',
+              release: {
+                name: version,
+              },
+              telemetry: false,
+            }),
+          );
+        }
+      },
+      extendElectronPreloadConf: (esbuildConf) => {
+        if (!devMode) {
+          esbuildConf.sourcemap = true;
+          if (!esbuildConf.plugins) esbuildConf.plugins = [];
+          esbuildConf.plugins.push(
+            sentryEsbuildPlugin({
+              authToken: process.env.SENTRY_AUTH_TOKEN,
+              org: 'jw-projects',
+              project: 'mmm-v2',
+              release: {
+                name: version,
+              },
+              telemetry: false,
+            }),
+          );
+        }
+      },
       extendPackageJson(pkg) {
         const electronDeps = [
           'electron-window-state',
@@ -205,41 +214,7 @@ module.exports = configure(function (/* ctx */) {
           if (!electronDeps.includes(dep)) delete pkg.dependencies[dep];
         });
       },
-      extendElectronMainConf: (esbuildConf) => {
-        if (!devMode) {
-          esbuildConf.sourcemap = true;
-          if (!esbuildConf.plugins) esbuildConf.plugins = [];
-          esbuildConf.plugins.push(
-            sentryEsbuildPlugin({
-              authToken: process.env.SENTRY_AUTH_TOKEN,
-              org: 'jw-projects',
-              project: 'mmm-v2',
-              release: {
-                name: version,
-              },
-            }),
-          );
-        }
-      },
-
-      extendElectronPreloadConf: (esbuildConf) => {
-        if (!devMode) {
-          esbuildConf.sourcemap = true;
-          if (!esbuildConf.plugins) esbuildConf.plugins = [];
-          esbuildConf.plugins.push(
-            sentryEsbuildPlugin({
-              authToken: process.env.SENTRY_AUTH_TOKEN,
-              org: 'jw-projects',
-              project: 'mmm-v2',
-              release: {
-                name: version,
-              },
-            }),
-          );
-        }
-      },
       inspectPort: 5858,
-      packager: {},
     },
 
     // https://github.com/quasarframework/quasar/tree/dev/extras

@@ -1,10 +1,15 @@
 {
   "name": "mmm-v2",
   "version": "24.10.4",
-  "description": "A cross platform app to download and present media for congregation meetings of Jehovah’s Witnesses.",
-  "productName": "Meeting Media Manager",
-  "author": "Olivier Savignac",
+  "description": "A cross platform app to download and present media for congregation meetings of Jehovah's Witnesses.",
+  "homepage": "https://sircharlo.github.io/mmm-refactor/",
+  "bugs": "https://github.com/sircharlo/mmm-refactor/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sircharlo/mmm-refactor.git"
+  },
   "private": true,
+  "author": "Olivier Savignac",
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
@@ -83,10 +88,18 @@
     "vitepress": "^1.4.1",
     "vue-tsc": "^2.1.6"
   },
+  "browserslist": [
+    "Electron >= 32"
+  ],
   "engines": {
     "node": "^24 || ^22 || ^20",
     "yarn": ">= 4.5.10"
   },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
   "packageManager": "yarn@4.5.0",
   "resolutions": {
     "canvas": "npm:empty-npm-package@1.0.0"
