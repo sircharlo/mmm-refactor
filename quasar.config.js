@@ -182,7 +182,28 @@ module.exports = configure(function (/* ctx */) {
       },
 
       bundler: 'builder', // 'packager' or 'builder'
+      extendPackageJson(pkg) {
+        const electronDeps = [
+          'electron-window-state',
+          'fs-extra',
+          'music-metadata',
+          'pdfjs-dist',
+          'adm-zip',
+          '@electron/remote',
+          'better-sqlite3',
+          'heic-convert',
+          'klaw-sync',
+          'quasar',
+          'upath',
+          'electron-updater',
+        ];
 
+        // Remove UI dependencies from production build
+        Object.keys(pkg.dependencies).forEach((dep) => {
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          if (!electronDeps.includes(dep)) delete pkg.dependencies[dep];
+        });
+      },
       extendElectronMainConf: (esbuildConf) => {
         if (!devMode) {
           esbuildConf.sourcemap = true;
@@ -241,41 +262,6 @@ module.exports = configure(function (/* ctx */) {
 
       // Quasar plugins
       plugins: ['LocalStorage', 'Notify'],
-    },
-
-    // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
-    pwa: {
-      injectPwaMetaTags: true,
-      manifestFilename: 'manifest.json',
-      swFilename: 'sw.js',
-      useCredentialsForManifestTag: false,
-      workboxMode: 'generateSW', // or 'injectManifest'
-      // useFilenameHashes: true,
-      // extendGenerateSWOptions (cfg) {}
-      // extendInjectManifestOptions (cfg) {},
-      // extendManifestJson (json) {}
-      // extendPWACustomSWConf (esbuildConf) {}
-    },
-
-    // https://v2.quasar.dev/quasar-cli-vite/developing-ssr/configuring-ssr
-    ssr: {
-      // ssrPwaHtmlFilename: 'offline.html', // do NOT use index.html as name!
-      // will mess up SSR
-
-      // extendSSRWebserverConf (esbuildConf) {},
-      // extendPackageJson (json) {},
-
-      middlewares: [
-        'render', // keep this as last one
-      ],
-
-      // manualStoreHydration: true,
-      // manualPostHydrationTrigger: true,
-
-      prodPort: 3000, // The default port that the production server should use
-      // (gets superseded if process.env.PORT is specified at runtime)
-
-      pwa: false,
     },
   };
 });

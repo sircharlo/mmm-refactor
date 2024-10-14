@@ -12,7 +12,10 @@
     "dev": "quasar dev -m electron",
     "build": "quasar build -m electron",
     "rebuild": "./node_modules/.bin/electron-rebuild.cmd -f -m ./node_modules/better-sqlite3",
-    "icons": "node ./build/svg2font.js"
+    "icons": "node ./build/svg2font.js",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
     "@electron/remote": "^2.1.2",
@@ -77,6 +80,7 @@
     "prettier": "^3.3.3",
     "process": "^0.11.10",
     "typescript": "~5.5.4",
+    "vitepress": "^1.4.1",
     "vue-tsc": "^2.1.6"
   },
   "engines": {
