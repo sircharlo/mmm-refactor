@@ -344,5 +344,7 @@
   "yes": "Yes",
   "you-can-also-use-the-button-below-to-browse-for-files": "You can also browse for files manually if you prefer.",
   "zoom-in": "Zoom in",
-  "zoom-out": "Zoom out"
+  "zoom-out": "Zoom out",
+  "no-circuit-overseer-date-set": "The date of the circuit overseer's visit is not set",
+  "dont-forget-to-add-circuit-overseer-date": "For best results, add the date of the circuit overseer's visit to the \"{ congregationMeetings }\" section in { settings }."
 }
