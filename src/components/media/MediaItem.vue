@@ -8,7 +8,10 @@
       >
         <q-icon name="mmm-music-note" size="lg" />
       </div>
-      <div v-else class="q-pr-none rounded-borders relative-position bg-black">
+      <div
+        v-else
+        class="q-pr-none rounded-borders overflow-hidden relative-position bg-black"
+      >
         <q-img
           :id="media.uniqueId"
           :ratio="16 / 9"
@@ -16,7 +19,6 @@
             thumbnailFromMetadata ||
             (media.isImage ? media.fileUrl : media.thumbnailUrl)
           "
-          class="rounded-borders"
           fit="contain"
           width="150px"
           @error="imageLoadingError"
@@ -188,11 +190,7 @@
                 class="q-pl-md q-pr-none col-shrink"
                 side
               >
-                <q-chip
-                  :clickable="false"
-                  class="media-tag bg-accent-200"
-
-                >
+                <q-chip :clickable="false" class="media-tag bg-accent-200">
                   <q-icon
                     :name="
                       media.paragraph !== 9999
@@ -514,7 +512,10 @@
 <script setup lang="ts">
 import type { DynamicMediaObject } from 'src/types';
 
-import Panzoom, { type PanzoomObject } from '@panzoom/panzoom';
+import Panzoom, {
+  type PanzoomObject,
+  type PanzoomOptions,
+} from '@panzoom/panzoom';
 import { storeToRefs } from 'pinia';
 import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
@@ -687,10 +688,11 @@ const initiatePanzoom = (elemId: string) => {
     if (!elem) return;
     panzooms[elemId] = Panzoom(elem, {
       animate: true,
+      contain: 'outside',
       maxScale: 5,
       minScale: 1,
       panOnlyWhenZoomed: true,
-    });
+    } as PanzoomOptions);
 
     elem.addEventListener('panzoomend', () => {
       zoomReset(elemId);
