@@ -94,7 +94,7 @@
                 }}
               </q-card-section>
               <q-card-section>
-                <div class="text-subtitle1 q-pb-sm">{{ media.title }}</div>
+                <div class="text-subtitle1 q-pb-sm">{{ mediaTitle }}</div>
                 <div class="row items-center q-mt-lg">
                   <div class="col-shrink q-pr-md time-duration">
                     {{ formatTime(0) }}
@@ -222,11 +222,11 @@
                 </q-chip>
               </div>
               <div class="q-px-md col">
-                <div class="ellipsis-3-lines">
-                  {{
-                    media.title ||
-                    (media.fileUrl ? path.basename(media.fileUrl) : '')
-                  }}
+                <div
+                  class="ellipsis-3-lines"
+                  @dblclick="mediaEditTitleDialog = true"
+                >
+                  {{ mediaTitle }}
                 </div>
               </div>
               <div
@@ -440,6 +440,23 @@
       </div>
     </div>
   </q-item>
+  <q-dialog v-model="mediaEditTitleDialog">
+    <q-card class="modal-confirm">
+      <q-card-section class="items-center">
+        <q-input v-model="mediaTitle" focused outlined type="textarea" />
+      </q-card-section>
+      <q-card-actions align="right" class="text-primary">
+        <q-btn
+          v-close-popup
+          :label="$t('reset')"
+          color="negative"
+          flat
+          @click="resetMediaTitle()"
+        />
+        <q-btn v-close-popup :label="$t('save')" flat />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
   <q-dialog v-model="mediaStopPending">
     <q-card class="modal-confirm">
       <q-card-section
@@ -545,6 +562,21 @@ const props = defineProps<{
   list: DynamicMediaObject[];
   media: DynamicMediaObject;
 }>();
+
+const mediaEditTitleDialog = ref(false);
+const mediaTitle = ref('');
+
+const resetMediaTitle = () => {
+  if (props?.media) {
+    mediaTitle.value =
+      props.media.title ||
+      (props.media.fileUrl ? path.basename(props.media.fileUrl) : '');
+  } else {
+    mediaTitle.value = '';
+  }
+};
+
+resetMediaTitle();
 
 const thumbnailFromMetadata = ref('');
 
