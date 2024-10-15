@@ -282,21 +282,14 @@ const playMedia = () => {
 };
 
 function onResize(size: { height: number; width: number }) {
-  // $q.notify({
-  //   badgeStyle: 'display: none',
-  //   group: 'resize',
-  //   icon: 'mmm-info',
-  //   message: size.width + 'x' + size.height,
-  //   timeout: 500,
-  //   type: 'info',
-  // });
   createTemporaryNotification({
     badgeStyle: 'display: none',
+    color: 'accent-400',
     group: 'resize',
     icon: 'mmm-info',
     message: size.width + 'x' + size.height,
     noClose: true,
-    type: 'info',
+    position: 'bottom'
   });
 }
 
