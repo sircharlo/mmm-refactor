@@ -148,13 +148,19 @@ const lookupCongregation = async () => {
       ).then((response) => {
         results.value = ((response.geoLocationList as GeoRecord[]) || []).map(
           (location) => {
-            location.properties.languageCode =
-              congregationLookupLanguages.value.find(
-                (l) => l.languageCode === location.properties.languageCode,
-              )?.writtenLanguageCode[0] || location.properties.languageCode;
+            const languageIsAlreadyGood = !!jwLanguages.value?.list.find(
+              (l) => l.langcode === location.properties.languageCode,
+            );
+            if (!languageIsAlreadyGood) {
+              location.properties.languageCode =
+                congregationLookupLanguages.value.find(
+                  (l) => l.languageCode === location.properties.languageCode,
+                )?.writtenLanguageCode[0] || location.properties.languageCode;
+            }
             return location;
           },
         );
+        console.debug(results.value);
       });
     } else {
       results.value = [];
