@@ -39,7 +39,6 @@
     "fs-extra": "^11.2.0",
     "heic-convert": "^2.1.0",
     "is-online": "^11.0.0",
-    "jszip": "^3.10.1",
     "klaw-sync": "^6.0.0",
     "music-metadata": "^10.5.1",
     "obs-websocket-js": "^5.0.6",
