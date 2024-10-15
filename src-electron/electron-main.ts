@@ -56,8 +56,6 @@ function createMediaWindow() {
     alwaysOnTop: false,
     backgroundColor: 'black',
     frame: false,
-    // roundedCorners: windowOpts.fullscreen,
-    fullscreen: false,
     height: 720,
     icon: path.resolve(path.join(__dirname, 'icons', 'media-player.png')),
     minHeight: 110,
