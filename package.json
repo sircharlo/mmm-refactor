@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/sircharlo/mmm-refactor.git"
   },
-  "version": "24.10.5",
+  "version": "24.10.6",
   "description": "A cross platform app to download and present media for congregation meetings of Jehovah’s Witnesses.",
   "productName": "Meeting Media Manager",
   "author": "Olivier Savignac",
