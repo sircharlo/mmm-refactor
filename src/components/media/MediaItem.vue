@@ -20,6 +20,8 @@
           fit="contain"
           width="150px"
           @error="imageLoadingError"
+          @mouseleave="hoveredBadges[media.uniqueId] = false"
+          @mouseover="hoveredBadges[media.uniqueId] = true"
         >
           <q-badge
             v-if="media.isVideo"
@@ -39,8 +41,6 @@
             "
             style="padding: 5px !important"
             @click="showMediaDurationPopup(media)"
-            @mouseleave="hoveredBadges[media.uniqueId] = false"
-            @mouseover="hoveredBadges[media.uniqueId] = true"
           >
             <q-icon
               :name="
