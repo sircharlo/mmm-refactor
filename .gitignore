@@ -52,3 +52,6 @@ yarn-error.log*
 # VitePress
 docs/.vitepress/dist
 docs/.vitepress/cache
+
+# Custom dep helper script
+depChecker.js
