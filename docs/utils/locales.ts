@@ -147,6 +147,10 @@ export const mapThemeConfig = (
   returnToTopLabel: msg.returnToTopLabel,
   sidebar: [
     { link: link(locale, 'about'), text: msg.about },
+    {
+      link: link(locale, 'using-at-a-kingdom-hall'),
+      text: msg.usingAtAKingdomHall,
+    },
     { link: link(locale, 'faq'), text: msg.faq },
   ],
 });
