@@ -66,8 +66,12 @@ const mapSearchTranslations = (
     backButtonTitle: msg.backButtonTitle,
     displayDetails: msg.displayDetails,
     footer: {
+      closeKeyAriaLabel: msg.esc,
       closeText: msg.closeText,
+      navigateDownKeyAriaLabel: msg.arrowDown,
       navigateText: msg.navigateText,
+      navigateUpKeyAriaLabel: msg.arrowUp,
+      selectKeyAriaLabel: msg.enter,
       selectText: msg.selectText,
     },
     noResultsText: msg.noResultsText,

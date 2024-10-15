@@ -1,5 +1,7 @@
 {
   "about": "About",
+  "arrowDown": "down arrow",
+  "arrowUp": "up arrow",
   "backButtonTitle": "Back",
   "closeText": "to close",
   "darkModeSwitchLabel": "Appearance",
@@ -9,6 +11,8 @@
   "docFooterNext": "Next page",
   "docFooterPrev": "Previous page",
   "editLink": "Edit this page on Crowdin",
+  "enter": "enter",
+  "esc": "escape",
   "faq": "FAQ",
   "langMenuLabel": "Change language",
   "lastUpdated": "Updated at",

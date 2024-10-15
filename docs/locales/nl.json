@@ -1,5 +1,7 @@
 {
   "about": "Over",
+  "arrowDown": "pijltje omlaag",
+  "arrowUp": "pijltje omhoog",
   "backButtonTitle": "Terug",
   "closeText": "Sluiten",
   "darkModeSwitchLabel": "Weergave",
@@ -9,6 +11,8 @@
   "docFooterNext": "Volgende pagina",
   "docFooterPrev": "Vorige pagina",
   "editLink": "Bewerk deze pagina op Crowdin",
+  "enter": "enter",
+  "esc": "escape",
   "faq": "Veelgestelde vragen",
   "langMenuLabel": "Verander taal",
   "lastUpdated": "Laatst bewerkt op",
