@@ -260,11 +260,11 @@ app
   .then(createWindow)
   .catch((err) => errorCatcher(err));
 
-app.on('window-all-closed', () => {
-  if (platform !== 'darwin') {
-    app.quit();
-  }
-});
+// app.on('window-all-closed', () => {
+// if (platform !== 'darwin') {
+// app.quit();
+// }
+// });
 
 app.on('activate', () => {
   if (!mainWindow || (mainWindow && mainWindow.isDestroyed())) {
