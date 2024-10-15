@@ -176,7 +176,8 @@ function chooseCongregation(
 }
 
 const checkCoDate = () => {
-  if (!currentSettings.value) return;
+  if (!currentSettings.value || currentSettings.value?.disableMediaFetching)
+    return;
   console.debug(route.fullPath);
   if (
     !currentSettings.value?.coWeek ||
