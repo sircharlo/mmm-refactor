@@ -692,10 +692,20 @@ const initiatePanzoom = (elemId: string) => {
       maxScale: 5,
       minScale: 1,
       panOnlyWhenZoomed: true,
+      pinchAndPan: true,
     } as PanzoomOptions);
+
+    elem.addEventListener('dblclick', () => {
+      zoomIn(elemId);
+    });
 
     elem.addEventListener('panzoomend', () => {
       zoomReset(elemId);
+    });
+
+    elem.addEventListener('wheel', function(e) {
+        if (!e.ctrlKey) return;
+        panzooms[elemId]?.zoomWithWheel(e);
     });
 
     elem.addEventListener(
