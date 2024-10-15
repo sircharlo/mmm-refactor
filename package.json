@@ -1,6 +1,6 @@
 {
   "name": "mmm-v2",
-  "version": "24.10.4",
+  "version": "24.10.5",
   "description": "A cross platform app to download and present media for congregation meetings of Jehovah’s Witnesses.",
   "productName": "Meeting Media Manager",
   "author": "Olivier Savignac",
@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@electron/remote": "^2.1.2",
-    "@formkit/drag-and-drop": "^0.2.3",
+    "@formkit/drag-and-drop": "^0.2.4",
     "@panzoom/panzoom": "^4.5.1",
     "@quasar/cli": "^2.4.1",
     "@quasar/extras": "^1.16.12",
