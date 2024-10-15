@@ -157,7 +157,6 @@ export default defineConfig({
     logo: '/icon.png',
     outline: { level: 'deep' },
     search: mapSearch(),
-    lastUpdated: { formatOptions: { dateStyle: 'full', forceLocale: true } },
     socialLinks: [{ icon: 'github', link: GH_REPO_URL, ariaLabel: 'GitHub' }],
   },
 });

@@ -122,7 +122,10 @@ export const mapThemeConfig = (
     pattern: 'https://crowdin.com/project/meeting-media-manager',
     text: msg.editLink,
   },
-  lastUpdated: { text: msg.lastUpdated },
+  lastUpdated: {
+    formatOptions: { dateStyle: 'long', forceLocale: true },
+    text: msg.lastUpdated,
+  },
   lightModeSwitchTitle: msg.lightModeSwitchTitle,
   nav: [
     { link: link(locale, 'about'), text: msg.about },
