@@ -191,7 +191,7 @@
                 <q-chip
                   :clickable="false"
                   class="media-tag bg-accent-200"
-                  square
+
                 >
                   <q-icon
                     :name="
@@ -214,7 +214,6 @@
                 <q-chip
                   :clickable="false"
                   class="media-tag bg-accent-400"
-                  square
                   text-color="white"
                 >
                   <q-icon class="q-mr-xs" name="mmm-music-note" />

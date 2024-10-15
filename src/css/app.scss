@@ -437,6 +437,10 @@ body.body--dark {
   border-radius: $generic-border-radius;
 }
 
+.q-notifications__list--top {
+  margin-top: 4em;
+}
+
 .q-dialog,
 .q-card,
 .q-list,
@@ -482,6 +486,7 @@ a {
 
 .media-tag {
   min-width: 70px;
+  border-radius: 6px;
 }
 
 .media-tag .q-chip__content {
