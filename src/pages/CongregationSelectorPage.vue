@@ -178,7 +178,6 @@ function chooseCongregation(
 const checkCoDate = () => {
   if (!currentSettings.value || currentSettings.value?.disableMediaFetching)
     return;
-  console.debug(route.fullPath);
   if (
     !currentSettings.value?.coWeek ||
     date.getDateDiff(new Date(), currentSettings.value?.coWeek, 'months') > 2

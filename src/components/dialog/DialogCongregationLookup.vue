@@ -160,7 +160,6 @@ const lookupCongregation = async () => {
             return location;
           },
         );
-        console.debug(results.value);
       });
     } else {
       results.value = [];

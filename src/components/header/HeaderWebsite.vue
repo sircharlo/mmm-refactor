@@ -1,5 +1,5 @@
 <template>
-  <template v-if="mediaPlayingAction == 'website'">
+  <template v-if="mediaPlayingAction === 'website'">
     <q-btn-group unelevated>
       <q-btn color="white-transparent" @click="zoomWebsiteWindow('out')">
         <q-icon name="mmm-minus" size="xs" />
