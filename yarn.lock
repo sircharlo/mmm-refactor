@@ -851,10 +851,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formkit/drag-and-drop@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@formkit/drag-and-drop@npm:0.2.3"
-  checksum: 10c0/d073e6ca3335a069c41e12d1313dc62854c836ee2730130a0d4bbe882929f35b66d873594b896b4867146683eee04d9bd3505b812a16da6d33484fb513f71f86
+"@formkit/drag-and-drop@npm:^0.2.4":
+  version: 0.2.4
+  resolution: "@formkit/drag-and-drop@npm:0.2.4"
+  checksum: 10c0/2e1cb181634c546fc971e9565e58155e576309d87c4413a7ab43750f8929d4229cf40c1cbcce29177f5a3f138ef6300b1b8f07e3d99001f2ab1f3bf6674c7529
   languageName: node
   linkType: hard
 
@@ -9096,7 +9096,7 @@ __metadata:
     "@daipeng7/rollup-plugin-iconfont": "npm:^3.0.6"
     "@electron/rebuild": "npm:^3.7.0"
     "@electron/remote": "npm:^2.1.2"
-    "@formkit/drag-and-drop": "npm:^0.2.3"
+    "@formkit/drag-and-drop": "npm:^0.2.4"
     "@intlify/vite-plugin-vue-i18n": "npm:^7.0.0"
     "@panzoom/panzoom": "npm:^4.5.1"
     "@quasar/app-vite": "npm:^1.10.0"
