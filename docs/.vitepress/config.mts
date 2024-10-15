@@ -112,6 +112,43 @@ export default defineConfig({
           },
         ];
       }),
+      [
+        'script',
+        {},
+        `
+        const initialVisit = localStorage.getItem('initialVisit') !== 'false'
+
+        if (initialVisit) {
+          const langs = [${localeOptions.map((l) => `"${camelToKebabCase(l.value)}"`)}]
+
+          function mapLang(lang) {
+            switch (lang) {
+              case 'zh':
+              case 'zh-CN':
+              case 'zh-TW':
+                return 'cmn-hans';
+              default:
+                return lang.toLowerCase();
+            }
+          }
+
+          let match;
+          navigator.languages.forEach((lang) => {
+            const mapped = mapLang(lang);
+            if (!match) match = langs.find((l) => l === mapped);
+            if (!match) match = langs.find((l) => l === mapped.split('-')[0]);
+          })
+
+          if (match) {
+            localStorage.setItem('initialVisit', false);
+            const parts = window.location.pathname.split('/');
+            const isEnglish = parts.length === 3;
+            const page = isEnglish ? parts[2] : parts[3]
+            window.location.pathname = "${base}" + (match !== 'en' ? match + '/' : '') + page
+          }
+        }
+        `,
+      ],
     );
   },
   locales: mapLocales(),
