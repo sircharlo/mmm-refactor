@@ -22,7 +22,20 @@ const mapLocale = (
   link?: string;
 } & LocaleSpecificConfig<DefaultTheme.Config> => ({
   description: msg.description,
-  head: [['meta', { content: msg.description, name: 'og:description' }]],
+  head: [
+    ['meta', { content: msg.title, property: 'og:site_name' }],
+    ['meta', { content: msg.description, property: 'og:description' }],
+    ['meta', { content: lang, property: 'og:locale' }],
+    ...localeOptions
+      .filter((l) => l.label !== label)
+      .map((l): [string, Record<string, string>] => [
+        'meta',
+        {
+          content: camelToKebabCase(l.value),
+          property: 'og:locale:alternate',
+        },
+      ]),
+  ],
   label,
   lang,
   themeConfig: mapThemeConfig(lang, msg),
@@ -92,7 +105,7 @@ export const mapSearch = (): {
 };
 
 const link = (locale: string, url: string) =>
-  `${locale ? `/${locale}` : ''}/${url}`;
+  `${locale === 'en' ? '' : `/${locale}`}/${url}`;
 
 export const mapThemeConfig = (
   locale: string,

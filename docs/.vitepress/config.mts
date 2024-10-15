@@ -1,6 +1,8 @@
 import { defineConfig } from 'vitepress';
+import { localeOptions } from './../locales';
 import { mapLocales, mapSearch } from './../utils/locales';
 import { CANONICAL_URL, GH_REPO, GH_REPO_URL } from './../utils/constants';
+import { camelToKebabCase } from './../utils/general';
 
 const base = `/${GH_REPO}/`;
 
@@ -10,6 +12,7 @@ export default defineConfig({
   srcDir: './src',
   cleanUrls: true,
   lastUpdated: true,
+  rewrites: { 'en/:rest*': ':rest*' },
   markdown: { image: { lazyLoading: true } },
   head: [
     [
@@ -57,12 +60,20 @@ export default defineConfig({
         href: `${base}logo-no-background.svg`,
       },
     ],
-    ['meta', { content: `${CANONICAL_URL}icon.png`, name: 'og:image' }],
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { content: `${CANONICAL_URL}icon.png`, property: 'og:image' }],
+    ['meta', { content: 'image/png', property: 'og:image:type' }],
+    ['meta', { content: '512', property: 'og:image:width' }],
+    ['meta', { content: '513', property: 'og:image:height' }],
+    ['meta', { content: 'The logo of M³', property: 'og:image:alt' }],
   ],
   transformPageData(pageData) {
     const canonicalUrl = `${CANONICAL_URL}${pageData.relativePath}`
       .replace(/index\.md$/, '')
       .replace(/\.md$/, '');
+
+    const pageLang = pageData.relativePath.split('/')[0];
+    const isEnglish = pageData.relativePath.split('/').length === 1;
 
     pageData.frontmatter.head ??= [];
     pageData.frontmatter.head.push(
@@ -77,6 +88,30 @@ export default defineConfig({
               : `${pageData.title} | M³ docs`,
         },
       ],
+      [
+        'link',
+        {
+          rel: 'alternate',
+          hreflang: 'x-default',
+          href: isEnglish
+            ? canonicalUrl
+            : canonicalUrl.replace(`/${pageLang}/`, '/'),
+        },
+      ],
+      ...localeOptions.map((l): [string, Record<string, string>] => {
+        const lang = camelToKebabCase(l.value);
+        return [
+          'link',
+          {
+            rel: 'alternate',
+            hreflang: lang,
+            href: (!isEnglish
+              ? canonicalUrl.replace(`/${pageLang}/`, `/${lang}/`)
+              : `${CANONICAL_URL}${lang}/${pageData.relativePath}`
+            ).replace('/en/', '/'),
+          },
+        ];
+      }),
     );
   },
   locales: mapLocales(),
