@@ -26,6 +26,7 @@ import {
 import fs from 'fs-extra';
 import convert from 'heic-convert';
 import klawSync from 'klaw-sync';
+import os from 'os';
 import { throttle } from 'quasar';
 import { FULL_HD } from 'src/helpers/converters';
 import { errorCatcher } from 'src/helpers/error-catcher';
@@ -37,6 +38,18 @@ const getMainWindow = () =>
       !w.webContents.getURL().includes('media-player') &&
       !w.webContents.getURL().includes('https://'),
   );
+
+const platform = process.platform || os.platform();
+if (platform === 'darwin') {
+  try {
+    globalShortcut.register('Command+Q', () => {
+      getMainWindow()?.close();
+    });
+  } catch (err) {
+    errorCatcher(err);
+  }
+}
+
 const getMediaWindow = () =>
   BrowserWindow.getAllWindows().find(
     (w) =>
