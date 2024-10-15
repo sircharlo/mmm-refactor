@@ -188,10 +188,11 @@ const checkCoDate = () => {
         congregationMeetings: t('congregationMeetings'),
         settings: t('titles.settings'),
       }),
+      color: 'primary',
       icon: 'mmm-error',
       message: t('no-circuit-overseer-date-set'),
+      textColor: 'white',
       timeout: 10000,
-      type: 'info',
     });
   }
 };

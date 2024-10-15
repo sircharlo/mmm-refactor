@@ -5,10 +5,13 @@ import { errorCatcher } from './error-catcher';
 const createTemporaryNotification = ({
   badgeStyle,
   caption,
+  color,
   group,
   icon,
   message,
   noClose = false,
+  position,
+  textColor,
   timeout = 2000,
   type,
 }: { noClose?: boolean } & QNotifyCreateOptions) => {
@@ -25,6 +28,8 @@ const createTemporaryNotification = ({
       message,
       timeout,
       ...(caption && { caption }),
+      ...(color && { color }),
+      ...(textColor && { textColor }),
       ...(type && { type }),
       ...(icon && { icon }),
       ...(group && { group }),
@@ -38,7 +43,7 @@ const createTemporaryNotification = ({
           },
         ],
       }),
-      position: 'top',
+      position: position || 'top',
     });
   } catch (error) {
     errorCatcher(error);
