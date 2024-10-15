@@ -389,10 +389,14 @@ const unregisterShortcut = (keySequence: string) => {
   }
 };
 
+const bcClose = new BroadcastChannel('closeAttempts');
 ipcRenderer.on('attemptedClose', () => {
-  const bcClose = new BroadcastChannel('closeAttempts');
   bcClose.postMessage({ attemptedClose: true });
 });
+
+bcClose.onmessage = (event) => {
+  if (event.data.authorizedClose) ipcRenderer.send('authorizedClose');
+};
 
 const convertPdfToImages = async (
   pdfPath: string,
