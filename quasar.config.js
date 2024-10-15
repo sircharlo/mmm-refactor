@@ -30,15 +30,7 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
-      // chainWebpack(chain) {
-      //   const nodePolyfillWebpackPlugin = require('node-polyfill-webpack-plugin');
-      //   chain.plugin('node-polyfill').use(nodePolyfillWebpackPlugin);
-      // },
       extendViteConf(viteConf) {
-        // if (!viteConf.optimizeDeps) viteConf.optimizeDeps = {};
-        // if (!viteConf.optimizeDeps.exclude) viteConf.optimizeDeps.exclude = [
-        //   'pdfjs-dist',
-        // ];
         viteConf.optimizeDeps = mergeConfig(viteConf, {
           esbuildOptions: {
             define: {
@@ -90,7 +82,6 @@ module.exports = configure(function (/* ctx */) {
       vueRouterMode: 'hash', // available values: 'hash', 'history'
     },
 
-    // animations: 'all', // --- includes all animations
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: ['app.scss', 'mmm-icons.css'],
 
@@ -117,11 +108,6 @@ module.exports = configure(function (/* ctx */) {
         appId: 'sircharlo.meeting-media-manager',
         // eslint-disable-next-line no-template-curly-in-string
         artifactName: 'meeting-media-manager-${version}.${ext}',
-        // buildDependenciesFromSource: true,
-        // files: [
-        //   '!node_modules/better-sqlite3/build/Release/*.node',
-        //   '!node_modules/canvas/build/Release/*.node',
-        // ],
         generateUpdatesFilesForAllChannels: true,
         linux: {
           category: 'Utility',
@@ -192,9 +178,12 @@ module.exports = configure(function (/* ctx */) {
         }
       },
       extendPackageJson(pkg) {
-        const electronDeps = [
+        const requiredNonUiElectronDependencies = [
           '@electron/remote',
+          '@quasar/extras',
+          '@sentry/vue',
           'adm-zip',
+          'axios',
           'better-sqlite3',
           'electron-updater',
           'electron-window-state',
@@ -203,21 +192,42 @@ module.exports = configure(function (/* ctx */) {
           'klaw-sync',
           'music-metadata',
           'pdfjs-dist',
+          'pinia',
+          'pinia-shared-state',
           'quasar',
+          'sanitize-filename',
+          'sanitize-html',
           'upath',
+          'vue',
+          'vue-i18n',
+          'vue-router',
         ];
 
-        // Remove UI dependencies from production build
+        // Remove unneeded dependencies from production build
         Object.keys(pkg.dependencies).forEach((dep) => {
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-          if (!electronDeps.includes(dep)) delete pkg.dependencies[dep];
+          if (!requiredNonUiElectronDependencies.includes(dep)) {
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+            delete pkg.dependencies[dep];
+          }
         });
+
+        /* As of 2024-10-15, this logic results in the following dependencies being removed:
+          {
+            '@formkit/drag-and-drop',
+            '@panzoom/panzoom',
+            '@quasar/cli',
+            'dompurify',
+            'is-online',
+            'obs-websocket-js',
+            'p-queue',
+            'pretty-bytes',
+          }
+
+          Anything more than this led to errors in the built Electron app.
+        */
       },
       inspectPort: 5858,
     },
-
-    // https://github.com/quasarframework/quasar/tree/dev/extras
-    // extras: ['fontawesome-v6', 'material-icons', 'mdi-v7'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
