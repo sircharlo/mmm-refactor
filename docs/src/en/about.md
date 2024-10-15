@@ -6,7 +6,9 @@
 
 It features support for managing custom and recurring media, an optional synchronization feature for members of the same congregation, as well as support for multiple congregations and/or groups using the same computer account.
 
-> Note: M³ used to be known as JWMMF (JW Meeting Media Fetcher), but was renamed in May 2022.
+::: info Note:
+M³ used to be known as JWMMF (JW Meeting Media Fetcher), but was renamed in May 2022.
+:::
 
 ## What can M³ do?
 

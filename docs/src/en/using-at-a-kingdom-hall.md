@@ -20,7 +20,9 @@ This guide will walk you through the process of downloading, installing, and set
 - The next step is to choose a **profile type**.
 - For a regular Kingdom Hall setup, choose **Regular**. This will configure many features that are commonly used for congregation meetings.
 
-> You should only choose **Other** if you are creating a profile for which no media should be automatically downloaded. Media will have to be manually imported for use in this profile. This type of profile is used mostly to use M³ during theocratic schools, assemblies, conventions and other special events. **For normal use during congregation meetings, choose _Regular_.**
+::: warning Note:
+You should only choose **Other** if you are creating a profile for which no media should be automatically downloaded. Media will have to be manually imported for use in this profile. This type of profile is used mostly to use M³ during theocratic schools, assemblies, conventions and other special events. **For normal use during congregation meetings, choose _Regular_.**
+:::
 
 ### Automatic congregation lookup
 
@@ -52,4 +54,4 @@ This guide will walk you through the process of downloading, installing, and set
 
 ## 3. Enjoy using M³
 
-Once the setup wizard is complete, M³ is ready to help manage and present media for congregation meetings. Enjoy using the app!
+Once the setup wizard is complete, M³ is ready to help manage and present media for congregation meetings. Enjoy using the app! :tada:
