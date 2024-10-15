@@ -25,14 +25,6 @@ module.exports = configure(function (/* ctx */) {
     // https://v2.quasar.dev/options/animations
     animations: ['fadeIn', 'fadeOut'],
 
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex
-    bex: {
-      contentScripts: ['my-content-script'],
-
-      // extendBexScriptsConf (esbuildConf) {}
-      // extendBexManifestJson (json) {}
-    },
-
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
     boot: ['sentry', 'i18n', 'axios', 'globals'],
 
@@ -67,20 +59,14 @@ module.exports = configure(function (/* ctx */) {
               release: {
                 name: version,
               },
+              telemetry: false,
             }),
           );
         }
       },
-      // eslint-disable-next-line no-empty-pattern
-      extendWebpack(cfg, {}) {
-        cfg.externals = ['better-sqlite3'];
-      },
       sourcemap: true,
-      target: {
-        // browser: ['esnext', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
-        browser: ['esnext'],
-        node: 'node22',
-      },
+      // See: https://www.electronjs.org/docs/latest/tutorial/electron-timelines#timeline
+      target: { browser: ['chrome128'], node: 'node20' },
       vitePlugins: [
         [
           '@intlify/vite-plugin-vue-i18n',
@@ -102,16 +88,6 @@ module.exports = configure(function (/* ctx */) {
         // ],
       ],
       vueRouterMode: 'hash', // available values: 'hash', 'history'
-    },
-
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-capacitor-apps/configuring-capacitor
-    capacitor: {
-      hideSplashscreen: true,
-    },
-
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-cordova-apps/configuring-cordova
-    cordova: {
-      // noIosLegacyBuildFlag: true, // uncomment only if you know what you are doing
     },
 
     // animations: 'all', // --- includes all animations
@@ -180,9 +156,7 @@ module.exports = configure(function (/* ctx */) {
           ],
         },
       },
-
       bundler: 'builder', // 'packager' or 'builder'
-
       extendElectronMainConf: (esbuildConf) => {
         if (!devMode) {
           esbuildConf.sourcemap = true;
@@ -195,11 +169,11 @@ module.exports = configure(function (/* ctx */) {
               release: {
                 name: version,
               },
+              telemetry: false,
             }),
           );
         }
       },
-
       extendElectronPreloadConf: (esbuildConf) => {
         if (!devMode) {
           esbuildConf.sourcemap = true;
@@ -212,12 +186,34 @@ module.exports = configure(function (/* ctx */) {
               release: {
                 name: version,
               },
+              telemetry: false,
             }),
           );
         }
       },
+      extendPackageJson(pkg) {
+        const electronDeps = [
+          '@electron/remote',
+          'adm-zip',
+          'better-sqlite3',
+          'electron-updater',
+          'electron-window-state',
+          'fs-extra',
+          'heic-convert',
+          'klaw-sync',
+          'music-metadata',
+          'pdfjs-dist',
+          'quasar',
+          'upath',
+        ];
+
+        // Remove UI dependencies from production build
+        Object.keys(pkg.dependencies).forEach((dep) => {
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          if (!electronDeps.includes(dep)) delete pkg.dependencies[dep];
+        });
+      },
       inspectPort: 5858,
-      packager: {},
     },
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
@@ -241,41 +237,6 @@ module.exports = configure(function (/* ctx */) {
 
       // Quasar plugins
       plugins: ['LocalStorage', 'Notify'],
-    },
-
-    // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
-    pwa: {
-      injectPwaMetaTags: true,
-      manifestFilename: 'manifest.json',
-      swFilename: 'sw.js',
-      useCredentialsForManifestTag: false,
-      workboxMode: 'generateSW', // or 'injectManifest'
-      // useFilenameHashes: true,
-      // extendGenerateSWOptions (cfg) {}
-      // extendInjectManifestOptions (cfg) {},
-      // extendManifestJson (json) {}
-      // extendPWACustomSWConf (esbuildConf) {}
-    },
-
-    // https://v2.quasar.dev/quasar-cli-vite/developing-ssr/configuring-ssr
-    ssr: {
-      // ssrPwaHtmlFilename: 'offline.html', // do NOT use index.html as name!
-      // will mess up SSR
-
-      // extendSSRWebserverConf (esbuildConf) {},
-      // extendPackageJson (json) {},
-
-      middlewares: [
-        'render', // keep this as last one
-      ],
-
-      // manualStoreHydration: true,
-      // manualPostHydrationTrigger: true,
-
-      prodPort: 3000, // The default port that the production server should use
-      // (gets superseded if process.env.PORT is specified at runtime)
-
-      pwa: false,
     },
   };
 });

@@ -1,5 +1,11 @@
 {
   "name": "mmm-v2",
+  "homepage": "https://sircharlo.github.io/mmm-refactor/",
+  "bugs": "https://github.com/sircharlo/mmm-refactor/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sircharlo/mmm-refactor.git"
+  },
   "version": "24.10.5",
   "description": "A cross platform app to download and present media for congregation meetings of Jehovah’s Witnesses.",
   "productName": "Meeting Media Manager",
@@ -12,7 +18,10 @@
     "dev": "quasar dev -m electron",
     "build": "quasar build -m electron",
     "rebuild": "./node_modules/.bin/electron-rebuild.cmd -f -m ./node_modules/better-sqlite3",
-    "icons": "node ./build/svg2font.js"
+    "icons": "node ./build/svg2font.js",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
     "@electron/remote": "^2.1.2",
@@ -78,12 +87,21 @@
     "prettier": "^3.3.3",
     "process": "^0.11.10",
     "typescript": "~5.5.4",
+    "vitepress": "^1.4.1",
     "vue-tsc": "^2.1.6"
   },
+  "browserslist": [
+    "Electron >= 32"
+  ],
   "engines": {
     "node": "^24 || ^22 || ^20",
     "yarn": ">= 4.5.10"
   },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
   "packageManager": "yarn@4.5.0",
   "resolutions": {
     "canvas": "npm:empty-npm-package@1.0.0"
