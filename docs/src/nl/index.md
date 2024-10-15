@@ -5,6 +5,7 @@ layout: home
 hero:
   name: 'M³ docs'
   text: 'Hulp bij het gebruik van Meeting Media Manager'
+  image: /icon.png
   actions:
     - theme: brand
       text: Installeer M³
