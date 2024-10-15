@@ -1,8 +1,8 @@
 # Frequently Asked Questions
 
-## Does this app depend on external sites, sources or "curators" to download publications and meeting media?
+## Does this app depend on external sites, sources or "curators" to download publications, meeting media or other content?
 
-**No.** The app behaves similarly to JW Library. It downloads publications and media directly from the official JW.org website and its content delivery network. At runtime, the app automatically determines what needs to be downloaded, such as media files and publications. The source code is available for all to examine and verify this.
+**No.** The app behaves similarly to JW Library. It downloads publications, media and other content directly from the official JW.org website and its content delivery network. The app automatically determines what needs to be downloaded and when previously-downloaded content is no longer up-to-date and should be re-downloaded. The source code is available for all to examine and verify this.
 
 ## Does this app infringe the JW.org Terms of Use?
 
