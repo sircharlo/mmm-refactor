@@ -194,7 +194,7 @@ const obsConnect = async (setup?: boolean) => {
           break;
         }
       } catch (err) {
-        errorCatcher(err);
+        obsErrorHandler(err);
       } finally {
         attempt++;
         if (attempt < maxAttempts) {
