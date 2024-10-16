@@ -43,6 +43,7 @@ import { useRoute, useRouter } from 'vue-router';
 
 // Globals
 import { barStyle, queues, thumbStyle } from 'src/boot/globals';
+import { localeOptions } from 'src/i18n';
 
 // Components
 import HeaderBase from 'src/components/header/HeaderBase.vue';
@@ -226,7 +227,11 @@ watch(
   ([newAppLang]) => {
     if (newAppLang) {
       if (newAppLang.includes('-')) newAppLang = newAppLang.split('-')[0];
-      locale.value = newAppLang;
+      if (!localeOptions?.map((option) => option.value).includes(newAppLang)) {
+        currentSettings.value.localAppLang = 'en';
+      } else {
+        locale.value = newAppLang;
+      }
     }
   },
 );
