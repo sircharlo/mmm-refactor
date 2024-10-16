@@ -9,7 +9,7 @@ const get = async (url: string, params?: AxiosRequestConfig) => {
   returnVal = await axios.get(url, { params }).catch((error) => {
     if (
       !(error instanceof AxiosError) ||
-      (error.status !== 400 && error.status !== 404)
+      ![400, 404].includes(error.status ?? 0)
     )
       errorCatcher(error);
     return { data: undefined };
