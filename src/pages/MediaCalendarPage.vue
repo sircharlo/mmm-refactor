@@ -156,13 +156,13 @@
       class="media-section additional"
     >
       <q-item class="text-additional items-center">
-            <!-- :class="
+        <!-- :class="
               isWeMeetingDay(selectedDateObject?.date)
                 ? 'bg-white text-additional jw-icon'
                 : 'text-white bg-additional rounded-borders-sm'
             " -->
         <q-avatar
-        :size="isWeMeetingDay(selectedDateObject?.date) ? 'lg' : 'md'"
+          :size="isWeMeetingDay(selectedDateObject?.date) ? 'lg' : 'md'"
           class="text-white bg-additional jw-icon"
         >
           <template v-if="isWeMeetingDay(selectedDateObject?.date)">
