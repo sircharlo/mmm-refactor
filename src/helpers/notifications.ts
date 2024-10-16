@@ -3,6 +3,7 @@ import { Notify, type QNotifyCreateOptions } from 'quasar';
 import { errorCatcher } from './error-catcher';
 
 const createTemporaryNotification = ({
+  actions,
   badgeStyle,
   caption,
   color,
@@ -35,7 +36,7 @@ const createTemporaryNotification = ({
       ...(group && { group }),
       ...(badgeStyle && { badgeStyle }),
       ...(!noClose && {
-        actions: [
+        actions: actions || [
           {
             color: 'white',
             icon: 'close',

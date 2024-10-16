@@ -183,6 +183,19 @@ const checkCoDate = () => {
     date.getDateDiff(new Date(), currentSettings.value?.coWeek, 'months') > 2
   ) {
     createTemporaryNotification({
+      actions: [
+        {
+          color: 'white',
+          label: t('remind-me-later'),
+        },
+        {
+          color: 'white',
+          handler: () => {
+            router.push('/settings/coWeek');
+          },
+          label: t('go-to-settings'),
+        },
+      ],
       caption: t('dont-forget-to-add-circuit-overseer-date', {
         congregationMeetings: t('congregationMeetings'),
         settings: t('titles.settings'),
@@ -191,7 +204,7 @@ const checkCoDate = () => {
       icon: 'mmm-error',
       message: t('no-circuit-overseer-date-set'),
       textColor: 'white',
-      timeout: 10000,
+      timeout: 30000,
     });
   }
 };

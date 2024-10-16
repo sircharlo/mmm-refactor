@@ -51,7 +51,7 @@ const routes: RouteRecordRaw[] = [
     children: [{ component: () => import('pages/SettingsPage.vue'), path: '' }],
     component: () => import('layouts/MainLayout.vue'),
     meta: { icon: 'mmm-settings', title: 'titles.settings' },
-    path: '/settings',
+    path: '/settings/:setting?',
   },
 
   // Always leave this as last one,
