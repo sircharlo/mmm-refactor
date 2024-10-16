@@ -57,7 +57,7 @@ const getDateOptions = (options: SettingsItemOption[] | undefined) => {
   try {
     const filteredOptions = options
       ?.map((option) => {
-        if (option == 'coTuesdays') {
+        if (option === 'coTuesdays') {
           return coTuesdays;
         } else {
           return undefined;
@@ -77,12 +77,12 @@ const getRules = (rules: SettingsItemRule[] | undefined) => {
   try {
     const filteredRules = rules
       ?.map((rule) => {
-        if (rule == 'notEmpty') {
+        if (rule === 'notEmpty') {
           return !rules.includes('regular') ||
             !currentSettings.value?.disableMediaFetching
             ? requiredRule
             : undefined;
-        } else if (rule == 'portNumber') {
+        } else if (rule === 'portNumber') {
           return portNumberRule;
         } else {
           return undefined;
@@ -100,7 +100,7 @@ const getActions = (actions: SettingsItemAction[] | undefined) => {
   try {
     return actions
       ?.map(async (action) => {
-        if (action == 'obsConnect') {
+        if (action === 'obsConnect') {
           return window.dispatchEvent(
             new CustomEvent('obsConnectFromSettings'),
           );
@@ -134,7 +134,7 @@ const getTimeOptions = (options: SettingsItemOption[] | undefined) => {
     if (!options) return undefined;
     const filteredOptions = options
       ?.map((option) => {
-        if (option == 'meetingTime') {
+        if (option === 'meetingTime') {
           return meetingTime;
         } else {
           return undefined;
@@ -187,7 +187,7 @@ const filterFn = (
 
 const getListOptions = (list: string | undefined) => {
   try {
-    if (list == 'jwLanguages') {
+    if (list === 'jwLanguages') {
       return filteredJwLanguages.value.map((language) => {
         return {
           label: `${language.vernacularName} (${language.name})`,
@@ -207,20 +207,20 @@ const getListOptions = (list: string | undefined) => {
             value: language.value,
           };
         });
-    } else if (list == 'darkModes') {
+    } else if (list === 'darkModes') {
       return [
         { label: 'automatic', value: 'auto' },
         { label: 'dark', value: true },
         { label: 'light', value: false },
       ];
-    } else if (list == 'resolutions') {
+    } else if (list === 'resolutions') {
       return [
         { label: '240p', value: '240p' },
         { label: '360p', value: '360p' },
         { label: '480p', value: '480p' },
         { label: '720p', value: '720p' },
       ];
-    } else if (list == 'days') {
+    } else if (list === 'days') {
       const array = [];
       for (let i = 0; i <= 6; i++) {
         array.push({ label: String(i), value: String(i) });

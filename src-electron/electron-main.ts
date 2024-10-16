@@ -1,5 +1,5 @@
 import { enable, initialize } from '@electron/remote/main';
-import { app, BrowserWindow, Menu, session } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, session } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import windowStateKeeper from 'electron-window-state';
 import { readFileSync, writeFileSync } from 'fs-extra';
@@ -209,30 +209,38 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
   }
 
-  let closeAttempts = 0;
-  mainWindow.on('close', async (e) => {
-    const closeAppWindows = () => {
+  const closeAllWindows = () => {
+    try {
       if (mediaWindow && !mediaWindow.isDestroyed()) mediaWindow.close();
       const websiteWindow = BrowserWindow.getAllWindows().find((w) =>
         w.webContents.getURL().includes('https://'),
       );
       if (websiteWindow && !websiteWindow.isDestroyed()) websiteWindow.close();
-    };
+    } catch (err) {
+      errorCatcher(err);
+    }
+  };
+
+  let authorizedClose = false;
+
+  mainWindow.on('close', async (e) => {
     try {
-      closeAttempts++;
-      setTimeout(() => {
-        closeAttempts--;
-      }, 10000);
-      if (closeAttempts < 2) {
+      if (!authorizedClose) {
         e.preventDefault();
         mainWindow?.webContents?.send('attemptedClose');
       } else {
-        closeAppWindows();
+        closeAllWindows();
       }
     } catch (err) {
       errorCatcher(err);
-      closeAppWindows();
+      closeAllWindows();
+      if (mainWindow && !mainWindow.isDestroyed()) mainWindow.close();
     }
+  });
+
+  ipcMain.on('authorizedClose', () => {
+    authorizedClose = true;
+    if (mainWindow && !mainWindow.isDestroyed()) mainWindow.close();
   });
 
   mainWindow.on('closed', () => {
@@ -260,11 +268,11 @@ app
   .then(createWindow)
   .catch((err) => errorCatcher(err));
 
-app.on('window-all-closed', () => {
-  if (platform !== 'darwin') {
-    app.quit();
-  }
-});
+// app.on('window-all-closed', () => {
+// if (platform !== 'darwin') {
+// app.quit();
+// }
+// });
 
 app.on('activate', () => {
   if (!mainWindow || (mainWindow && mainWindow.isDestroyed())) {

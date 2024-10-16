@@ -91,7 +91,7 @@ const getWeekDay = (lookupDate: Date) => {
 function getSpecificWeekday(lookupDate: Date | string, desiredWeekday: number) {
   try {
     if (!lookupDate) return new Date();
-    if (desiredWeekday == null) throw new Error('No desired weekday');
+    if (desiredWeekday === null) throw new Error('No desired weekday');
     lookupDate = dateFromString(lookupDate);
     desiredWeekday++;
     desiredWeekday = desiredWeekday === 7 ? 0 : desiredWeekday;
@@ -144,7 +144,7 @@ const isMwMeetingDay = (lookupDate: Date) => {
       const coWeekTuesday = dateFromString(currentSettings.value?.coWeek);
       return datesAreSame(coWeekTuesday, lookupDate);
     } else {
-      return currentSettings.value?.mwDay == getWeekDay(lookupDate);
+      return currentSettings.value?.mwDay === getWeekDay(lookupDate);
     }
   } catch (error) {
     errorCatcher(error);
@@ -158,7 +158,7 @@ const isWeMeetingDay = (lookupDate: Date) => {
     lookupDate = dateFromString(lookupDate);
     const currentState = useCurrentStateStore();
     const { currentSettings } = storeToRefs(currentState);
-    return currentSettings.value?.weDay == getWeekDay(lookupDate);
+    return currentSettings.value?.weDay === getWeekDay(lookupDate);
   } catch (error) {
     errorCatcher(error);
     return false;
@@ -219,6 +219,32 @@ const getLocalDate = (dateObj: Date | string, locale: DateLocale) => {
   return date.formatDate(parsedDate, 'D MMMM YYYY', locale);
 };
 
+const remainingTimeBeforeMeetingStart = () => {
+  try {
+    const currentState = useCurrentStateStore();
+    const { currentSettings, selectedDateObject } = storeToRefs(currentState);
+    const meetingDay =
+      !!selectedDateObject.value?.today && !!selectedDateObject.value?.meeting;
+    if (meetingDay) {
+      const now = new Date();
+      const weMeeting = selectedDateObject.value?.meeting === 'we';
+      const meetingStartTime = weMeeting
+        ? currentSettings.value?.weStartTime
+        : currentSettings.value?.mwStartTime;
+      const [hours, minutes] = meetingStartTime.split(':').map(Number);
+      const meetingStartDateTime = new Date(now);
+      meetingStartDateTime.setHours(hours, minutes, 0, 0);
+      const dateDiff = date.getDateDiff(meetingStartDateTime, now, 'seconds');
+      return dateDiff;
+    } else {
+      return 0;
+    }
+  } catch (error) {
+    errorCatcher(error);
+    return 0;
+  }
+};
+
 export {
   dateFromString,
   datesAreSame,
@@ -229,5 +255,6 @@ export {
   isInPast,
   isMwMeetingDay,
   isWeMeetingDay,
+  remainingTimeBeforeMeetingStart,
   updateLookupPeriod,
 };

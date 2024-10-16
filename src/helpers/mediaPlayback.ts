@@ -27,9 +27,12 @@ const formatTime = (time: number) => {
   try {
     if (!time) return '00:00';
     if (Number.isNaN(time)) return '..:..';
-    const minutes = Math.floor(time / 60);
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor((time % 3600) / 60);
     const seconds = Math.floor(time % 60);
-    return `${pad(minutes.toString(), 2, '0')}:${pad(seconds.toString(), 2)}`;
+    return hours > 0
+      ? `${hours}:${pad(minutes.toString(), 2, '0')}:${pad(seconds.toString(), 2)}`
+      : `${pad(minutes.toString(), 2, '0')}:${pad(seconds.toString(), 2)}`;
   } catch (error) {
     errorCatcher(error);
     return '..:..';

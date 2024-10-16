@@ -10,7 +10,7 @@
     @click="musicPopup = true"
   >
     <q-icon name="mmm-music-note" />
-    <div v-if="musicPlaying" class="q-ml-sm">
+    <div v-if="musicPlaying || musicStarting" class="q-ml-sm">
       {{ musicRemainingTime }}
     </div>
 
@@ -128,6 +128,7 @@ import type { SongItem } from 'src/types';
 import { storeToRefs } from 'pinia';
 import { date } from 'quasar';
 import { barStyle, thumbStyle } from 'src/boot/globals';
+import { remainingTimeBeforeMeetingStart } from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import {
@@ -214,7 +215,7 @@ const fadeToVolumeLevel = (targetVolume: number, fadeOutSeconds: number) => {
 
 function stopMusic() {
   try {
-    if (!musicPlayer.value) return;
+    if (!musicPlayer.value || musicPlayer.value.paused) return;
     musicStopping.value = true;
     fadeToVolumeLevel(0, 5);
   } catch (error) {
@@ -225,8 +226,7 @@ function stopMusic() {
 const getNextSong = async () => {
   try {
     let musicDurationSoFar = 0;
-    const timeBeforeMeetingStart =
-      ((remainingTimeBeforeMeetingStart() as number) ?? 60) - 60;
+    const timeBeforeMeetingStart = remainingTimeBeforeMeetingStart() - 60;
     let secsFromEnd = 0;
     if (!songList.value.length) {
       let attempts = 0;
@@ -319,36 +319,6 @@ const getNextSong = async () => {
   }
 };
 
-const remainingTimeBeforeMeetingStart = (formatted?: boolean) => {
-  try {
-    if (meetingDay.value) {
-      const now = new Date();
-      const weMeeting = selectedDateObject.value?.meeting === 'we';
-      const meetingStartTime = weMeeting
-        ? currentSettings.value?.weStartTime
-        : currentSettings.value?.mwStartTime;
-      const [hours, minutes] = meetingStartTime.split(':').map(Number);
-      const meetingStartDateTime = new Date(now);
-      meetingStartDateTime.setHours(hours, minutes, 0, 0);
-      const dateDiff = date.getDateDiff(meetingStartDateTime, now, 'seconds');
-      if (dateDiff < 0) {
-        return null;
-      } else {
-        if (formatted) {
-          return formatTime(dateDiff);
-        } else {
-          return dateDiff;
-        }
-      }
-    } else {
-      return null;
-    }
-  } catch (error) {
-    errorCatcher(error);
-    return null;
-  }
-};
-
 async function playMusic() {
   try {
     if (
@@ -357,8 +327,8 @@ async function playMusic() {
       !musicPlayer.value
     )
       return;
-    downloadBackgroundMusic();
     musicStarting.value = true;
+    downloadBackgroundMusic();
     songList.value = [];
     musicPlayer.value.appendChild(musicPlayerSource.value);
     musicPlayer.value.style.display = 'none';
@@ -407,9 +377,8 @@ async function playMusic() {
         );
         currentSongRemainingTime.value = formatTime(remainingTime);
         const timeBeforeMeeting = remainingTimeBeforeMeetingStart();
-        if (timeBeforeMeeting && !musicStoppedAutomatically.value) {
-          timeRemainingBeforeMusicStop.value =
-            (timeBeforeMeeting as number) - 60;
+        if (timeBeforeMeeting > 0 && !musicStoppedAutomatically.value) {
+          timeRemainingBeforeMusicStop.value = timeBeforeMeeting - 60;
           if (timeRemainingBeforeMusicStop.value <= 0 && !musicStopping.value) {
             stopMusic();
             musicStoppedAutomatically.value = true;
@@ -430,7 +399,8 @@ const meetingDay = ref(false);
 
 const musicRemainingTime = computed(() => {
   try {
-    if (!musicPlayer.value || musicStarting.value) return '..:..';
+    if (!musicPlayer.value) return '..:..';
+    if (musicStarting.value) return ref(t('music.starting')).value;
     if (musicStopping.value) return ref(t('music.stopping')).value;
     if (meetingDay.value && timeRemainingBeforeMusicStop.value > 0)
       return formatTime(timeRemainingBeforeMusicStop.value);
@@ -493,13 +463,11 @@ onMounted(() => {
     ([newToday, newMeeting]) => {
       try {
         meetingDay.value = !!newToday && !!newMeeting;
-        const timeBeforeMeetingStart =
-          (remainingTimeBeforeMeetingStart() as number) ?? 0;
         if (
           currentSettings.value?.enableMusicButton &&
           currentSettings.value?.autoStartMusic &&
           meetingDay.value &&
-          timeBeforeMeetingStart > 90
+          remainingTimeBeforeMeetingStart() > 90
         ) {
           playMusic();
         }
@@ -519,6 +487,7 @@ onMounted(() => {
         oldCongregation !== newCongregation
       )
         stopMusic();
+      musicStoppedAutomatically.value = false;
     },
   );
 });

@@ -54,7 +54,10 @@ import {
   cleanAdditionalMediaFolder,
   cleanLocalStorage,
 } from 'src/helpers/cleanup';
-import { updateLookupPeriod } from 'src/helpers/date';
+import {
+  remainingTimeBeforeMeetingStart,
+  updateLookupPeriod,
+} from 'src/helpers/date';
 import { electronApi } from 'src/helpers/electron-api';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { downloadSongbookVideos } from 'src/helpers/jw-media';
@@ -148,6 +151,7 @@ const {
   currentCongregation,
   currentSettings,
   downloadProgress,
+  mediaPlaying,
   online,
   selectedDate,
 } = storeToRefs(currentState);
@@ -343,16 +347,18 @@ try {
 cleanLocalStorage();
 cleanAdditionalMediaFolder();
 
-const bcClose = new BroadcastChannel('closeAttempts');
-const attemptedClose = ref(false);
-bcClose.onmessage = (event) => {
-  attemptedClose.value = event?.data?.attemptedClose;
-};
+const closeAttempts = ref(0);
 
-watch(
-  () => attemptedClose.value,
-  (newAttemptedClose, oldAttemptedClose) => {
-    if (newAttemptedClose && !oldAttemptedClose) {
+const bcClose = new BroadcastChannel('closeAttempts');
+bcClose.onmessage = (event) => {
+  if (event?.data?.attemptedClose) {
+    if (
+      (mediaPlaying.value ||
+        (currentCongregation.value &&
+          !currentSettings.value?.disableMediaFetching &&
+          remainingTimeBeforeMeetingStart() < 90)) &&
+      closeAttempts.value === 0
+    ) {
       createTemporaryNotification({
         caption: ref(t('clicking-the-close-button-again-will-close-app')).value,
         icon: 'mmm-error',
@@ -362,12 +368,16 @@ watch(
         timeout: 10000,
         type: 'negative',
       });
+      closeAttempts.value += 1;
       setTimeout(() => {
-        attemptedClose.value = false;
+        closeAttempts.value = 0;
       }, 10000);
+    } else {
+      const bcClose = new BroadcastChannel('closeAttempts');
+      bcClose.postMessage({ authorizedClose: true });
     }
-  },
-);
+  }
+};
 
 onMounted(() => {
   document.title = 'Meeting Media Manager';
