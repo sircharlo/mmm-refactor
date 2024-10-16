@@ -36,9 +36,9 @@
         <HeaderCongregation
           v-if="route.fullPath.includes('congregation-selector')"
         />
-        <HeaderCalendar v-else-if="route.fullPath === '/media-calendar'" />
-        <HeaderSettings v-else-if="route.fullPath === '/settings'" />
-        <HeaderWebsite v-else-if="route.fullPath === '/present-website'" />
+        <HeaderCalendar v-else-if="route.fullPath.includes('/media-calendar')" />
+        <HeaderSettings v-else-if="route.fullPath.includes('/settings')" />
+        <HeaderWebsite v-else-if="route.fullPath.includes('/present-website')" />
       </div>
     </div>
   </q-header>

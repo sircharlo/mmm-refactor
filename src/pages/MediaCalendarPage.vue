@@ -432,6 +432,7 @@ import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute, useRouter } from 'vue-router';
 
 const dragging = ref(false);
 const jwpubImportDb = ref('');
@@ -449,6 +450,8 @@ watch(
 );
 
 const { t } = useI18n();
+const route = useRoute();
+const router = useRouter();
 
 const jwStore = useJwStore();
 const { addToAdditionMediaMap, removeFromAdditionMediaMap } = jwStore;
@@ -769,6 +772,44 @@ const goToNextDayWithMedia = () => {
 
 const coWeek = ref(false);
 
+const checkCoDate = () => {
+  if (
+    !currentSettings.value ||
+    currentSettings.value?.disableMediaFetching ||
+    route.params?.typeOfLoad !== 'initial'
+  )
+    return;
+  if (
+    !currentSettings.value?.coWeek ||
+    date.getDateDiff(new Date(), currentSettings.value?.coWeek, 'months') > 2
+  ) {
+    createTemporaryNotification({
+      actions: [
+        {
+          color: 'white',
+          label: t('remind-me-later'),
+        },
+        {
+          color: 'white',
+          handler: () => {
+            router.push('/settings/coWeek');
+          },
+          label: t('go-to-settings'),
+        },
+      ],
+      caption: t('dont-forget-to-add-circuit-overseer-date', {
+        congregationMeetings: t('congregationMeetings'),
+        settings: t('titles.settings'),
+      }),
+      color: 'primary',
+      icon: 'mmm-error',
+      message: t('no-circuit-overseer-date-set'),
+      textColor: 'white',
+      timeout: 30000,
+    });
+  }
+};
+
 onMounted(async () => {
   window.addEventListener('draggingSomething', startDragging);
   window.addEventListener('localFiles-browsed', localFilesBrowsedListener);
@@ -791,6 +832,7 @@ onMounted(async () => {
   goToNextDayWithMedia();
   sendObsSceneEvent('camera');
   fetchMedia();
+  checkCoDate();
 });
 
 const [tgwList, sortableTgwMediaItems] = useDragAndDrop(

@@ -229,8 +229,6 @@ onMounted(() => {
         if (!newWatchedSettings[0]) return;
         document.getElementById(newWatchedSettings[0])?.scrollIntoView({
           behavior: 'smooth',
-          block: 'start',
-          inline: 'nearest',
         });
       }, 500);
     },
