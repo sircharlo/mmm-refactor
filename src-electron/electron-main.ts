@@ -4,7 +4,7 @@ import packageInfo from 'app/package.json'
 import { app, BrowserWindow, ipcMain, Menu, session } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import windowStateKeeper from 'electron-window-state';
-import { readFileSync, writeFileSync } from 'fs-extra';
+import { existsSync, readFileSync, writeFileSync } from 'fs-extra';
 import os from 'os';
 import path from 'path';
 import { join } from 'upath';
@@ -17,7 +17,16 @@ init({
 });
 
 initialize();
-autoUpdater.checkForUpdatesAndNotify();
+
+let updatesDisabled = false;
+try {
+  updatesDisabled = existsSync(
+    path.join(app.getPath('userData'), 'Global Preferences', 'disable-updates'),
+  );
+} catch (err) {
+  console.error(err);
+}
+if (!updatesDisabled) autoUpdater.checkForUpdatesAndNotify();
 
 // needed in case process is undefined under Linux
 const platform = process.platform || os.platform();

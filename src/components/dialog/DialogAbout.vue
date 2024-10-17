@@ -11,7 +11,24 @@
           <div class="row text-h6">
             {{ $t('meeting-media-manager') }}
           </div>
-          <div class="row">v{{ appVersion }}</div>
+          <div class="row items-center">
+            <div class="col">v{{ appVersion }}</div>
+            <div
+              :class="
+                'col text-right ' +
+                (!updatesEnabled ? 'text-negative text-weight-bold' : '')
+              "
+            >
+              <q-toggle
+                v-model="updatesEnabled"
+                :label="$t('auto-updates')"
+                checked-icon="mmm-check"
+                dense
+                left-label
+                unchecked-icon="mmm-clear"
+              />
+            </div>
+          </div>
         </div>
       </div>
       <div class="row">
@@ -78,6 +95,8 @@
 </template>
 <script setup lang="ts">
 import { electronApi } from 'src/helpers/electron-api';
+import { disableUpdates, enableUpdates, updatesDisabled } from 'src/helpers/fs';
+import { ref, watch } from 'vue';
 
 const { getAppVersion, openExternalWebsite } = electronApi;
 
@@ -86,4 +105,14 @@ const open = defineModel<boolean>({ default: false });
 const appVersion = getAppVersion();
 const githubLink = 'https://github.com/sircharlo/mmm-refactor';
 const docsLink = 'https://sircharlo.github.io/mmm-refactor/';
+
+const updatesEnabled = ref(!updatesDisabled());
+
+watch(updatesEnabled, (newUpdatesEnabled) => {
+  if (newUpdatesEnabled) {
+    enableUpdates();
+  } else {
+    disableUpdates();
+  }
+});
 </script>

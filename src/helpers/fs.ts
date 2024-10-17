@@ -312,7 +312,35 @@ const removeEmptyDirs = (rootDir: string) => {
   }
 };
 
+const disableUpdatesPath = path.join(
+  getUserDataPath(),
+  'Global Preferences',
+  'disable-updates',
+);
+
+const updatesDisabled = () => fs.existsSync(disableUpdatesPath);
+
+const disableUpdates = () => {
+  try {
+    fs.ensureFileSync(disableUpdatesPath);
+    fs.writeFileSync(disableUpdatesPath, 'true');
+  } catch (error) {
+    errorCatcher(error);
+  }
+};
+
+const enableUpdates = () => {
+  try {
+    fs.removeSync(disableUpdatesPath);
+  } catch (error) {
+    errorCatcher(error);
+  }
+};
+
 export {
+  disableUpdates,
+  disableUpdatesPath,
+  enableUpdates,
   getAdditionalMediaPath,
   getDurationFromMediaPath,
   getFileUrl,
@@ -325,4 +353,5 @@ export {
   getTempDirectory,
   getThumbnailUrl,
   removeEmptyDirs,
+  updatesDisabled,
 };
