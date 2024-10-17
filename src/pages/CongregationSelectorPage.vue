@@ -117,20 +117,16 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { date } from 'quasar';
 import { useLocale } from 'src/composables/useLocale';
 import { errorCatcher } from 'src/helpers/error-catcher';
 import { downloadSongbookVideos } from 'src/helpers/jw-media';
-import { createTemporaryNotification } from 'src/helpers/notifications';
 import { useCongregationSettingsStore } from 'src/stores/congregation-settings';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 
 const { getDateLocale } = useLocale();
-const { t } = useI18n();
 
 const congregationSettings = useCongregationSettingsStore();
 const currentState = useCurrentStateStore();
@@ -139,7 +135,7 @@ const { updateYeartext } = jwStore;
 const { congregationCount, congregations } = storeToRefs(congregationSettings);
 const { createCongregation, deleteCongregation } = congregationSettings;
 const { invalidSettings, setCongregation } = currentState;
-const { currentCongregation, currentSettings } = storeToRefs(currentState);
+const { currentCongregation } = storeToRefs(currentState);
 const route = useRoute();
 const router = useRouter();
 const congToDelete = ref<number | string>('');
@@ -161,11 +157,10 @@ function chooseCongregation(
         // if (initialLoad || invalidSettings)
         router.push('/setup-wizard');
       } else {
-        checkCoDate();
         if (invalidSettings) {
           router.push('/settings');
         } else {
-          router.push('/media-calendar');
+          router.push('/media-calendar/initial');
         }
       }
     }
@@ -174,27 +169,6 @@ function chooseCongregation(
     router.push('/');
   }
 }
-
-const checkCoDate = () => {
-  if (!currentSettings.value || currentSettings.value?.disableMediaFetching)
-    return;
-  if (
-    !currentSettings.value?.coWeek ||
-    date.getDateDiff(new Date(), currentSettings.value?.coWeek, 'months') > 2
-  ) {
-    createTemporaryNotification({
-      caption: t('dont-forget-to-add-circuit-overseer-date', {
-        congregationMeetings: t('congregationMeetings'),
-        settings: t('titles.settings'),
-      }),
-      color: 'primary',
-      icon: 'mmm-error',
-      message: t('no-circuit-overseer-date-set'),
-      textColor: 'white',
-      timeout: 10000,
-    });
-  }
-};
 
 const isHomePage = computed(() => {
   return route?.path === '/initial-congregation-selector';

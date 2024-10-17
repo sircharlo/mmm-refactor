@@ -81,7 +81,7 @@
                     jwLanguages.list?.find(
                       (l) =>
                         l.langcode === congregation?.properties?.languageCode,
-                    )?.name
+                    )?.vernacularName
                   }}</q-item-label>
                 </q-item-section>
               </q-item>

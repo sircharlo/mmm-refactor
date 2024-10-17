@@ -281,16 +281,19 @@ const playMedia = () => {
   }
 };
 
+let initialResize = true;
 function onResize(size: { height: number; width: number }) {
-  createTemporaryNotification({
-    badgeStyle: 'display: none',
-    color: 'accent-400',
-    group: 'resize',
-    icon: 'mmm-info',
-    message: size.width + 'x' + size.height,
-    noClose: true,
-    position: 'bottom'
-  });
+  if (!initialResize)
+    createTemporaryNotification({
+      badgeStyle: 'display: none',
+      color: 'accent-400',
+      group: 'resize',
+      icon: 'mmm-info',
+      message: size.width + 'x' + size.height,
+      noClose: true,
+      position: 'bottom',
+    });
+  initialResize = false;
 }
 
 const $q = useQuasar();

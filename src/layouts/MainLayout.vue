@@ -155,6 +155,7 @@ const {
   mediaPlaying,
   online,
   selectedDate,
+  selectedDateObject,
 } = storeToRefs(currentState);
 
 watch(currentCongregation, (newCongregation, oldCongregation) => {
@@ -201,7 +202,7 @@ watch(online, (isNowOnline) => {
 
 const navigateToCongregationSelector = () => {
   try {
-    if (route.fullPath !== '/congregation-selector') {
+    if (!route.fullPath.includes('/congregation-selector')) {
       router.push({ path: '/congregation-selector' });
       selectedDate.value = '';
     }
@@ -357,11 +358,14 @@ const closeAttempts = ref(0);
 const bcClose = new BroadcastChannel('closeAttempts');
 bcClose.onmessage = (event) => {
   if (event?.data?.attemptedClose) {
+    const meetingDay =
+      !!selectedDateObject.value?.today && !!selectedDateObject.value?.meeting;
     if (
       (mediaPlaying.value ||
-        (currentCongregation.value &&
-          !currentSettings.value?.disableMediaFetching &&
-          remainingTimeBeforeMeetingStart() < 90)) &&
+        (currentCongregation.value && // a congregation is selected
+          !currentSettings.value?.disableMediaFetching && // media fetching is enabled
+          meetingDay && // today is a meeting day
+          remainingTimeBeforeMeetingStart() < 90)) && // meeting is starting in less than 90 seconds
       closeAttempts.value === 0
     ) {
       createTemporaryNotification({

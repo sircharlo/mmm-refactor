@@ -464,10 +464,11 @@ onMounted(() => {
       try {
         meetingDay.value = !!newToday && !!newMeeting;
         if (
-          currentSettings.value?.enableMusicButton &&
-          currentSettings.value?.autoStartMusic &&
-          meetingDay.value &&
-          remainingTimeBeforeMeetingStart() > 90
+          currentSettings.value?.enableMusicButton && // background music feature is enabled
+          currentSettings.value?.autoStartMusic && // auto-start music is enabled
+          meetingDay.value && // today is a meeting day
+          remainingTimeBeforeMeetingStart() > 90 && // meeting is starting in at least 90 seconds
+          remainingTimeBeforeMeetingStart() < 60 * 60 * 2 // meeting is starting in less than 2 hours
         ) {
           playMusic();
         }
