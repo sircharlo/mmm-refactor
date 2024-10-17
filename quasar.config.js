@@ -200,21 +200,6 @@ module.exports = configure(function (/* ctx */) {
             delete pkg.dependencies[dep];
           }
         });
-
-        /* As of 2024-10-15, this logic results in the following dependencies being removed:
-          {
-            '@formkit/drag-and-drop',
-            '@panzoom/panzoom',
-            '@quasar/cli',
-            'dompurify',
-            'is-online',
-            'obs-websocket-js',
-            'p-queue',
-            'pretty-bytes',
-          }
-
-          Anything more than this led to errors in the built Electron app.
-        */
       },
       inspectPort: 5858,
     },
