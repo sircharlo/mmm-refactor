@@ -15,7 +15,7 @@
     "LICENSE.md",
     "yarn.lock"
   ],
-  "cSpell.ignoreWords": ["shorthand"],
+  "cSpell.ignoreWords": ["shorthand", "PDF"],
   "cSpell.words": [
     "akamaihd",
     "alllangs",
@@ -32,6 +32,7 @@
     "docid",
     "dompurify",
     "Eesti",
+    "EPUB",
     "esnext",
     "fileformat",
     "fileurl",

@@ -180,10 +180,8 @@ module.exports = configure(function (/* ctx */) {
       extendPackageJson(pkg) {
         const requiredNonUiElectronDependencies = [
           '@electron/remote',
-          '@quasar/extras',
-          '@sentry/vue',
+          '@sentry/electron',
           'adm-zip',
-          'axios',
           'better-sqlite3',
           'electron-updater',
           'electron-window-state',
@@ -192,15 +190,7 @@ module.exports = configure(function (/* ctx */) {
           'klaw-sync',
           'music-metadata',
           'pdfjs-dist',
-          'pinia',
-          'pinia-shared-state',
-          'quasar',
-          'sanitize-filename',
-          'sanitize-html',
           'upath',
-          'vue',
-          'vue-i18n',
-          'vue-router',
         ];
 
         // Remove unneeded dependencies from production build
@@ -210,21 +200,6 @@ module.exports = configure(function (/* ctx */) {
             delete pkg.dependencies[dep];
           }
         });
-
-        /* As of 2024-10-15, this logic results in the following dependencies being removed:
-          {
-            '@formkit/drag-and-drop',
-            '@panzoom/panzoom',
-            '@quasar/cli',
-            'dompurify',
-            'is-online',
-            'obs-websocket-js',
-            'p-queue',
-            'pretty-bytes',
-          }
-
-          Anything more than this led to errors in the built Electron app.
-        */
       },
       inspectPort: 5858,
     },

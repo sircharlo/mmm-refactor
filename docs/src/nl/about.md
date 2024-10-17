@@ -6,7 +6,9 @@
 
 De applicatie beschikt over terugkomende en eigen media management, als ook de optie om media te synchroniseren voor leden van dezelfde gemeente en instellingen voor meerdere gemeentes of groepen die dezelfde computer gebruiken.
 
-<sup>Opmerking: M³ stond bekend als JWMMF (JW Meeting Media Fetcher), maar werd hernoemd in mei 2022.</sup>
+::: info Opmerking:
+M³ stond bekend als JWMMF (JW Meeting Media Fetcher), maar werd hernoemd in mei 2022.
+:::
 
 ## Wat kan M³?
 

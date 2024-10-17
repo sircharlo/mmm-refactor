@@ -1,12 +1,20 @@
 import { enable, initialize } from '@electron/remote/main';
+import {init} from '@sentry/electron/main';
+import packageInfo from 'app/package.json'
 import { app, BrowserWindow, ipcMain, Menu, session } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import windowStateKeeper from 'electron-window-state';
 import { existsSync, readFileSync, writeFileSync } from 'fs-extra';
 import os from 'os';
 import path from 'path';
-import { errorCatcher } from 'src/helpers/error-catcher';
 import { join } from 'upath';
+
+import { errorCatcher } from './utils';
+
+init({
+  dsn: 'https://0f2ab1c7ddfb118d25704c85957b8188@o1401005.ingest.us.sentry.io/4507449197920256',
+  release: packageInfo.version,
+});
 
 initialize();
 
