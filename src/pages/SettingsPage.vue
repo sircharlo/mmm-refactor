@@ -66,10 +66,12 @@
                   !invalidSettingsLength ||
                   invalidSettings.includes(settingId as keyof SettingsItems))
               "
+              :id="settingId"
               :class="{
                 'bg-error': invalidSettings.includes(
                   settingId as keyof SettingsItems,
                 ),
+                'bg-accent-300': route.params.setting === settingId,
                 'q-mt-sm': index === 0,
                 'rounded-borders': true,
               }"
@@ -166,6 +168,9 @@ import { errorCatcher } from 'src/helpers/error-catcher';
 import { useCurrentStateStore } from 'src/stores/current-state';
 import { useJwStore } from 'src/stores/jw';
 import { computed, onMounted, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
 
 // Store initializations
 const currentState = useCurrentStateStore();
@@ -207,6 +212,28 @@ const validateSettingsLocal = () => {
 // Lifecycle hooks
 onMounted(() => {
   validateSettingsLocal();
+  watch(
+    () => route.params.setting,
+    (newWatchedSettings) => {
+      if (!newWatchedSettings) return;
+      if (!Array.isArray(newWatchedSettings))
+        newWatchedSettings = [newWatchedSettings];
+      newWatchedSettings.forEach((setting) => {
+        if (setting)
+          expansionState.value[
+            settingsDefinitions[setting as keyof SettingsItems]
+              .group as keyof SettingsItems
+          ] = true;
+      });
+      setTimeout(() => {
+        if (!newWatchedSettings[0]) return;
+        document.getElementById(newWatchedSettings[0])?.scrollIntoView({
+          behavior: 'smooth',
+        });
+      }, 500);
+    },
+    { immediate: true },
+  );
 });
 
 watch(

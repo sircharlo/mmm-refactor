@@ -158,16 +158,8 @@ const obsCloseHandler = () => {
 
 const obsErrorHandler = (err: OBSWebSocketError) => {
   obsMessage.value = 'obs.error';
-  if (
-    !(
-      err?.code === -1 ||
-      err?.code === 1001 ||
-      err?.code === 1006 ||
-      err?.code === 4009
-    )
-  ) {
+  if (err?.code && ![-1, 1001, 1006, 4009].includes(err.code))
     errorCatcher(err);
-  }
 };
 
 const obsConnect = async (setup?: boolean) => {
@@ -202,7 +194,7 @@ const obsConnect = async (setup?: boolean) => {
           break;
         }
       } catch (err) {
-        errorCatcher(err);
+        obsErrorHandler(err);
       } finally {
         attempt++;
         if (attempt < maxAttempts) {
