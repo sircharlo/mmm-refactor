@@ -27,10 +27,10 @@ import fs from 'fs-extra';
 import convert from 'heic-convert';
 import klawSync from 'klaw-sync';
 import os from 'os';
-import { throttle } from 'quasar';
 import { FULL_HD } from 'src/helpers/converters';
-import { errorCatcher } from 'src/helpers/error-catcher';
 import path from 'upath';
+
+import { errorCatcher, throttle } from './utils';
 
 const getMainWindow = () =>
   BrowserWindow.getAllWindows().find(
