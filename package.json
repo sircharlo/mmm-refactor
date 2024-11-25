@@ -83,7 +83,7 @@
     "eslint-plugin-perfectionist": "^3.9.1",
     "eslint-plugin-vue": "^9.29.0",
     "globals": "^15.11.0",
-    "postcss": "^8.4.47",
+    "postcss": "^8.4.49",
     "prettier": "^3.3.3",
     "process": "^0.11.10",
     "typescript": "~5.5.4",
