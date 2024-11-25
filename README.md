@@ -10,4 +10,4 @@ A cross-platform app to download and present media (pictures and videos) for con
 
 ~Download the latest release from this repository to try it out. **Please note that this version of M³ is still in development and testing mode; consider it somewhere between an alpha and a beta version.** This warning will be removed once all remaining bugs have been ironed out and all missing features have been implemented.~
 
-The refactored version of M³ has been released and can be accessed on the [official repository](https://github.com/sircharlo/meeting-media-manager).**
+The refactored version of M³ has been released and can be accessed on the [official repository](https://github.com/sircharlo/meeting-media-manager).
