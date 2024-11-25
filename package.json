@@ -32,7 +32,7 @@
     "@sentry/electron": "^5.6.0",
     "@sentry/vue": "^8.34.0",
     "adm-zip": "^0.5.16",
-    "axios": "^1.7.7",
+    "axios": "^1.7.8",
     "better-sqlite3": "^11.4.0",
     "dompurify": "^3.1.7",
     "electron-updater": "^6.3.9",
