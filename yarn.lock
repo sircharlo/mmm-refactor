@@ -1767,9 +1767,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@quasar/app-vite@npm:^1.10.1":
-  version: 1.10.1
-  resolution: "@quasar/app-vite@npm:1.10.1"
+"@quasar/app-vite@npm:^1.11.0":
+  version: 1.11.0
+  resolution: "@quasar/app-vite@npm:1.11.0"
   dependencies:
     "@quasar/render-ssr-error": "npm:^1.0.3"
     "@quasar/vite-plugin": "npm:^1.7.0"
@@ -1799,7 +1799,7 @@ __metadata:
     open: "npm:^8.4.0"
     register-service-worker: "npm:^1.7.2"
     rollup-plugin-visualizer: "npm:^5.5.4"
-    sass: "npm:^1.79.1"
+    sass: "npm:^1.80.2"
     semver: "npm:^7.3.5"
     serialize-javascript: "npm:^6.0.0"
     table: "npm:^6.8.0"
@@ -1833,7 +1833,7 @@ __metadata:
       optional: true
   bin:
     quasar: bin/quasar
-  checksum: 10c0/0f5d0c22232612a605c5edca4d17afcef1bf4f6d6c5361a2a4f7ff120d9d1126598ecc59cc6eb3a474e9a9390666db5261c04f635189a8890d789c68133b6ddb
+  checksum: 10c0/acb7aa9cd8cbd117dc861af89091259aa0aaf7bb1140051dc6760d3ae98f34a261b03972811b17d41c78e7b08b2170506de84b850631d4ce2924e7f7d13bef99
   languageName: node
   linkType: hard
 
@@ -8132,10 +8132,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"immutable@npm:^4.0.0":
-  version: 4.3.7
-  resolution: "immutable@npm:4.3.7"
-  checksum: 10c0/9b099197081b22f6433003e34929da8ecddbbdc1474cdc8aa3b7669dee4adda349c06143de22def36016d1b6de5322b043eccd7a11db1dad2ca85dad4fff5435
+"immutable@npm:^5.0.2":
+  version: 5.0.3
+  resolution: "immutable@npm:5.0.3"
+  checksum: 10c0/3269827789e1026cd25c2ea97f0b2c19be852ffd49eda1b674b20178f73d84fa8d945ad6f5ac5bc4545c2b4170af9f6e1f77129bc1cae7974a4bf9b04a9cdfb9
   languageName: node
   linkType: hard
 
@@ -9753,7 +9753,7 @@ __metadata:
     "@formkit/drag-and-drop": "npm:^0.2.4"
     "@intlify/vite-plugin-vue-i18n": "npm:^7.0.0"
     "@panzoom/panzoom": "npm:^4.5.1"
-    "@quasar/app-vite": "npm:^1.10.1"
+    "@quasar/app-vite": "npm:^1.11.0"
     "@quasar/cli": "npm:^2.4.1"
     "@quasar/extras": "npm:^1.16.12"
     "@rollup/plugin-inject": "npm:^5.0.5"
@@ -11715,17 +11715,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:^1.79.1":
-  version: 1.79.5
-  resolution: "sass@npm:1.79.5"
+"sass@npm:^1.80.2":
+  version: 1.81.0
+  resolution: "sass@npm:1.81.0"
   dependencies:
     "@parcel/watcher": "npm:^2.4.1"
     chokidar: "npm:^4.0.0"
-    immutable: "npm:^4.0.0"
+    immutable: "npm:^5.0.2"
     source-map-js: "npm:>=0.6.2 <2.0.0"
+  dependenciesMeta:
+    "@parcel/watcher":
+      optional: true
   bin:
     sass: sass.js
-  checksum: 10c0/7331865fd1d0c03e6e180a4fe0e175ac1bf1214f6c77f0d99ad72fbe2ed9ede3fab8a64c0c41471cb8a358a9d11624ec59a49283f9b6070eb99c522b34b814bf
+  checksum: 10c0/9c59b3c9b4231c18fcb4583cc232dbc4de501ddc11101b7a025e44833e3f3ce6031546dc1cd109ee9f04ebcfb1fe30ff870810af33b8feb9aa9e36dfba9ec1ef
   languageName: node
   linkType: hard
 
