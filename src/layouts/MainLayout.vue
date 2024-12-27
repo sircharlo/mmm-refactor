@@ -13,6 +13,27 @@
       style="flex: 1 1 1px"
     >
       <q-page-container class="main-bg">
+        <q-banner class="text-white bg-negative">
+          <template #avatar>
+            <q-icon name="mmm-broken" />
+          </template>
+          <p>
+            This version of Meeting Media Manager was developed for testing
+            purposes only and is no longer supported or maintained.
+          </p>
+          <p>
+            To avoid issues, please uninstall this version and download the
+            latest official release of Meeting Media Manager by clicking the
+            button below.
+          </p>
+          <template #action>
+            <q-btn
+              flat
+              label="Download Latest Version"
+              @click="openExternalWebsite(newVersionLink)"
+            />
+          </template>
+        </q-banner>
         <router-view />
       </q-page-container>
     </q-scroll-area>
@@ -263,6 +284,7 @@ const {
   getAppDataPath,
   getUserDataPath,
   getUserDesktopPath,
+  openExternalWebsite,
   path,
   readShortcutLink,
   setAutoStartAtLogin,
@@ -387,6 +409,8 @@ bcClose.onmessage = (event) => {
     }
   }
 };
+
+const newVersionLink = 'https://sircharlo.github.io/meeting-media-manager/';
 
 onMounted(() => {
   document.title = 'Meeting Media Manager';
