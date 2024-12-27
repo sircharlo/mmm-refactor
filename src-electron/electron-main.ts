@@ -201,7 +201,7 @@ function createWindow() {
     height: mainWindowState.height,
     icon: path.resolve(path.join(__dirname, 'icons', 'icon.png')),
     minHeight: 400,
-    minWidth: 500,
+    minWidth: 560,
     show: false,
     webPreferences: {
       backgroundThrottling: false,
