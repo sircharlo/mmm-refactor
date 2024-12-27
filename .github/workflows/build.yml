@@ -85,53 +85,49 @@ jobs:
       - run: |
           corepack enable
           yarn -v
-        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
+        # if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - name: Check out Git repository
         uses: actions/checkout@v4
-        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
+        # if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v4
-        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
+        # if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
         with:
           node-version: 22
           cache: 'yarn'
 
       - run: |
           yarn -v
-        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
+        # if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       # - uses: actions/setup-python@v5
       #   if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
       #   with:
       #     python-version: '3.9'
-
       # - run: |
       #     pip install setuptools
       #   if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
-
       # - name: Install dependencies on Ubuntu
       #   if: matrix.os == 'ubuntu-latest'
       #   run: sudo apt-get update && sudo apt-get install libsdl-pango-dev
-
       # - name: Install dependencies on macOS
       #   if: matrix.os == 'macos-latest'
       #   run: brew install pkg-config cairo pango libpng jpeg giflib
-
       - run: |
           yarn install
-        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
+        # if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
 
       - name: Build and Publish Electron App
         run: yarn build
-        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
+        # if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Upload artifacts
-        if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
+        # if: ${{ needs.version_checker.outputs.VERSION_MATCH == 'false' }}
         uses: actions/upload-artifact@v4
         with:
           name: package-${{ matrix.os }}
